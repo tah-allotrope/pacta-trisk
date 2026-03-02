@@ -1,0 +1,542 @@
+---
+title: "PACTA for Banks Demo"
+author: "Trang Tran"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Resources:
+i. [PACTA for Banks Methodology](https://pacta.rmi.org/wp-content/uploads/2024/05/PACTA-for-Banks-Methodology-document_v1.2.3_030524.pdf)  
+ii. [PACTA for Banks Packages](https://rmi-pacta.github.io/pacta.loanbook/index.html)  
+iii. [Step-by-step Instruction](https://rmi-pacta.github.io/pacta.loanbook/articles/cookbook_overview.html)  
+iv. [PACTA Scenario Support Document](https://pacta.rmi.org/wp-content/uploads/2022/10/20221010-PACTA-for-Banks_Scenario-Supporting-document_v1.3.1_final.pdf)  
+v. [PACTA for Banks Knowledge Hub](https://rmi.gitbook.io/pacta-knowledge-hub/introduction/pacta)
+
+## **1. Overview**
+- **Purpose**: Measure the alignment of banks' financial portfolios to various climate scenarios across a set of key climate-relevant sectors based on granular, physical asset-level data.
+
+- **Scope**: 
+ + **Sectors**: 7 sectors, only cover the most emission-tensive segment in the value chain
+
+![](https://drive.google.com/uc?export=download&id=1uKQpxIr7wVqw9SANo8UA5ciNsZRsWV1G)
+
+ + **Financial assets**: Only cover **loans** (other assets like equity or bonds are covered in Pacta for Investors tool). Can either use the **drawn amount** (outstanding loans) or the **committed amount** (both undrawn & drawn loans) for the analysis.  
+ + **Time horizon**: 5 years forward  
+ 
+- **Package**:  
+
+| Package | Short Description | Function |  
+|:---|:---|:---|  
+| **r2dii.data** | Dataset Templates | Provides mock datasets and templates for loan books and asset-level data. |  
+| **r2dii.match** | Data Linking | Uses fuzzy-matching algorithms to link bank clients to physical assets. |  
+| **r2dii.analysis** | Core Calculation | Calculates Technology Mix, Production Trajectories, and Emission Intensity. |  
+| **r2dii.plot** | Visualization | Generates standardized charts to visualize alignment with climate scenarios. |  
+
+
+## **2. Methodology**
+Step 1: Gather inputs: loanbook, asset-based company data, climate scenarios.  
+Step 2: Map loans from the bank's loanbook to physical assets in the real economy and their corresponding production values.  
+Step 3: Measure & visualize portfolio alignment & company alignment in 3 metrics and 2 approaches, depending on the sector.  
+
+  * **Accounting principles**:
+    - Portfolio alignment (Portfolio-weighted approach):  Allocates economic assets (production volume/capacity & emission responsibility) based on the weight of the financial asset in the portfolio. This is to measure the overall contribution of the bank to real-economy emissions and to compare with peers & market.  
+    - Company alignment (Unweighted approach): Allocate absolute production values of a company to the portfolio level (meaning the portfolio accounts for the whole emission from that each of the clients). This is to identify the leading emitters in the portfolio.  
+ 
+  * **3 metrics & 2 approaches to measure alignment**: 
+    - **Technoloy/Fuel Mix** applied to **sectors with clear low-carbon technology pathway** (Power, Oil & Gas, Coal, & Automotive), alignment compared by **Market Share Approach**: the share of different technologies or fuels (e.g., coal, gas, renewables) within a specific sector. PACTA aligns the current and projected (5-year) technology mix of a portfolio or client with the target mix prescribed by climate scenarios for that market. The effort to achieve alignment is distributed based on the company's actual market share.
+    - **Production Volume Trajectory** applied to **sectors with clear low-carbon technology pathway** (Power, Oil & Gas, Coal, & Automotive) alignment compared by **Market Share Approach**: the projected production volumes in 5 years from the base year. PACTA measures the alignment of a portfolio or client’s projected production volumes against the absolute trends prescribed in climate scenarios. It tracks the expansion of low-carbon technologies and the contraction of high-carbon ones over a 5-year horizon. The effort to achieve alignment is distributed based on the company's actual market share.
+    - **Emission Intensity** applied to **sectors without low-carbon technology pathway** (Cement, Steel, & Aviation), alignment compared by **Sectoral Decarbonization Approach (convergence approach)**: the average CO2 emitted per product unit. PACTA compares the average CO2 intensity of a portfolio or client against a reference intensity prescribed by climate scenarios. It requires the portfolio or client to meet the same sector-wide intensity target by the scenario’s end date, regardless of their starting point.
+
+![](https://drive.google.com/thumbnail?id=10TgTXpZu_e4YtQHhUviKTmw29hbTsWhY&sz=w1000)
+
+## **3. Demo with mock dataset from r2dii.data**
+**Important note for the demo:**  
+  - Assume the data is already clean and requires no further validation. In a real-world scenario, data cleaning steps would be mandatory.  
+  - Only consider **portfolio-weighted approach** as it would be most relevant to our scope of work.  
+  - To view full analysis procedure, please refer to the **Step-by-step Instruction** pinned at the top of this document.  
+
+### 3.1. Prepare the tool
+Need to install: R Studio, R language & the following packages
+
+```{r, message= FALSE, warning=FALSE}
+library("rmarkdown")
+library("pacta.loanbook")
+library("r2dii.data")
+library("r2dii.analysis")
+library("r2dii.match")
+library("r2dii.plot")
+library("dplyr")
+library("ggplot2")
+library("scales")
+library("tidyr")
+```
+
+### **3.2. Prepare the input**
+PACTA is data-agnostic. None of the inputs below are available by PACTA itself and should be prepared by users. All the data points have **data dictionary** which we can refer to in input preparation.
+
+#### **3.2.1. Loan book**
+- Source: Prepared by Bank  
+- Required input:  
+  * `id_loan`: \<character\>
+  * `id_direct_loantaker`: \<character\>
+  * `name_direct_loantaker`: \<character\>
+  * `id_ultimate_parent`: \<character\>
+  * `name_ultimate_parent`: \<character\>
+  * `loan_size_outstanding`: \<numeric\>
+  * `loan_size_outstanding_currency`: \<character\>
+  * `loan_size_credit_limit`: \<numeric\>
+  * `loan_size_credit_limit_currency`: \<character\>
+  * `sector_classification_system`: \<character\>
+  * `sector_classification_direct_loantaker`: \<character\>
+  * `lei_direct_loantaker`: \<character\>
+  * `isin_direct_loantaker`: \<character\>  
+- For sector classfication: We have previously done VSIC & NAICS mapping, so if we proceed this analysis for Vietnamese banks, we can ultilize that.  
+
+- Below is the demo:
+
+```{r}
+ap_loanbook <- r2dii.data::loanbook_demo %>%
+  mutate(sector_classification_direct_loantaker = as.character(sector_classification_direct_loantaker)) %>%
+  left_join(sector_classifications, by = c(
+    "sector_classification_system" = "code_system",
+    "sector_classification_direct_loantaker" = "code"
+  )) %>%
+  rename(
+    sector_matched = sector,
+    borderline_matched = borderline
+  )
+
+paged_table(ap_loanbook)
+```
+
+
+
+#### **3.2.2. Asset-based company data (ABCD)**
+- Description: Production profiles and emission intensities for companies in climate critical economic sectors. 
+- Source: This **typically must be purchase from third-party providers (eg. Asset Impact)**, it can also be self-prepared or supplemented with additional entries. This is the **most challenging** input for Vietnamese banks. 
+- Required inputs:  
+  * `company_id`: \<character\>
+  * `name_company`: \<character\>
+  * `lei`: \<character\>
+  * `sector`: \<character\>
+  * `technology`: \<character\>
+  * `production_unit`: \<character\>
+  * `year`: \<integer\>
+  * `production`: \<numeric\>
+  * `emission_factor`: \<numeric\>
+  * `plant_location`: \<character\>
+  * `is_ultimate_owner`: \<logical\>
+  * `emission_factor_unit`: \<character\>  
+
+- Below is the demo:
+
+```{r}
+ap_abcd <- r2dii.data::abcd_demo
+paged_table(ap_abcd)
+```
+
+
+#### **3.2.3. Scenarios (ABCD)**
+- Source: World Energy Outlook by IEA, JRC, ISF...
+- Required inputs
+  + Sectors using Market Share Approach:
+    * `scenario`: \<character\>
+    * `sector`: \<character\>
+    * `technology`: \<character\>
+    * `region`: \<character\>
+    * `year`: \<integer\>
+    * `tmsr`: \<numeric\>
+    * `smsp`: \<numeric\>
+    * `scenario_source`: \<character\>  
+    
+  + Sectors using Sectoral Decarbonization Approach:
+    * `scenario_source`: \<character\>
+    * `scenario`: \<character\>
+    * `sector`: \<character\>
+    * `region`: \<character\>
+    * `year`: \<numeric\>
+    * `emission_factor_unit`: \<character\>
+    * `emission_factor`: \<numeric\>
+    
+- Below is the demo
+
+```{r}
+scenario <- r2dii.data::scenario_demo_2020
+co2 <- r2dii.data::co2_intensity_scenario_demo
+region <- r2dii.data::region_isos_demo
+```
+
+
+### **3.3. Match loans (from loanbook) to physical assets & production values (from ABCD)**
+#### **3.3.1. Match**
+- We can match loanbook & ABCD data by the `match_name` function based on fuzzy matching algorithms. Advanced arguments including:
+  * `min_score`: a threshold between 0 and 1 that sets the minimum similarity score required for a match to be suggested, where 1 represents a perfect match.
+  * `method`: specifies the string distance calculation algorithm used to score name similarity, with options including "jw" (Jaro-Winkler), "levenshtein", "cosine", and "jaccard".
+  * `p`: prefix factor used with Jaro-Wrinkler (jw) method ranging from 0 to 0.25, giving the highest scores to name pairs with a common prefix.
+  * `overwrite`: an optional data frame used to manually replace or correct the sector or name columns for specific borrowers, allowing the user to bypass the algorithm for known entities or ownership changes  
+- After we run the match function, we need to export the file and check manually for each match with score lower than 1 and manually change the score to 1 or 0 depending on the correctness of the match.  
+- We then import the file into R again and run funtion `prioritize` to remove duplicates in case one loan ID is matched with multiple levels of ownership.  
+- Below is the demo (the min_score is set to 1 because I cannot check if it's a correct match or not so only exact match should be kept, no manual check needed)
+
+```{r}
+matches <- ap_loanbook %>%
+  match_name(ap_abcd, by_sector = TRUE, min_score = 1, method = "jw", p = 0.1) %>%
+  #between the two steps must be manual check
+  prioritize()
+paged_table(matches)
+```
+
+
+```{r}
+mismatch_analysis <- matches %>%
+  filter(sector_matched != sector) %>%
+  select(id_loan, name_direct_loantaker, name_ultimate_parent, sector_matched, sector)
+
+if (nrow(mismatch_analysis) > 0) {
+  paged_table(mismatch_analysis)
+} else {
+  print("No sector mismatch found. Scope matched by Bank is consistent with ABCD.")
+}
+
+```
+
+#### **3.3.2. Calculate match success rate**
+
+
+```{r}
+#Calculation
+loanbook_sector_summary <- ap_loanbook %>%
+ group_by(sector_matched) %>%
+  summarise(
+   total_outstanding = sum(loan_size_outstanding, na.rm = TRUE)
+  )
+matches_sector_summary <- matches %>%
+  group_by(sector) %>%
+   summarise(
+     matches_outstanding = sum(loan_size_outstanding, na.rm = TRUE)
+   )
+sector_summary <- loanbook_sector_summary %>%
+  left_join(matches_sector_summary, by = c("sector_matched" = "sector")) %>%
+  mutate(
+    matches_outstanding = ifelse(is.na(matches_outstanding), 0, matches_outstanding),
+    match_percentage = (matches_outstanding / total_outstanding) * 100
+  )
+
+#Pie Chart
+outstanding_total <- sum(sector_summary$total_outstanding)
+outstanding_matched <- sum(sector_summary$matches_outstanding)
+outstanding_notinscope <- loanbook_sector_summary %>%
+  filter(sector_matched == "not in scope") %>%
+  pull(total_outstanding)
+
+df_sector_pie <- data.frame(
+  status = c("(In Scope) Matched", "(In Scope) Not Matched", "Not in Scope"),
+  amount = c(
+    outstanding_matched, 
+    (outstanding_total - outstanding_notinscope - outstanding_matched), 
+    outstanding_notinscope
+  )
+) %>%
+  mutate(
+    percent = amount / sum(amount),
+    label = paste0(status, "\n", percent(percent, accuracy = 0.01))
+  )
+
+ggplot(df_sector_pie, aes(x = "", y = amount, fill = status)) +
+  geom_bar(stat = "identity", width = 1, color = "white") +
+  coord_polar("y", start = 0) +
+  geom_text(aes(label = label), 
+            position = position_stack(vjust = 0.5), 
+            color = "white", 
+            fontface = "bold",
+            size = 3) +
+  scale_fill_manual(values = c(
+    "(In Scope) Matched" = "#14645c",
+    "(In Scope) Not Matched" = "#e8594b",
+    "Not in Scope" = "#9E9E9E"
+  )) +
+  labs(
+    title = "Portfolio Distribution Breakdown",
+    subtitle = paste0("Loanbook Value: ", comma(outstanding_total), " EUR"),
+    fill = NULL
+  ) +
+  theme_void() +
+  theme(
+    legend.position = "bottom",
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 16),
+    plot.subtitle = element_text(hjust = 0.5, size = 12)
+  )
+
+
+#Bar Chart
+df_sector_bar <- sector_summary %>%
+  mutate(not_matched_outstanding = total_outstanding - matches_outstanding) %>%
+  pivot_longer(
+    cols = c(matches_outstanding, not_matched_outstanding),
+    names_to = "type",
+    values_to = "amount"
+  ) %>%
+  mutate(
+    status = case_when(
+      sector_matched == "not in scope" ~ "Not in Scope",
+      type == "matches_outstanding" ~ "(In Scope) Matched",
+      TRUE ~ "(In Scope) Not Matched"
+    ),
+  status = factor(status, levels = c("(In Scope) Matched", "(In Scope) Not Matched", "Not in Scope"))
+  )
+
+ggplot(df_sector_bar, aes(x = reorder(sector_matched, amount, sum), y = amount, fill = status)) +
+  geom_col(width = 0.7, color = "white", linewidth = 0.1,position=position_stack(reverse=TRUE)) +
+  geom_text(data = sector_summary %>% filter(sector_matched != "not in scope"),
+            aes(x = sector_matched, y = total_outstanding, 
+                label = percent(match_percentage/100, accuracy = 0.01)),
+            inherit.aes = FALSE,
+            hjust = -0.2,
+            size = 3.5) +
+  coord_flip() +
+  scale_y_continuous(labels = label_comma(), expand = expansion(mult = c(0, 0.2))) +
+  scale_fill_manual(values = c(
+    "(In Scope) Matched" = "#14645c",
+    "(In Scope) Not Matched" = "#e8594b",
+    "Not in Scope" = "#9E9E9E"
+  )) +
+  labs(
+    title = "Breakdown of Matching Coverage by Sector",
+    x = "Sector", 
+    y = "Outstanding Amount (EUR)", 
+    fill = NULL
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",
+    axis.text.y = element_text(face = "bold"),
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 16)
+  )
+```
+
+
+### **3.4. Calculate PACTA alignment metrics**
+#### **3.4.1. Calculate alignment for Power & Automotive Sectors by Market Share Approach**
+##### **3.4.1.1. Sector-level: Technology Mix**
+- Function: `target_market_share`
+
+```{r}
+market_share_targets_portfolio <-
+  target_market_share(
+    data = matches %>%
+      select(-c("sector_matched", "borderline_matched")),
+    abcd = ap_abcd,
+    scenario = scenario,
+    region_isos = region
+  )
+unique(market_share_targets_portfolio$sector)
+head(market_share_targets_portfolio)
+```
+
+* **Power Sector**  
+Note: If you take a look at the graph, you can see portfolio in 2025 is empty. This is because the data projected for 2025 for capacity did not add up to 100%.
+
+```{r}
+data_portfolio <- filter(
+  market_share_targets_portfolio,
+  scenario_source == "demo_2020",
+  sector == "power",
+  region == "global",
+  metric %in% c("projected", "corporate_economy", "target_sds")
+)
+
+qplot_techmix(data_portfolio) +
+  ggrepel::geom_label_repel(
+    aes(label = paste0(round(technology_share, 3) * 100, "%")),
+    min.segment.length = 0,
+    position = position_stack(vjust = 0.5),
+    show.legend = FALSE
+  ) +
+  theme(text=element_text(family="sans"))
+```
+
+* **Automotive Sector**
+
+```{r}
+data_portfolio <- filter(
+  market_share_targets_portfolio,
+  scenario_source == "demo_2020",
+  sector == "automotive",
+  region == "global",
+  metric %in% c("projected", "corporate_economy", "target_sds")
+)
+
+qplot_techmix(data_portfolio) +
+  ggrepel::geom_label_repel(
+    aes(label = paste0(round(technology_share, 3) * 100, "%")),
+    min.segment.length = 0,
+    position = position_stack(vjust = 0.5),
+    show.legend = FALSE
+  ) +
+  theme(text=element_text(family="sans"))
+```
+
+##### **3.4.1.2. Technology-level Production Volume Trajectory**
+
+* **Power Sector**
+
+```{r}
+#Renewables
+data_portfolio <- filter(
+  market_share_targets_portfolio,
+  sector == "power",
+  technology == "renewablescap",
+  region == "global",
+  scenario_source == "demo_2020"
+)
+
+data_renewablescap <- data_portfolio %>% 
+  dplyr::filter(year == min(.data$year) + 5) %>% 
+  dplyr::rename(value = "percentage_of_initial_production_by_scope")
+
+qplot_trajectory(data_portfolio) +
+  ggrepel::geom_text_repel(
+    aes(label = paste0(round(value, 3) * 100, "%")),
+    data = data_renewablescap
+  ) +
+  theme(text=element_text(family="sans"))
+
+#Coal
+data_portfolio <- filter(
+  market_share_targets_portfolio,
+  sector == "power",
+  technology == "coalcap",
+  region == "global",
+  scenario_source == "demo_2020"
+)
+
+data_coalcap <- data_portfolio %>% 
+  dplyr::filter(year == min(.data$year) + 5) %>% 
+  dplyr::rename(value = "percentage_of_initial_production_by_scope")
+
+qplot_trajectory(data_portfolio) +
+  ggrepel::geom_text_repel(
+    aes(label = paste0(round(value, 3) * 100, "%")),
+    data = data_coalcap
+  )+
+  theme(text=element_text(family="sans"))
+```
+
+* **Automotive Sector**
+
+```{r}
+#Electric
+data_portfolio <- filter(
+  market_share_targets_portfolio,
+  sector == "automotive",
+  technology == "electric",
+  region == "global",
+  scenario_source == "demo_2020"
+)
+
+data_electric_auto <- data_portfolio %>% 
+  dplyr::filter(year == min(.data$year) + 5) %>% 
+  dplyr::rename(value = "percentage_of_initial_production_by_scope")
+
+qplot_trajectory(data_portfolio) +
+  ggrepel::geom_text_repel(
+    aes(label = paste0(round(value, 3) * 100, "%")),
+    data = data_electric_auto
+  )+
+  theme(text=element_text(family="sans"))
+
+#Combustion engine
+data_portfolio <- filter(
+  market_share_targets_portfolio,
+  sector == "automotive",
+  technology == "ice",
+  region == "global",
+  scenario_source == "demo_2020"
+)
+
+data_ice_auto <- data_portfolio %>% 
+  dplyr::filter(year == min(.data$year) + 5) %>% 
+  dplyr::rename(value = "percentage_of_initial_production_by_scope")
+
+qplot_trajectory(data_portfolio) +
+  ggrepel::geom_text_repel(
+    aes(label = paste0(round(value, 3) * 100, "%")),
+    data = data_ice_auto
+  )+
+  theme(text=element_text(family="sans"))
+```
+
+#### **3.4.2 Calculate alignment for Cement and Steel Sectors by Sectoral Decarbonization Approach**
+- Funtion: `target_sda`
+
+```{r}
+sda_targets_portfolio <-
+  target_sda(
+    data = matches,
+    abcd = ap_abcd,
+    co2_intensity_scenario = co2,
+    region_isos = region)
+
+unique(sda_targets_portfolio$sector)
+
+head(sda_targets_portfolio)
+```
+
+* **Cement**
+
+```{r}
+data_portfolio <- filter(
+  sda_targets_portfolio,
+  sector == "cement",
+  region == "global"
+)
+
+data_cement <- data_portfolio %>% 
+  dplyr::filter(year == min(.data$year) + 5) %>% 
+  dplyr::mutate(
+    year = as.Date(strptime(as.character(year), "%Y")),
+    label = pacta.loanbook::to_title(emission_factor_metric)
+  )
+
+qplot_emission_intensity(data_portfolio) +
+  ggrepel::geom_text_repel(
+    aes(label = round(emission_factor_value, 3)),
+    data = data_cement,
+    show.legend = FALSE
+  )+
+  theme(text=element_text(family="sans"))
+```
+
+* **Steel**
+
+```{r}
+data_portfolio <- filter(
+  sda_targets_portfolio,
+  sector == "steel",
+  region == "global"
+)
+
+data_steel <- data_portfolio %>% 
+  dplyr::filter(year == min(.data$year) + 5) %>% 
+  dplyr::mutate(
+    year = as.Date(strptime(as.character(year), "%Y")),
+    label = pacta.loanbook::to_title(emission_factor_metric)
+  )
+
+qplot_emission_intensity(data_portfolio) +
+  ggrepel::geom_text_repel(
+    aes(label = round(emission_factor_value, 3)),
+    data = data_steel,
+    show.legend = FALSE
+  )+
+  theme(text=element_text(family="sans"))
+```
+
+
+
+
+
+

@@ -1,0 +1,24 @@
+id_loan,name_direct_loantaker,name_abcd,score,sector_abcd,level
+L16,"Bianchi, Bianchi e Bianchi SPA",Bianchi-Bianchi e figli,0.9007692307692308,power,direct_loantaker
+L7,Morissette Group,Moretti Group,0.9111538461538462,power,direct_loantaker
+L18,"Mariani, Mariani e Mariani s.r.l.",Mariani-Mariani s.r.l.,0.9217948717948719,power,direct_loantaker
+L177,"Costa, Costa e Costa s.r.l.",Wiek KG,0.9222222222222223,automotive,ultimate_parent
+L89,Carstenn GbR,Carsten e.G.,0.9232323232323232,power,direct_loantaker
+L19,Harris-Harris,"Harris, Harris and Harris",0.9333333333333333,power,direct_loantaker
+L17,"De luca, De luca e De luca e figli","De luca, De luca e De luca Group",0.9418181818181818,power,direct_loantaker
+L53,Brownn Inc,Brown Inc,0.9466666666666667,power,direct_loantaker
+L189,Schenc Schenk GmbH & Co. OHG,Schenk Schenk GmbH & Co. OHG,0.9509523809523809,automotive,direct_loantaker
+L151,Messina SPA,Legros and Sons,0.9518181818181818,automotive,ultimate_parent
+L199,Legross and Sons,Legros and Sons,0.9518181818181818,automotive,direct_loantaker
+L37,Russo s.r.l.,Seidel Seidel GmbH,0.95359477124183,power,ultimate_parent
+L97,Romaguera-Romaguera,Kuphal LLC,0.9618181818181818,power,ultimate_parent
+L51,"Messina, Messina e Messina e figli",VonRueden Inc,0.9626373626373625,power,ultimate_parent
+L173,"Bernardi, Bernardi e Bernardi SPA",Bins Inc,0.9777777777777777,automotive,ultimate_parent
+L59,"Kulas, Kulas and Kulas",Wyman PLC,0.98,power,ultimate_parent
+L61,Sipess Inc,Sipes Inc,0.98,power,direct_loantaker
+L89,Carstenn GbR,Carsten GbR,0.9818181818181818,power,direct_loantaker
+L41,"Raynor, Raynor and Raynor",Bolzmann GbR,0.9833333333333333,power,ultimate_parent
+L190,Bolzmannn AG,Bolzmann AG,0.9833333333333333,automotive,direct_loantaker
+L8,Barone s.r.l.,Williamson PLC,0.9866666666666667,power,ultimate_parent
+L80,"Kihn, Kihn and Kihn",Carsten GmbH & Co. OHG,0.9882352941176471,power,ultimate_parent
+L55,Kostolzinn GmbH & Co. KG,Kostolzin GmbH & Co. KG,0.9888888888888889,power,direct_loantaker

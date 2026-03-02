@@ -1,0 +1,221 @@
+sector,year,region,scenario_source,emission_factor_metric,emission_factor_value
+cement,2020,advanced economies,demo_2020,projected,0.02298667871783423
+cement,2020,developing asia,demo_2020,projected,0.05952278892079012
+cement,2020,global,demo_2020,projected,0.6643119669148667
+cement,2021,advanced economies,demo_2020,projected,0.023164799208488213
+cement,2021,developing asia,demo_2020,projected,0.05937320932021781
+cement,2021,global,demo_2020,projected,0.6652207353686838
+cement,2022,advanced economies,demo_2020,projected,0.02334291966694675
+cement,2022,developing asia,demo_2020,projected,0.05922362971964551
+cement,2022,global,demo_2020,projected,0.6661295035244527
+cement,2023,advanced economies,demo_2020,projected,0.02352104015760073
+cement,2023,developing asia,demo_2020,projected,0.05907405017947662
+cement,2023,global,demo_2020,projected,0.6670382719586899
+cement,2024,advanced economies,demo_2020,projected,0.02369916061605927
+cement,2024,developing asia,demo_2020,projected,0.058924470578904306
+cement,2024,global,demo_2020,projected,0.6679470404431431
+cement,2025,advanced economies,demo_2020,projected,0.023877281074517812
+cement,2025,developing asia,demo_2020,projected,0.058774890978331995
+cement,2025,global,demo_2020,projected,0.6688558087975573
+steel,2020,developing asia,demo_2020,projected,0.202162902
+steel,2020,europe,demo_2020,projected,0.07697137
+steel,2020,global,demo_2020,projected,0.2852330826035042
+steel,2021,developing asia,demo_2020,projected,0.199856479
+steel,2021,europe,demo_2020,projected,0.077088465
+steel,2021,global,demo_2020,projected,0.28691046673545373
+steel,2022,developing asia,demo_2020,projected,0.197550055
+steel,2022,europe,demo_2020,projected,0.07720556
+steel,2022,global,demo_2020,projected,0.2885628396201085
+steel,2023,developing asia,demo_2020,projected,0.195243632
+steel,2023,europe,demo_2020,projected,0.077322655
+steel,2023,global,demo_2020,projected,0.2901905121226104
+steel,2024,developing asia,demo_2020,projected,0.192937208
+steel,2024,europe,demo_2020,projected,0.07743975
+steel,2024,global,demo_2020,projected,0.291793788832908
+steel,2025,developing asia,demo_2020,projected,0.190630785
+steel,2025,europe,demo_2020,projected,0.077556845
+steel,2025,global,demo_2020,projected,0.29337296992496636
+cement,2020,advanced economies,demo_2020,corporate_economy,0.6675147484081301
+cement,2020,caspian,demo_2020,corporate_economy,0.639616878
+cement,2020,developing asia,demo_2020,corporate_economy,0.6565920908552837
+cement,2020,europe,demo_2020,corporate_economy,0.6296168
+cement,2020,global,demo_2020,corporate_economy,0.6692937636513615
+cement,2021,advanced economies,demo_2020,corporate_economy,0.6587678797938707
+cement,2021,caspian,demo_2020,corporate_economy,0.644423337
+cement,2021,developing asia,demo_2020,corporate_economy,0.6590092796929586
+cement,2021,europe,demo_2020,corporate_economy,0.622270997
+cement,2021,global,demo_2020,corporate_economy,0.6702766682660144
+cement,2022,advanced economies,demo_2020,corporate_economy,0.6478055772248303
+cement,2022,caspian,demo_2020,corporate_economy,0.649229796
+cement,2022,developing asia,demo_2020,corporate_economy,0.6618657028122158
+cement,2022,europe,demo_2020,corporate_economy,0.614925194
+cement,2022,global,demo_2020,corporate_economy,0.6712236994310585
+cement,2023,advanced economies,demo_2020,corporate_economy,0.6344980724661953
+cement,2023,caspian,demo_2020,corporate_economy,0.654036254
+cement,2023,developing asia,demo_2020,corporate_economy,0.6652291962522769
+cement,2023,europe,demo_2020,corporate_economy,0.607579391
+cement,2023,global,demo_2020,corporate_economy,0.6721348186454842
+cement,2024,advanced economies,demo_2020,corporate_economy,0.6187052584218402
+cement,2024,caspian,demo_2020,corporate_economy,0.658842713
+cement,2024,developing asia,demo_2020,corporate_economy,0.6691823235298829
+cement,2024,europe,demo_2020,corporate_economy,0.600233587
+cement,2024,global,demo_2020,corporate_economy,0.6730099871783665
+cement,2025,advanced economies,demo_2020,corporate_economy,0.6002756444599624
+cement,2025,caspian,demo_2020,corporate_economy,0.663649172
+cement,2025,developing asia,demo_2020,corporate_economy,0.6738266010121576
+cement,2025,europe,demo_2020,corporate_economy,0.592887784
+cement,2025,global,demo_2020,corporate_economy,0.6738491661172612
+steel,2020,advanced economies,demo_2020,corporate_economy,0.4131752533940242
+steel,2020,caspian,demo_2020,corporate_economy,0
+steel,2020,developing asia,demo_2020,corporate_economy,0.2019526903622815
+steel,2020,europe,demo_2020,corporate_economy,0.3853193033808277
+steel,2020,global,demo_2020,corporate_economy,0.27386371122485087
+steel,2021,advanced economies,demo_2020,corporate_economy,0.4220574514424989
+steel,2021,caspian,demo_2020,corporate_economy,0
+steel,2021,developing asia,demo_2020,corporate_economy,0.201947181741541
+steel,2021,europe,demo_2020,corporate_economy,0.3919875096059903
+steel,2021,global,demo_2020,corporate_economy,0.27551846176865025
+steel,2022,advanced economies,demo_2020,corporate_economy,0.43166063401871635
+steel,2022,caspian,demo_2020,corporate_economy,0
+steel,2022,developing asia,demo_2020,corporate_economy,0.2018480600521349
+steel,2022,europe,demo_2020,corporate_economy,0.3990811393687348
+steel,2022,global,demo_2020,corporate_economy,0.27714934692299875
+steel,2023,advanced economies,demo_2020,corporate_economy,0.4421099001228689
+steel,2023,caspian,demo_2020,corporate_economy,0
+steel,2023,developing asia,demo_2020,corporate_economy,0.2016588768108999
+steel,2023,europe,demo_2020,corporate_economy,0.4066656421003685
+steel,2023,global,demo_2020,corporate_economy,0.2787555569939668
+steel,2024,advanced economies,demo_2020,corporate_economy,0.45356106320050477
+steel,2024,caspian,demo_2020,corporate_economy,0
+steel,2024,developing asia,demo_2020,corporate_economy,0.2013830062612118
+steel,2024,europe,demo_2020,corporate_economy,0.41482061522874286
+steel,2024,global,demo_2020,corporate_economy,0.2803362441287639
+steel,2025,advanced economies,demo_2020,corporate_economy,0.4662107012916286
+steel,2025,caspian,demo_2020,corporate_economy,0
+steel,2025,developing asia,demo_2020,corporate_economy,0.20102365607142003
+steel,2025,europe,demo_2020,corporate_economy,0.42364385183637054
+steel,2025,global,demo_2020,corporate_economy,0.281890521880547
+cement,2020,global,demo_2020,target_demo,0.6643119669148667
+steel,2020,global,demo_2020,target_demo,0.2852330826035042
+cement,2021,global,demo_2020,target_demo,0.6074421097041138
+steel,2021,global,demo_2020,target_demo,0.27090826529900314
+cement,2022,global,demo_2020,target_demo,0.5505722524933607
+steel,2022,global,demo_2020,target_demo,0.2565834479945021
+cement,2023,global,demo_2020,target_demo,0.49370239528260795
+steel,2023,global,demo_2020,target_demo,0.242258630690001
+cement,2024,global,demo_2020,target_demo,0.436832538071855
+steel,2024,global,demo_2020,target_demo,0.22793381338549998
+cement,2025,global,demo_2020,target_demo,0.3799626808611021
+steel,2025,global,demo_2020,target_demo,0.2136089960809989
+cement,2026,global,demo_2020,target_demo,0.378067018954077
+steel,2026,global,demo_2020,target_demo,0.21169902043084884
+cement,2027,global,demo_2020,target_demo,0.37617135704705185
+steel,2027,global,demo_2020,target_demo,0.20978904478069885
+cement,2028,global,demo_2020,target_demo,0.3742756951400268
+steel,2028,global,demo_2020,target_demo,0.20787906913054882
+cement,2029,global,demo_2020,target_demo,0.3723800332330017
+steel,2029,global,demo_2020,target_demo,0.20596909348039885
+cement,2030,global,demo_2020,target_demo,0.3704843713259766
+steel,2030,global,demo_2020,target_demo,0.2040591178302488
+cement,2031,global,demo_2020,target_demo,0.36858870941895144
+steel,2031,global,demo_2020,target_demo,0.2021491422087484
+cement,2032,global,demo_2020,target_demo,0.3666930475119264
+steel,2032,global,demo_2020,target_demo,0.20023916658724805
+cement,2033,global,demo_2020,target_demo,0.36479738560490127
+steel,2033,global,demo_2020,target_demo,0.19832919096574766
+cement,2034,global,demo_2020,target_demo,0.36290172369787616
+steel,2034,global,demo_2020,target_demo,0.1964192153442473
+cement,2035,global,demo_2020,target_demo,0.36100606179085104
+steel,2035,global,demo_2020,target_demo,0.1945092397227469
+cement,2036,global,demo_2020,target_demo,0.3363624569995248
+steel,2036,global,demo_2020,target_demo,0.16967955638539517
+cement,2037,global,demo_2020,target_demo,0.3117188522081985
+steel,2037,global,demo_2020,target_demo,0.14484987304804345
+cement,2038,global,demo_2020,target_demo,0.28707524741687224
+steel,2038,global,demo_2020,target_demo,0.12002018971069171
+cement,2039,global,demo_2020,target_demo,0.26243164262554597
+steel,2039,global,demo_2020,target_demo,0.09519050637334
+cement,2040,global,demo_2020,target_demo,0.2377880378342197
+steel,2040,global,demo_2020,target_demo,0.07036082303598828
+cement,2041,global,demo_2020,target_demo,0.22830972829909424
+steel,2041,global,demo_2020,target_demo,0.06319841438373774
+cement,2042,global,demo_2020,target_demo,0.21883141876396872
+steel,2042,global,demo_2020,target_demo,0.05603600573148722
+cement,2043,global,demo_2020,target_demo,0.20935310922884323
+steel,2043,global,demo_2020,target_demo,0.04887359707923668
+cement,2044,global,demo_2020,target_demo,0.19987479969371777
+steel,2044,global,demo_2020,target_demo,0.041711188426986144
+cement,2045,global,demo_2020,target_demo,0.19039649015859228
+steel,2045,global,demo_2020,target_demo,0.03454877977473562
+cement,2046,global,demo_2020,target_demo,0.17143987108834127
+steel,2046,global,demo_2020,target_demo,0.033116298044285515
+cement,2047,global,demo_2020,target_demo,0.1524832520180903
+steel,2047,global,demo_2020,target_demo,0.03168381631383541
+cement,2048,global,demo_2020,target_demo,0.13352663294783934
+steel,2048,global,demo_2020,target_demo,0.0302513345833853
+cement,2049,global,demo_2020,target_demo,0.11457001387758833
+steel,2049,global,demo_2020,target_demo,0.028818852852935194
+cement,2050,global,demo_2020,target_demo,0.09561339480733737
+steel,2050,global,demo_2020,target_demo,0.027386371122485088
+cement,2020,global,demo_2020,adjusted_scenario_demo,0.6692937636513615
+steel,2020,global,demo_2020,adjusted_scenario_demo,0.27386371122485087
+cement,2021,global,demo_2020,adjusted_scenario_demo,0.6119257267669591
+steel,2021,global,demo_2020,adjusted_scenario_demo,0.2601705256636083
+cement,2022,global,demo_2020,adjusted_scenario_demo,0.5545576898825566
+steel,2022,global,demo_2020,adjusted_scenario_demo,0.2464773401023658
+cement,2023,global,demo_2020,adjusted_scenario_demo,0.49718965299815426
+steel,2023,global,demo_2020,adjusted_scenario_demo,0.23278415454112322
+cement,2024,global,demo_2020,adjusted_scenario_demo,0.43982161611375187
+steel,2024,global,demo_2020,adjusted_scenario_demo,0.2190909689798807
+cement,2025,global,demo_2020,adjusted_scenario_demo,0.38245357922934947
+steel,2025,global,demo_2020,adjusted_scenario_demo,0.20539778341863815
+cement,2026,global,demo_2020,adjusted_scenario_demo,0.38054131133320274
+steel,2026,global,demo_2020,adjusted_scenario_demo,0.203572025334677
+cement,2027,global,demo_2020,adjusted_scenario_demo,0.37862904343705595
+steel,2027,global,demo_2020,adjusted_scenario_demo,0.2017462672507159
+cement,2028,global,demo_2020,adjusted_scenario_demo,0.3767167755409092
+steel,2028,global,demo_2020,adjusted_scenario_demo,0.19992050916675475
+cement,2029,global,demo_2020,adjusted_scenario_demo,0.3748045076447625
+steel,2029,global,demo_2020,adjusted_scenario_demo,0.19809475108279365
+cement,2030,global,demo_2020,adjusted_scenario_demo,0.37289223974861574
+steel,2030,global,demo_2020,adjusted_scenario_demo,0.1962689929988325
+cement,2031,global,demo_2020,adjusted_scenario_demo,0.37097997185246895
+steel,2031,global,demo_2020,adjusted_scenario_demo,0.19444323494225774
+cement,2032,global,demo_2020,adjusted_scenario_demo,0.3690677039563222
+steel,2032,global,demo_2020,adjusted_scenario_demo,0.192617476885683
+cement,2033,global,demo_2020,adjusted_scenario_demo,0.3671554360601755
+steel,2033,global,demo_2020,adjusted_scenario_demo,0.19079171882910823
+cement,2034,global,demo_2020,adjusted_scenario_demo,0.36524316816402874
+steel,2034,global,demo_2020,adjusted_scenario_demo,0.1889659607725335
+cement,2035,global,demo_2020,adjusted_scenario_demo,0.36333090026788195
+steel,2035,global,demo_2020,adjusted_scenario_demo,0.18714020271595871
+cement,2036,global,demo_2020,adjusted_scenario_demo,0.3384714176179742
+steel,2036,global,demo_2020,adjusted_scenario_demo,0.16340534773400953
+cement,2037,global,demo_2020,adjusted_scenario_demo,0.31361193496806655
+steel,2037,global,demo_2020,adjusted_scenario_demo,0.1396704927520603
+cement,2038,global,demo_2020,adjusted_scenario_demo,0.2887524523181588
+steel,2038,global,demo_2020,adjusted_scenario_demo,0.11593563777011112
+cement,2039,global,demo_2020,adjusted_scenario_demo,0.26389296966825115
+steel,2039,global,demo_2020,adjusted_scenario_demo,0.09220078278816192
+cement,2040,global,demo_2020,adjusted_scenario_demo,0.2390334870183434
+steel,2040,global,demo_2020,adjusted_scenario_demo,0.06846592780621272
+cement,2041,global,demo_2020,adjusted_scenario_demo,0.22947214753760967
+steel,2041,global,demo_2020,adjusted_scenario_demo,0.06161933502559145
+cement,2042,global,demo_2020,adjusted_scenario_demo,0.21991080805687593
+steel,2042,global,demo_2020,adjusted_scenario_demo,0.054772742244970175
+cement,2043,global,demo_2020,adjusted_scenario_demo,0.2103494685761422
+steel,2043,global,demo_2020,adjusted_scenario_demo,0.0479261494643489
+cement,2044,global,demo_2020,adjusted_scenario_demo,0.20078812909540847
+steel,2044,global,demo_2020,adjusted_scenario_demo,0.041079556683727626
+cement,2045,global,demo_2020,adjusted_scenario_demo,0.19122678961467474
+steel,2045,global,demo_2020,adjusted_scenario_demo,0.03423296390310636
+cement,2046,global,demo_2020,adjusted_scenario_demo,0.17210411065320724
+steel,2046,global,demo_2020,adjusted_scenario_demo,0.03286364534698211
+cement,2047,global,demo_2020,adjusted_scenario_demo,0.15298143169173978
+steel,2047,global,demo_2020,adjusted_scenario_demo,0.031494326790857854
+cement,2048,global,demo_2020,adjusted_scenario_demo,0.1338587527302723
+steel,2048,global,demo_2020,adjusted_scenario_demo,0.030125008234733595
+cement,2049,global,demo_2020,adjusted_scenario_demo,0.11473607376880483
+steel,2049,global,demo_2020,adjusted_scenario_demo,0.028755689678609343
+cement,2050,global,demo_2020,adjusted_scenario_demo,0.09561339480733737
+steel,2050,global,demo_2020,adjusted_scenario_demo,0.027386371122485088

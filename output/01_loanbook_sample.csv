@@ -1,0 +1,21 @@
+id_loan,id_direct_loantaker,name_direct_loantaker,id_ultimate_parent,name_ultimate_parent,loan_size_outstanding,loan_size_outstanding_currency,loan_size_credit_limit,loan_size_credit_limit_currency,sector_classification_system,sector_classification_direct_loantaker,lei_direct_loantaker,isin_direct_loantaker
+L1,C294,Vitale Group,UP15,Scholz KGaA,225625,EUR,18968805,EUR,NACE,D35.11,NA,NA
+L2,C293,Moen-Moen,UP84,NA,301721,EUR,19727961,EUR,NACE,D35.11,NA,NA
+L3,C292,Rowe-Rowe,UP288,"Harvey, Harvey and Harvey",410297,EUR,20811147,EUR,NACE,D35.11,801600ATB1D513IUFZ77,NA
+L4,C299,Fadel-Fadel,UP54,NA,233049,EUR,19042869,EUR,NACE,D35.11,NA,NA
+L5,C305,Ring AG & Co. KGaA,UP104,"Conti, Conti e Conti SPA",406585,EUR,20774115,EUR,NACE,D35.11,NA,NA
+L6,C304,Kassulke-Kassulke,UP83,"Farrell, Farrell and Farrell",185721,EUR,18570711,EUR,NACE,D35.11,108200TUBGG1DR0QR635,NA
+L7,C227,Morissette Group,UP134,Weller AG,184793,EUR,18561453,EUR,NACE,D35.11,NA,NA
+L8,C303,Barone s.r.l.,UP163,Williamsonn PLC,291513,EUR,19626123,EUR,NACE,D35.11,NA,NA
+L9,C301,Werner Werner AG & Co. KGaA,UP138,Leone-Leone s.r.l.,407513,EUR,20783373,EUR,NACE,D35.11,NA,NA
+L10,C302,De rosa s.r.l.,UP32,"Benedetti, Benedetti e Benedetti Group",186649,EUR,18579969,EUR,NACE,D35.11,NA,NA
+L11,C309,Donnelly and Sons,UP81,Bianco e figli,191289,EUR,18626259,EUR,NACE,D35.11,428900A72KWJF1NS8R68,NA
+L12,C298,Longo-Longo s.r.l.,UP269,Lorch AG & Co. KG,294297,EUR,19653897,EUR,NACE,D35.11,3964002V1QVPR0TVKP02,NA
+L13,C297,Ladeck,UP69,Kuhlman-Kuhlman,200569,EUR,18718839,EUR,NACE,D35.11,948400P8YHB5DZHF3869,NA
+L14,C296,Gallo e figli,UP3,Gleichner-Gleichner,187577,EUR,18589227,EUR,NACE,D35.11,215100AKY9SNKI9FVK45,NA
+L15,C295,"Silvestri, Silvestri e Silvestri s.r.l.",UP196,Partzelt Partzelt AG,192217,EUR,18635517,EUR,NACE,D35.11,8300002JSECGX9QFNJ97,NA
+L16,C291,"Bianchi, Bianchi e Bianchi SPA",UP132,NA,298009,EUR,19690929,EUR,NACE,D35.11,NA,NA
+L17,C290,"De luca, De luca e De luca e figli",UP6,Fontana SPA,205209,EUR,18765129,EUR,NACE,D35.11,NA,NA
+L18,C284,"Mariani, Mariani e Mariani s.r.l.",UP121,McGlynn LLC,189433,EUR,18607743,EUR,NACE,D35.11,7444009O64MJFH06C955,NA
+L19,C289,Harris-Harris,UP78,"Emard, Emard and Emard",194073,EUR,18654033,EUR,NACE,D35.11,NA,NA
+L20,C287,Weinhold,UP35,Heinz,308217,EUR,19792767,EUR,NACE,D35.11,NA,NA

@@ -1,0 +1,21 @@
+company_id,name_company,lei,sector,technology,production_unit,year,production,emission_factor,plant_location,is_ultimate_owner,emission_factor_unit
+175,"Giordano, Giordano e Giordano e figli",18500033XH6RG332SX89,power,hydrocap,MW,2020,121031.94,NA,MY,TRUE,tonnes of CO2 per per hour per MW
+175,"Giordano, Giordano e Giordano e figli",18500033XH6RG332SX89,power,hydrocap,MW,2021,119273.6141,NA,MY,TRUE,tonnes of CO2 per per hour per MW
+175,"Giordano, Giordano e Giordano e figli",18500033XH6RG332SX89,power,hydrocap,MW,2022,117515.2881,NA,MY,TRUE,tonnes of CO2 per per hour per MW
+175,"Giordano, Giordano e Giordano e figli",18500033XH6RG332SX89,power,hydrocap,MW,2023,115756.9622,NA,MY,TRUE,tonnes of CO2 per per hour per MW
+175,"Giordano, Giordano e Giordano e figli",18500033XH6RG332SX89,power,hydrocap,MW,2024,113998.6363,NA,MY,TRUE,tonnes of CO2 per per hour per MW
+175,"Giordano, Giordano e Giordano e figli",18500033XH6RG332SX89,power,hydrocap,MW,2025,112240.3103,NA,MY,TRUE,tonnes of CO2 per per hour per MW
+526,"Vitali, Vitali e Vitali s.r.l.",887100CAVZ6Y3KYT3Q90,cement,integrated facility,tonnes per year,2020,6327857.823,0.723087039,CI,TRUE,tonnes of CO2 per tonne of cement
+526,"Vitali, Vitali e Vitali s.r.l.",887100CAVZ6Y3KYT3Q90,cement,integrated facility,tonnes per year,2021,6569982.698,0.734577008,CI,TRUE,tonnes of CO2 per tonne of cement
+526,"Vitali, Vitali e Vitali s.r.l.",887100CAVZ6Y3KYT3Q90,cement,integrated facility,tonnes per year,2022,6812107.573,0.746066977,CI,TRUE,tonnes of CO2 per tonne of cement
+526,"Vitali, Vitali e Vitali s.r.l.",887100CAVZ6Y3KYT3Q90,cement,integrated facility,tonnes per year,2023,7054232.448,0.757556945,CI,TRUE,tonnes of CO2 per tonne of cement
+526,"Vitali, Vitali e Vitali s.r.l.",887100CAVZ6Y3KYT3Q90,cement,integrated facility,tonnes per year,2024,7296357.323,0.769046914,CI,TRUE,tonnes of CO2 per tonne of cement
+526,"Vitali, Vitali e Vitali s.r.l.",887100CAVZ6Y3KYT3Q90,cement,integrated facility,tonnes per year,2025,7538482.199,0.780536882,CI,TRUE,tonnes of CO2 per tonne of cement
+184,Gleichner-Gleichner,275600DKF5IK97A17060,power,renewablescap,MW,2020,14126.32832,NA,MW,TRUE,tonnes of CO2 per per hour per MW
+184,Gleichner-Gleichner,275600DKF5IK97A17060,power,renewablescap,MW,2021,14523.25407,NA,MW,TRUE,tonnes of CO2 per per hour per MW
+184,Gleichner-Gleichner,275600DKF5IK97A17060,power,renewablescap,MW,2022,14920.17982,NA,MW,TRUE,tonnes of CO2 per per hour per MW
+184,Gleichner-Gleichner,275600DKF5IK97A17060,power,renewablescap,MW,2023,15317.10558,NA,MW,TRUE,tonnes of CO2 per per hour per MW
+184,Gleichner-Gleichner,275600DKF5IK97A17060,power,renewablescap,MW,2024,15714.03133,NA,MW,TRUE,tonnes of CO2 per per hour per MW
+184,Gleichner-Gleichner,275600DKF5IK97A17060,power,renewablescap,MW,2025,16110.95708,NA,MW,TRUE,tonnes of CO2 per per hour per MW
+113,"De luca, De luca e De luca SPA",4912008DZ4Y8FMWZ9R83,oil and gas,oil,GJ per day,2020,28907046.63,2247570.195,CM,TRUE,tonnes of CO2 per GJ
+113,"De luca, De luca e De luca SPA",4912008DZ4Y8FMWZ9R83,oil and gas,oil,GJ per day,2021,28404903.19,1887821.958,CM,TRUE,tonnes of CO2 per GJ

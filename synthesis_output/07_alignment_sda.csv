@@ -1,0 +1,3 @@
+sector,projected,target_demo,intensity_gap,gap_pct,aligned
+cement,0.6688558087975573,0.3799626808611021,0.2889,76,Misaligned
+steel,0.29337296992496636,0.2136089960809989,0.0798,37.3,Misaligned
