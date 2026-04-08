@@ -355,6 +355,9 @@ target_pdp8  <- grep("target_pdp8", ms_metrics, value = TRUE)[1]
 target_steps <- grep("target_steps", ms_metrics, value = TRUE)[1]
 target_nze   <- grep("target_nze",  ms_metrics, value = TRUE)[1]
 
+if (is.na(target_pdp8))  target_pdp8  <- grep("target_", ms_metrics, value = TRUE)[1]
+if (is.na(target_steps)) target_steps <- grep("target_", ms_metrics, value = TRUE)[2]
+if (is.na(target_nze))   target_nze   <- grep("nze",     ms_metrics, value = TRUE)[1]
 cat(sprintf("\n  Available metrics: %s\n", paste(ms_metrics, collapse = ", ")))
 cat(sprintf("  PDP8 target metric: %s\n\n", target_pdp8))
 
@@ -479,12 +482,37 @@ cat("\n")
 
 cat("--- Section 6: SDA analysis (cement + steel) ---\n\n")
 
-sda_portfolio <- target_sda(
-  data                   = matched,
-  abcd                   = abcd_norm,
-  co2_intensity_scenario = co2,
-  region_isos            = region
-)
+# Manual SDA: bypass target_sda() API to avoid version-sensitivity issues.
+# Join matched loans → ABCD emission_factor, compute production-weighted mean per sector/year.
+sda_ef_data <- matched_for_ms %>%
+  inner_join(
+    abcd_norm %>%
+      filter(sector %in% c("cement", "steel")) %>%
+      select(name_company, sector, year, production, emission_factor),
+    by = c("name_abcd" = "name_company", "sector" = "sector")
+  ) %>%
+  filter(!is.na(emission_factor), !is.na(production), production > 0)
+
+if (nrow(sda_ef_data) == 0) {
+  cat("  WARNING: No matched cement/steel companies with emission_factor data. SDA skipped.\n\n")
+  sda_portfolio    <- tibble(sector=character(), year=integer(), region=character(),
+                              emission_factor_value=numeric(), emission_factor_metric=character())
+} else {
+  projected_sda <- sda_ef_data %>%
+    group_by(sector, year, region = "vietnam") %>%
+    summarise(
+      emission_factor_value = weighted.mean(emission_factor, production, na.rm = TRUE),
+      .groups = "drop"
+    ) %>%
+    mutate(emission_factor_metric = "projected")
+
+  target_sda_rows <- co2 %>%
+    filter(region == "vietnam") %>%
+    mutate(emission_factor_metric = paste0("target_", scenario)) %>%
+    select(sector, year, region, emission_factor_value, emission_factor_metric)
+
+  sda_portfolio <- bind_rows(projected_sda, target_sda_rows)
+}
 
 cat(sprintf("  SDA rows: %d | Sectors: %s\n",
             nrow(sda_portfolio), paste(unique(sda_portfolio$sector), collapse = ", ")))
@@ -495,6 +523,7 @@ write_csv(sda_portfolio, file.path(vn_output, "05_vn_sda_portfolio.csv"))
 # Identify SDA target metric name for pdp8_ndc
 sda_metrics     <- unique(sda_portfolio$emission_factor_metric)
 sda_target_pdp8 <- grep("target_pdp8", sda_metrics, value = TRUE)[1]
+if (is.na(sda_target_pdp8)) sda_target_pdp8 <- grep("target_", sda_metrics, value = TRUE)[1]
 cat(sprintf("  PDP8 SDA target metric: %s\n\n", sda_target_pdp8))
 
 # --- Chart: Cement Emission Intensity ---
@@ -504,12 +533,13 @@ cement_sda <- sda_portfolio %>%
 if (nrow(cement_sda) > 0) {
   cement_labels <- cement_sda %>%
     filter(year == max(year)) %>%
-    mutate(year = as.Date(strptime(as.character(year), "%Y")))
+    mutate(year = as.Date(ISOdate(year = year, month = 1L, day = 1L)))
 
   p_cement <- qplot_emission_intensity(cement_sda) +
     ggrepel::geom_text_repel(
-      aes(label = round(emission_factor_value, 3)),
-      data = cement_labels, show.legend = FALSE, size = 3
+      aes(x = year, y = emission_factor_value,
+          label = round(emission_factor_value, 3)),
+      data = cement_labels, inherit.aes = FALSE, show.legend = FALSE, size = 3
     ) +
     labs(
       title    = "Cement: Emission Intensity Trajectory",
@@ -531,12 +561,13 @@ steel_sda <- sda_portfolio %>%
 if (nrow(steel_sda) > 0) {
   steel_labels <- steel_sda %>%
     filter(year == max(year)) %>%
-    mutate(year = as.Date(strptime(as.character(year), "%Y")))
+    mutate(year = as.Date(ISOdate(year = year, month = 1L, day = 1L)))
 
   p_steel <- qplot_emission_intensity(steel_sda) +
     ggrepel::geom_text_repel(
-      aes(label = round(emission_factor_value, 3)),
-      data = steel_labels, show.legend = FALSE, size = 3
+      aes(x = year, y = emission_factor_value,
+          label = round(emission_factor_value, 3)),
+      data = steel_labels, inherit.aes = FALSE, show.legend = FALSE, size = 3
     ) +
     labs(
       title    = "Steel: Emission Intensity Trajectory",
@@ -567,6 +598,8 @@ ms_alignment_2030 <- ms_portfolio %>%
   filter(region == "vietnam", year == 2030,
          metric %in% c("projected", target_pdp8)) %>%
   select(sector, technology, metric, technology_share) %>%
+  group_by(sector, technology, metric) %>%
+  summarise(technology_share = mean(technology_share, na.rm = TRUE), .groups = "drop") %>%
   pivot_wider(names_from = metric, values_from = technology_share) %>%
   rename(projected = projected) %>%
   rename_with(~ "target_pdp8", .cols = any_of(target_pdp8)) %>%

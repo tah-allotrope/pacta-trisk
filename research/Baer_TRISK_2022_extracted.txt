@@ -1,0 +1,2233 @@
+
+
+===== PAGE 1 =====
+
+TRISK - A Climate Stress Test for Transition Risk ∗
+Moritz Baer 1,3, Ben Caldecott 1,2, Jacob Kastl 3, Alissa M. Kleinnjienhuis 4, and Nicola
+Ranger1,2
+1Smith School of Enterprise and the Environment, University of Oxford
+2UK Centre for Greening Finance and Investment
+32°Investing Initiative
+4Stanford Institute for Economic Policy Research and Institute for New Economic
+Thinking at University of Oxford
+February 2022
+Abstract
+Climate change has the potential to impact the stability of the financial system. We
+develop a climate stress test that translates climate transition risks affecting individual
+firms and economies to shocks affecting the financial system. As part of this, we present a
+forward-looking risk measure - TRISK - which is the expected loss of a financial institution
+given the uncertain materialisation of a transition stress scenario. The approach is rooted in
+asset-level data and represents transition impacts on the level of the firm in a microeconomic
+and financial model. Key distinct features of the climate stress test are its forward-looking
+nature based on the transition strategy of firms, the explicit representation of technological
+costs and firms’ comparative advantage, the transparency and flexibility to accommodate for
+a wide range of scenarios and underlying modelling choices, and the ability to demonstrate
+sensitivities in all modelling stages. We perform an exploratory analysis to a selection of
+international power firms. We find that transition impacts entail significant heterogeneity
+across firms and the financial sector with clear distributional consequences. This highlights
+the need for bottom-up stress tests able to reflect the complexity of the transition impact
+to inform financial markets as well as financial policy design.
+∗The views expressed in this paper do not necessarily reflect the views of Oxford Sustainable Finance Group,
+the Environmental Stress Testing and Scenarios Programme (ESTS) or 2 °Investing Initiative (2DII). The au-
+thors would like to thank Gireesh Shrimali, XY for helpful comments. The computational tool and code
+of the TRISK methodology can be found open source on github: https://github.com/2DegreesInvesting/
+r2dii.climate.stress.test. The code infrastructure is hosted and maintained by 2 °Investing Initiative.
+The authors acknowledge funding from the European Union’s Life NGO program under Grant No LIFE20
+NGO/SGA/DE/200040. The paper reflects only the authors’ view and that the Agency and the Commission are
+not responsible. Corresponding author: moritz.baer@smithschool.ox.ac.uk
+1
+
+===== PAGE 2 =====
+
+Contents
+1 Introduction 3
+2 Climate Stress Testing Model Framework 7
+2.1 Layer One: Scenarios . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 8
+2.1.1 Scenario Parameters and Calibration Strategy . . . . . . . . . . . . . . . . 8
+2.1.2 Design of Baseline and Stress Scenarios . . . . . . . . . . . . . . . . . . . 15
+2.2 Layer Two: The Economy . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 18
+2.2.1 Firm Value under Different Scenarios . . . . . . . . . . . . . . . . . . . . . 18
+2.2.2 Stranded Assets . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 20
+2.2.3 Firm Calibration Strategy . . . . . . . . . . . . . . . . . . . . . . . . . . . 21
+2.3 Layer Three: The Financial System . . . . . . . . . . . . . . . . . . . . . . . . . . 23
+2.3.1 Financial Institutions . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 23
+2.3.2 Expected Financial Loss . . . . . . . . . . . . . . . . . . . . . . . . . . . . 23
+2.3.3 TRISK . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 25
+2.3.4 Financial Exposure Calibration Strategy . . . . . . . . . . . . . . . . . . . 27
+2.4 Model Limitations . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 28
+3 Results of Exploratory Application 31
+3.1 Impact on Firms . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 32
+3.2 Impact on Financial Institutions . . . . . . . . . . . . . . . . . . . . . . . . . . . 40
+4 Treatment of Uncertainty and Sensitivity Analysis 42
+4.1 Extrinsic Uncertainty . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 43
+4.2 Intrinsic Uncertainty . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 44
+4.3 Sensitivity Analysis . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 45
+5 Conclusion 50
+A Appendix 58
+A.1 Model Parameter Overview . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 58
+A.2 Data and additional analysis . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 60
+2
+
+===== PAGE 3 =====
+
+1 Introduction
+The impact of climate risks on financial stability are increasingly recognised by governments, in-
+vestors, central banks and financial regulators. The Network for Greening the Financial System
+aims to support best practices and contribute to building a climate-resilient financial system
+(NGFS, 2019). Believes around the materiality of climate risks have begun to shape financial
+decision making and risk management practices (Bolton & Kacperczyk, 2021; Krueger, Sautner,
+& Starks, 2020). Further, expectations on how financial institutions and banks should scale up
+capabilities and manage climate-related risks have been set by the Bank of England (PRA, 2019)
+and the European Central Bank (ECB, 2020) and proposed guidelines scale up internationally
+across supervisory institutions (see e.g. MAS (2020)).
+Depending on institutional responsibilities, actors have engaged in either steering financial
+capital, adjusting fiscal measures to support the net-zero transition or in analysing climate-
+related financial risk. Governments have predominantly focused policy efforts on redirecting
+financial capital towards sustainable investments and align economic activities with climate
+objectives set out in the Paris Agreement (EU HLEG, 2018; European Commission, 2018;
+Ripple, Wolf, Newsome, Barnard, & Moomaw, 2020). The recent COVID-crisis underlines the
+importance of such climate policies to allow for a sustainable recovery (Hallegatte & Hammer,
+2020; Hepburn, O’Callaghan, Stern, & Zenghelis, 2020). Central banks and supervisors have
+prominently focused on the risk dimension of climate change. To this end, they are assessing
+prudential and financial policy measures that are targeted to safeguard financial stability. A
+key focus has been on informational policies such as climate-related disclosures and setting
+of supervisory expectations, which have signaling effects and enhance the transparency around
+accountability of financial institutions (Baer, Campiglio, & Deyris, 2021). In particular, climate
+stress testing and scenario analysis has emerged as a key analytical tool, used by a vast array
+of stakeholders (BIS, 2021a).
+While such developments are promising, decisive climate action in the financial sector is still
+absent. Political and mandate-related challenges prevent interventionist financial policies and
+regulation in support of the net-zero transition (Baer et al., 2021). Moreover, investors and
+central banks are faced with analytical obstacles in risk management practices to adequately
+measure the impact of climate risks (Giglio, Kelly, & Stroebel, 2020). Current climate stress
+tests are in their infancy from a methodological standpoint and are therefore only exploratory
+in nature (see e.g. (ECB, 2021; of England, 2021). Most importantly, challenges remain to
+adequately capture the heterogeneity involved in transition risks. So far, this has prevented the
+effective distinction of transitioning firms and climate laggards in scenario analysis. For instance,
+climate stress tests that have employed an industry level-approach or top down-macroeconomic
+approach, insufficiently capture within sector variation (Battiston & Monasterolo, 2021; Ver-
+meulen et al., 2019). While some climate stress testing approaches have been employed on a
+3
+
+===== PAGE 4 =====
+
+granular level, these approaches are limited in capturing the forward-looking transition strate-
+gies of firms (Cormack, Donovan, Koberle, & Ostrovnaya, 2020; ECB, 2021; Reinders, Schoen-
+maker, & Van Dijk, 2020), focus on policy driven transition risks only (Nguyen, Diaz-Rainey,
+Kuruppuarachchi, McCarten, & Tan, 2020) or lack the representation of demand-driven ef-
+fects and technological change Bressan, Duranovic, Monasterolo, and Battiston (2022). Other
+approaches, such as the CRISK measure by (Jung, Engle, & Berner, 2021), rely on more market-
+based approaches that identify correlations between a stranded asset portfolio and the largest
+global banks’ stock market valuations. This is only a sufficient metric to evaluate a firm’s tran-
+sition risk, to the extent that transition risk is priced into financial markets today. There is
+ample reason to believe that this is not yet done to a full extent.
+Most importantly, these approaches rely mostly on current and backward-looking carbon
+emission intensities as a proxy for transition risk. We argue that disclosing carbon emissions
+is not a sufficient metric for investors and regulators to determine a firm’s transition risk and
+alignment with the Paris goals. Importantly, two firms with exactly the same current emissions
+today could face widely disparate transition risk. If firm A is an oil major that is planning
+to keep investing in oil fields, and firm B is another one planning to transition to a business
+model based on solar farms, then firm B will presumably face much lower transition risk. The
+reason is that it will not be subject to a carbon tax, demand driven effects or phase-out policies,
+for instance. Transition risk proxied by current emissions will not capture this. There is an-
+other fundamental problem with failure to distinguish transitioning firms from climate laggards
+within the same industry due to disclosure of similar current carbon emissions. Firms belonging
+to high-carbon-emission sectors today, such as the energy sector, will need to receive plenty of
+funding at a low cost of capital in order to finance the transition to a green energy economy
+while expand world energy capacity. If investors, including central banks, divest from firms in
+high-carbon industries, based on their disclosure of currently high carbon emissions, as is the
+custom now among many investors (Bolton & Kacperczyk, 2021) and under consideration in
+central bank circles (NGFS, 2021), then these sectors are drained of the financing needed to
+transition. From a market perspective, accurately capturing the heterogeneity of the transi-
+tion impact between climate laggards and transitioning firms is highly relevant. This informs
+effective capital allocation and accelerates the transition, rather than hindering it. Investors
+should divest only from those firms that do not plan to transition to a greener business model,
+thereby driving up the cost of capital for climate laggards but keeping the cost of capital low for
+greening firms. From a regulatory perspective, to increase the resilience of financial institution
+and safeguard financial stability in the transition, climate stress tests need to identify exactly
+where the risk lies and how concentrated it is.
+Identified approaches fall short of capturing forward-looking strategies of firms and lack
+the granularity to capture the relevant heterogeneity involved in transition risk. In addition,
+4
+
+===== PAGE 5 =====
+
+current approaches are limited in accommodating for a wide range of scenarios and underlying
+modelling choices to better represent prevailing uncertainties and the ability to assess sensi-
+tivities in all modelling stages. Existing climate stress test approaches developed by central
+banks and academics go a long way in solving analytical challenges around longer time hori-
+zons of climate change. Yet, such regulatory exercises most often leave significant discretion
+to supervised institutions in adjusting their own risk models and hence lack the transparency
+and consistency to compare and validate risk outcomes (BoE, 2020). This bears the risk of
+biased scenario selection and design choices that lead to support existing strategies of financial
+institutions and solely to fulfill supervisory expectations without an appropriate risk assessment.
+We are therefore in need of forward-looking, transparent, innovative and flexible climate
+stress testing approaches. This would allow to overcome some of the analytical challenges
+involved in assessing climate transition risk, while adequately reflecting uncertainties and sen-
+sitivities. We contribute with such a model framework. The multi-layered stress test represents
+individual firms’ asset values under different scenarios. The transition risk is represented by
+a set of climate-adjusted economic parameters, designed and curated in a set of severe but
+plausible transition scenarios. The financial system is represented by heterogeneous financial
+institutions and their balance sheets. Each of these layers is connected through a set of trans-
+mission channels, which propagates the climate-adjusted economic impact to the asset value of
+firms and subsequently translates the impact into financial risk.
+We also present a forward-looking risk measure - TRISK - which is the expected loss of a
+financial institution given the uncertain materialisation of a transition stress scenario. It is our
+view, that classic risk management practices and risk metrics are inadequate to assess transition
+risk1. We present TRISK on two levels. On the firm level, TRISK is expressed as the difference
+in the discounted net present value (NPV), as well as the probability of default (PD) for a firm
+under a baseline and transition stress scenario. On the financial level, TRISK is expressed as
+the difference in the expected loss (EL) of a portfolio under a baseline and stress scenario, hence
+represent the value at risk from the uncertain materialisation of a transition stress scenario.
+Key distinctive analytical features of our approach include the calibration in asset-level data
+and representation of the transition risk on the firm-level, representation of the strategic be-
+havior of firms, the explicit representation of technological costs and associated comparative
+advantages of firms. It allows for the integration of a wide range of scenarios, a balance between
+carbon tax and demand impacts, as well as flexible parametrisation to better represent prevail-
+ing uncertainties and the ability to demonstrate sensitivities.The aim is to better understand
+how much confidence is present in the calibration of such approaches with data and how to use
+1They pose unrealistic assumptions on a highly non-linear problem with a non-stationary distribution (Bolton,
+Despres, Pereira da Silva, Samama, & Svartzman, 2020). It is our view that transition risk will only be priced in
+so far as investors have developed forward-looking measures of transition risk of firms.
+5
+
+===== PAGE 6 =====
+
+it most effectively.
+To showcase an initial application of the climate stress test, we analyse the transition risk
+for a set of international public power firms and its financial impacts. This exploratory exercise
+is intended to present a proof of concept of the unique features, modelling choices and the range
+of possible analyses of the proposed framework. We highlight two key findings that strengthen
+our argument for the need of innovative approaches that are forward-looking and capture the
+heterogeneity involved in the transition. First, we find that transition impacts entail signif-
+icant heterogeneity across individual firms and the financial sector with clear distributional
+consequences. Second, we identify a significant variance of transition impacts - TRSIK - across
+different scenario narratives and model parameters, highlighting the elevated levels of variability
+and uncertainty of such approaches.
+The paper is structured as follows. Section 2 outlines the climate stress testing framework,
+discusses calibration strategies and the model limitations. Section 3 presents the results of the
+empirical application. Section 4 discusses the sources of uncertainty arising across the layers of
+the climate stress tests and presents the sensitivity analysis and mitigation strategy. Section 5
+concludes and discusses avenues for future research, as well as the practical application of the
+approach for stakeholders.
+6
+
+===== PAGE 7 =====
+
+2 Climate Stress Testing Model Framework
+The asset-level climate stress test (ACST) 2 consists of three interlinked layers. The first layer
+’Scenarios’ describes the source of transition risk, represented by a set of climate-adjusted
+economic parameters, designed and curated in a set of severe but plausible transition scenarios.
+The second layer ’The Economy’ describes the real economy, as well as individual firms’ asset
+values under different scenarios. It represents a firm by its physical economic assets and the
+associated ownership structure. The third layer ’The Financial System’ describes the financial
+system, represented by heterogeneous financial institutions and their balance sheets. Each of
+these layers is connected through a set of transmission channels, which propagates the climate-
+adjusted economic impact to the asset value of firms and subsequently translates the impact
+into financial risk. Refer to figure 1 for a stylistic overview of the model transmission channels.
+Figure 1: Representation of the key model layers, stylised overview of the climate stress testing
+framework and its transmission channels.
+In the model, transition scenarios feature decarbonisation pathways, policy-induced carbon
+taxes and technological change affecting the unit cost of technologies (e.g. solar, oil extraction or
+electricity generated from coal-fired power plants). The climate-adjusted economic parameters
+affect the physical production of firms, induce additional costs and shifts market shares according
+to the alignment of firms and emission intensities of their physical assets. This alters the firms
+cost structure and production mix across technologies and business units and impacts their
+income and profitability. In addition, a firm will be faced with stranded assets, i.e. a share of
+firms’ production that is incompatible with constrained carbon budget. Firm impacts’ are then
+translated into equity valuation changes, through a discounted dividend flow model. Using an
+time-horizon adjusted Merton credit risk framework equity impacts are subsequently translated
+into changes in the probability of default. On the financial level, TRISK is then expressed as
+2For simplification, the terms ACST and TRISK model will be used interchangeably
+7
+
+===== PAGE 8 =====
+
+the difference in the expected loss (EL) of a portfolio under a baseline and stress scenario, hence
+represent the value at risk from the uncertain materialisation of a transition stress scenario.
+In this section, we present in detail the modelling choices and underlying assumptions. We
+further discuss current model limitations in Section 2.4. Note that the model is described in a
+data-agnostic fashion, highlighting its flexibility to be adjusted to different needs (e.g. different
+sectors, such as automotive, power, fossil fuel extraction) and on varying levels of granularity
+(e.g. financial counterparty level).
+2.1 Layer One: Scenarios
+We represent the set of transition scenarios by a set of climate-adjusted economic parame-
+ters with geographical differentiation to account for institutional and regulatory heterogeneity
+across economic systems. This allows to capture the different capabilities and responsibilities
+of individual countries in climate change mitigation.
+2.1.1 Scenario Parameters and Calibration Strategy
+The set of climate-adjusted economic parameters includes decarbonisation pathways, unit cost
+projections and carbon tax pathways, reflecting different climate policy scenarios, demand shifts
+and technological change in energy and industrial systems. The scenario parameters are exoge-
+nous and depict various socio-economic and climatological assumptions that are generated across
+a variety of climate-economic models with underlying differences in modelling choices and gran-
+ularity. The approach used in this paper is scenario-agnostic and can be applied with a variety
+of scenarios ranging from the Network for Greening the Financial System (NGFS, 2020) to the
+International Energy Agency (IEA, 2020). The level of granularity that can be adopted in a our
+model will largely depend on the granularity of the scenario data on which the stress scenario
+can be calibrated.
+More specifically, the set of transition scenarios S is defined as S = {s1, ..., sN }, where
+si denotes the applied scenario and N are the total number of scenarios. Each scenario s
+consists of the specification of three matrices of climate-adjusted variables over time: (1) pro-
+duction Ps ∈ R|Y|×|H|×|T | ; (2) technology unit costs cs ∈ R|Y|×|H|×|G|×|T | ; and (3) carbon taxes
+ψs ∈ R|G|×|T |. The elements in these respective matrices are P s,t
+yhg, cs,t
+yhg, and ψs,t
+g . Here Y is the
+set of sectors, H is the set of technologies, G is the set of regions and T is the set of time. In
+what follows, we explain these scenario parameters in greater detail. We also briefly describe
+the calibration strategy and data inputs.
+Production Decarbonisation Pathways. P s,t
+yhg denotes the production levels in sector y ∈ Y
+of production technology h ∈ H, in region g ∈ G , across scenario s ∈ S . The production compo-
+sition across scenario s in time t reflects the required transformation of a sector y to meet the
+net-zero targets. For instance, to transform the global energy sector, the IEA projects the phase
+8
+
+===== PAGE 9 =====
+
+out of electricity production from fossil-fuel-related technologies, while scaling up renewable en-
+ergy to meet increasing demand. Most of the scenarios are designed on the global, regional and,
+more importantly, sectoral and technological level. Hence, these inputs do not provide for the
+required level of granularity to perform an asset- and firm-level approach. To capture the het-
+erogeneity of risks associated with the transition for individual balance sheet compositions and
+firms themselves, we need to adjust the regional production pathways P s,t
+yhg into firm transition
+pathways. This is one of the distinctive key features of our approach that gives an unprece-
+dented level of granularity through the integration of asset level information gathered through
+earth observation, satellite imagery and remote sensing that provide a comprehensive picture
+of the geolocation, characteristics and capacity of physical assets and infrastructure (OxSFP,
+2018) as well as the ownership structure to firms in climate-critical sectors. We rely on data
+from the provider Asset Resolution (AR) 3.
+We calibrate our model and represent the balance sheet of firm i ∈ C through its unique
+composition of individual physical production assets a ∈ A across business units 4 and tech-
+nologies h, where C and A is the set of climate-critical firms and assets. More specifically, we
+obtain a firm i’s production P s,t
+i by summing over the asset production P s,t
+yhga across each sector
+y and technologies h across its ownership of assetsa, i.e. P s,t
+i = P
+g∈G
+P
+y∈Y
+P
+h∈H
+P
+a∈A P s,t
+igyha.
+Additionally, we then obtain the market share ηt
+iyha of asset a of firm i in sector y and
+technology h in region g at time t, which is given by its asset production P t
+iyhga relative to the
+total production P t
+yh in sector y and and technology h in region g at time t; i.e.,
+ηt
+iyha =
+P t
+iyha
+P t
+yh
+. (1)
+The market share ηt
+iyha of asset a of firm i is typically defined based on current data, but
+could in principle be defined based on the market share at a future time t projected under a
+given scenario s. Therefore, the market share ηs,t
+iyha could be given a superscript s.
+Obtaining the firm i’s asset market share ηt
+iyha allows us to derive the firms responsibility
+in implementing the requisite change in the absolute production levels in scenario s to achieve
+a certain decarbonisation climate target. For instance, according to a Paris-aligned scenario,
+electricity generated from coal will slowly be phased out according to government commitments
+and the cost-disadvantage due to the replacement of renewable power generation. We then
+assume that a firm that owns a coal-fired power plant will contribute to such a decarbonisation
+by decreasing its production according to its market share. An asset with higher capacities and
+3https://asset-resolution.com
+4For simplicity, in this paper, we use the terms technology and business unit interchangeably. In the power
+and automotive sector, a firm has its production composition across technologies such as electricity generation
+from solar or electric vehicles. However, for fossil fuel companies that extract oil and gas, strictly, these are not
+technologies, henceforth these are better described as business units
+9
+
+===== PAGE 10 =====
+
+production will therefore be required to reduce production levels to a greater absolute extent. A
+firm that has both, production assets in oil extraction and power plants that produce electricity
+from solar, will need to adjust its respective production levels in oil extraction (downwards)
+and solar power (upwards) depending on the location of the plants and applicability of regional
+targets that are consistent with climate objectives. More formally, the requisite production level
+change ∆ P s,t
+iyha by asset a of firm i is given by its asset-specific market share ηt
+iyha times the
+change in production levels P s,t
+yh specificed in scenario s, i.e.
+∆P s,t
+iyha = ηt
+iyha∆P s,t
+yh , (2)
+where the change in production in region g in technology h under scenario s is defined as
+∆P s,t
+yh = P s,t
+yh − P s,t−1
+yh .5 Firms i’s overall market share across technologies and sectors at a given
+time t is ultimately a composition of its market shares ηt
+iyha of asset a at time t. Importantly,
+it can be seen from equation 2 that a firm with a smaller market share across its assets in
+sustainable technologies today will be at greater transition risk tomorrow if its high-carbon
+technologies are subject to a phase-out according to the requisite scenarios production levels
+P s,t
+yh . Further, from equation 1, it is clear that ηt
+iyha is time-varying and could be made depen-
+dent on the firms’ own production plans as observed in the data.
+A unique feature of the AR data is that it contains information on the 5-year production
+plan of firms. This allows us to represent a forward-looking dimension that depends on the
+transition plan of firm i, stipulating how it might reduce and shift its production composition
+towards sustainable technologies. Firms that do so will then see their production levels and
+associated carbon emissions fall, and will be less vulnerable to a carbon tax, a demand change,
+policy-induced phase-out, or other climate policies that could harm their profits. AR captures
+asset-level information for climate-critical sectors, i.e. oil, gas and coal extraction, power, steel,
+cement, aviation, shipping and car manufacturing, that account for nearly 80% of global carbon
+emissions. The graphs below show the production plans for an illustrative selection of energy
+firms across its business units and technologies, as well as the associated emission levels.
+The ACST framework was designed in a way to leverage off such forward looking production
+plan information 6. This allows to model the strategic direction that firms in climate-critical
+sectors are moving towards and integrate such information in the construction of the baseline
+scenario (see section 2.1.2). This is a key distinctive feature of the proposed approach. Relying
+on production plans of firms highlights a crucial advantage compared to other stress testing
+frameworks. Most models are calibrated using the historical carbon emission of a firm or sector
+as a proxy to derive the climate-economic transition impact. This stems from the fact that a
+5Henceforth, the ∆ of a variable is always defined as the difference between a variable at time t and t − 1.
+6Alternatively, information on CAPEX plans and or investments across technologies h of firm i could be
+gathered to project production plans
+10
+
+===== PAGE 11 =====
+
+Figure 2: Historical and forward-looking production plans across business units for a repre-
+sentative energy firm, as well as associated total carbon emissions from 2013-2026. Data based
+on Asset Resolution. Fossil fuel extraction in Giga Joule (GJ), emissions in 1e 8 tonnes of CO 2
+Figure 3: Historical and forward-looking production plans across business units for a repre-
+sentative energy firm, as well as associated total carbon emissions from 2013-2026. Data based
+on Asset Resolution. Fossil fuel extraction in Giga Joule (GJ), emissions in 1e 8 tonnes of CO 2
+consensus seems to have emerged that institutions and firms should be mandated to disclose
+their Scope I, II and potentially Scope III emissions, as a proxy for their transition risk and a
+barometer for their alignment with the Paris goals. Contrary to the emerging consensus, we
+argue that historical carbon emissions are not a sufficient metric to determine a firm’s transition
+risk. Importantly, two firms with exactly the same current emissions today could face widely
+disparate transition risk depending on their strategic operational decisions and investments
+across technologies. However, we do recognise the importance of explicit carbon budgets and
+emissions in our model, therefore other transmission channels in our model capture the impact
+of an explicit policy-induced carbon tax on firms’ cost structure.
+Carbon tax. Another parameter in the set of transitions scenarios is the carbon tax ψs,t
+g in
+dollars per ton of C0 2 emitted resulting from a unit of production in region g under scenario
+11
+
+===== PAGE 12 =====
+
+s at time t.7 Depending on policy and regulatory changes across regions and jurisdictions,
+governments are well positioned to tackle the market failure around climate change and carbon
+externalises through direct pricing mechanisms in the economy (Nordhaus, 2007, 2017). De-
+pending on the envisioned speed of the structural transformation towards a net-zero economy,
+carbon price regimes may be enacted very differently, also depending on geopolitical, economic
+and trade-related strategies across jurisdictions. Such a carbon tax will directly affect the cost
+structure of firms in climate-critical sectors and create incentives to change production compo-
+sition across competing firms. We allow in the model to integrate a regional- or country-specific
+carbon tax pathway that is given exogenous by scenario providers. Figure 4 illustrates various
+global carbon tax trajectories from the NGFS under different transition scenarios s.
+Figure 4: Climate policy scenarios s corresponding to different carbon tax paths ψs,t
+g over the
+period t = 2020 , ...,2050. The scenarios are consistent with those formulated by the (NGFS,
+2020).
+Unit cost projections. The projected path of decarbonisation of the economy, is driven by
+assumptions and models of technological cost advancements. This is reflected through cs,t
+yhg,
+which is the unit cost of production in sector y, across technologies h, in region g, in scenario
+s at time t. Most often, cost pathways are modelled in integrated assessment models (IAMs)
+or by academics such as as Way, Ives, Mealy, and Farmer (2021) who use historical trends
+in production costs to forecast future trends. For instance, the costs of many sustainable
+technologies, such as producing solar power, have fallen exponentially over the last decades
+in line with Moore’s and Wright’s law. The costs of extracting oil from the ground has not
+experienced exponential decay, but rather stayed relatively constant ((Way et al., 2021)). Future
+trends of production costs is an integral part of the transition scenario, as it reflects the likely
+diffusion and comparative advantage across a range of high-carbon and sustainable technologies.
+7If a global carbon tax is applied, the carbon tax will be the same across all regions.
+12
+
+===== PAGE 13 =====
+
+Unit cost developments may be significantly different under various climate mitigation and
+policy scenarios. Information on time-variant, regional different and scenario-specific unit costs
+is a critical information in the set of scenario parameters that underlie our climate stress testing
+approach. This will impact the comparative advantage and unit cost structure of firms in our
+model. Figure 5 shows an illustrative selection of cost projections across scenarios that are
+suitable to calibrate the ACST.
+Figure 5: Projection of the Levelised Cost of Electricity (LCOE) by technology and scenario
+for the IEA Sustainable Development Scenario (SDS) (IEA, 2020) and Oxford scenarios (Way
+et al., 2021). Oxford no transition refers to a counterfactual scenarios where the technological
+improvement is frozen to current levels.
+The scenario parameters form the basis for the transition scenario that is required to perform
+the ACST put forward in this paper. We aim to describe the relevant segments of a transition
+risk as agnostic as possible, acknowledging that a wide range of scenarios exist in the academic
+and non-academic sphere, with varying degrees of granularity, specificity and transparency
+around underlying assumptions. The level of granularity achieved in the ACST also varies
+with the granularity of scenario inputs. Note that different scenarios can be integrated in a
+complementary fashion as long as the scenario narrative and assumptions are largely consistent.
+Moreover, as shown in (Gasparini, Baer, & Ives, 2022), the ACST can also serve the purpose of
+comparing and constructing several benchmark scenarios to assess the fundamental differences
+in assumptions and compare different stress test outcomes based on the scenario narrative. This
+can be valuable to better understand the uncertainties and sensitivities around scenarios and
+consistently apply these in one modelling framework. To this end, the ACST can serve as a new
+methodological approach to combine several scenarios to construct robust net zero benchmarks
+and to assess transition plans and the impact on the financial system. The framework proposed
+here is also consistent with emerging consensus around the need for clear scenario principles
+to assess the robustness of individual climate scenarios (Fankhauser et al., 2022). Note that,
+further advancements around the granularity of scenarios are urgently needed. For instance,
+global and regional scenarios from the NGFS and other providers, are underpinned by high-
+13
+
+===== PAGE 14 =====
+
+level assumptions on the global or regional level, rendering those narratives of limited use for
+country-specific analyses that are influenced by government commitments, as well as specific
+legal and economic contexts.
+14
+
+===== PAGE 15 =====
+
+2.1.2 Design of Baseline and Stress Scenarios
+In order to construct a set of suitable scenarios, we need to calibrate scenario parameters and
+curate a baseline scenario and a set of stress scenarios. This process is flexible and can be
+adjusted to various forms of different scenario narratives, depending on the scope of the stress
+testing exercise. We propose the following way forward to reflect the transition risk in the model.
+Baseline Scenario. We construct the baseline scenario s2 = {baseline} for each firm i in a
+way that reflects the production plans. Firms are expected to follow their planned production
+across technologies and sectors P s,t
+iyh over the period t = {2020, ...,2025}. After that, the firm
+i follows the respective production change ∆ P s,t
+iyh prescribed in a business as usual scenario
+for the remainder of the stress testing horizon ( t = {2025, ...,2040}), where ∆ P s,t
+yha is obtained
+from the current policy scenario ’CPS’ by the (IEA, 2020). The CPS reflects a baseline picture
+of how the global economy would evolve if governments and firms made no changes to their
+existing policies and announced forward-looking plans. Further, the firm i will be faced with
+scenario-consistent unit cost developments cs,t
+yhg by the (IEA, 2020) and carbon tax trajectories
+ψs,t
+g from the ’no transition’ scenario by the (NGFS, 2020). The resulting scenario s1 = baseline
+reflects a narrative of firms producing according to their strategic plans, irrespective and with
+no foresight to the materialisation of transition risks other than already reflected in their firms
+production plans.
+Target and Stress Scenario. In order to construct a stress scenario, we need to first define
+a scenario s2 = {target} that is aligned with future climate targets. We choose the ’Sustain-
+able Development Scenario” (SDS) by the (IEA, 2020). This scenario prescribes the requisite
+production changes across sectors and technologies ∆ P s,t
+yh that are needed to transform the
+economy, comply with carbon budgets and achieve a Paris-aligned climate target of below 2 °.
+Figure 6 illustrates for a set of firms in the power sector, the SDS target scenario across tech-
+nologies. The scenario s3 = {stress}, or late and sudden scenario, is then constructed in the
+following way. Firm i continues to produce according to the scenario s1 = {baseline} until the
+introduction of “climate action” shock year Z in the set of Z = {Z2025, ..., Z2035}.8 This shifts
+the production of firm i across sector y and technology h onto a Paris-aligned path, to comply
+with the climate targets and carbon budgets set out in scenario s2 = {target}, while overcom-
+pensating for previous misalignment. Note that in the stress scenario the required production
+change ∆ P stress,t
+iyh for firm i is greater than the production change prescribed in the scenario
+s2 = {target}, i.e. ∆ P stress,t
+iyh > ∆P target,t
+iyh for the period t = {2030, ...,2040} (see Figure 6
+for a visual representation of this mechanism). This is intuitive, as firms need to decarbonise
+their production more steeply, following a potential misalignment prior to the shock year Z.
+It follows that Z defines the degree to which a transition is considered ’disorderly’, i.e. the
+8Note that the shock year can be varied for sensitivity purposes to reflect varying degrees of a disorderly
+transition
+15
+
+===== PAGE 16 =====
+
+later transition policies are implemented, the longer firms in climate-critical sectors remain mis-
+aligned with the target scenario, and the steeper a potential adjustment in production levels.
+The climate action in our model is not restricted to being dependent on strong government
+intervention, but that transition can also be driven by firms’ strategic decisions. The model
+allows for the implementation of a wide range of different scenario providers, to accommodate
+for the various needs of different risk management exercises.
+Figure 6: Stress Scenario. The graphs depict the constructed firm-specific target and stress
+scenario for a set of power firms. The scenarios2 = {target} reflects the IEA SDS that shows the
+required global change across high- and low-carbon technologies to meet the final energy demand
+by the global economy, while achieving the temperature goal set out in the Paris Agreement
+(below 2°Degrees). The scenario s3 = {stress} assumes that firms remain on their business as
+usual production trajectories as outlined in the Asset Resolution production plan data until a
+shock in 2030, that requires firm to shift production to meet the SDS while overcompensating
+for previous misalignment.
+Further, the firms in F will be faced with scenario-consistent unit cost developments cs,t
+yhg
+by the (IEA, 2020) and carbon tax trajectories ψs,t
+g from the ’disorderly transition’ scenario
+by the (NGFS, 2020). The resulting scenario s3 = {stress} reflects a narrative of a disruptive
+unanticipated production phase-out across technologies, decreased unit cost projections due to
+technological change and the sudden implementation of an increasing carbon tax. See table 1
+for a summary of a representative scenario construction.
+16
+
+===== PAGE 17 =====
+
+Table 1: Illustrative Scenario Construction
+Baseline Scenario
+• Ps,t
+iyhover the periodt ={2020, ...,2025} calibrated on production plans of firmi from AR
+and ∆Ps,t
+iyhobtained from the current policy scenario ’CPS’ by the (IEA, 2020)
+for the remainder of the stress testing horizon (t ={2025, ...,2040})
+• unit cost developmentscs,t
+yhg by the (IEA, 2020)
+• carbon tax trajectoriesψs,tg from the ’no transition’ scenario by the (NGFS, 2020)
+Stress Scenario
+• s1 ={baseline} until the introduction of “climate action” in shock yearZ2030
+• fromt ={2030, ...,2040} ∆Pstress,t
+iyh derived froms2 ={target}
+• unit cost developmentscs,t
+yhg by the (IEA, 2020)
+• carbon tax trajectoriesψs,tg from the ’disorderly transition’ scenario by the (NGFS, 2020)
+For a more detailed discussion on the construction of the scenarios and baseline settings of
+our exploratory analysis, please refer to section 3. In the next section, we outline how we model
+the different asset values of firm i under the baseline and shock scenario.
+17
+
+===== PAGE 18 =====
+
+2.2 Layer Two: The Economy
+In order to understand the propagation from the transition risk scenario s to the real economy
+and the formal transmission channels, we need to introduce the heart of the ACST. That is a
+microeconomic framework to model the asset value and profitability of climate critical firms in
+the real economy based on their physical asset production infrastructure.
+2.2.1 Firm Value under Different Scenarios
+We represent the real economy as a set of heterogeneous firms i across sectors y ∈ Y . Each firm
+i has a unique balance sheet that is composed of assets As,t
+i and liabilities Ls,t
+i , where the firm
+asset value is given by the value of its stock of physical assets. We model the balance sheet
+of firm i across its corresponding ownership tree and subsidiaries. We assume that a parent
+companies production levels P s,t
+igyha are aggregated relative to the parent company’s equity stake
+in its subsidiary (see Figure 17 for an illustration).
+Figure 7: Illustrative example of asset-based activity aggregation in ownership tree of firms
+in climate stress testing framework. Note, that this has important risk implications, as the
+transition impact on production is modelled on the level of individual physical assets.
+Importantly, each firms’ asset value As,t
+i at time t in scenario s is given by the sum of the
+values of its physical assets As,t
+i,a across its ownership structure and subsidiaries, i.e.
+As,t
+i =
+X
+a∈A
+As,t
+ia (3)
+where the value of physical production assets As,t
+ia at time t in scenario s is given by the
+discounted sum of the profit generated by the asset a, i.e.
+As,t
+ia =
+X
+t∈T
+exp−ρj (t−T ) Et[πs,t
+i,a] + Ωs,T
+iar , (4)
+18
+
+===== PAGE 19 =====
+
+where Et[πs,t
+i,a] gives the assets’ expected profits in scenario s at time t. Future profits are
+discounted at the firm-specific risk premium ρj that is given by
+ρi = ρf + βiE[RM], (5)
+where ρf is the risk-free rate. βj represents the covariance between the firm return Rt
+i and the
+market return Rt
+M over the variance of the firm return, i.e.,
+βi = cov(RM , Ri)
+var(RM) , (6)
+where Ri, RM ∈ N1×|T |. E[RM] is the expected market return, which is also referred to as risk
+premium. We assume that after the time horizon of the stress test, future profits remain in a
+normalized state forever, given by the terminal value (perceptual growth) Ω s,T
+iar , i.e.,
+Ωs,T
+iar = πs,T
+ia (1 + r)
+ρi − r , (7)
+where r is the long-term growth rate. The resulting expected profit of firm i can be estimated
+as the average profits over M Monte Carlo (MC) runs, i.e.
+Et[πs,t
+ia ] ≈ 1
+M
+MX
+m=1
+πs,m,t
+ia , (8)
+where πs,m,t
+ia represent the realized profits of asset a of firm i in MC run m in scenario s at time
+t. For simplicity, we assume that the profit in each MC run m is the same 9. Hence, the asset
+value As,t
+i of firm i represents the sum of the net present values As,t
+ia of its assets a derived from
+a discounted cash flow model.
+The profits πs,t
+ia of firm i’s asset a at time t are given by its revenues Rs,t
+ia minus its costs
+Cs,t
+ia , i.e.
+πs,t
+ia = Rs,t
+ia − Cs,t
+ia , (9)
+where the revenue Rs,t
+ia of firm i’s asset a is given by its production P s,t
+iyha times the price
+ps,t
+yh, i.e.
+Rs,t
+j =
+X
+y∈Y
+X
+h∈H
+P s,t
+iyh((ps,t
+yh + ωyθs,t
+jyh), (10)
+and the cost structure of firm i’s asset a is represented, i.e.
+Cs,t
+ia =
+X
+y∈Y
+X
+h∈H
+P s,t
+iyha(cs,t
+iyha + (1 − ωy)θs,t
+jyha) (11)
+9hence we omit the m superscript going forward
+19
+
+===== PAGE 20 =====
+
+and ωy ∈ [0, 1] represents the elasticity of sector y to pass through the carbon tax and avoid
+additional costs. θs,t
+jyha represents the carbon tax in dollars, if any, per unit of production in
+industry y and technology h at time v applicable in scenario s to firm i’ asset a. It is given by
+θs,t
+jyha = ϵs
+jyha ψs,t
+iyha. (12)
+Here ϵs
+jyha denotes the tons of C02 firm i’s asset a emits per unit of production in {y, h} at time
+t. In other words, it is the emission intensity on the asset-level. ψs,t
+jyha denotes the carbon tax
+in dollars per ton of C0 2 emitted applicable in year t under scenario s. From equation 10 and
+equation 11 it becomes clear that the profit margin νt
+j of asset a of firm i is time-varying and
+dependent on the unit cost and price differentials across scenarios, i.e.
+νs,t
+iyha = 1 −
+ps,t
+yh + ωyθs,t
+jyha
+cs,t
+iyha + (1 − ωy)θs,tiyha
+(13)
+This way the model captures changes in profit margins due to comparative advantages of
+individual firms and incorporates the cost-savings present in transitioning to a green business
+model resulting from advancements in technological innovation. This reflects increased profits
+for firms due to declining costs in, e.g. levelised cost of electricity in low-carbon technologies
+for the energy sector 10.
+2.2.2 Stranded Assets
+Our model allows to estimate the share of stranded assets for firm i that has an impact on the
+collateral value of a firm and the debt financial instruments. More specifically we assess carbon
+budget implications of a scenario s on the asset composition of firm i. We hereby rely on the
+respective carbon budgets set out in the transition scenarios defined in section 2. Put simply,
+we define stranded assets Si of firm i as the ratio of the sum of firms’ physical asset production
+P s,t
+ia that is incompatible with a given scenario budget over the period t = {2020, ...,2040}.
+Incompatibility is expressed as the overshoot of cumulative committed emissions across assets
+beyond a regional carbon budget. We proceed in two steps.
+First, we estimate the committed emissions χs,t
+iga under scenario s for each emitting asset a
+of firm i in region g over the remaining period starting from date t under the transition baseline
+scenario.
+χs,t
+iga =
+X
+v∈T
+P s,v
+iga ϵv
+iga (14)
+where ϵv
+iga is the emission intensity of asset a of firm i.
+10Note that the same principle applies to a wide range of climate-critical sectors and can be implemented
+with slight adjustments. For instance, in the automotive industry, different technology assumptions for batteries,
+internal combustion engines and electric cars can be applied.
+20
+
+===== PAGE 21 =====
+
+Second, we identify the contribution of the asset to the carbon budget consumption of region
+g to identify an incompatibility threshold, beyond which the assets production and emission
+exceed the allowed consumption of the carbon budget. More specifically, we assume that the
+regional carbon budget Bs
+iga is distributed according to the relative share of the assets production
+in the given region. Hence, the carbon budget Bs
+iga as of date t of asset a of firm i in region g
+under a Paris-aligned scenario is given by:
+Bs,t
+iga = P s,t
+ga
+P s,t
+g
+Bs,t
+g , (15)
+where Bs,t
+g is the total remaining carbon budget in region g under scenario s as of time t. Hence,
+we have that at time t the share Ss,t
+ig ∈ [0, 1] of firm i’s production across its assets a in region
+g having stranded asset risk given the materialization of scenario s is given by
+Ss,t
+ig =
+X
+a∈A
+χs,t
+iga − Bs,t
+iga
+χs,t
+iga
+(16)
+From equation 16 it becomes clear, that stranded assets of firm i are given by the share of
+the firms production that is incompatible with a Paris-aligned carbon budget. Note that firms
+with a more sustainable asset composition and lower emission intensities face lower stranded
+assets than firms that have a large share of their production in high-carbon technologies and
+business units such as power generation from coal-fired plants. We assume that this stranded
+asset measure is a key driver of financial risk as it directly depreciates the value of the firms
+liabilities (FI, 2018), when such assets serve as underlying collateral for refinancing on financial
+markets. Stranded asset directly feed into our credit risk model described in section 3 by lin-
+early increasing the loss given default of firm i.
+2.2.3 Firm Calibration Strategy
+To calibrate the second layer of the ACST, we need financial and economic data on firms.
+Datasets such as ORBIS 11, Bloomberg 12, Refinitiv Eikon 13 provide the required information,
+but other financial databases and providers have similar information with varying degrees of
+scope.14.
+To assess the firm value under different scenarios, we require information on firm profit
+margins, unit costs and prices to calibrate equation 13. This enables us to compute the free
+cash flow for each firm and asset. For data requirements on the scenario-specific unit cost
+11https://www.bvdinfo.com/en-gb/
+12https://www.bloomberg.com/professional/solution/bloomberg-terminal/
+13https://www.refinitiv.com/en/products/eikon-trading-software
+14The decision on which datasets to use to calibrate the model should be considered case-specific, depending
+on the scope and granularity of the exercise
+21
+
+===== PAGE 22 =====
+
+projections, refer to section 2.2.1. In case price data is not available to a sufficient level of
+granularity, we propose the following strategy to model the prices of technologies endogenously.
+We can assume that the regional unit end-price for each technology ps,t
+gyh at time t in scenario
+s is dependent on the average regional unit costs for the technology ¯cs,t
+gyh as well as the average
+net profit margin νg of firms that produce technologies in region g, i.e.
+ps,t
+gyh = ¯cs,t
+gyh(1 + νgyh) (17)
+where νgyh represents the average net profit margin of firms in regiong in sector y producing
+technology h in our sample and cs,t
+gyh represents the regional unit cost projections across scenar-
+ios. Note that νgyh can also be calibrated to be time-varying and inversely linearly dependent on
+the unit cost differentials across scenarios. Depending on the availability of data for calibration,
+this relationship can generate cost and price parameters.
+Our model captures the ability to discount future cash flows on a firm-specific discount
+rate, whereby the firm specific betas are required. Another option is to calibrate the discount
+rate with the weighted-average cost of capital (WACC) for the respective sector y, assuming a
+constant beta, constant risk premium and a constant risk-free rate. The risk-free rate ρf can be
+set equal to the 30Y US treasury yield, the firm- or sector specific beta βi and the global risk
+premium E[RM] to be the excess CAPE yield of Shiller. 15. Further, to estimate the terminal
+value in equation 7 we need to calibrate the standard economic growth rate, based on historical
+observations.
+A prerequisite of the model is information on emission intensities and production or capac-
+ities on the physical asset level. Here we rely on data provided by Asset Resolution, but the
+availability of asset-level data across many climate critical sectors is steadily increasing across
+different providers, e.g. Spatial Finance Initiative (SFI) 16, Global Energy Monitor17, the World
+Resource Institute18 among others. More information on the use of asset-level data to generate
+the scenario production trajectories, as well as required data inputs for unit costs and carbon
+tax trajectories can be found in Section 2.1. To calibrate the change in the firm cost structure
+due to the implementation of a carbon tax, information on the pass-trough parameter ω is
+needed. This can be based upon empirical findings in the academic literature. 19. More detailed
+information on the calibration strategy of the exploratory analysis in this paper can be found
+in section 3.
+15See: http://www.econ.yale.edu/~shiller/data.htm.
+16https://www.cgfi.ac.uk/spatial-finance-initiative/
+17https://globalenergymonitor.org
+18https://datasets.wri.org/dataset/globalpowerplantdatabase
+19For instance (Neuhoff & Ritz, n.d.) find a relatively low pass-trough effect of 7% in the industrial sector.
+22
+
+===== PAGE 23 =====
+
+2.3 Layer Three: The Financial System
+In order to understand the propagation of transition risk from the real economy to the financial
+system, we need to introduce the third layer of the ACST.
+2.3.1 Financial Institutions
+We represent financial sectors s ∈ S (e.g. banks, investment funds, insurance and pension
+funds), by a set of individual financial institutions j. We represent each financial institutions j
+at a representative level with a unique balance sheet composition to reflect the importance of
+balance sheet heterogeneity. The exposure of each financial actor j to firm i can be decomposed
+along the main types of financial instruments. Following (Battiston, Mandel, Monasterolo,
+Sch¨ utze, & Visentin, 2017),At
+j gives the total assets of financial actor j, C the set of climate-
+critical firms, and V = [equity, bond, loan] the set of financial instruments. The assets of
+financial institution j are then given by the asset value across its counterparty and asset types
+with each counterparty, i.e.,
+As,t
+j =
+X
+i∈C
+X
+v∈V
+As,t
+jiv . (18)
+In what follows, we focus on the formulation and transmission channels of risk propagation
+through financial instruments that directly affect financial institutions balance sheets.
+2.3.2 Expected Financial Loss
+The expected total financial loss Et[Ls
+ji] that financial institution j is facing in the scenario s as
+of time t. This is expressed as the sum of the expected losses from its individual asset exposure
+Av
+ji across all relevant asset classes v ∈ V , i.e.,
+Et[Ls
+ji] =
+X
+v∈V
+Et[Ls
+jiv] = Et[Ls
+ji,equity] + Et[Ls
+ji,bond] + Et[Ls
+jj,loan]. (19)
+Equity. The expected financial losses for financial institutions j′s equity exposure can be
+described as follows:
+Et[Ls,equity
+ji ] = Estress,t
+ji − Ebaseline,t
+ji , (20)
+where Es,t
+ji denotes the equity value ofj’s investment in firmi under scenario s = {stress, baseline}
+and is given by
+Es,t
+ji =
+ut
+ji
+ut
+j
+Es,t
+i . (21)
+Hence, institution j’s equity value in firm i is given by the current equity value of firm i in
+scenario s, Es,t
+i , times the number of equity shares j holds of firm i, ut
+ji, relative to the total
+number of outstanding shares of firm i, ut
+i. Equation 21 makes clear that institution j’s equity
+23
+
+===== PAGE 24 =====
+
+investment in i changes proportionally to changes in the equity value of i.
+We obtain the firms equity value Es,t
+ji in the model under different scenarios, by abstracting
+from the asset value As,t
+i of firm i, assuming that the firm can choose its share of dividends
+payed out to investors in response to the shock. The dividend factor βt
+j then determines the
+relationship between the net present value of the firm i and the financial equity valuation, i.e.
+Es,t
+i = βs,t
+i As,t
+i . (22)
+Hence, we assume that firm i’s equity value at time t under scenario s is equal to its asset
+value As,t
+i in this scenario, i.e. the sum of all of its future dividend payments when discounted
+back to their present value, times the dividend factor. Refer back to section 2.2.1 which will
+discuss how the asset value of firm i is obtained. From equation 22 it becomes clear, that the
+model allows for a time-varying dividend factor, that reflects a companies’ strategic response
+to climate shocks. For instance, firm i, in the face of reduced cash-flows in the transition,
+might chose to reduce dividends paid out to investors to increase liquidity. Alternatively, the
+firm might decide to increase dividends, which firm i can offset by increasing debt levels Lj
+respectively. This will decrease the equity loss for financial institution j exposed to firm i,
+but simultaneously will impact the firms creditworthiness and leverage ratio (expected loss for
+bonds and loans), as we describe in more detail below. 20
+Bond and Loan. The expected financial losses for financial institutions j′s bond and loan
+exposure can be described as follows:
+Et[Ls,loan
+ji ] = (P Dstress
+i − P Dbaseline
+i ) ∗ LGDs
+ji ∗ EaDji, (23)
+For now, we assume that EaDji is not dependent on the scenario s, hence we assume a
+static balance sheet.
+The LGDs
+ji of institutions j′s investment in firm i is inversely linear dependent on the
+stranded assets Si in the stress scenario, i.e.
+LGDs
+ji = λmin + (1 − λmin)Si, (24)
+where λmin represents the loss given default threshold that can be calibrated accordingly.
+Assuming log-normal asset returns of each firm i ∈ C , the PD 21 of firm i in scenario s is,
+according to the Merton model (Merton, 1974), given by
+P Ds
+i = 1 − N (DDs
+i ), (25)
+20Note that this mechanism has not yet been implemented yet in the code infrastructure. For now, we assume
+βs,t
+i = 1
+21Note, that the creditworthiness of some state-owned firms are highly dependent on the home countries’ credit
+profile (Hoepner, Oikonomou, Scholtens, & Schr¨ oder, 2016), which cannot be sufficiently captured yet.
+24
+
+===== PAGE 25 =====
+
+where N is the cumulative standard normal distribution, and where the distance to default
+(DD) of firm i in scenario s is given by
+DDs
+i =
+log (As,t
+i ) + (µj − 1
+2 σ2
+j )Ti − log(Lt
+i)
+σj
+√Ti
+, (26)
+where µi denotes the expected return of the assets of firm i (and can be set to the firm-
+specific risk premium as defined in section 2.2) and σi the volatility of i’s assets. For now, we
+assume that this is scenario independent. Further, Ti represents the average maturity of firm
+i’s liability. In the Merton model Ti is the maturity of the single liability of the firm. The asset
+value As,t
+i of firm i is scenario dependent and will be impacted in the stress scenario, depending
+on the firms strategic alignment and individual cost structure (see 2.2.1). The firms’ liabilities
+Lt
+i are given by its current liabilities plus the additional debt needed to mitigate the dividend
+pass through of the climate risks (difference between Astress,t
+i and Estress,t
+i in the shock scenario,
+dependent on the behavioral dividend parameter to minimise equity volatility. It follows that,
+i.e.
+Lt
+i = Li + (1 − βj)As,t
+i . (27)
+The liabilities Li of firm i can be calibrated based on observable debt levels. Overall, this
+representation of the financial system allows us to model the changes in the value of the equity
+and liabilities of the real economy and the effect on the balance sheets of financial institutions.
+2.3.3 TRISK
+We define the transition risk – put differently TRISK – of a financial institution j associated
+with the stress scenario s3 = {stress} relative to the baseline scenario s3 = {baseline}. More
+formally, the TRISK of institution j gives the current value at time t of the expected dollar
+loss that it is estimated to suffer given the uncertain materialisation of the transition. TRISK
+can be obtained across a wide range of different transition narratives and parameters in the set
+scenarios S to represent a plausible range of risk estimates for financial institution j, depending
+on different beliefs around future transition pathways, technological change and carbon tax
+policies. More formally, TRISK is defined as
+T RISK s,t
+j =
+X
+v∈V
+X
+i∈C
+T RISK s,v,t
+ji = Et[Ls,equity,t
+ji ] + Et[Ls,bond,t
+ji ] + Et[Ls,loan,t
+ji ], (28)
+where T RISK s,t
+ji represents the dollar loss that financial insitution j could suffer on its
+portfolio of assets of type v ∈ V , where V is the set of financial assets. Further, T RISK s,v,t
+ji
+denotes the TRISK institution j faces in scenario s on its asset investments of type v in firm
+i, where C represents the set of analysed firms in climate-critical sectors. This can also be
+expressed as expected loss in relative terms to the overall exposure of financial institution j, i.e.
+25
+
+===== PAGE 26 =====
+
+Ej[L] = T RISK s,v,t
+i
+Aj
+. (29)
+We can also define the TRISK for each real economic firm i across two dimensions, irrespec-
+tive of the financial risk implications. First, T RISK N P V
+i is expressed as the difference in the
+net present value of firm i between the stress and the baseline scenario , i.e.
+T RISK N P V
+i = Astress
+i − Abaseline
+i . (30)
+Further, T RISK P D
+i is expressed as the difference in the probability of default of firm i
+between the stress and the baseline scenario , i.e.
+T RISK P D
+i = P Dstress
+i − P Dbaseline
+i (31)
+This way risk implications can also be reflected on the country level. Here, O represents the
+set of firms i headquartered in country c. The T RISK c of country c is then the sum of TRISK
+across domestic firms, i.e. P
+i∈O T RISK N P V
+i and P
+i∈O T RISK P D
+i .
+Indirect impact. A large portion of total assets held by financial institutions are issued by
+other financial institutions (Battiston et al., 2017). As a result, there is a potential systemic
+risk that can materialize through the so-called second-round effects (Stolbova, Monasterolo,
+& Battiston, 2018). In the breakdown of total assets As,t
+j by financial institution j , we can
+distinguish the securities issued by firms in the financial sectorss ∈ S (whose values additionally
+depend on their own assets’ values as Aj) from those issued directly by firms in the climate-
+critical sectors i ∈ C to obtain:
+As,t
+j =
+"X
+i∈C
+X
+v∈V
+As,t
+jiv
+#
++
+
+X
+j∈S
+X
+v∈V
+As,t
+jjv
+
+ . (32)
+Put simply, financial institution j is not only directly exposed to firm i (which asset value
+As,t
+i is impacted by the transition shock), but also holds exposure to other financial institutions
+j across financial sectors s ∈ S , which itself have exposure to transition-affected firms and hence
+see their own asset value diminishing. Across its counterparty assets Aj, financial institution j
+is also faced with indirect losses Et[L] due to TRISK, i.e.
+Ei[Lindirect] =
+X
+j∈S
+X
+v∈V
+[As,t
+jjv − T RISK s,t
+j ]. (33)
+Note that such a representation of indirect holdings represents the potential second-round
+losses in its simplest form and neglects amplification mechanisms due to the reactive behavior of
+financial institutions, fire-sale assumptions and broader contagion effects. However, the shocks
+on the individual firm-financial level could inform more complex heterogeneous network models,
+such as (Farmer, Kleinnijenhuis, Nahai-Williamson, & Wetzer, 2020). Such an integration allows
+for a more comprehensive analysis of systemic resilience across a set of financial sectors.
+26
+
+===== PAGE 27 =====
+
+2.3.4 Financial Exposure Calibration Strategy
+To calibrate the third layer of the ACST, we need additional financial data on firms, as well
+as data on financial portfolios and counterparty-level securities along relevant financial instru-
+ments. For analysed financial insitutioni, we need information on the balance sheet composition,
+i.e. their absolute number of equity shares, bond and loan exposure to firms at time t. For
+central banks and supervisors, granular exposure data such as AnaCredit 22 for the European
+banking sector can be used. Alongside this, information on the maturities of debt securities is
+required as well as estimates on current probabilities of default based on standard risk manage-
+ment frameworks.23
+To calibrate the TRISK framework, additional information for firms is needed. This includes
+the total number of outstanding equity shares of firm i, annualised volatility and rate of change
+of the market value of the firm’s assets, market capitalization and outstanding debt levels, as
+well as debt-to-equity leverage ratios. For a more detailed discussion on the calibration of the
+exploratory analysis undertaken in this paper, refer to section 3 and for additional plots and
+graphs for the illustrative firm sample, refer to the Appendix A. All information can again be
+gathered from financial databases. 24
+22https://www.ecb.europa.eu/stats/money credit banking/anacredit/html/index.en.html
+23A common challenge with the Merton framework is the alignment of model predicted PDs with empirically
+observed PDs (Cormack et al., 2020). Note that our ACST produces estimates on the transition-related changes
+in probabilities of default, which can then be used to adjust the empirically observed probabilities of defaults
+(Cormack et al., 2020).
+24Note that further assumptions have to be made for firms and FIs on which we do not have such granular
+information. Here, we propose to construct meaningful benchmark averages to populate missing values. Especially
+for private firms we can, for example, assume that the leverage of each energy company is given by a target leverage
+of debt over enterprise value of similar sized public firms in the same region.
+27
+
+===== PAGE 28 =====
+
+2.4 Model Limitations
+The model is faced with limitations across the three layers of the framework - scenarios, the
+economy and the financial system - which is now discussed in more detail.
+Scenarios. While the framework accounts for the three drivers of a transition shock, i.e.,
+demand changes, technological change and policy-induced carbon pricing, these are modelled
+in isolation. There is no interaction mechanism between scenarios in the model that represent
+the potential compounding and amplifying nature of the risk drivers.
+The Economy. The model features a limited representation of the firms balance sheet, revenue
+and cost structure. For instance, we assume that the revenue of a firm is solely dependent on
+the future cash flows generated through its physical production infrastructure. For now, the
+model does not account for other revenue or income generated from other than the firms core
+business activities, i.e., it neglects the potential income due to investments in other business
+segments or other financial income. While the model captures the potential choice of a firm
+to reduce dividends payed to shareholders, it cannot capture the inter-temporal complexity
+involved in such a strategy. Future research could expand the representation of mitigating pa-
+rameters that allow a strategic reaction of the impacted firm to mitigate the impact on financial
+firm valuation. Further, the model accounts for a simple representation of the pass trough of
+additional policy-induced costs to the consumer, assuming that an increased price can be sold
+in the market without any demand losses.
+While the ACST represents the strategic direction firms are taking through the represen-
+tation of production plans, it is faced with limitations in fully capturing the adaptive capacity
+and shifts in companies strategies. For instance, the model mechanisms are currently set in a
+way that firms that have not yet build out, and are indeed not planning to build out sustainable
+technologies in the near future, miss out on the opportunity to capture market shares in an ex-
+panding market. This indirectly penalises firms that are climate laggards in some technologies,
+preventing them from catching up throughout the time horizon of the stress test.
+Further, no endogenous feedback mechanisms are integrated. The framework does not cap-
+ture a dynamic response to the transition shock from the financial sector to the real economy. For
+instance, a TRISK exposed bank may find it individually optimal to reduce lending (deleverage)
+to highly vulnerbale firms in climate-critical sectors. When the whole banking sector exercises
+such deleveraging, this may trigger an adverse credit supply shock, i.e. a substantial contraction
+to the credit granted to the non-financial private sector. As the banking system in the is the
+backbone of the real economy and finances a substantial share of macroeconomic investment,
+such a contraction would result into higher loan interest rates, ultimately dampening economic
+growth (ESRB, 2020). The integration of such a feedback transmission channel is left for further
+research.
+28
+
+===== PAGE 29 =====
+
+The Financial System. The model does not fully capture a probabilistic approach around
+the expected shortfall and unexpected loss of exposed financial institutions. Note, that also the
+choice of financial models, the dividend cash flow model and the Merton approach to estimate
+the effect of climate transition impacts are not without limitations. For instance, the Merton
+framework assumes perfect competition and efficient financial markets without frictions, as well
+as a normal distribution of the shock and market value of assets - assumptions that, in the
+context of tail-risk distributed risks under a extreme but plausible transition scenario could be
+violated25.
+Further we assume a scenario-independent asset volatility, where the shock transmission will
+enter the credit risk only through a relative change of the equity value of firm i and the impact
+of stranded assets on the loss given default. This is clearly a limitation and may lead to an
+underestimation of the TRISK, as it is reasonable to expect that also the volatility increases
+in relation to a declining absolute equity value and decreasing dividends. Such a stochastic
+representation of the transition risk channel is however currently not incorporated in the model
+and is left for future research. This also highlights the need for a better representation of firms
+reactive behavior to initial shocks. This could be modelled through the representation of both,
+dynamic balance sheets of financial intuitions exposed to transition risk, and the dynamic re-
+sponse of financial institutions itself to restructure their balance sheet in response to a TRISK
+shock. For instance, if a bank suffers a financial loss due to the direct impact of climate-related
+risk (e.g. decreasing loan quality and increased probability of default to TRISK exposed firms)
+it is likely to deteriorate their capitalisation and profitability. This may trigger certain ampli-
+fication effects within the banking sector, as it could be perceived from an investor perspective
+that this particular bank has a lower creditworthiness. This in turn may result in an increase
+of funding cost on the inter-bank market, further deteriorating the bank’s profitability and ul-
+timately banks’ solvency.
+Last, it should be highlighted that the TRISK-related changes in PDs should be interpreted
+carefully, due to the context of longer time horizons. The probability of defaults do not represent
+a one-year PD as interpreted in the classical financial context. The PD changes incorporate the
+discounted shock effect that spans across the horizon of the stress test and hence do not repre-
+sent the true probability of a firm defaulting today, but rather reflect the potential range and
+spectrum of a default given the manifestation of the transition. Hence, the PD change depends
+on the scenario itself, the strategic direction and potential misalignment of firms throughout
+the entire duration of the net-zero transition. This limitations clearly stresses the need for new
+innovative climate-related financial models that are designed for the purpose of higher uncer-
+25For a detailed discussion on the limitations and assumptions underlying the Merton framework please refer
+to e.g. (Sundaresan, 2013)
+29
+
+===== PAGE 30 =====
+
+tainties and longer time horizons. Most approaches, including the TRISK framework simply
+adjust existing frameworks and ”forces” these models to accommodate to climate change com-
+plexities. This is a more fundamental critique, where the finance and research community needs
+to accelerate efforts to appropriately develop tools and techniques to effectively represent longer
+time horizons.
+30
+
+===== PAGE 31 =====
+
+3 Results of Exploratory Application
+This section presents the results of an exploratory application of the ACST and TRISK to
+an illustrative set of 135 public power firms that in 2021 capture around 30% of global power
+production and are responsible for 4.543 Gt of CO 2 or around 34% of power-related global
+emissions. These firms are headquartered in 29 countries, and through their ownership struc-
+ture own 8025 physical power assets across 92 countries. We further decompose these firms
+into relevant business units to capture the unique composition of electricity generating tech-
+nologies.We distinguish between electricity generation from oil, coal, gas, renewables, hydro and
+nuclear. Together, these firms represent a total market capitalisation of US $ 1.87 trillion and
+outstanding debt of US $ 1.86 trillion US $.
+The data used to map physical infrastructure and production information is provided by
+Asset Resolution. We source relevant financial data from Refinitiv Eikon as of February 2022.
+Table 2 presents the baseline settings for our results and the detailed calibration strategy of
+main parameter. For the set of endogenous model parameters, a descriptive statistic of key
+parameters, sector and firm’ business unit and technology in the sample refer to Appendix A.
+In principle, the ACST can be extended to cover all public and nonpublic 70.000 firms in the
+Asset Resolution dataset, comprising over 350.000 physical assets
+Table 2: Baseline settings of results.
+Time horizon [t,T] of climate stress test•t= 2020,T= 2040
+Shock Year,Z •2030
+Stress Scenario
+•s1={baseline}until the introduction of “climate action” in shock yearZ2030
+•fromt={2030, ...,2040}∆Pstress,tiyh derived froms2={target}
+•unit cost developmentscs,tyhgby the (IEA, 2020)
+•carbon tax trajectoriesψs,tg = 0
+Baseline Scenario
+•Ps,tiyhover the periodt={2020, ...,2025}calibrated on production plans of firmifrom AR
+and ∆Ps,tiyhobtained from the current policy scenario ’CPS’ by the (IEA, 2020)
+for the remainder of the stress testing horizon (t={2025, ...,2040})
+•unit cost developmentscs,tyhgby the (IEA, 2020)
+•Carbon taxψs,t= 0
+Discount rate,ρ •ρ= 4,83% (Cost of equity withρf= 0.02,βj= 0.0073 andE[RM] = 0.0387)
+Profit marginνi •firm-specifc; Refinitiv Eikon data
+Pricesps,tgyh •ps,tgyh= ¯cs,tgyh(1 +νgyh)
+Carbon budget,Bsiga Bsiga= 466 Gt/CO2(1.5°Degree Target)
+Dividend factorβ •βtj= 1
+Volatility of asset,σ •firm-specifc; Refinitiv Eikon data
+asset drift,µ •firm-specifc; Refinitiv Eikon data
+growth rateg •g= 0.02 (World Bank average 2012-2022)
+Maturity of financial instrument, T•Global corporate average for sample portfolio (Chen, Ganum, Liu, Martinez, & Martinez Peria, 2019)
+Loss given default thresholdλ λ = 0.45
+Set of Firms
+•135 public firms,Y= power sector,a= 8025 assets
+•PEi= 1.87 trillion US$
+•PLi= 1.86 trillion US$
+Production levelsPs,tiyh •AR data
+Asset emission intensityϵsjyha •AR data
+31
+
+===== PAGE 32 =====
+
+We present our results on two stages, reflecting the flexibility of the ACST to produce
+TRSIK estimates on economic firms ( T RISK N P V
+i and T RISK P D
+i respectively; see subsection
+3.1) and on financial institutions ( Ej[L]; see subsection 3.2). The results aim to demonstrate
+the core model mechanisms, as well as the range and structure of the stress testing outcomes.
+More importantly, we aim to adequately reflect the uncertainties and sensitivities involved in
+the ACST and convey the flexibility and transparency of our approach.
+3.1 Impact on Firms
+The TRISK across our analysed subset of firms shows significant heterogeneity. Table 7 sum-
+marises the transition related impact on firms’ net present values (NPVs) - T RISK N P V
+i - and
+probability of defaults (PDs) - T RISK P D
+i - in the stress scenario. We observe that depending
+on the firms’ alignment of business strategy, cost-advantages across its business units and tech-
+nologies, as well as individual balance sheet compositions and leverage, the T RISK N P V
+i varies
+significantly, with an average impact of -14%. We observe a large standard deviation, with the
+5th and 95 th percentile of T RISK N P V
+i around -49% and 11.56%. Individual firms that are
+highly misaligned even see their net present values decline by around 80% in the stress relative
+to the baseline scenario. Unsurprisingly, firms with a Paris-aligned strategy even receive net
+positive impacts of up to 21% from the transition shock.
+Table 3: Descriptive statistics of key results for TRISK of 135 international power firms,
+expressed as unweighted average net present value changes and probability of default changes.
+5th Percentile Mean Median 95th Percentile
+Net present value changes (in %) -48.96 -14.22 -10.31 11.56
+Probability of default changes (in percentage points) -0.15 0.34 0.00 2.17
+On average, we observe an additional 0.34 percentage points in probabilities of defaults
+in the stress relative to baseline scenario. Yet, there is significant variation in T RISK P D
+i
+between -0.15 and 2.17 percentage points, reflecting that some firms see positive changes to
+their creditworthiness (negative PD change) while other firms may see large PD increases in the
+net-zero transition. For highly impacted firms this represent an up to five-fold relative decrease
+in their creditworthiness. While PD changes tend to be smaller in absolute scale, in part due
+to difficulties in reflecting longer time horizons in credit risk models (see limitation section 2.4
+for discussion), we see a strong heterogeneity in the impact and a negative correlation with the
+impacts on the firms’ asset values, as shown in Figure 8.
+32
+
+===== PAGE 33 =====
+
+Figure 8: Heterogeneity in Transition Risk for set of international public power firms. TRISK
+is expressed as the change in net present value of a firm and the change in the probability of
+default of a firm in the stress relative to the baseline scenario
+Differences in PD changes across the worst affected firms can be attributed to initial differ-
+ences in debt-to-equity ratios and profitability, as reflected in the calibration of the model (see
+Figure 14 in the Appendix). This is intuitive, as firms with a strategic transition misalignment
+see their NPVs worsened, which moves those firms closer to their default thresholds.
+Further, we can decompose the impact on firms’ creditworthiness, by representing the annual
+changes in the PDs across the time horizon of our stress test exercise. Figure 9 shows for the
+sample of analysed firms the additional annual PD change due to the transition-related shock.
+While probabilities of default remain largely unaffected in the years following the shock in 2030,
+33
+
+===== PAGE 34 =====
+
+we observe a non-linear increase towards the end of the time horizon, reaching an additional
+3.5 percentage point increase in the average PDs. This highlights the significant impact on
+the credit quality of analysed firms, with negative effects on the expected losses for financial
+institutions exposed to these firms.
+34
+
+===== PAGE 35 =====
+
+Figure 9: Annual average changes in the probability of default for the selection of analysed
+firms. Results are expressed in percentage points and reflect the additional transition-related
+changes across the time horizon of the climate stress test.
+Overall, we observe that a large share of the analysed firms are highly misaligned with the
+climate targets of transition scenarios. Most firms are therefore not only at high risk of signifi-
+cant transition risk, but also hinder the structural transformation of the global power sector. 26
+Further, the high variation in the results reflect our model mechanisms, where firms, depending
+on their production plans and profitability, as observed in the data, can exhibit a comparative
+advantage to capture new market shares and profits across low-carbon technologies and business
+units. Climate-laggards that were not planning on building out renewable power technologies,
+are confronted with the necessary phase-out of high-carbon technologies to meet the carbon
+budget set out in the Paris Agreement. Figure 8 highlights the complexity and variation in
+transition impacts across firms, that would be missed in purely sectoral exercises.
+26Note that for this exploratory analysis, we assumed a global shock scenario, that does not adequately re-
+flect the regional differences and policy landscape of economic decarbonisation trends. We expect that more
+differentiated stress scenarios, will deflate the negative impact on firms operating in developing and emerging
+economies. This is due to the fact that climate commitments remain behind advanced economies and high-carbon
+dependencies are higher for several economic, political and development reasons.
+35
+
+===== PAGE 36 =====
+
+This highlights the added-value of granular stress testing frameworks that allow to differ-
+entiate between transitioning firms and climate-laggards, to effectively inform policy makers
+and financial institutions across jurisdictions on the distributional transition impact. Such an
+analysis can be further expanded to other climate-critical sectors for which granular asset-level
+information is available and be calibrated to a much larger set of firms to capture systemic
+first-round effects distributional impacts across geographies. While our exploratory analysis
+suggests that European power firms are on average less negatively impacted by the transition,
+than US and Asian counterparts, we still observe individual firms across all jurisdictions that
+significantly deviate from peers in their region - both, negatively and positively. The model
+set up and asset-level data also allows to capture firms’ subsidiaries and attributes individual
+physical assets across the ownership structure of firms globally. Such interconnected economic
+networks, where production facilities in Asia are owned by European counter-parties and vice
+versa, stresses the need for a global analysis on the firm-level. As seen in Figure 17 and 18 in
+the Appendix, even our small selection of international power firms, while headquartered across
+22 countries, own more than 8.000 individual power assets across 92 countries. This reflects
+interconnected modern production networks. As transition risks not only depend on the in-
+stitutional framework and governments’ net-zero commitments where firms are headquartered,
+but also on the policy landscape and efforts in countries where supply chains and production
+facilities lie, it seems crucial to structure climate stress tests based on bottom-up microeconomic
+models, able to capture such differences.
+To showcase whats driving the results on the firm-level, figure 12 shows for a selection of
+firms the infra-firm variation of transition impacts across business units (technologies) and the
+overall weighted T RISK N P V
+i .
+We observe that firms with active business units and production in high-carbon technologies
+(i.e. electricity generated from coal, oil and gas) are negatively impacted due to demand changes
+and increased relative unit costs, impacting their future cash-flows. For instance, some firms
+see their NPV of coal power business units decline between 55-60% depending on firms’ cost
+advantage vis-a-vis its peers. Note that the demand shock is the same across all firms. This
+variation in impact across firms is even more prominent in operations focusing on renewable
+power generation. Here, depending on the respective market share of a firms in such technolo-
+gies, their business units are faced with increasing cash flows, driven by first mover advantages.
+Note, that we allow a simple form of comparative advantage in the model, where firms that
+already build out renewable technologies according to their production plans, can capture larger
+share of future profits as opposed to firms that are not planning on building production across
+such business units.
+Figure 12 shows that the transition impact is, in addition to cost differentials due to tech-
+nological change, driven by the firms production composition and demand effects across its
+36
+
+===== PAGE 37 =====
+
+Figure 10: Within Firm heterogeneity across business units and overall transition-related
+impact
+relevant business units 27. Such demand effects are represented in the model as the required
+production change stated in the target scenario.
+Note that such changes can be driven endogenously by strategic shifts of firms operations,
+consumer behavior or policy induced-phase outs of high-carbon technologies 28. The model aims
+to leave the reason of the introduced ”stress” to the system open for interpretation of whats
+driving such a shock. However, as the model mechanisms allows for a parametrisation of the
+shock year, the degree of disruption resulting from such a shock can be adjusted and tested.
+Refer to section 4 for an extensive sensitivity analysis of different scenario narratives (degree
+27Note that not all firms in our sample are pure power firms and may generate income from other business
+units outside of climate-critical sectors, in which case we would overestimate the transition impact on the firm.
+28Or mixture of the above drivers, e.g. governments introduce a steep carbon tax on fossil fuels, which increases
+the prices to the end consumer and demand flattens
+37
+
+===== PAGE 38 =====
+
+of disruption of transition scenario), as well as robustness tests of our results on a variety of
+model parameters.
+Stranded Assets. We estimate for the set of power firms their stranded assets, i.e., the share
+of production that is incompatible with the carbon budget in the target scenario. This allows
+us to proxy the impact on collateral values and the resulting loss given default in the financial
+layer. As a baseline setting, we assume a global carbon budget of 460bn tonnes of CO2 as
+outlined in the SR15 by the IPCC 29. We further allocate the carbon budget for the set of firms
+in our sample, by estimating the share of firms’ individual production levels in 2020 relative
+to the global power production and the attributed carbon emissions 30. Note, that the model
+framework allows for more sophisticated geographical allocation rules and more granular carbon
+budgets.
+29https://www.ipcc.ch/sr15/
+30The share of the power sector carbon emissions is based on World Electricity Power Production: BP Statistical
+Review of World Energy, Ember Global Electricity Review (2022) Ember European Electricity Review (2022)
+38
+
+===== PAGE 39 =====
+
+Figure 11: Share of Stranded Assets by firms
+Figure 11 shows the distribution of stranded assets ( Ss,t
+i ) across the set of analysed firms.
+While the power production of around 26% of the firms are compatible with a 1.5 ° carbon
+budget, the majority of firms face the risk of stranded assets. Individual firms risk up to 95%
+of their production to be stranded, hence rendering production facilities uneconomically in the
+face of strong climate action and demand changes.
+39
+
+===== PAGE 40 =====
+
+3.2 Impact on Financial Institutions
+In this section, we present the TRISK that individual financial institutions face in a stress sce-
+nario, expressed as the expected loss Ej[L] relative to the overall portfolio size. The focus of
+the analysis is to highlight the distributional consequences of the transition depending on the
+unique portfolio composition and balance sheet of an FI. For this, we construct two portfolios
+that represent extreme cases 31. Portfolio A includes equity and debt to the 18 least impacted
+power firms in the stress scenario, with an overall portfolio exposure of 512 billion US $. Port-
+folio B includes equity and debt to the 24 most impacted power firms in the stress scenario,
+with an overall portfolio exposure of 524 billion US $. These portfolios hence represent the full
+spectrum of transition impacts. We further assume a constant balance sheet throughout the
+time-horizon of the stress test, hence do not represent strategic behavior of FIs or feedback
+mechanisms between the economy and the financial system.
+We estimate the TRISK - i.e. the expected loss from transition-related market and credit
+risk - across the two constructed portfolios. Overall, FIs that are invested or provide credit to
+firms that are aligned with climate objectives are the winners of the net-zero transformation,
+even seeing an overall reduction in expected losses, while FIs that are exposed to misaligned
+firms are the losers and might be facing significant financial losses. Across the two portfolios
+the overall TRISK relative to the overall portfolio size varies between a highly negative impact
+of around 18% as opposed to an overall positive impact of around 8%. The impact is stronger
+on market risk losses, reflecting that equity prices are more volatile and sensible to investors
+and market behavior than debt. The heterogeneous impact on portfolios, highlights that the
+transition inhibits clear distributional consequences across the financial sector, with potential
+amplification and second round effects if the TRISK creates solvency issues. It is borne by
+financial institutions that have portfolio exposure to firms most at risk from the transition.
+Table 4: Descriptive statistics of key results for TRISK in the two sample portfolios, expressed
+as transition-related market risk and expected loss from credit risk relative to overall portfolio
+size in %.
+TRISKEj[L] Portfolio Size (in$US billion) No. of firms exposed
+Portfolio A (least impacted firm) 7.80 512 18
+Portfolio B (most impacted firm) -18.03 524 24
+Capturing such a heterogeneity in scenario and stress testing models is crucial to inform
+31We assume all outstanding debt is held with a maturity of 5.61 years, representing the global corporate
+average (Chen et al., 2019). We further assume a constant dividend factor of 1, hence impacts on the firms
+profits are passed on directly to shareholders by reducing dividends accordingly. See Baseline settings of results
+in section 3.
+40
+
+===== PAGE 41 =====
+
+financial markets and regulators. The failure to distinguish transitioning firms from climate
+laggards within the same industry in current financial risk management practices is problem-
+atic. Firms belonging to carbon-intensive sectors today, such as the power sector, will need to
+receive plenty of funding at a low cost of capital in order finance the net-zero transition and
+expand world energy capacity to meet the increase in world demand. Large energy firms have
+the most know-how and skills to produce energy at scale to meet future demand. Therefore,
+investors should divest only from those firms that do not plan to transition to a greener business
+model.
+Further research could utilise the climate stress testing framework to assess the TRISK and
+resilience of the international banking system. We therefore focus our analysis on testing sensi-
+tivities of different scenario narratives and model parameter to derive the cost of the financial
+sector if climate action is delayed (see sensitivity analysis in Section 4).
+41
+
+===== PAGE 42 =====
+
+4 Treatment of Uncertainty and Sensitivity Analysis
+The ACST and underlying scenarios are subject to uncertainty, given the complex nature of
+climate risks and its interdependencies with socio-economic transformations, the irreversibil-
+ity, technological progress and individual decision-making of firms. In this section, we want to
+shortly outline how and why scenario analysis has been identified to, at least in part, circumvent
+such uncertainties, but also want to highlight some critical insights and limitations around the
+treatment of uncertainty.
+Emerging consensus, and also a key recommendation from the TCFD, have identified forward-
+looking scenario analysis and the integration of financial vulnerability analysis as a crucial tool
+to overcome some of these limitations (BIS, 2021a; NGFS, 2019; Semieniuk, Campiglio, Mer-
+cure, Volz, & Edwards, 2021; TCFD, 2017) and to effectively assess the resilience of financial
+institutions to physical and transition risks over a longer horizon. In essence, climate scenario
+analysis seeks to set up plausible hypotheses for the future that allows to examine the effects
+of a wide range of plausible scenarios (BIS, 2021a). This approach can assist in quantifying
+tail risks (Weitzman, 2009) and can clarify the uncertainties inherent to climate-related risks
+by focusing on questions such as ‘under how many scenarios are financial institutions resilient
+to climate shocks? ´- this represents more of a what-if scenario approach that is able to derive
+meaningful upper-bound climate risk estimates under worst-case hypothesis, rather than aiming
+to predict future climate risk impacts per se. Our approach put forward in this paper there-
+fore allows to construct multiple scenarios, under varying climate and economic assumptions to
+better understand the sensitivities of model parameters and TRISK outcomes. In our sensitiv-
+ity analysis, one parameter can be altered across multiple scenario runs to observe the range of
+TRISK outcomes that result from changes in that parameter (BIS, 2021a; Mercure et al., 2019).
+It can also be adjusted to capture the necessary climate change time-horizon, where standard
+backward-looking modelling approaches would lead to no meaningful result due to large error
+margins in the predictive power of models.
+While the climate stress testing model has been set up to allow for such long-time horizons,
+flexible scenario integration and parameterization, the issue of uncertainty should not be ne-
+glected. This is especially the case for multi-layered modelling approaches that seek to combine
+highly complex relationships between economic and financial actors. Uncertainties arise at each
+step along the causal chain, from the construction of the transition scenario, to the estimation
+of micro- and macroscale climate-adjusted impacts to the validation against reported financial
+losses. Conceptually, we want to make the high-level distinction between (a) intrinsic uncer-
+tainty, including model and parametric uncertainty, and (b) extrinsic uncertainty. We identify
+the following sources of uncertainty in our model.
+42
+
+===== PAGE 43 =====
+
+4.1 Extrinsic Uncertainty
+Extrinsic uncertainty arises from various factors that are influencing the design and construction
+of the scenarios, limitations around the representation of climate risk transmission channels and
+external factors that we cannot capture in the analysis.
+Asset and Firm Value. While we rely on financial approaches and a micro-economic repre-
+sentation to estimate the asset and firm value under different scenarios, the approach is limited
+in capturing individual firm specific characteristics that might influence the climate transition
+impact. For instance, we currently do not model scenario-dependent geopolitical and regulatory
+influences that might differentiate the profitability of some firms. Further, we do not capture
+revenue generated from business units other than the physical production, e.g. dividends on
+financial investments and other income generated from products outside of the spectrum of the
+technologies that we capture. We further, cannot account for location-specific differences in
+the characteristics of physical infrastructure assets, that may result in different valuations, e.g.
+distance to relevant transport routes and supply chains.
+IAMs and Transition Scenarios The transition scenarios are at the heart of the asset-level
+based climate stress test model and drive the results and magnitude of the transition risk
+impact to firms and financial institutions. We acknowledge that the choice of scenarios and
+the respective underlying assumptions are a significant source of uncertainty. This is typically
+described by a single indicator (e.g. the reduction in production). For all practical purposes,
+this indicator is subject to uncertainty, stemming either from imprecise measurement, uncertain
+model output (variation across integrated assessment models), or confidence levels estimated
+from extreme value statistics. We describe the sources of uncertainty more in detail. Note
+that even if the ACST proposed in this paper is a bottom up approach, it relies on some
+scenario inputs that have been generated in climate-economic models and therefore underlies
+this uncertainty.
+Relying on complex modelling of potential future climate damages and the resulting economic
+impact in IAMs is hindered by a wide range of challenges, such as heterogeneous climate im-
+pact across income groups (Errickson, Keller, Collins, Srikrishnan, & Anthoff, 2021; Hallegatte
+& Rozenberg, 2017), irreversibility of catastrophic climate events and large uncertainty ranges
+(Pindyck, 2017; Weitzman, 2009), modelling the distinction between inter-temporal inequality
+aversion and use of discount rates (Nordhaus, 2017; Stern, 2007), identifying adequate social
+welfare utility functions, and accounting for non-gradual damages, such as climatic and socioe-
+conomic tipping points (Lontzek, Cai, Judd, & Lenton, 2015; Rising, Dietz, Stoerk, & Wagner,
+2020). For instance, the effects of rising temperature pathways on economic outputs are often
+simulated and modeled in complex macroeconomic systems (see e.g. (Mercure et al., 2021;
+Semieniuk et al., 2021), and their assumptions differ significantly in terms of their input pa-
+rameter assumptions and modelling component representations, such as the degree of regional
+43
+
+===== PAGE 44 =====
+
+and sectoral disaggregation, formulation of climate damages, and treatment of adaptation and
+uncertainty (Diaz & Moore, 2017) and these limitations are often not transparent.
+4.2 Intrinsic Uncertainty
+Intrinsic uncertainty arises from various methodological choices and assumptions in the mod-
+elling framework, some of which are a result of incomplete data and calibration problems.
+Model Framework and scenario-independent parameters. Uncertainty arises from pa-
+rameters in the model and the underlying assumptions. Climate stress tests are somewhat
+sensitive to the choice of discount rates, as it influences the discounted cash flow model as well
+as links into the financial credit risk assessment. We therefore perform an extensive sensitivity
+analysis on different discount rates. Our model is further subject to uncertainty from limited
+data on the asset volatility, net profit margin projections and debt structure of firms, as well as
+emission intensities on the physical asset level. Assumptions were made around these param-
+eters that most often assume scenario independence, which introduces uncertainty around the
+accuracy of these model parameters, when calibration on real data is not feasible. We aim to
+show in the next section the sensitivity of the model to such parameters to better reflect the
+TRISK outcome variability.
+Adaptive capacity of firms. A source of uncertainty and variability of the impact can be
+traced back to the assumptions taken around the adaptive capacity of firms and their strategies
+in our model. As outlined in the model limitations section 2.4, we derive the strategy of firms
+and adaptive capacity from the forward-looking production plans of firms over a time horizon of
+five years. Firms that are not planning to build out sustainable technologies in that time, miss
+out on the opportunity to capture market shares in an expanding market for such technologies.
+Any potential strategic shifts after that period are, due to data limitations, not reflected in the
+model and lead to an under or overestimation of the firms TRISK.
+Carbon tax and cost projections. The regional and institutional differentiation of these
+scenario projections is limited. In principle it possible to increase granularity, but deep uncer-
+tainty about international relations and political behavior remains a source of uncertainty that
+is difficult to model. This influences the probability distribution around various carbon taxes
+and does not necessarily imply that the scenarios chosen are plausible and extreme. The same
+is true for unit cost projections and price projections. There is significant uncertainty around
+technological breakthroughs and the scale up of renewable energy, but also carbon capture
+and storage technologies that have the potential to influence the profitability and cost impact
+on firms. Data limitations usually permit no more than a stratification to a few predefined
+set of transition parameters. Again, a bottom up approach based on asset-level data reduces
+this uncertainty significantly as opposed to top-down macroeconomic projections that calculate
+44
+
+===== PAGE 45 =====
+
+damages on a regional level and abstract impacts on GDP levels. Further we perform a sen-
+sitivity analysis with different unit cost projections to show sensitivities in the TRISK impact
+due to such variability - the spectrum of technological change however cannot be captured fully
+and depends on political and economic decisions in the structural transformation towards net
+zero.
+4.3 Sensitivity Analysis
+Given the extrinsic uncertainties around the transition scenario, we recognise the need for our
+climate stress test to incorporate a wide range of plausible scenarios (BIS, 2021b). This goes
+beyond current exercises that have just focused on the construction of a few scenario pathways
+created within the same Integrated assessment model (IAM) such as exercises by the BoE and
+the ECB that both used NGFS scenarios. In contrast, we identify the need to include multiple
+scenario pathways across multiple providers and generated across a wide range of models (see
+also (Gasparini et al., 2022) for a more in-depth analysis of the effect of different scenarios on
+the variability of financial risk outcome).
+We differentiate the sensitivity test across (a) scenario-dependent parameters (marked with
+an asterisk * in table 5 and table 6) and (b) scenario-independent parameters. The former is
+highly dependent on the scenario narrative itself and therefore creates variation in the results
+that can be beneficial for the interpretation of the plausible outcome ranges of the stress test.
+Scenario-dependent variables include the introduction of the shock year, which represents the
+degree of ’disruption’ of a stress scenario and reflects choices around market foresight of firms,
+varying carbon tax trajectories that reflect different views on the likely introduction of carbon
+pricing mechanisms across jurisdictions, as well as prices and cost projections reflecting the
+demand mechanisms and technological change assumptions made in the scenario.
+In contrast, the scenario-independent parameters represent choices made in the model set
+up and therefore create noise in the outcome ranges that are due to calibration techniques.
+Scenario-independent variables include the choices made around the discount rate and financial
+parameters such as asset volatility. This differentiation is relevant when the aim of the analysis
+is to isolate methodological variation and to allow only different scenario narratives to drive the
+impact on firms valuations.
+Sensitivity Analysis. We perform a sensitivity analysis for the key parameter in the ACST
+(see table 5). Unsurprisingly, we see a significant variation as a result of changing scenario-
+dependent parameters, such as the shock year. This reflects the changes in the stress scenario
+narrative, as a later shock year reflects an even more disruptive transition and hence represents
+an even more tail-risk scenario, depending on the believes around the manifestation of the
+45
+
+===== PAGE 46 =====
+
+transition. Our results suggest that delaying the transition from 2025 to 2035 will almost
+double the the T RISK N P V
+i in our sample (from -10.33% to almost - 19%) and more than
+doubles their transition-related changes to the firms PDs (from 0.24 to 0.51 percentage points).
+Interestingly, the standard distribution of these impacts increases substantially with the 5 th
+percentile of impacts to firms valuation increasing from around -37% to almost -70%. This
+entails clear implications for a delayed transition. Firms that are continuously misaligned with
+the target scenario will be increasingly impacted the later we introdcue the transition, while
+aligned firms will see an increasing positive impact due to newly captured market shares in
+sustainable technologies. Such a wider range of results can serve as useful outputs, when
+interpreted in the right context. A more disruptive transition, and hence an increasing TRISK
+distribution, points to the non-linear relationship between the continued misalignment of firms
+with the target scenario. In other words, the increases in TRISK reflect the cost for the financial
+sector if climate action by firms are further delayed.
+Table 5: Sensitivity analysis of TRISK for firms based on different parameter settings. Net
+present value changes in % and PD changes in percentage points.
+T RISKN P Vi T RISKP Di
+5th Mean 95th 5th Mean 95th
+Shock Year,Y (*)
+•T= 2025 -36.79 -10.33 9.89 -0.2 0.24 1.45
+•T= 2030 -48.96 -14.22 11.56 -0.15 0.34 2.17
+•T= 2035 -69.64 -18.75 20.49 -0.36 0.51 3.41
+Target Scenario,s(*) •Sustainable Development Scenario IEA (IEA, 2020)-48.96 -14.22 11.56 -0.15 0.33 2.17
+•NGFS net-zero scenario (NGFS, 2020) -63.54 -19.73 29.85 -0.22 0.70 4.67
+•Oxford Fast Transition Scenario (Way et al., 2021) -64.28 2.41 121.57 -1.41 0.51 4.05
+Unit cost projections,cs,tgyh(*) •Cost projections (Way et al., 2021): Fast Transition-46.08 -6.17 28.53 -0.86 0.21 2.20
+•Regional cost projections SDS (IEA, 2020) -48.96 -14.22 11.56 -0.15 0.34 2.17
+Discount rate,ρ
+•ρ= 7.5% (Average WACC public power firms)-48.53 -14.11 11.51 -0.15 0.33 2.14
+•ρ= 4,83% (Cost of equity withρf = 0.02,βj = 0.0073
+andE[RM] = 0.0387) -50.62 -14.74 11.78 -0.16 0.35 2.31
+•ρ= 3,83% (Cost of equity withρf = 0.01,βj = 0.0073
+andE[RM] = 0.0387) -51.40 -14.98 11.88 -0.16 0.36 2.37
+Figure 12 represents such a dynamic, with a focus on the changed creditworthiness and
+NPVs of analysed firms, as a function of an increased severity of the transition, namely a con-
+tinuous delay of the introduction of climate action (shock year Z). While a shock year of 2025
+represents the earliest feasible transition, given that firms follow their own production plans
+based on the data by Asset Resolution. These results point to a simple message - a disorderly
+transition is costly, and gets more costly the longer we wait. At the same time we observe that
+even an early transition in 2025 is likely to entail significant economic and financial costs as a
+large share of the analysed firms remain to be misaligned with the targets set out in the Paris
+Agreement.
+46
+
+===== PAGE 47 =====
+
+Figure 12: NPV and PD changes by introduction of climate action. EXPAND
+Interestingly, our result show a significant variability due to different cost projections (be-
+tween the IEA and (Way et al., 2021)). The mean transition-related impact on the firms valu-
+ation varies between -6% and nearly 14%, while we see less variability in the transition-related
+PD changes. 32. The most striking result are the differences in the TRISK outcome based on
+different target scenarios s = target. We see a large variation in the results. In the (Way et
+al., 2021) production scenarios, some firms are significantly positively affected (in the 95 th per-
+centile up to 121%) while the worst performing firms receive a significant negative shock that is
+higher in magnitude compared to scenarios by the NGFS And the IEA. Such an increase in the
+standard deviation of our results highlights the importance of different scenario narratives and
+further points to the fact that transition shocks entail a large heterogeneity across firms. The
+same interpretation holds true for the sensitivity of the TRISK outcomes on financial portfolios
+32This is intuitive, as the cost directly feed into reduced cash flows and only indirectly feature in the credit
+risk model
+47
+
+===== PAGE 48 =====
+
+(see 6), although to a lesser degree, as the construction of the portfolios focused on two extreme
+cases and is not representative of the full sample. We observe expected losses in these portfolios
+from transition-related market risk Et[Lmarket] increase from -14% to -26%, when the shock year
+is delayed from 2025 to 2035, reflecting a more disruptive transition.
+Table 6: Sensitivity analysis of TRISK for sample Portfolio A and B, expressed as expected
+loss from transition-related equity and PD changes as share of overall portfolio exposure.
+Sample FI Portfolio A Sample FI Portfolio B
+Et[Lmarket] Et[Lcredit] Et[Lmarket] Et[Lcredit]
+Shock Year,Y (*)
+•Y= 2025 -13.67 -0.44 6.70 0.03
+•Y= 2030 -17.97 -0.61 7.77 0.03
+•Y= 2030 -25.71 -0.93 11.86 0.04
+Target Scenario,s(*) •Sustainable Development Scenario IEA (IEA, 2020)-17.97 -0.61 7.77 0.03
+•NGFS net-zero scenario (NGFS, 2020) -24.72 -1.43 19.05 0.01
+•Oxford Fast Transition Scenario (Way et al., 2021) -23.51 -1.64 62.97 0.03
+Unit cost projections,cs,tgyh(*) •Cost projections (Way et al., 2021): Fast Transition-17.84 -0.61 15.28 0.04
+•Regional cost projections SDS (IEA, 2020) -17.97 -0.60 7.77 0.03
+Discount rate,ρ
+•ρ= 7.5% (Average WACC public power firms)-17.84 -0.60 7.74 0.03
+•ρ= 4,83% (Cost of equity withρf= 0.02,βj= 0.0073 and
+E[RM] = 0.0387) -18.54 -0.64 7.94 0.03
+•ρ= 3,83% (Cost of equity withρf= 0.01,βj= 0.0073 and
+E[RM] = 0.0387) -18.81 -0.65 8.01 0.03
+Maturity of debt instrument,T
+•T= 1 -17.97 0.00 7.77 0.00
+•T= 3 -17.97 -0.13 7.77 0.00
+•T= 5 -17.97 -0.61 7.77 0.03
+Loss given default thresholdλ
+•λ= 0.45 -17.97 -0.61 7.77 0.02
+•λ= 0.25 -17.97 -0.56 7.77 0.03
+•λ= 0.65 -17.97 -0.65 7.77 0.04
+For the scenario-independent parameters, such as the discount rate, we see some variations
+in the results, however the order of magnitude remains robust to changes in these parameters
+(T RISK N P V
+i mean change from -14.11% to - 14.89% and T RISK P D
+i mean change from 0.33
+to 0.36 percentage points). We used the average WACC for firms in our sample and the cost
+of equity with different average risk premiums. Note that while our model runs are robust
+to different discount rates, the choice of discount rate can be a significant source of variation
+and noise in the result in other studies, and could be potentially used by financial intuitions to
+mask regulatory stress test results in their favor. More transparency around the choice of such
+parameters is therefore highly desirable, especially in the context of climate stress testing and
+scenario analysis, where longer time horizons and the involved complexities of the model place
+inevitably greater emphasise on these parameters. Reflecting the robustness of our results, we
+identify that the model is less sensitive to other scenario-independent parameters, such as the
+loss given default threshold on the financial layer of the ACST. However, we see a non-negligible
+variation in the results of the relative impact to the credit expected losses of our constructed
+portfolios, due to the maturity parameter for outstanding debt. This is initiative, as expected
+48
+
+===== PAGE 49 =====
+
+loss for short-term debt will be less impacted, given the longer time-horizon and shock year
+introduction in the ACST.
+Table 7: Sensitivity analysis of Stranded Assets and resulting loss given default (for λ = 0.45)
+for different carbon budgets (in %)
+Stranded Assets SAj Loss given default LGDj
+5thpercentile Mean 95thpercentile 5thprecentile Mean 95thpercentile
+Global Carbon Budget
+•1.5°Degree Target (466 Gt/CO2) 0 36.04 71.43 45 64.82 84.29
+•2°Degree Target (762 Gt/CO2) 0 15.40 50.31 45 53.46 62.67
+•3°Degree Target (2082 Gt/CO2) 0 0.7 0 45 45 45
+Table 7 further shows the sensitivity of the loss given default (LGD) based on different
+carbon budgets that influence the share of stranded assets. While under a 1.5 ° carbon budget
+of 466 Gt/CO 2 the average share of stranded assets for our firm sample amounts to 36% of
+production incompatible with the target, this share decreases to around 15% and 0.7% in a 2 °
+and 3° degrees target respectively. This points to the fact that most of the firms production in
+electricity generation is not compatible with targets set out in the Paris agreement, and may
+significantly influence the collateral value of underlying physical production infrastructure.
+Overall, this sensitivity analysis highlights two important features of climate stress tests.
+First, different scenario narratives around technological change, the future energy mix to meet
+net-zero targets and the degree of disruption of the transition, lead to a significant variability in
+the TRISK results. Such a variability can effectively inform decision-making and the respective
+implications on financial risk management. The flexibility of the ACST therefore allows to
+test various pathways and manifestations of a delayed transition, reflecting different underlying
+assumptions on how the transition could manifest. Second, the results of the ACST are robust
+to scenario-independent parameters and therefore less sensitive to calibration problems.
+49
+
+===== PAGE 50 =====
+
+5 Conclusion
+This paper presented a novel bottom-up climate stress testing framework, that translates climate
+transition risks affecting individual firms and economies to shocks affecting financial system.
+We highlighted some of the challenges involved with current climate stress testing approaches.
+Most importantly, challenges remain to adequately capture the heterogeneity involved in tran-
+sition risks to effectively distinguish among climate-laggards. We identified the need for a
+forward-looking, transparent, innovative and flexible climate stress testing approach that allows
+to overcome some of the analytical challenges involved in reflecting climate transition risk, while
+adequately reflecting uncertainties and sensitivities. This is crucial to inform central banks and
+supervisors, investors and financial institutions on the materiality of transition risk and to shift
+capital flows to accelerate the low-carbon transition while safeguarding financial stability. We
+presented such a framework rooted in an micro economic and financial asset-level based ap-
+proach, that relies on forward-looking information of firms to derive the transition risk as a
+function of the strategic misalignment of firms with Paris-aligned scenarios. As part of this,
+we introduce a forward-looking risk measure - TRISK. We present TRISK on two levels. On
+the firm level, TRISK is expressed as the difference in the discounted net present value (NPV),
+as well as the probability of default (PD) for a firm under a baseline and transition stress sce-
+nario. On the financial level, TRISK is expressed as the difference in the expected loss (EL)
+of a portfolio under a baseline and stress scenario, hence represent the value at risk from the
+uncertain materialisation of a transition stress scenario. Our approach allows to accommodate
+for a wide range of scenarios and underlying modelling choices to better represent prevailing
+uncertainties and the ability to demonstrate sensitivities in all modelling stages. Key distinctive
+analytical features of our approach include the calibration in asset-level data and representation
+of the transition risk on the firm-level, representation of the strategic behavior of firms, explicit
+representation of technological costs and comparative advantages and a model framework that
+allows for the integration of different scenario parameters, a balance between carbon tax and
+demand impacts, as well as flexible parametrisation for extensive sensitivity testing. The aim
+is to better understand how much confidence is present in the calibration of such approaches
+with data and how to use it most effectively.
+We performed an exploratory analysis to a set of 135 international power firms. We find
+that the transition impact entails significant heterogeneity across individual firms and the fi-
+nancial sector with clear distributional consequences, highlighting the need for bottom up stress
+tests that can effectively inform financial markets as well as financial policy design by financial
+regulators. Further, we find analysed firms are insufficiently aligned with the net zero transi-
+tion, highlighting that even in a scenario with early climate action the transition is likely to
+be disorderly, stressing the need for immediate action to avoid the build up of climate related
+transition risks. In addition, we find a significant variation of TRSIK across different scenario
+50
+
+===== PAGE 51 =====
+
+narratives and model parameters, highlighting the elevated levels of variability and uncertainty
+of such approaches. We acknowledge the model, data and calibration limitations involved in all
+stages of the climate stress testing framework and propose two relevant areas for further research.
+Methodological improvements and extension of the modular approach. The asset-
+level based climate stress test (ACST) and the TRISK measure just present early stage ap-
+proaches that can be subsequently improved, due to its transparency and flexible set up. The
+framework can serve as a foundational module that can be extended to physical risk impacts in
+order to comprehensively assess the interdependencies and trade-offs between physical and tran-
+sition risk, as well as compounding shocks (Baer et al. forthcoming). There is increasing concern
+that physical risks such as changes in the frequency and distribution of extreme weather events
+pose a systemic threat to the financial system (Giuzio et al., 2019; Mandel et al., 2021). The
+ACST can also serve the purpose of comparing and constructing several benchmark scenarios
+to assess the fundamental differences in assumptions and compare different stress test outcomes
+based on the scenario narrative (Gasparini et al., 2022). What is more, the ACST could be ex-
+tended to account for systemic impacts and second-round losses in a financial network approach.
+Our climate stress testing framework has insufficiently focused on the interconnectedness and
+potential amplification mechanisms within the financial sector that have the potential to ag-
+gravate direct climate-financial impacts. While some research has focused on the estimation of
+second-round losses within the financial system (Roncoroni et al., 2021), current frameworks
+still lack a wider representation of financial sector interdependencies. The model only partially
+accounts for the adaptive capacity and technological change on the firm level and could be
+expanded to feature endogenous learning rates and positive spillover effects. The complexity of
+the climate-adjusted economic model could be increased in this domain to allow for strategic
+responses of firms’ investment in sustainable carbon technologies based on technological change
+and firms’ behavior in optimising market shares. The ACST could serve as a basis for financial
+policy analysis through a counterfactual representation of dynamic balance sheets of financial
+institutions to capture behavioral reactions to initial transition shocks. Currently, the model
+allows to estimate the transition risk of banks and FIs but does not capture the climate impact
+on sovereign bonds. While our model approach allows us to map the geographical impact of
+the transition, we have not integrated a module that translates such effects into changes in
+sovereign bond spreads.
+Empirical Application Improvement. While we showed an exploratory application of the
+stress testing framework to a selection of international power firms as a proof of concept, the
+application of the model can be significantly improved depending on future data availability
+and institutional resources. Especially, more country- and regional specific assessments that
+better accommodate jurisdictional differences with respect to carbon budget allowances, net-
+zero strategies and political commitment, could significantly improve the practical relevance of
+51
+
+===== PAGE 52 =====
+
+such a climate stress testing exercise. The open source nature 33 of the framework allows for a
+wide diffusion and application globally. Further, while we restrained the analysis to power firms,
+the model can be applied to many climate-critical sectors on which sufficient asset-level data is
+available (e.g. Asset Resolution, Oxford Spatial Finance Initiative or World Resource Institute
+capture firms and assets in oil and gas, coal extraction, steel, cement, aviation, automotive
+and shipping that together account for around 80 % of global carbon emissions. Lastly, we
+did not represent individual balance sheets of financial sectors or FIs. This would allow to
+assess the TRISK in individual investor, banks or insurance portfolios and further unravel the
+distributional effects within the financial network. This makes the ACST a powerful tool for
+central banks and supervisors to assess TRSIK on a counterparty-level across a wide range of
+parameter and scenario assumptions.
+33The code of the ACST can be found on github - https://github.com/2DegreesInvesting/r2dii.climate
+.stress.test and is hosted and maintained by 2 °Investing Initiative
+52
+
+===== PAGE 53 =====
+
+References
+Baer, M., Campiglio, E., & Deyris, J. (2021). It takes two to dance: Institutional dynamics and
+climate-related financial policies. Ecological Economics, 190, 107210. Retrieved from
+https://www.sciencedirect.com/science/article/pii/S092180092100269X doi:
+https://doi.org/10.1016/j.ecolecon.2021.107210
+Battiston, S., Mandel, A., Monasterolo, I., Sch¨ utze, F., & Visentin, G. (2017, March). A
+climate stress-test of the financial system. Nature Climate Change , 7, 283–288. Re-
+trieved 2017-03-28, from http://www.nature.com/nclimate/journal/vaop/ncurrent/
+full/nclimate3255.html
+Battiston, S., & Monasterolo, I. (2021). On the dependence of investor’s probability of default
+on climate transition scenarios. , 25.
+BIS. (2021a). Climate-related financial risks - measurement methodologies. , 56.
+BIS. (2021b). Climate-related risk drivers and their transmission channels. , 45.
+BoE. (2020, June). The Bank of England’s climate-related financial disclosure 2020 (Tech.
+Rep.). London: Bank of England.
+Bolton, P., Despres, M., Pereira da Silva, L. A., Samama, F., & Svartzman, R. (2020). The
+green swan. Central banking and financial stability in the age of climate change. (Tech.
+Rep.). Basel: Bank of International Settlements.
+Bolton, P., & Kacperczyk, M. (2021). Do Investors Care about Carbon Risk? , 81.
+Bressan, G., Duranovic, A., Monasterolo, I., & Battiston, S. (2022). Asset-Level Climate
+Physical Risk Assessment and Cascading Financial Losses. SSRN Electronic Journal .
+Retrieved 2022-04-21, from https://www.ssrn.com/abstract=4062275 doi: 10.2139/
+ssrn.4062275
+Chen, S., Ganum, P., Liu, L. Q., Martinez, L., & Martinez Peria, M. (2019, February). Debt
+Maturity and the Use of Short-Term Debt: Evidence form Sovereigns and Firms. De-
+partmental Papers / Policy Papers , 19(03), 1. Retrieved 2021-10-25, from https://
+elibrary.imf.org/view/journals/087/2019/001/087.2019.issue-001-en.xml doi:
+10.5089/9781484380536.087
+Cormack, C., Donovan, C., Koberle, A., & Ostrovnaya, A. (2020). Estimating Financial Risks
+from the Energy Transition: Potential Impacts from Decarbonisation in the European
+Power Sector. SSRN Electronic Journal . Retrieved 2022-05-17, from https://www.ssrn
+.com/abstract=3598183 doi: 10.2139/ssrn.3598183
+Diaz, D., & Moore, F. (2017, November). Quantifying the economic risks of climate change.
+Nature Climate Change , 7(11), 774–782. doi: 10.1038/nclimate3411
+ECB. (2020, November). ECB publishes final guide on climate-related and environmental risks
+for banks. Retrieved 2021-01-12, from https://www.bankingsupervision.europa.eu/
+press/pr/date/2020/html/ssm.pr201127~5642b6e68d.en.html
+ECB. (2021, October). Climate risk stress test: SSM stress test 2022 (Tech. Rep.). European
+53
+
+===== PAGE 54 =====
+
+Central Bank.
+ECB. (2021). ECB economy-wide climate stress test: methodology and results (Vol. Occasional
+Paper Series). LU: Publications Office. Retrieved 2021-10-28, from https://data.europa
+.eu/doi/10.2866/460490
+Errickson, F. C., Keller, K., Collins, W. D., Srikrishnan, V., & Anthoff, D. (2021, April).
+Equity is more important for the social cost of methane than climate uncertainty. Nature,
+592(7855), 564–570. Retrieved from https://doi.org/10.1038/s41586-021-03386-6
+doi: 10.1038/s41586-021-03386-6
+ESRB. (2020, June). Positively green: measuring climate change risks to financial stability.
+Report. European Systemic Risk Board , 56.
+EU HLEG. (2018). Financing a sustainable European economy (Tech. Rep.). Brussels: EU
+High-Level Expert Group on Sustainable Finance.
+European Commission. (2018). Action Plan: Financing Sustainable Growth (Communication
+from the Commission No. COM/2018/097). Brussels.
+Fankhauser, S., Smith, S. M., Allen, M., Axelsson, K., Hale, T., Hepburn, C., . . . Wetzer,
+T. (2022, January). The meaning of net zero and how to get it right. Nature Climate
+Change, 12(1), 15–21. Retrieved 2022-02-28, from https://www.nature.com/articles/
+s41558-021-01245-w doi: 10.1038/s41558-021-01245-w
+Farmer, J. D., Kleinnijenhuis, A. M., Nahai-Williamson, P., & Wetzer, T. (2020). Foundations of
+System-Wide Financial Stress Testing with Heterogeneous Institutions. SSRN Electronic
+Journal. Retrieved 2021-03-29, from https://www.ssrn.com/abstract=3601846 doi:
+10.2139/ssrn.3601846
+FI, U. (2018, April). Extending our Horizon - Assessing credit risk and opportunity in a changing
+climate: Outputs of a working group of 16 banks piloting the TCFD Recommendations
+(Tech. Rep.). UNEP Finance Initative.
+Gasparini, M., Baer, M., & Ives, M. C. (2022). Is climate stress testing accounting for scenario
+uncertainty right? Working paper No 2-2022 , Environemtal Stress Testing and Scenarios
+Programme (ESTS), Oxford Sustainable Finance Group, University of Oxford .
+Giglio, S., Kelly, B. T., & Stroebel, J. (2020, December).Climate Finance (Tech. Rep.). National
+Bureau of Economic Research, Inc. Retrieved from https://EconPapers.repec.org/
+RePEc:nbr:nberwo:28226 (Issue: 28226)
+Hallegatte, S., & Hammer, S. (2020). Thinking ahead: for a sustainable recovery from COVID-
+19. World Bank Blogs. Available at .
+Hallegatte, S., & Rozenberg, J. (2017, April). Climate change through a poverty lens. Nature
+Climate Change , 7, 250–256. doi: 10.1038/nclimate3253
+Hepburn, C., O’Callaghan, B., Stern, N., & Zenghelis, D. (2020). Will COVID-19 fiscal re-
+covery packages accelerate or retard progress on climate change? Oxford Smith School of
+Enterprise and the Environment | Working Paper No. 20-02 ISSN 2732-4214 , 48.
+Hoepner, A., Oikonomou, I., Scholtens, B., & Schr¨ oder, M. (2016). The Effects of Corporate
+54
+
+===== PAGE 55 =====
+
+and Country Sustainability Characteristics on The Cost of Debt: An International In-
+vestigation. Journal of Business Finance & Accounting , 43(1-2), 158–190. Retrieved
+from https://onlinelibrary.wiley.com/doi/abs/10.1111/jbfa.12183 ( eprint:
+https://onlinelibrary.wiley.com/doi/pdf/10.1111/jbfa.12183) doi: https://doi.org/10
+.1111/jbfa.12183
+IEA. (2020). World Energy Outlook 2020. , 464.
+Jung, H., Engle, R. F., & Berner, R. (2021). Climate Stress Testing. SSRN Electronic Journal .
+Retrieved 2022-04-21, from https://www.ssrn.com/abstract=3931516 doi: 10.2139/
+ssrn.3931516
+Krueger, P., Sautner, Z., & Starks, L. T. (2020, March). The Importance of Climate Risks for
+Institutional Investors. The Review of Financial Studies , 33(3), 1067–1111. Retrieved
+2022-04-21, from https://doi.org/10.1093/rfs/hhz137 doi: 10.1093/rfs/hhz137
+Lontzek, T. S., Cai, Y., Judd, K. L., & Lenton, T. M. (2015). Stochastic integrated assessment
+of climate tipping points indicates the need for strict climate policy. Nature Climate
+Change, 5(5), 441–444. Retrieved from https://EconPapers.repec.org/RePEc:nat:
+natcli:v:5:y:2015:i:5:d:10.1038 nclimate2570
+MAS. (2020, June). Consultation Paper on Proposed Guidelines on Environmental Risk Man-
+agement for Banks (Consultation paper). Monetary Authority of Singapore (MAS).
+Mercure, J.-F., Knobloch, F., Pollitt, H., Paroussos, L., Scrieciu, S. S., & Lewney, R. (2019,
+September). Modelling innovation and the macroeconomics of low-carbon transitions: the-
+ory, perspectives and practical use. Climate Policy , 19(8), 1019–1037. Retrieved 2021-02-
+01, from https://www.tandfonline.com/doi/full/10.1080/14693062.2019.1617665
+doi: 10.1080/14693062.2019.1617665
+Mercure, J.-F., Salas, P., Vercoulen, P., Semieniuk, G., Lam, A., Pollitt, H., . . . Vinuales,
+J. E. (2021, December). Reframing incentives for climate policy action. Nature Energy,
+6(12), 1133–1143. Retrieved from https://doi.org/10.1038/s41560-021-00934-2 doi:
+10.1038/s41560-021-00934-2
+Merton, R. C. (1974). On the Pricing of Corporate Debt: The Risk Structure of Interest
+Rates. The Journal of Finance , 29(2), 449–470. Retrieved 2021-10-25, from http://
+www.jstor.org/stable/2978814 (Publisher: [American Finance Association, Wiley])
+doi: 10.2307/2978814
+Neuhoff, K., & Ritz, R. (n.d.). Carbon cost pass-through in industrial sectors. Cambridge
+Working Papers in Economics . doi: https://doi.org/10.17863/CAM.46544
+NGFS. (2019, July). Macroeconomic and financial stability Implications of climate change -
+Technical supplement to the First comprehensive report (Tech. Rep.).
+NGFS. (2020). Guide to climate scenario analysis for central banks and supervisors (Technical
+document). Network for Greening the Financial System.
+NGFS. (2020). NGFS Climate Scenarios for central banks and supervisors (Tech. Rep.). Net-
+work for Greening the Financial System.
+55
+
+===== PAGE 56 =====
+
+NGFS. (2020). Progress report on the implementation of sustainable and responsible investment
+practices in central banks’ portfolio management (Tech. Rep.). Network for Greening
+the Financial System. Retrieved from https://www.ngfs.net/sites/default/files/
+medias/documents/sri progress report 2020.pdf
+NGFS. (2021). Progress report on bridging the data gaps. Network for Greening the Financial
+System - technical report , 52.
+Nguyen, Q., Diaz-Rainey, I., Kuruppuarachchi, D., McCarten, M., & Tan, E. K. M. (2020).
+Climate Transition Risk in U.S. Loan Portfolios: Are All Banks the Same? SSRN Elec-
+tronic Journal . Retrieved 2022-04-21, from https://www.ssrn.com/abstract=3766592
+doi: 10.2139/ssrn.3766592
+Nordhaus, W. D. (2007, January). To Tax or Not to Tax: Alternative Approaches to
+Slowing Global Warming. Review of Environmental Economics and Policy , 1(1), 26–
+44. Retrieved 2019-12-11, from https://academic.oup.com/reep/article-lookup/
+doi/10.1093/reep/rem008 doi: 10.1093/reep/rem008
+Nordhaus, W. D. (2017, February). Revisiting the social cost of carbon. Proceedings of the
+National Academy of Sciences , 114(7), 1518–1523. Retrieved 2022-02-08, from http://
+www.pnas.org/lookup/doi/10.1073/pnas.1609244114 doi: 10.1073/pnas.1609244114
+of England, B. (2021). Discussion Paper: The 2021 biennial exploratory scenario on the financial
+risks from climate change. Discussion Paper , 33.
+OxSFP. (2018, July). Climate risk analysis from space: remote sensing, machine learning, and
+the future of measuring climate-related risk (Tech. Rep.). Oxford Sustainable Finance
+Program.
+Pindyck, R. S. (2017, January). The Use and Misuse of Models for Climate Policy. Review
+of Environmental Economics and Policy , 11(1), 100–114. Retrieved 2022-04-21, from
+https://doi.org/10.1093/reep/rew012 (Publisher: The University of Chicago Press)
+doi: 10.1093/reep/rew012
+PRA. (2019). Supervisory Statement SS3/19 - Enhancing Banks’ and Insurers’ Approaches
+to Managing the Financial Risks from Climate Change. Bank of England Pruden-
+tial Regulation Authority. Retrieved from https://www.bankofengland.co.uk/
+-/media/boe/files/prudential-regulation/supervisory-statement/2019/
+ss319.pdf?la=en&hash=7BA9824BAC5FB313F42C00889D4E3A6104881C44.
+Reinders, H. J., Schoenmaker, D., & Van Dijk, M. A. (2020). A Finance Approach to Climate
+Stress Testing. SSRN Electronic Journal . Retrieved 2022-04-21, from https://www.ssrn
+.com/abstract=3573107 doi: 10.2139/ssrn.3573107
+Ripple, W. J., Wolf, C., Newsome, T. M., Barnard, P., & Moomaw, W. R. (2020, Jan-
+uary). World Scientists’ Warning of a Climate Emergency. BioScience, 70(1), 8–12.
+Retrieved 2021-03-04, from https://doi.org/10.1093/biosci/biz088 doi: 10.1093/
+biosci/biz088
+Rising, J., Dietz, S., Stoerk, T., & Wagner, G. (2020, May). Tipping Points in the Climate
+56
+
+===== PAGE 57 =====
+
+System and the Economics of Climate Change. In EGU General Assembly Conference
+Abstracts (p. 2959). doi: 10.5194/egusphere-egu2020-2959
+Semieniuk, G., Campiglio, E., Mercure, J.-F., Volz, U., & Edwards, N. R. (2021). Low-
+carbon transition risks for finance. WIREs Climate Change , 12(1), e678. Retrieved 2020-
+12-18, from https://onlinelibrary.wiley.com/doi/abs/10.1002/wcc.678 ( eprint:
+https://onlinelibrary.wiley.com/doi/pdf/10.1002/wcc.678) doi: https://doi.org/10.1002/
+wcc.678
+Stern, N. (2007). The Economics of Climate Change: The Stern Review . Cambridge:
+Cambridge University Press. Retrieved from https://www.cambridge.org/core/books/
+economics-of-climate-change/A1E0BBF2F0ED8E2E4142A9C878052204 doi: 10.1017/
+CBO9780511817434
+Stolbova, V., Monasterolo, I., & Battiston, S. (2018, July). A Financial Macro-
+Network Approach to Climate Policy Evaluation. Ecological Economics , 149, 239–
+253. Retrieved 2019-11-08, from https://linkinghub.elsevier.com/retrieve/pii/
+S0921800917314192 doi: 10.1016/j.ecolecon.2018.03.013
+Sundaresan, S. (2013). A Review of Merton’s Model of the Firm’s Capital Structure with its
+Wide Applications. , 21.
+TCFD. (2017). Recommendations of the Task Force on Climate-related Financial Disclosures
+(Tech. Rep.). Task Force on Climate-related Financial Disclosures.
+Vermeulen, R., Schets, E., Lohuis, M., K¨ olbl, B., Jansen, D.-J., & Heeringa, W. (2019). The
+Heat is on: A framework for measuring financial stress under disruptive energy transition
+scenarios (Tech. Rep.). Amsterdam: De Nederlandsche Bank.
+Way, R., Ives, M. C., Mealy, P., & Farmer, J. D. (2021). Empirically grounded technology
+forecasts and the energy transition. , 23.
+Weitzman, M. L. (2009, February). On Modeling and Interpreting the Economics of Catas-
+trophic Climate Change. Review of Economics and Statistics , 91(1), 1–19. Retrieved
+2019-11-04, from http://www.mitpressjournals.org/doi/10.1162/rest.91.1.1 doi:
+10.1162/rest.91.1.1
+57
+
+===== PAGE 58 =====
+
+A Appendix
+A.1 Model Parameter Overview
+58
+
+===== PAGE 59 =====
+
+Table 8: Model parameters, subscripts and calibration
+Variable Name Baseline Calibration
+P Production levels AR Production data: h−1(y) : GJ/year→GW
+p market price per technology h IEA projections [2020,2040]
+c Unit cost of production IEA and Way et al. (2020) LCOE projections [2020,2040]
+ψ level of carbon tax NGFS trajectory in Dollars per tonne of CO 2($/tCO2)
+η technology market shareeta∈[0,1] AR data computed: Ps,tayh
+Ps,tgyh
+R Real Economy R ∈ R
+Aj Firm Assets ?
+Lj Firm Liabilities total outstanding debt, Eikon refinitiv data
+χ emission levels Tonnes of CO 2(tCO2)
+ϵ emission intensity in tonnes of CO2 χ/Pj
+ρ discount rate ρj =ρf+βjE[RM]
+ω Carbon tax elasticityω= [0,1] 0.5
+ν profit margin
+B Carbon budget 450 Gt/CO 2
+v Type of financial instrument v∈[equity, bond, loan]
+E Equity Ex,tj =As,tj −Ls,tj
+PD Probability of Default
+LGD Loss Given Default λ+ (1−λ)SAj
+λ LGD threshold λ∈[0,1]
+N cumulative standard normal distribution
+σ volatility of asset EIKON data
+βtj firm dividend rate βtj ∈[0,1]
+T maturity of financial instrument (in years)
+Sj Stranded Assets, production incompatible with carbon budgetB
+s Scenario s = [baseline, target and stress]
+t time [t, T]
+h Technology h ∈ H
+y Sector y ∈ Y
+g Geographical region g∈ G= [global, regional]
+a Physical Production Asset a ∈ A
+c country
+i Financial Institution Portfolio data, constructed
+j Firm AR data
+59
+
+===== PAGE 60 =====
+
+Table 9: Firm and Asset Coverage
+Sector Number of Assets Number of Firms HQ countries Share of global production (in %)34 Countries with Assets
+Power8025 135 29 29,7 92
+A.2 Data and additional analysis
+34Based on a global production in 2021 of 27.520 TW/h. Total Production of firm sample 8.181 TW/h.
+60
+
+===== PAGE 61 =====
+
+Table 10: Sector Description
+Sector Segment Production unit Emission intensity scope Technology and Business Unit Type
+Power Power Generation Installed capcity (MW)35 Scope 1 Electricity generated from oil, gas, coal, nuclear, hydro and renewables
+Table 11: Descriptive statistics of key parameters for firm sample. Based on empirical cali-
+bration and baseline settings (in %)
+5th Percentile Mean Median 95th Percentile
+Net profit margin, νi 1.44 11.87 10.76 23.87
+Stranded Assets, S i 0 36.04 41.23 71.43
+Loss given default, LGD j 45 64.82 67.67 84.29
+35We transform installed capacity into power generation by applying regional capacity factors from (IEA, 2020):
+h−1(y) : MW/year → MW/h
+61
+
+===== PAGE 62 =====
+
+Figure 13: Top 100 firm profit margin
+62
+
+===== PAGE 63 =====
+
+Figure 14: Debt-to-Equity Ratio and Net Profit Margin for Top 100 Firms
+63
+
+===== PAGE 64 =====
+
+Figure 15: Stranded Assets and resulting LGD with 1.5 ° Carbon Budget
+Figure 15 shows the calibration of firms’ loss given default values (LGD) on outstanding
+debt to assess their credit risk on a counterparty level.
+64
+
+===== PAGE 65 =====
+
+Figure 16: Debt-to-Equity Ratio and observed PDs for Top 100 Firms
+65
+
+===== PAGE 66 =====
+
+Figure 17: Firms Country of Domicile
+66
+
+===== PAGE 67 =====
+
+Figure 18: Firms Asset Location across Geographies
+67
