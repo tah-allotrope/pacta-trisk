@@ -1,0 +1,7 @@
+year,model,scenario,scenario_geography,variable,unit,carbon_tax
+2025,synthetic_vietnam_demo,increasing_carbon_tax_50,Vietnam,Price|Carbon,USD/t CO2,0
+2026,synthetic_vietnam_demo,increasing_carbon_tax_50,Vietnam,Price|Carbon,USD/t CO2,0
+2027,synthetic_vietnam_demo,increasing_carbon_tax_50,Vietnam,Price|Carbon,USD/t CO2,0
+2028,synthetic_vietnam_demo,increasing_carbon_tax_50,Vietnam,Price|Carbon,USD/t CO2,50
+2029,synthetic_vietnam_demo,increasing_carbon_tax_50,Vietnam,Price|Carbon,USD/t CO2,52
+2030,synthetic_vietnam_demo,increasing_carbon_tax_50,Vietnam,Price|Carbon,USD/t CO2,54.08

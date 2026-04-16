@@ -1,0 +1,97 @@
+company_id,company_name,asset_id,asset_name,country_iso2,production_year,sector,technology,capacity,capacity_factor,emission_factor,production_unit,technology_type
+VN_ABCD_001,EVN (Electricity of Vietnam),VN_ABCD_001_CoalCap,EVN (Electricity of Vietnam) :: CoalCap,VN,2025,Power,CoalCap,17857.14285714286,0.7,0.95,MW,carbontech
+VN_ABCD_001,EVN (Electricity of Vietnam),VN_ABCD_001_CoalCap,EVN (Electricity of Vietnam) :: CoalCap,VN,2026,Power,CoalCap,17857.14285714286,0.7,0.95,MW,carbontech
+VN_ABCD_001,EVN (Electricity of Vietnam),VN_ABCD_001_CoalCap,EVN (Electricity of Vietnam) :: CoalCap,VN,2027,Power,CoalCap,17142.857142857145,0.7,0.95,MW,carbontech
+VN_ABCD_001,EVN (Electricity of Vietnam),VN_ABCD_001_CoalCap,EVN (Electricity of Vietnam) :: CoalCap,VN,2028,Power,CoalCap,16857.14285714286,0.7,0.95,MW,carbontech
+VN_ABCD_001,EVN (Electricity of Vietnam),VN_ABCD_001_CoalCap,EVN (Electricity of Vietnam) :: CoalCap,VN,2029,Power,CoalCap,16428.57142857143,0.7,0.95,MW,carbontech
+VN_ABCD_001,EVN (Electricity of Vietnam),VN_ABCD_001_CoalCap,EVN (Electricity of Vietnam) :: CoalCap,VN,2030,Power,CoalCap,15714.285714285716,0.7,0.95,MW,carbontech
+VN_ABCD_001,EVN (Electricity of Vietnam),VN_ABCD_001_GasCap,EVN (Electricity of Vietnam) :: GasCap,VN,2025,Power,GasCap,2727.272727272727,0.55,0.45,MW,carbontech
+VN_ABCD_001,EVN (Electricity of Vietnam),VN_ABCD_001_GasCap,EVN (Electricity of Vietnam) :: GasCap,VN,2026,Power,GasCap,2763.6363636363635,0.55,0.45,MW,carbontech
+VN_ABCD_001,EVN (Electricity of Vietnam),VN_ABCD_001_GasCap,EVN (Electricity of Vietnam) :: GasCap,VN,2027,Power,GasCap,2800,0.55,0.45,MW,carbontech
+VN_ABCD_001,EVN (Electricity of Vietnam),VN_ABCD_001_GasCap,EVN (Electricity of Vietnam) :: GasCap,VN,2028,Power,GasCap,2836.363636363636,0.55,0.45,MW,carbontech
+VN_ABCD_001,EVN (Electricity of Vietnam),VN_ABCD_001_GasCap,EVN (Electricity of Vietnam) :: GasCap,VN,2029,Power,GasCap,2872.7272727272725,0.55,0.45,MW,carbontech
+VN_ABCD_001,EVN (Electricity of Vietnam),VN_ABCD_001_GasCap,EVN (Electricity of Vietnam) :: GasCap,VN,2030,Power,GasCap,2909.090909090909,0.55,0.45,MW,carbontech
+VN_ABCD_001,EVN (Electricity of Vietnam),VN_ABCD_001_HydroCap,EVN (Electricity of Vietnam) :: HydroCap,VN,2025,Power,HydroCap,17333.333333333332,0.45,0.02,MW,greentech
+VN_ABCD_001,EVN (Electricity of Vietnam),VN_ABCD_001_HydroCap,EVN (Electricity of Vietnam) :: HydroCap,VN,2026,Power,HydroCap,17444.444444444445,0.45,0.02,MW,greentech
+VN_ABCD_001,EVN (Electricity of Vietnam),VN_ABCD_001_HydroCap,EVN (Electricity of Vietnam) :: HydroCap,VN,2027,Power,HydroCap,17555.555555555555,0.45,0.02,MW,greentech
+VN_ABCD_001,EVN (Electricity of Vietnam),VN_ABCD_001_HydroCap,EVN (Electricity of Vietnam) :: HydroCap,VN,2028,Power,HydroCap,17666.666666666668,0.45,0.02,MW,greentech
+VN_ABCD_001,EVN (Electricity of Vietnam),VN_ABCD_001_HydroCap,EVN (Electricity of Vietnam) :: HydroCap,VN,2029,Power,HydroCap,17777.777777777777,0.45,0.02,MW,greentech
+VN_ABCD_001,EVN (Electricity of Vietnam),VN_ABCD_001_HydroCap,EVN (Electricity of Vietnam) :: HydroCap,VN,2030,Power,HydroCap,18000,0.45,0.02,MW,greentech
+VN_ABCD_002,Vinacomin Power JSC,VN_ABCD_002_CoalCap,Vinacomin Power JSC :: CoalCap,VN,2025,Power,CoalCap,3714.2857142857147,0.7,0.95,MW,carbontech
+VN_ABCD_002,Vinacomin Power JSC,VN_ABCD_002_CoalCap,Vinacomin Power JSC :: CoalCap,VN,2026,Power,CoalCap,3685.714285714286,0.7,0.95,MW,carbontech
+VN_ABCD_002,Vinacomin Power JSC,VN_ABCD_002_CoalCap,Vinacomin Power JSC :: CoalCap,VN,2027,Power,CoalCap,3642.857142857143,0.7,0.95,MW,carbontech
+VN_ABCD_002,Vinacomin Power JSC,VN_ABCD_002_CoalCap,Vinacomin Power JSC :: CoalCap,VN,2028,Power,CoalCap,3571.4285714285716,0.7,0.95,MW,carbontech
+VN_ABCD_002,Vinacomin Power JSC,VN_ABCD_002_CoalCap,Vinacomin Power JSC :: CoalCap,VN,2029,Power,CoalCap,3514.2857142857147,0.7,0.95,MW,carbontech
+VN_ABCD_002,Vinacomin Power JSC,VN_ABCD_002_CoalCap,Vinacomin Power JSC :: CoalCap,VN,2030,Power,CoalCap,3428.571428571429,0.7,0.95,MW,carbontech
+VN_ABCD_003,International Power Mong Duong,VN_ABCD_003_CoalCap,International Power Mong Duong :: CoalCap,VN,2025,Power,CoalCap,1714.2857142857144,0.7,0.95,MW,carbontech
+VN_ABCD_003,International Power Mong Duong,VN_ABCD_003_CoalCap,International Power Mong Duong :: CoalCap,VN,2026,Power,CoalCap,1714.2857142857144,0.7,0.95,MW,carbontech
+VN_ABCD_003,International Power Mong Duong,VN_ABCD_003_CoalCap,International Power Mong Duong :: CoalCap,VN,2027,Power,CoalCap,1714.2857142857144,0.7,0.95,MW,carbontech
+VN_ABCD_003,International Power Mong Duong,VN_ABCD_003_CoalCap,International Power Mong Duong :: CoalCap,VN,2028,Power,CoalCap,1714.2857142857144,0.7,0.95,MW,carbontech
+VN_ABCD_003,International Power Mong Duong,VN_ABCD_003_CoalCap,International Power Mong Duong :: CoalCap,VN,2029,Power,CoalCap,1714.2857142857144,0.7,0.95,MW,carbontech
+VN_ABCD_003,International Power Mong Duong,VN_ABCD_003_CoalCap,International Power Mong Duong :: CoalCap,VN,2030,Power,CoalCap,1714.2857142857144,0.7,0.95,MW,carbontech
+VN_ABCD_004,PVN Power Corporation,VN_ABCD_004_CoalCap,PVN Power Corporation :: CoalCap,VN,2025,Power,CoalCap,857.1428571428572,0.7,0.95,MW,carbontech
+VN_ABCD_004,PVN Power Corporation,VN_ABCD_004_CoalCap,PVN Power Corporation :: CoalCap,VN,2026,Power,CoalCap,857.1428571428572,0.7,0.95,MW,carbontech
+VN_ABCD_004,PVN Power Corporation,VN_ABCD_004_CoalCap,PVN Power Corporation :: CoalCap,VN,2027,Power,CoalCap,857.1428571428572,0.7,0.95,MW,carbontech
+VN_ABCD_004,PVN Power Corporation,VN_ABCD_004_CoalCap,PVN Power Corporation :: CoalCap,VN,2028,Power,CoalCap,857.1428571428572,0.7,0.95,MW,carbontech
+VN_ABCD_004,PVN Power Corporation,VN_ABCD_004_CoalCap,PVN Power Corporation :: CoalCap,VN,2029,Power,CoalCap,857.1428571428572,0.7,0.95,MW,carbontech
+VN_ABCD_004,PVN Power Corporation,VN_ABCD_004_CoalCap,PVN Power Corporation :: CoalCap,VN,2030,Power,CoalCap,857.1428571428572,0.7,0.95,MW,carbontech
+VN_ABCD_004,PVN Power Corporation,VN_ABCD_004_GasCap,PVN Power Corporation :: GasCap,VN,2025,Power,GasCap,7636.363636363636,0.55,0.45,MW,carbontech
+VN_ABCD_004,PVN Power Corporation,VN_ABCD_004_GasCap,PVN Power Corporation :: GasCap,VN,2026,Power,GasCap,8181.818181818181,0.55,0.45,MW,carbontech
+VN_ABCD_004,PVN Power Corporation,VN_ABCD_004_GasCap,PVN Power Corporation :: GasCap,VN,2027,Power,GasCap,9454.545454545454,0.55,0.45,MW,carbontech
+VN_ABCD_004,PVN Power Corporation,VN_ABCD_004_GasCap,PVN Power Corporation :: GasCap,VN,2028,Power,GasCap,10545.454545454544,0.55,0.45,MW,carbontech
+VN_ABCD_004,PVN Power Corporation,VN_ABCD_004_GasCap,PVN Power Corporation :: GasCap,VN,2029,Power,GasCap,11272.727272727272,0.55,0.45,MW,carbontech
+VN_ABCD_004,PVN Power Corporation,VN_ABCD_004_GasCap,PVN Power Corporation :: GasCap,VN,2030,Power,GasCap,12363.636363636362,0.55,0.45,MW,carbontech
+VN_ABCD_005,Nghi Son Power LLC,VN_ABCD_005_CoalCap,Nghi Son Power LLC :: CoalCap,VN,2025,Power,CoalCap,1714.2857142857144,0.7,0.95,MW,carbontech
+VN_ABCD_005,Nghi Son Power LLC,VN_ABCD_005_CoalCap,Nghi Son Power LLC :: CoalCap,VN,2026,Power,CoalCap,1714.2857142857144,0.7,0.95,MW,carbontech
+VN_ABCD_005,Nghi Son Power LLC,VN_ABCD_005_CoalCap,Nghi Son Power LLC :: CoalCap,VN,2027,Power,CoalCap,1714.2857142857144,0.7,0.95,MW,carbontech
+VN_ABCD_005,Nghi Son Power LLC,VN_ABCD_005_CoalCap,Nghi Son Power LLC :: CoalCap,VN,2028,Power,CoalCap,1714.2857142857144,0.7,0.95,MW,carbontech
+VN_ABCD_005,Nghi Son Power LLC,VN_ABCD_005_CoalCap,Nghi Son Power LLC :: CoalCap,VN,2029,Power,CoalCap,1714.2857142857144,0.7,0.95,MW,carbontech
+VN_ABCD_005,Nghi Son Power LLC,VN_ABCD_005_CoalCap,Nghi Son Power LLC :: CoalCap,VN,2030,Power,CoalCap,1714.2857142857144,0.7,0.95,MW,carbontech
+VN_ABCD_006,Dung Quat LNG Power Consortium,VN_ABCD_006_GasCap,Dung Quat LNG Power Consortium :: GasCap,VN,2025,Power,GasCap,0,0.55,0.45,MW,carbontech
+VN_ABCD_006,Dung Quat LNG Power Consortium,VN_ABCD_006_GasCap,Dung Quat LNG Power Consortium :: GasCap,VN,2026,Power,GasCap,0,0.55,0.45,MW,carbontech
+VN_ABCD_006,Dung Quat LNG Power Consortium,VN_ABCD_006_GasCap,Dung Quat LNG Power Consortium :: GasCap,VN,2027,Power,GasCap,727.2727272727273,0.55,0.45,MW,carbontech
+VN_ABCD_006,Dung Quat LNG Power Consortium,VN_ABCD_006_GasCap,Dung Quat LNG Power Consortium :: GasCap,VN,2028,Power,GasCap,1236.3636363636363,0.55,0.45,MW,carbontech
+VN_ABCD_006,Dung Quat LNG Power Consortium,VN_ABCD_006_GasCap,Dung Quat LNG Power Consortium :: GasCap,VN,2029,Power,GasCap,1363.6363636363635,0.55,0.45,MW,carbontech
+VN_ABCD_006,Dung Quat LNG Power Consortium,VN_ABCD_006_GasCap,Dung Quat LNG Power Consortium :: GasCap,VN,2030,Power,GasCap,1363.6363636363635,0.55,0.45,MW,carbontech
+VN_ABCD_007,Vietnam Hydropower JSC,VN_ABCD_007_HydroCap,Vietnam Hydropower JSC :: HydroCap,VN,2025,Power,HydroCap,5333.333333333333,0.45,0.02,MW,greentech
+VN_ABCD_007,Vietnam Hydropower JSC,VN_ABCD_007_HydroCap,Vietnam Hydropower JSC :: HydroCap,VN,2026,Power,HydroCap,5377.777777777777,0.45,0.02,MW,greentech
+VN_ABCD_007,Vietnam Hydropower JSC,VN_ABCD_007_HydroCap,Vietnam Hydropower JSC :: HydroCap,VN,2027,Power,HydroCap,5444.444444444444,0.45,0.02,MW,greentech
+VN_ABCD_007,Vietnam Hydropower JSC,VN_ABCD_007_HydroCap,Vietnam Hydropower JSC :: HydroCap,VN,2028,Power,HydroCap,5555.555555555556,0.45,0.02,MW,greentech
+VN_ABCD_007,Vietnam Hydropower JSC,VN_ABCD_007_HydroCap,Vietnam Hydropower JSC :: HydroCap,VN,2029,Power,HydroCap,5666.666666666667,0.45,0.02,MW,greentech
+VN_ABCD_007,Vietnam Hydropower JSC,VN_ABCD_007_HydroCap,Vietnam Hydropower JSC :: HydroCap,VN,2030,Power,HydroCap,5777.777777777777,0.45,0.02,MW,greentech
+VN_ABCD_008,Trung Nam Group,VN_ABCD_008_RenewablesCap,Trung Nam Group :: RenewablesCap,VN,2025,Power,RenewablesCap,3500,0.3,0.01,MW,greentech
+VN_ABCD_008,Trung Nam Group,VN_ABCD_008_RenewablesCap,Trung Nam Group :: RenewablesCap,VN,2026,Power,RenewablesCap,4500,0.3,0.01,MW,greentech
+VN_ABCD_008,Trung Nam Group,VN_ABCD_008_RenewablesCap,Trung Nam Group :: RenewablesCap,VN,2027,Power,RenewablesCap,5333.333333333334,0.3,0.01,MW,greentech
+VN_ABCD_008,Trung Nam Group,VN_ABCD_008_RenewablesCap,Trung Nam Group :: RenewablesCap,VN,2028,Power,RenewablesCap,6333.333333333334,0.3,0.01,MW,greentech
+VN_ABCD_008,Trung Nam Group,VN_ABCD_008_RenewablesCap,Trung Nam Group :: RenewablesCap,VN,2029,Power,RenewablesCap,7333.333333333334,0.3,0.01,MW,greentech
+VN_ABCD_008,Trung Nam Group,VN_ABCD_008_RenewablesCap,Trung Nam Group :: RenewablesCap,VN,2030,Power,RenewablesCap,8333.333333333334,0.3,0.01,MW,greentech
+VN_ABCD_009,BIM Group,VN_ABCD_009_RenewablesCap,BIM Group :: RenewablesCap,VN,2025,Power,RenewablesCap,1266.6666666666667,0.3,0.01,MW,greentech
+VN_ABCD_009,BIM Group,VN_ABCD_009_RenewablesCap,BIM Group :: RenewablesCap,VN,2026,Power,RenewablesCap,1400,0.3,0.01,MW,greentech
+VN_ABCD_009,BIM Group,VN_ABCD_009_RenewablesCap,BIM Group :: RenewablesCap,VN,2027,Power,RenewablesCap,1533.3333333333335,0.3,0.01,MW,greentech
+VN_ABCD_009,BIM Group,VN_ABCD_009_RenewablesCap,BIM Group :: RenewablesCap,VN,2028,Power,RenewablesCap,1700,0.3,0.01,MW,greentech
+VN_ABCD_009,BIM Group,VN_ABCD_009_RenewablesCap,BIM Group :: RenewablesCap,VN,2029,Power,RenewablesCap,1866.6666666666667,0.3,0.01,MW,greentech
+VN_ABCD_009,BIM Group,VN_ABCD_009_RenewablesCap,BIM Group :: RenewablesCap,VN,2030,Power,RenewablesCap,2000,0.3,0.01,MW,greentech
+VN_ABCD_010,Thanh Thanh Cong Group,VN_ABCD_010_RenewablesCap,Thanh Thanh Cong Group :: RenewablesCap,VN,2025,Power,RenewablesCap,1733.3333333333335,0.3,0.01,MW,greentech
+VN_ABCD_010,Thanh Thanh Cong Group,VN_ABCD_010_RenewablesCap,Thanh Thanh Cong Group :: RenewablesCap,VN,2026,Power,RenewablesCap,1933.3333333333335,0.3,0.01,MW,greentech
+VN_ABCD_010,Thanh Thanh Cong Group,VN_ABCD_010_RenewablesCap,Thanh Thanh Cong Group :: RenewablesCap,VN,2027,Power,RenewablesCap,2133.3333333333335,0.3,0.01,MW,greentech
+VN_ABCD_010,Thanh Thanh Cong Group,VN_ABCD_010_RenewablesCap,Thanh Thanh Cong Group :: RenewablesCap,VN,2028,Power,RenewablesCap,2333.3333333333335,0.3,0.01,MW,greentech
+VN_ABCD_010,Thanh Thanh Cong Group,VN_ABCD_010_RenewablesCap,Thanh Thanh Cong Group :: RenewablesCap,VN,2029,Power,RenewablesCap,2533.3333333333335,0.3,0.01,MW,greentech
+VN_ABCD_010,Thanh Thanh Cong Group,VN_ABCD_010_RenewablesCap,Thanh Thanh Cong Group :: RenewablesCap,VN,2030,Power,RenewablesCap,2666.666666666667,0.3,0.01,MW,greentech
+VN_ABCD_011,Xuan Thien Group,VN_ABCD_011_RenewablesCap,Xuan Thien Group :: RenewablesCap,VN,2025,Power,RenewablesCap,2166.666666666667,0.3,0.01,MW,greentech
+VN_ABCD_011,Xuan Thien Group,VN_ABCD_011_RenewablesCap,Xuan Thien Group :: RenewablesCap,VN,2026,Power,RenewablesCap,2433.3333333333335,0.3,0.01,MW,greentech
+VN_ABCD_011,Xuan Thien Group,VN_ABCD_011_RenewablesCap,Xuan Thien Group :: RenewablesCap,VN,2027,Power,RenewablesCap,2700,0.3,0.01,MW,greentech
+VN_ABCD_011,Xuan Thien Group,VN_ABCD_011_RenewablesCap,Xuan Thien Group :: RenewablesCap,VN,2028,Power,RenewablesCap,2933.3333333333335,0.3,0.01,MW,greentech
+VN_ABCD_011,Xuan Thien Group,VN_ABCD_011_RenewablesCap,Xuan Thien Group :: RenewablesCap,VN,2029,Power,RenewablesCap,3166.666666666667,0.3,0.01,MW,greentech
+VN_ABCD_011,Xuan Thien Group,VN_ABCD_011_RenewablesCap,Xuan Thien Group :: RenewablesCap,VN,2030,Power,RenewablesCap,3333.3333333333335,0.3,0.01,MW,greentech
+VN_ABCD_012,T&T Group,VN_ABCD_012_RenewablesCap,T&T Group :: RenewablesCap,VN,2025,Power,RenewablesCap,1600,0.3,0.01,MW,greentech
+VN_ABCD_012,T&T Group,VN_ABCD_012_RenewablesCap,T&T Group :: RenewablesCap,VN,2026,Power,RenewablesCap,1866.6666666666667,0.3,0.01,MW,greentech
+VN_ABCD_012,T&T Group,VN_ABCD_012_RenewablesCap,T&T Group :: RenewablesCap,VN,2027,Power,RenewablesCap,2133.3333333333335,0.3,0.01,MW,greentech
+VN_ABCD_012,T&T Group,VN_ABCD_012_RenewablesCap,T&T Group :: RenewablesCap,VN,2028,Power,RenewablesCap,2333.3333333333335,0.3,0.01,MW,greentech
+VN_ABCD_012,T&T Group,VN_ABCD_012_RenewablesCap,T&T Group :: RenewablesCap,VN,2029,Power,RenewablesCap,2533.3333333333335,0.3,0.01,MW,greentech
+VN_ABCD_012,T&T Group,VN_ABCD_012_RenewablesCap,T&T Group :: RenewablesCap,VN,2030,Power,RenewablesCap,2666.666666666667,0.3,0.01,MW,greentech
+VN_ABCD_013,Gia Lai Electricity JSC,VN_ABCD_013_RenewablesCap,Gia Lai Electricity JSC :: RenewablesCap,VN,2025,Power,RenewablesCap,1166.6666666666667,0.3,0.01,MW,greentech
+VN_ABCD_013,Gia Lai Electricity JSC,VN_ABCD_013_RenewablesCap,Gia Lai Electricity JSC :: RenewablesCap,VN,2026,Power,RenewablesCap,1266.6666666666667,0.3,0.01,MW,greentech
+VN_ABCD_013,Gia Lai Electricity JSC,VN_ABCD_013_RenewablesCap,Gia Lai Electricity JSC :: RenewablesCap,VN,2027,Power,RenewablesCap,1366.6666666666667,0.3,0.01,MW,greentech
+VN_ABCD_013,Gia Lai Electricity JSC,VN_ABCD_013_RenewablesCap,Gia Lai Electricity JSC :: RenewablesCap,VN,2028,Power,RenewablesCap,1500,0.3,0.01,MW,greentech
+VN_ABCD_013,Gia Lai Electricity JSC,VN_ABCD_013_RenewablesCap,Gia Lai Electricity JSC :: RenewablesCap,VN,2029,Power,RenewablesCap,1600,0.3,0.01,MW,greentech
+VN_ABCD_013,Gia Lai Electricity JSC,VN_ABCD_013_RenewablesCap,Gia Lai Electricity JSC :: RenewablesCap,VN,2030,Power,RenewablesCap,1666.6666666666667,0.3,0.01,MW,greentech

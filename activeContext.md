@@ -321,3 +321,102 @@ When filtering data to a subset of metrics but providing `scale_*_manual()` mapp
 - [ ] Build a Shiny dashboard for interactive exploration
 - [ ] Extend analysis to oil & gas and aviation sectors
 - [ ] Set up quarterly re-run monitoring framework
+
+---
+
+## Session Plan: TRISK Demo Roadmap (2026-04-16)
+
+**Goal:** Draft a detailed multi-phase markdown plan to showcase TRISK, optionally combined with PACTA, using synthetic but publicly anchored Vietnam market data in a demo final report for a prospective Vietnam bank.
+
+### Planned Work
+
+- [x] Review existing repo context, prior plans, and TRISK research brief
+- [x] Review extracted TRISK paper notes for sequencing, scope, and caveats
+- [ ] Draft a new multi-phase plan in `plans/vietnam_bank_trisk_demo_plan.md`
+- [ ] Record review notes and key decisions in this file after drafting
+
+### Planning Notes
+
+- TRISK should be framed as a downstream stress-test layer, not a replacement for PACTA.
+- The most credible first TRISK demo in this repo is power-sector first, because local synthetic Vietnam data and the Baer et al. proof of concept both fit power best.
+- The existing repo already covers most PACTA-side ingredients; the main missing TRISK inputs are synthetic financial features, price curves, carbon price curves, and schema mapping.
+
+### Review / Results
+
+- [x] Created new planning artifact: `plans/vietnam_bank_trisk_demo_plan.md`
+- [x] Anchored the plan in repo research, especially `research/2026-04-08_integration-trisk-model-existing.md` and `research/Baer_TRISK_2022_extracted.txt`
+- [x] Chose a phased strategy: stabilize PACTA baseline first, then build a power-sector TRISK pilot, then integrate both into a bank-facing final report
+- [x] Explicitly positioned TRISK as a downstream risk layer that complements PACTA alignment outputs
+- [x] Documented the need for synthetic but publicly anchored financial features and transition-price assumptions before any TRISK demo run
+
+---
+
+## Implementation Update: TRISK Pilot (2026-04-16)
+
+**Goal:** Implement the new TRISK demo plan with runnable artifacts, phase/final report outputs, and a real package-backed power-sector pilot where possible.
+
+### What Was Completed
+
+- Re-ran `scripts/pacta_vietnam_scenario.R` and confirmed the Vietnam PACTA baseline now completes end to end, including SDA outputs, alignment tables, charts, and `reports/PACTA_Vietnam_Bank_Report.html`
+- Installed `trisk.model` 2.6.1 into the user R library and verified the package's actual folder-based input contract and runnable API
+- Created `docs/TRISK_Demo_Assumptions.md` to document the synthetic financial, scenario, and carbon-price assumptions used in the pilot
+- Created `scripts/trisk_prepare_inputs.R` to generate TRISK-ready Vietnam power demo inputs and export a runnable folder package to `output/trisk_inputs/power_demo`
+- Created `scripts/trisk_power_demo.R` to run a real `trisk.model::run_trisk()` power-sector stress test and produce borrower-level summary outputs and figures in `synthesis_output/trisk/power_demo`
+
+### Key Output Artifacts
+
+- `data/vietnam_trisk_assets_power.csv`
+- `data/vietnam_trisk_scenarios_power.csv`
+- `data/vietnam_trisk_financial_features.csv`
+- `data/vietnam_trisk_ngfs_carbon_price.csv`
+- `output/trisk_inputs/power_demo/`
+- `synthesis_output/trisk/power_demo/company_summary.csv`
+- `synthesis_output/trisk/power_demo/top_borrowers_alignment_trisk.csv`
+- `synthesis_output/trisk/power_demo/figures/01_npv_change_by_company.png`
+- `synthesis_output/trisk/power_demo/figures/02_pd_change_by_company.png`
+- `synthesis_output/trisk/power_demo/figures/03_priority_score_top10.png`
+
+### Early Pilot Findings
+
+- The package-backed TRISK pilot runs successfully for the Vietnam synthetic power portfolio using a baseline scenario `VN_PDP8_BASELINE` and a stress scenario `VN_NZE_STRESS`
+- Highest modeled stress priority borrowers are coal-heavy entities: `Nghi Son Power LLC`, `Vinacomin Power JSC`, and `International Power Mong Duong`
+- `EVN (Electricity of Vietnam)` remains materially exposed because of its coal share even though the portfolio also contains hydro and gas assets
+- Renewable platforms (`Trung Nam Group`, `BIM Group`, `T&T Group`, `Thanh Thanh Cong Group`, `Xuan Thien Group`) show positive NPV change and negative PD change under the synthetic stress setup
+- `Dung Quat LNG Power Consortium` currently yields zero baseline output in the pilot because its pre-commissioning years create a zero-value edge case under the current setup; this should be treated as a demo-model limitation and refined later
+
+### Important Caveats
+
+- The TRISK pilot is still synthetic and should be interpreted as a comparative transition-stress ranking tool, not a production credit model
+- The current package-backed pilot only covers `power`, not the full multi-sector Vietnam book
+- Carbon pricing is driven by the package's `increasing_carbon_tax_50` logic, which is useful for demo stress behavior but not Vietnam policy forecasting
+- One package warning remains: 5 rows were removed during Merton-model compatibility checks in the PD stage; the run still completed and produced usable borrower-level outputs
+
+---
+
+## Next Implementation Plan: TRISK Sensitivity Package (2026-04-16)
+
+**Goal:** Strengthen the power-sector TRISK pilot by adding one-parameter-at-a-time sensitivity runs for the key model settings already identified in the plan.
+
+### Planned Work
+
+- [ ] Extend `scripts/trisk_power_demo.R` so the base run parameters are centralized and reusable
+- [ ] Add one-at-a-time sensitivity runs for `shock_year`, `discount_rate`, `risk_free_rate`, and `market_passthrough`
+- [ ] Export a borrower-level sensitivity table and a compact summary artifact in `synthesis_output/trisk/power_demo/`
+- [ ] Re-run the power demo and verify the new outputs are generated cleanly
+- [ ] Record the main sensitivity findings and any caveats here
+
+### Why This Next
+
+- Sensitivity analysis is already part of the approved TRISK roadmap and is the fastest way to improve demo credibility without destabilizing the working pilot
+- It is lower-risk than reworking the LNG edge case immediately because the current zero-output behavior is documented, while sensitivity adds new decision-useful evidence around robustness
+
+### Review / Results
+
+- [x] Refactored `scripts/trisk_power_demo.R` so the base-case TRISK run parameters are centralized and reused across all runs
+- [x] Added one-at-a-time sensitivity runs for `shock_year`, `discount_rate`, `risk_free_rate`, and `market_passthrough`
+- [x] Verified the script now produces borrower-level sensitivity outputs: `sensitivity_results.csv`, `sensitivity_summary.csv`, and `run_catalog.csv`
+- [x] Verified each sensitivity case writes to its own run directory under `synthesis_output/trisk/power_demo/runs/`
+- [x] Confirmed the headline borrower ranking is stable across all tested sensitivities: `Nghi Son Power LLC` remains the top-ranked stressed borrower in every case
+- [x] Confirmed `market_passthrough` is the most decision-relevant tested sensitivity for ranking shifts in this demo run, with the largest borrower-level score change observed for `PVN Power Corporation`
+- [x] Confirmed `shock_year` changes move relative severity among mid-ranked names, especially `PVN Power Corporation` and `Vietnam Hydropower JSC`, without displacing the top coal names
+- [ ] Remaining known issue: `Dung Quat LNG Power Consortium` still produces `NA` sensitivity outputs because the underlying zero-baseline edge case remains unresolved

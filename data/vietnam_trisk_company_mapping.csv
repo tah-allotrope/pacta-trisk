@@ -1,0 +1,14 @@
+company_id,company_name,archetype
+VN_ABCD_001,EVN (Electricity of Vietnam),state_owned_utility
+VN_ABCD_002,Vinacomin Power JSC,state_affiliated_coal
+VN_ABCD_003,International Power Mong Duong,bot_coal_project
+VN_ABCD_004,PVN Power Corporation,state_affiliated_gas
+VN_ABCD_005,Nghi Son Power LLC,bot_coal_project
+VN_ABCD_006,Dung Quat LNG Power Consortium,lng_growth_platform
+VN_ABCD_007,Vietnam Hydropower JSC,hydro_operator
+VN_ABCD_008,Trung Nam Group,renewable_ipp
+VN_ABCD_009,BIM Group,renewable_ipp
+VN_ABCD_010,Thanh Thanh Cong Group,renewable_ipp
+VN_ABCD_011,Xuan Thien Group,renewable_ipp
+VN_ABCD_012,T&T Group,renewable_ipp
+VN_ABCD_013,Gia Lai Electricity JSC,renewable_ipp
