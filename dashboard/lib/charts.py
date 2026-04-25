@@ -38,6 +38,11 @@ def npv_var_scatter(df: pd.DataFrame, x: str, y: str, color: str, hover_name: st
     return _base_layout(fig, title)
 
 
+def ranked_bar(df: pd.DataFrame, x: str, y: str, color: str, title: str):
+    fig = px.bar(df, x=x, y=y, color=color, orientation="h")
+    return _base_layout(fig, title)
+
+
 def pd_change_heatmap(df: pd.DataFrame, x: str, y: str, z: str, title: str):
     pivot = df.pivot(index=y, columns=x, values=z)
     fig = px.imshow(pivot, text_auto=True, aspect="auto", color_continuous_scale="Tealgrn")

@@ -26,6 +26,16 @@ TRISK, Reports, and Methodology are scaffolded so later phases can add the deepe
 """
 )
 
+st.markdown(
+    """
+<div class="what-new-card">
+  <strong>What's new:</strong> the TRISK Risk, Reports, and Methodology pages are now live, so the dashboard tells the full portfolio -> sector alignment -> borrower stress -> evidence narrative.
+  The latest anchor artifact is <code>2026-04-16-final-vietnam-bank-trisk-demo.html</code> in the Reports tab.
+</div>
+""",
+    unsafe_allow_html=True,
+)
+
 pacta = load_pacta_alignment_tables()
 trisk = load_trisk_tables()
 
@@ -34,6 +44,18 @@ col1.metric("PACTA tables", len(pacta))
 col2.metric("TRISK tables", len(trisk))
 col3.metric("Available pages", 4)
 col4.metric("Deployment target", "pactavn")
+
+st.markdown("## How to read this demo")
+guide_1, guide_2, guide_3 = st.columns(3)
+guide_1.markdown(
+    "**1. Start with PACTA**  \nSee where the portfolio is misaligned against Vietnam and global transition pathways."
+)
+guide_2.markdown(
+    "**2. Move to TRISK**  \nSee which power borrowers absorb the largest value and credit deterioration under the stress scenario."
+)
+guide_3.markdown(
+    "**3. Finish with evidence**  \nUse Reports and Methodology for the longer-form narrative, assumptions, and source traceability."
+)
 
 with st.expander("Current snapshot inventory", expanded=True):
     c1, c2 = st.columns(2)
@@ -44,9 +66,6 @@ with st.expander("Current snapshot inventory", expanded=True):
         st.write("**TRISK**")
         st.write(", ".join(sorted(trisk.keys())))
 
-st.info(
-    "Phase 02 delivered the shell. Phase 03 delivered the PACTA Alignment page. "
-    "TRISK, Reports, and Methodology remain stubs for the next implementation phase."
-)
+st.success("All planned dashboard pages are now implemented for the client-facing demo scope. Use the sidebar to move from alignment to stress to supporting artifacts.")
 
 footer_note()

@@ -27,6 +27,10 @@
 | File | Columns | Units | Provenance |
 |---|---|---|---|
 | `company_summary.csv` | `company_name, sector, technology, baseline_npv, stress_npv, npv_change_pct, pd_change, var_95` | VND, %, bp | `trisk_power_demo.R` — base run |
+| `assets.csv` | `company_id, company_name, asset_id, sector, technology, capacity, capacity_factor, emission_factor` | MW, factor, tCO2/unit | `trisk_prepare_inputs.R` — power asset input snapshot |
+| `financial_features.csv` | `company_id, pd, net_profit_margin, debt_equity_ratio, volatility` | ratio / decimal | `trisk_prepare_inputs.R` — synthetic borrower financial assumptions |
+| `scenarios.csv` | `scenario, scenario_type, scenario_geography, sector, technology, scenario_year, scenario_price, scenario_pathway, scenario_capacity_factor` | USD/MWh-eq, MW | `trisk_prepare_inputs.R` — baseline and stress scenario inputs |
+| `ngfs_carbon_price.csv` | `year, model, scenario, scenario_geography, variable, unit, carbon_tax` | USD/t CO2 | `trisk_prepare_inputs.R` — carbon tax input curve |
 | `npv_results_latest.csv` | `company_id, company_name, scenario, year, npv` | VND | `trisk_power_demo.R` — NPV term structure |
 | `pd_results_latest.csv` | `company_id, company_name, scenario, year, pd` | Decimal probability | `trisk_power_demo.R` — PD term structure |
 | `pd_summary.csv` | `company_name, baseline_pd_1y, stress_pd_1y, delta_pd_1y, baseline_pd_5y, stress_pd_5y, delta_pd_5y` | bp | `trisk_power_demo.R` — PD summary |

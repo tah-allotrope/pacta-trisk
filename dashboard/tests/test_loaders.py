@@ -12,4 +12,5 @@ def test_pacta_loaders_return_dataframes() -> None:
 def test_trisk_loaders_return_dataframes() -> None:
     tables = load_trisk_tables()
     assert tables["company_summary"].empty is False
+    assert tables["company_trajectories_latest"].empty is False
     assert tables["sensitivity_results"].empty is False

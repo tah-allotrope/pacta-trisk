@@ -14,12 +14,16 @@ source_files <- list(
     "synthesis_output/vietnam/06_vn_sda_alignment_2030.csv"
   ),
   trisk = c(
+    "output/trisk_inputs/power_demo/assets.csv",
     "synthesis_output/trisk/power_demo/company_summary.csv",
     "synthesis_output/trisk/power_demo/company_trajectories_latest.csv",
+    "output/trisk_inputs/power_demo/financial_features.csv",
+    "output/trisk_inputs/power_demo/ngfs_carbon_price.csv",
     "synthesis_output/trisk/power_demo/npv_results_latest.csv",
     "synthesis_output/trisk/power_demo/pd_results_latest.csv",
     "synthesis_output/trisk/power_demo/pd_summary.csv",
     "synthesis_output/trisk/power_demo/run_catalog.csv",
+    "output/trisk_inputs/power_demo/scenarios.csv",
     "synthesis_output/trisk/power_demo/sensitivity_results.csv",
     "synthesis_output/trisk/power_demo/sensitivity_summary.csv",
     "synthesis_output/trisk/power_demo/top_borrowers_alignment_trisk.csv"

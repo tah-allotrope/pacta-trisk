@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phase Report :: Dashboard Phase 04 05</title>
+  <meta name="color-scheme" content="dark">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    async function initMermaid() {
+      const blocks = document.querySelectorAll('.mermaid');
+      if (!blocks.length) return;
+      mermaid.initialize({ startOnLoad: false, theme: 'dark', securityLevel: 'loose' });
+      await mermaid.run({ nodes: blocks });
+    }
+    const run = () => initMermaid().catch((error) => console.error('Mermaid render failed', error));
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run, { once: true });
+    else run();
+  </script>
+  <style>
+    :root {
+      --bg: #0d0d0d; --panel: rgba(13,13,13,0.88); --panel-strong: rgba(19,19,19,0.96);
+      --line: rgba(0,245,255,0.26); --text: #e9f6ff; --muted: #8ea3ad;
+      --accent-blue: #00f5ff; --accent-green: #39ff14; --shadow: 0 14px 40px rgba(0,0,0,0.32);
+      --radius-lg: 22px; --radius-md: 16px; --radius-sm: 12px;
+      --narrative-font: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --technical-font: "Cascadia Code", "Fira Code", Consolas, "Liberation Mono", monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      position: relative; margin: 0; min-height: 100vh; overflow-x: hidden;
+      background: radial-gradient(circle at top left, rgba(0,245,255,0.12), transparent 28%), radial-gradient(circle at 85% 12%, rgba(57,255,20,0.08), transparent 24%), linear-gradient(180deg, #050505 0%, #0d0d0d 36%, #090909 100%);
+      color: var(--text); font-family: var(--narrative-font); line-height: 1.6; letter-spacing: 0.01em;
+    }
+    .page-shell { width: min(1180px, calc(100vw - 32px)); margin: 0 auto; padding: 32px 0 72px; }
+    .hero, .section { position: relative; padding: 24px; border: 1px solid var(--line); border-radius: 22px; background: var(--panel); box-shadow: var(--shadow); }
+    .hero { margin-bottom: 24px; background: linear-gradient(145deg, rgba(0,245,255,0.08), transparent 28%), var(--panel-strong); }
+    .hero-grid, .summary-grid, .metric-strip { display: grid; gap: 16px; }
+    .hero-grid { grid-template-columns: minmax(0,1.5fr) minmax(260px,0.85fr); }
+    .summary-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .metric-strip { grid-template-columns: repeat(4, minmax(0,1fr)); margin-top: 18px; }
+    .section { margin-top: 22px; }
+    .section-header { margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .section-index { color: var(--accent-green); font-weight: 700; font-size: 0.82rem; letter-spacing: 0.16em; text-transform: uppercase; font-family: var(--technical-font); }
+    .phase-title { margin: 0; font-size: clamp(2.4rem, 5vw, 4.4rem); line-height: 0.95; text-transform: uppercase; }
+    .hero-summary, .meta-label, .footer-note { color: var(--muted); }
+    .pill-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    .pill, .repo-tag, .metric-label, .metric-value { font-family: var(--technical-font); }
+    .pill, .repo-tag { display: inline-flex; padding: 8px 11px; border-radius: 999px; border: 1px solid rgba(57,255,20,0.22); background: rgba(57,255,20,0.06); }
+    .repo-tag { margin-top: 10px; border-color: rgba(0,245,255,0.24); background: rgba(0,245,255,0.08); color: var(--accent-blue); }
+    .meta-card, .column-card, .diagram-frame, .technical-frame, .viz-frame, .question-frame { padding: 16px; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; background: rgba(7,7,7,0.82); }
+    .column-label { color: var(--accent-blue); font-weight: 700; font-size: 0.83rem; letter-spacing: 0.14em; text-transform: uppercase; font-family: var(--technical-font); }
+    .technical-frame table { width: 100%; border-collapse: collapse; }
+    .technical-frame th, .technical-frame td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+    .technical-frame th { color: var(--accent-green); text-transform: uppercase; font-size: 0.76rem; text-align: left; }
+    .diagram-frame { overflow: auto; }
+    .diagram-frame .mermaid { min-width: 900px; }
+    .metric { padding: 14px 16px; border: 1px solid rgba(0,245,255,0.18); border-radius: 12px; background: rgba(0,245,255,0.04); }
+    .metric-value { margin-top: 8px; color: var(--accent-green); font-size: 1.2rem; font-weight: 700; }
+    canvas.report-chart { display: block; width: 100% !important; height: 320px !important; }
+    ul { margin-top: 0; }
+    .footer-note { margin-top: 18px; text-align: right; font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    @media (max-width: 900px) { .hero-grid, .summary-grid, .metric-strip { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero">
+      <div class="hero-grid">
+        <div>
+          <div class="section-index">Phase Report / Personal Technical Artifact</div>
+          <h1 class="phase-title">Dashboard Phase 04 05</h1>
+          <p class="hero-summary">Completed the client-facing dashboard narrative: TRISK risk views, embedded report hub, methodology page, and landing-page polish on top of the existing alignment shell.</p>
+          <div class="pill-row">
+            <span class="pill">project :: PACTA Vietnam + TRISK Showcase</span>
+            <span class="pill">date :: 2026-04-26</span>
+          </div>
+          <div class="repo-tag">repo :: pacta-trisk</div>
+        </div>
+        <div class="meta-card">
+          <div class="meta-label">Verification</div>
+          <div><strong>7 tests passed</strong></div>
+          <div class="meta-label" style="margin-top:12px;">New live pages</div>
+          <div><strong>TRISK Risk, Reports, Methodology</strong></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header"><div class="section-index">01 / Input -> Output</div><h2>Input -> Output Summary</h2></div>
+      <div class="summary-grid">
+        <div class="column-card">
+          <div class="column-label">Inputs Consumed</div>
+          <ul>
+            <li>TRISK snapshot outputs in <code>dashboard/data/trisk/</code></li>
+            <li>TRISK input assumption files from <code>output/trisk_inputs/power_demo/</code></li>
+            <li>Four HTML reports in <code>dashboard/data/reports/</code></li>
+            <li>Research notes: <code>PACTA for BANKS - TRISK overview.pptx.txt</code> and <code>Baer_TRISK_2022_extracted.txt</code></li>
+          </ul>
+        </div>
+        <div class="column-card">
+          <div class="column-label">Outputs Produced</div>
+          <ul>
+            <li>Implemented <code>dashboard/pages/2_TRISK_Risk.py</code></li>
+            <li>Implemented <code>dashboard/pages/3_Reports.py</code></li>
+            <li>Implemented <code>dashboard/pages/4_Methodology.py</code></li>
+            <li>Extended loaders, charts, branding, README, and snapshot refresh script</li>
+            <li>Generated <code>reports/2026-04-26-dashboard-phase-04-05.html</code></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header"><div class="section-index">02 / Logic Flow</div><h2>Logic Flow</h2></div>
+      <div class="diagram-frame"><div class="mermaid">flowchart LR
+A[Read Phase 04 and 05 plan] --> B[Inspect TRISK result schemas]
+B --> C[Inspect TRISK input assumption files]
+C --> D[Notice snapshot gap for inputs]
+D --> E[Copy inputs into dashboard/data/trisk]
+E --> F[Extend loaders and README]
+F --> G[Build TRISK Risk page]
+G --> H[Build Reports hub]
+H --> I[Build Methodology page]
+I --> J[Polish landing page and branding]
+J --> K[Expand tests to all pages]
+K --> L[Run pytest and boot check]
+L --> M[Record results and generate report]</div></div>
+    </section>
+
+    <section class="section">
+      <div class="section-header"><div class="section-index">03 / Math / Algorithm Used</div><h2>Math / Algorithm Used</h2></div>
+      <div class="technical-frame">
+        <p>No new TRISK model math was introduced. The dashboard continues to treat the frozen snapshot as the source of truth and only adds presentation logic.</p>
+        <p>The TRISK page derives:</p>
+        <ul>
+          <li><strong>NPV change percent</strong> from the stored <code>npv_change</code> column for chart readability.</li>
+          <li><strong>PD basis-point deltas</strong> by multiplying the stored decimal <code>pd_change</code> by 10,000.</li>
+          <li><strong>Sensitivity filtering</strong> by subsetting the precomputed <code>sensitivity_results.csv</code> grid on one parameter and one value at a time; no recomputation occurs.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header"><div class="section-index">04 / Tools / Formulas / Methods</div><h2>Tools / Formulas / Methods</h2></div>
+      <div class="technical-frame">
+        <table>
+          <tr><th>Tool / Method</th><th>Use in this phase</th></tr>
+          <tr><td>Streamlit</td><td>TRISK visuals, embedded reports, methodology page, download flows</td></tr>
+          <tr><td>Pandas</td><td>Filter TRISK sensitivity grid, prepare ranking tables, expose input assumptions</td></tr>
+          <tr><td>Plotly</td><td>Borrower ranking chart, NPV vs PD scatter, technology trajectories</td></tr>
+          <tr><td>ZipFile</td><td>Create downloadable zip bundle of TRISK snapshot files</td></tr>
+          <tr><td>Streamlit components</td><td>Embed HTML reports inline in the Reports page</td></tr>
+          <tr><td>Pytest + AppTest</td><td>Loader tests and smoke rendering for all pages</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header"><div class="section-index">05 / Results & Visualizations</div><h2>Results & Visualizations</h2></div>
+      <div class="viz-frame">
+        <div class="metric-strip">
+          <div class="metric"><div class="metric-label">Live dashboard pages</div><div class="metric-value">4</div></div>
+          <div class="metric"><div class="metric-label">Priority reports embedded</div><div class="metric-value">4</div></div>
+          <div class="metric"><div class="metric-label">TRISK input files snapped</div><div class="metric-value">4</div></div>
+          <div class="metric"><div class="metric-label">Tests passed</div><div class="metric-value">7 / 7</div></div>
+        </div>
+        <div style="margin-top:18px;"><canvas id="phaseChart" class="report-chart"></canvas></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header"><div class="section-index">06 / Limitations / Second-Best Alternative</div><h2>Limitations / Second-Best Alternative</h2></div>
+      <div class="question-frame">
+        <ul>
+          <li>The dashboard still depends on static HTML report artifacts and frozen CSV snapshots; there is no live pipeline or on-demand recomputation.</li>
+          <li>The TRISK page is still limited to the power pilot because the underlying TRISK model outputs are only available for that sector in this repo.</li>
+          <li>Second-best alternative: link out to reports instead of embedding them inline. Rejected because inline viewing is materially better for the client walkthrough and the current report sizes remain manageable.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header"><div class="section-index">07 / Errors / Warnings / Flags</div><h2>Errors / Warnings / Flags Encountered</h2></div>
+      <div class="question-frame">
+        <ul>
+          <li><strong>Real gap found:</strong> Phase 01 had not copied the TRISK input assumption files into <code>dashboard/data/trisk/</code>. Fixed in this phase and also added to <code>scripts/refresh_dashboard_data.R</code>.</li>
+          <li><strong>No failing tests remained:</strong> after exposing <code>company_trajectories_latest</code> through the shared loader, all page smoke tests passed.</li>
+          <li><strong>Boot timeout was intentional:</strong> the Streamlit startup command was allowed to time out after confirming the app served successfully, which is expected for a long-running web process.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header"><div class="section-index">08 / Open Questions / Next Phase Seeds</div><h2>Open Questions / Next Phase Seeds</h2></div>
+      <div class="question-frame">
+        <ul>
+          <li>Phase 06 remains: Streamlit Community Cloud deployment, custom <code>pactavn</code> subdomain, deployed smoke checklist, and demo script.</li>
+          <li>Decide whether to add screenshots to the repo now or capture them during Phase 06 after the deployed app is visually final.</li>
+          <li>Consider adding a root <code>.gitignore</code> update for Python <code>__pycache__</code> directories if the repo does not already exclude them.</li>
+        </ul>
+      </div>
+      <div class="footer-note">artifact generated for reflection, not presentation theater</div>
+    </section>
+  </main>
+  <script>
+    if (window.Chart) {
+      Chart.defaults.devicePixelRatio = 1;
+      Chart.defaults.animation = false;
+      Chart.defaults.resizeDelay = 150;
+      Chart.defaults.normalized = true;
+      Chart.defaults.maintainAspectRatio = false;
+      Chart.defaults.responsive = true;
+      new Chart(document.getElementById('phaseChart'), {
+        type: 'bar',
+        data: {
+          labels: ['TRISK page', 'Reports page', 'Methodology page', 'Embedded reports', 'Tests'],
+          datasets: [{
+            label: 'Count',
+            data: [1, 1, 1, 4, 7],
+            backgroundColor: ['rgba(0,229,255,0.70)', 'rgba(57,255,20,0.70)', 'rgba(124,255,178,0.70)', 'rgba(47,129,247,0.70)', 'rgba(255,176,0,0.70)'],
+            borderColor: ['#00E5FF', '#39FF14', '#7CFFB2', '#2F81F7', '#FFB000'],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          animation: false,
+          resizeDelay: 150,
+          normalized: true,
+          maintainAspectRatio: false,
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 1, color: '#8ea3ad' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+            x: { ticks: { color: '#8ea3ad' }, grid: { display: false } }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>

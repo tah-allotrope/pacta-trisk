@@ -481,3 +481,38 @@ When filtering data to a subset of metrics but providing `scale_*_manual()` mapp
 - [ ] `2_TRISK_Risk.py` is still a stub; PHASE-04 remains to be implemented
 - [ ] `3_Reports.py` and `4_Methodology.py` are still stubs; PHASE-05 remains to be implemented
 - [ ] Public-mode decision superseded the old optional password-gate task in the original draft plan
+
+---
+
+## Phase 04-05: TRISK Risk + Reports / Methodology (2026-04-26)
+
+**Goal:** Complete the client-facing dashboard narrative so the app can carry a viewer from alignment, to firm-level stress, to longer-form evidence and methodology.
+
+### Planned Work
+
+- [x] Extend `dashboard/data/README.md` and snapshot contents so TRISK input assumptions are available inside the frozen dashboard data contract
+- [x] Implement `dashboard/pages/2_TRISK_Risk.py` with company ranking, scatter, sensitivity explorer, assumptions panel, and zip download
+- [x] Implement `dashboard/pages/3_Reports.py` with inline HTML embeds and download buttons for the four priority reports
+- [x] Implement `dashboard/pages/4_Methodology.py` with PACTA/TRISK framing, citations, and source-file access
+- [x] Polish `dashboard/app.py`, shared branding, and README for the now-complete page set
+- [x] Run tests and boot verification, then record results here
+
+### Review / Results
+
+- [x] Copied TRISK input snapshot files into `dashboard/data/trisk/`: `assets.csv`, `financial_features.csv`, `scenarios.csv`, `ngfs_carbon_price.csv`
+- [x] Extended `dashboard/data/README.md` to document the TRISK input assumption files and actual output columns used by the dashboard
+- [x] Extended `dashboard/lib/loaders.py` to expose TRISK inputs, company trajectories, and a reports catalog
+- [x] Extended `dashboard/lib/charts.py` with a ranked horizontal bar helper for borrower ranking and sensitivity views
+- [x] Updated `dashboard/lib/branding.py` and `dashboard/app.py` to complete the landing-page narrative, “What’s new” callout, and Allotrope-branded footer
+- [x] Implemented `dashboard/pages/2_TRISK_Risk.py` with borrower ranking, NPV vs PD scatter, sensitivity filter panel, assumptions tables, and a zip download of all TRISK snapshot files
+- [x] Implemented `dashboard/pages/3_Reports.py` with inline HTML embedding and download actions for the four priority reports
+- [x] Implemented `dashboard/pages/4_Methodology.py` with PACTA/TRISK framing, research excerpts, and downloadable source PDF
+- [x] Updated `dashboard/README.md` to reflect completed Phases 04 and 05
+- [x] Updated `scripts/refresh_dashboard_data.R` so future dashboard snapshot refreshes include the TRISK input assumption files
+- [x] Expanded dashboard tests to cover the TRISK, Reports, and Methodology pages
+- [x] Verified with `python -m pytest dashboard/tests` -> `7 passed`
+- [x] Verified app boot with `python -m streamlit run dashboard/app.py --server.headless true`
+
+### Remaining Gaps
+
+- [ ] Phase 06 deployment and rehearsal tasks still remain: Streamlit Cloud setup, custom subdomain, smoke checklist on deployed URL, and demo script
