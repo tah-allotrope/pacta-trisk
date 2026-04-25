@@ -446,3 +446,38 @@ When filtering data to a subset of metrics but providing `scale_*_manual()` mapp
 - [x] Total `dashboard/data/` size: ~2 MB (well under 100 MB limit)
 
 **Next phase:** PHASE-02 — Streamlit app scaffold (`dashboard/app.py`, pages, loaders, theme).
+
+---
+
+## Phase 02-03: Streamlit Scaffold + PACTA Alignment (2026-04-26)
+
+**Goal:** Build the dashboard shell and the first client-facing alignment page against the frozen `dashboard/data/` snapshot.
+
+### Planned Work
+
+- [x] Create `dashboard/app.py` landing page with public-demo framing and synthetic-data disclaimer
+- [x] Create page stubs for `2_TRISK_Risk.py`, `3_Reports.py`, and `4_Methodology.py`
+- [x] Create shared loaders and chart helpers in `dashboard/lib/`
+- [x] Add Streamlit config, requirements, and dashboard README
+- [x] Implement `dashboard/pages/1_PACTA_Alignment.py` with KPI cards, sector filter, interactive tables, static chart panels, and downloads
+- [x] Add dashboard smoke/data-loader tests and run verification
+- [x] Record results and remaining gaps here
+
+### Review / Results
+
+- [x] Added package-scoped dashboard modules: `dashboard/__init__.py`, `dashboard/lib/__init__.py`
+- [x] Added reusable data loaders in `dashboard/lib/loaders.py` for PACTA, TRISK, markdown, bytes, and report file listing
+- [x] Added Plotly helper wrappers in `dashboard/lib/charts.py`
+- [x] Added shared demo banner and footer styling in `dashboard/lib/branding.py`
+- [x] Added the main Streamlit shell in `dashboard/app.py`
+- [x] Added the implemented PACTA page and three stub pages under `dashboard/pages/`
+- [x] Added `dashboard/.streamlit/config.toml`, `dashboard/requirements.txt`, and `dashboard/README.md`
+- [x] Added smoke/data-loader tests in `dashboard/tests/`
+- [x] Verified with `python -m pytest dashboard/tests` -> `4 passed`
+- [x] Verified app boot with `python -m streamlit run dashboard/app.py --server.headless true`
+
+### Remaining Gaps
+
+- [ ] `2_TRISK_Risk.py` is still a stub; PHASE-04 remains to be implemented
+- [ ] `3_Reports.py` and `4_Methodology.py` are still stubs; PHASE-05 remains to be implemented
+- [ ] Public-mode decision superseded the old optional password-gate task in the original draft plan

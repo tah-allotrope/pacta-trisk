@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phase Report :: Dashboard Phase 02 03</title>
+  <meta name="color-scheme" content="dark">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    async function initMermaid() {
+      const blocks = document.querySelectorAll('.mermaid');
+      if (!blocks.length) return;
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'dark',
+        securityLevel: 'loose',
+        themeVariables: {
+          primaryColor: '#111111', primaryTextColor: '#e8f6ff', primaryBorderColor: '#00f5ff',
+          lineColor: '#39ff14', secondaryColor: '#121a1a', tertiaryColor: '#111111',
+          background: '#0d0d0d', mainBkg: '#0d0d0d', nodeBorder: '#00f5ff',
+          clusterBkg: '#111111', clusterBorder: '#39ff14', edgeLabelBackground: '#0d0d0d'
+        }
+      });
+      await mermaid.run({ nodes: blocks });
+    }
+    const run = () => initMermaid().catch((error) => console.error('Mermaid render failed', error));
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run, { once: true });
+    } else {
+      run();
+    }
+  </script>
+  <style>
+    :root {
+      --bg: #0d0d0d; --panel: rgba(13,13,13,0.88); --panel-strong: rgba(19,19,19,0.96);
+      --line: rgba(0,245,255,0.26); --text: #e9f6ff; --muted: #8ea3ad;
+      --accent-blue: #00f5ff; --accent-green: #39ff14; --shadow: 0 14px 40px rgba(0,0,0,0.32);
+      --radius-lg: 22px; --radius-md: 16px; --radius-sm: 12px;
+      --narrative-font: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --technical-font: "Cascadia Code", "Fira Code", Consolas, "Liberation Mono", monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      position: relative; margin: 0; min-height: 100vh; overflow-x: hidden;
+      background:
+        radial-gradient(circle at top left, rgba(0,245,255,0.12), transparent 28%),
+        radial-gradient(circle at 85% 12%, rgba(57,255,20,0.08), transparent 24%),
+        linear-gradient(180deg, #050505 0%, #0d0d0d 36%, #090909 100%);
+      color: var(--text); font-family: var(--narrative-font); line-height: 1.6; letter-spacing: 0.01em;
+    }
+    body::before {
+      content: ""; position: absolute; inset: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+      background-size: 32px 32px; opacity: 0.16;
+    }
+    a { color: var(--accent-blue); }
+    code, pre, .technical, .meta-chip, .section-kicker, .pill, .metric-label, .metric-value, .repo-tag, .mermaid {
+      font-family: var(--technical-font);
+    }
+    .page-shell { width: min(1180px, calc(100vw - 32px)); margin: 0 auto; padding: 32px 0 72px; position: relative; z-index: 1; }
+    .hero {
+      position: relative; padding: 28px; margin-bottom: 24px; border: 1px solid var(--line); border-radius: 28px;
+      background:
+        linear-gradient(145deg, rgba(0,245,255,0.08), transparent 28%),
+        linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0)),
+        var(--panel-strong);
+      box-shadow: var(--shadow), inset 0 0 0 1px rgba(255,255,255,0.02);
+    }
+    .hero-grid { display: grid; grid-template-columns: minmax(0,1.55fr) minmax(260px,0.85fr); gap: 22px; align-items: end; }
+    .section-kicker { margin: 0 0 12px; color: var(--accent-green); font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.22em; }
+    .phase-title { margin: 0; max-width: 12ch; font-size: clamp(2.5rem,5vw,4.7rem); line-height: 0.94; letter-spacing: -0.05em; color: #f5feff; text-transform: uppercase; }
+    .hero-summary { margin: 18px 0 0; max-width: 60ch; color: var(--muted); font-size: 0.98rem; }
+    .hero-meta { display: grid; gap: 12px; }
+    .meta-card { padding: 16px 18px; border: 1px solid rgba(57,255,20,0.2); border-radius: 18px; background: rgba(255,255,255,0.025); }
+    .meta-label { margin-bottom: 6px; color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.16em; }
+    .meta-chip { color: var(--accent-blue); font-size: 1rem; font-weight: 700; word-break: break-word; }
+    .repo-tag { display: inline-flex; align-items: center; gap: 8px; margin-top: 10px; padding: 8px 12px; border: 1px solid rgba(0,245,255,0.24); border-radius: 999px; background: rgba(0,245,255,0.08); color: var(--accent-blue); font-size: 0.82rem; }
+    .pill-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    .pill { display: inline-flex; align-items: center; gap: 8px; padding: 8px 11px; border: 1px solid rgba(57,255,20,0.22); border-radius: 999px; background: rgba(57,255,20,0.06); color: #d9ffd0; font-size: 0.8rem; }
+    .section { position: relative; margin-top: 22px; padding: 24px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--panel); box-shadow: var(--shadow); }
+    .section::before { content: ""; position: absolute; left: 24px; right: 24px; top: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(0,245,255,0.9), rgba(57,255,20,0.9), transparent); transform: translateY(-1px); }
+    .section-header { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 18px; align-items: end; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .section-title { margin: 0; font-size: clamp(1.2rem,2vw,1.7rem); line-height: 1.1; color: #f0feff; }
+    .section-index { display: inline-flex; align-items: center; gap: 10px; color: var(--accent-green); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; }
+    .summary-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; }
+    .column-card, .diagram-frame, .technical-frame, .viz-frame, .question-frame {
+      border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-md);
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)), rgba(7,7,7,0.82);
+    }
+    .column-card, .diagram-frame, .technical-frame, .viz-frame, .question-frame { padding: 18px; }
+    .column-label { margin: 0 0 12px; color: var(--accent-blue); font-size: 0.83rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em; }
+    .diagram-frame { overflow: auto; max-height: min(70vh, 720px); }
+    .diagram-frame.compact-diagram .mermaid { min-width: 900px; }
+    .mermaid svg { display: block; width: auto !important; min-width: 100%; max-width: none !important; height: auto !important; }
+    .technical-frame table { width: 100%; border-collapse: collapse; }
+    .technical-frame th, .technical-frame td { padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+    .technical-frame th { color: var(--accent-green); font-size: 0.76rem; text-align: left; letter-spacing: 0.12em; text-transform: uppercase; }
+    .metric-strip { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; margin-top: 18px; }
+    .metric { padding: 14px 16px; border: 1px solid rgba(0,245,255,0.18); border-radius: var(--radius-sm); background: rgba(0,245,255,0.04); }
+    .metric-label { color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.16em; }
+    .metric-value { margin-top: 8px; color: var(--accent-green); font-size: 1.2rem; font-weight: 700; }
+    canvas.report-chart { display: block; width: 100% !important; height: 320px !important; min-height: 320px; max-height: 320px; }
+    .footer-note { margin-top: 18px; text-align: right; color: rgba(142,163,173,0.72); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    ul { margin-top: 0; }
+    @media (max-width: 900px) { .hero-grid, .summary-grid, .metric-strip { grid-template-columns: 1fr; } .phase-title { max-width: none; } }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero" id="phase-header">
+      <div class="hero-grid">
+        <div>
+          <p class="section-kicker">Phase Report / Personal Technical Artifact</p>
+          <h1 class="phase-title">Dashboard Phase 02 03</h1>
+          <p class="hero-summary">Streamlit shell plus the first client-facing PACTA alignment page, implemented against the frozen dashboard snapshot and verified with smoke tests.</p>
+          <div class="pill-row" aria-label="report metadata">
+            <span class="pill">project :: PACTA Vietnam + TRISK Showcase</span>
+            <span class="pill">date :: 2026-04-26</span>
+          </div>
+          <div class="repo-tag">repo :: pacta-trisk</div>
+        </div>
+        <div class="hero-meta">
+          <div class="meta-card"><div class="meta-label">Implemented pages</div><div class="meta-chip">1 live + 3 stubs</div></div>
+          <div class="meta-card"><div class="meta-label">Verification</div><div class="meta-chip">4 tests passed</div></div>
+          <div class="meta-card"><div class="meta-label">Data source</div><div class="meta-chip">dashboard/data/</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section narrative" id="input-output-summary">
+      <div class="section-header"><div><div class="section-index">01 / Input -> Output</div><h2 class="section-title">Input -> Output Summary</h2></div></div>
+      <div class="summary-grid">
+        <div class="column-card">
+          <div class="column-label">Inputs Consumed</div>
+          <ul>
+            <li><code>dashboard/data/pacta/*.csv</code> and <code>*.png</code> from Phase 01 snapshot</li>
+            <li><code>dashboard/data/README.md</code> for chart captions and provenance</li>
+            <li>Phase 02/03 implementation requirements from the dashboard plan</li>
+            <li>PACTA methodology notes from <code>research/PACTA for BANKS - TRISK overview.pptx.txt</code></li>
+          </ul>
+        </div>
+        <div class="column-card">
+          <div class="column-label">Outputs Produced</div>
+          <ul>
+            <li><code>dashboard/app.py</code> landing page shell</li>
+            <li><code>dashboard/lib/</code> loaders, charts, branding helpers</li>
+            <li><code>dashboard/pages/1_PACTA_Alignment.py</code> implemented sector-drilldown page</li>
+            <li><code>dashboard/pages/2_TRISK_Risk.py</code>, <code>3_Reports.py</code>, <code>4_Methodology.py</code> stubs</li>
+            <li><code>dashboard/tests/</code> smoke and loader tests</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="logic-flow">
+      <div class="section-header"><div><div class="section-index">02 / Logic Flow</div><h2 class="section-title">Logic Flow</h2></div></div>
+      <div class="diagram-frame compact-diagram technical"><div class="mermaid">flowchart LR
+A[Phase 01 snapshot exists] --> B[Read Phase 02 and 03 requirements]
+B --> C[Inspect real CSV schemas]
+C --> D[Build reusable loaders and chart wrappers]
+D --> E[Build landing shell and page stubs]
+E --> F[Implement PACTA Alignment page]
+F --> G[Run pytest smoke tests]
+G --> H{Import path issue?}
+H -->|Yes| I[Convert imports to dashboard.lib package paths]
+I --> J[Re-run tests]
+H -->|No| J
+J --> K[4 tests pass]
+K --> L[Record results and generate phase report]</div></div>
+    </section>
+
+    <section class="section narrative" id="math-algorithm-used">
+      <div class="section-header"><div><div class="section-index">03 / Math / Algorithm Used</div><h2 class="section-title">Math / Algorithm Used</h2></div></div>
+      <div class="technical-frame">
+        <p><strong>Interactive page logic:</strong> the PACTA page computes simple dashboard summaries from the frozen tables rather than re-running PACTA math. KPI cards use row counts, unique borrower counts, and mean match score from <code>02_vn_matched_prioritized.csv</code>. Interactive charts reshape the precomputed market-share and SDA outputs into Plotly bars and trajectories filtered by sector and technology.</p>
+        <p><strong>No new climate model math</strong> was introduced in these phases. The implementation intentionally treats <code>dashboard/data/</code> as the source of truth and only adds a presentation/query layer on top.</p>
+      </div>
+    </section>
+
+    <section class="section" id="tools-formulas-methods">
+      <div class="section-header"><div><div class="section-index">04 / Tools / Formulas / Methods</div><h2 class="section-title">Tools / Formulas / Methods</h2></div></div>
+      <div class="technical-frame technical">
+        <table>
+          <tr><th>Tool / Method</th><th>Use in this phase</th></tr>
+          <tr><td>Streamlit</td><td>Multi-page shell, layout, controls, downloads, and page rendering</td></tr>
+          <tr><td>Pandas</td><td>Load frozen CSV artifacts and derive filtered tables / KPI summaries</td></tr>
+          <tr><td>Plotly</td><td>Interactive alignment bar charts and trajectory charts</td></tr>
+          <tr><td>Streamlit AppTest</td><td>Smoke-test landing page and implemented PACTA page</td></tr>
+          <tr><td><code>@st.cache_data</code></td><td>Cache repeated CSV / bytes / markdown reads to keep page loads cheap</td></tr>
+          <tr><td>Package-qualified imports</td><td>Use <code>dashboard.lib.*</code> so tests and runtime resolve modules consistently</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="results-visualizations">
+      <div class="section-header"><div><div class="section-index">05 / Results &amp; Visualizations</div><h2 class="section-title">Results &amp; Visualizations</h2></div></div>
+      <div class="viz-frame">
+        <div class="metric-strip">
+          <div class="metric"><div class="metric-label">Implemented pages</div><div class="metric-value">4</div></div>
+          <div class="metric"><div class="metric-label">Live functional page</div><div class="metric-value">1</div></div>
+          <div class="metric"><div class="metric-label">Helper modules</div><div class="metric-value">3</div></div>
+          <div class="metric"><div class="metric-label">Tests passed</div><div class="metric-value">4 / 4</div></div>
+        </div>
+        <div style="margin-top:18px;"><canvas id="phaseChart" class="report-chart"></canvas></div>
+      </div>
+    </section>
+
+    <section class="section narrative" id="limitations-second-best-alternative">
+      <div class="section-header"><div><div class="section-index">06 / Limitations / Second-Best Alternative</div><h2 class="section-title">Limitations / Second-Best Alternative</h2></div></div>
+      <div class="question-frame">
+        <ul>
+          <li><strong>Only Phase 03 is functional today:</strong> the TRISK, Reports, and Methodology pages are deliberate stubs so the app shell exists without pretending those later phases are done.</li>
+          <li><strong>Static image constraint remains:</strong> the PNG charts are upstream snapshot outputs, so the sector filter changes the interactive table and Plotly views, while the image panel only swaps between pre-rendered files.</li>
+          <li><strong>Second-best alternative considered:</strong> skip Plotly entirely and ship only static PNGs plus tables. Rejected because the sector drilldown benefits materially from an interactive layer, and Plotly stayed light enough for this scope.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section narrative" id="errors-warnings-flags-encountered">
+      <div class="section-header"><div><div class="section-index">07 / Errors / Warnings / Flags</div><h2 class="section-title">Errors / Warnings / Flags Encountered</h2></div></div>
+      <div class="question-frame technical">
+        <ul>
+          <li><strong>Real issue found and fixed:</strong> AppTest initially failed because the Streamlit files imported <code>lib</code> as a top-level module. The fix was to add <code>dashboard/__init__.py</code> and switch imports to <code>dashboard.lib.*</code>.</li>
+          <li><strong>Verification outcome:</strong> after the import-path fix, <code>python -m pytest dashboard/tests</code> passed cleanly.</li>
+          <li><strong>Runtime flag:</strong> the short-lived Streamlit boot command timed out intentionally after confirming the app started and exposed a local URL; this was a controlled verification timeout, not an app failure.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section narrative" id="open-questions-next-phase-seeds">
+      <div class="section-header"><div><div class="section-index">08 / Open Questions / Next Phase Seeds</div><h2 class="section-title">Open Questions / Next Phase Seeds</h2></div></div>
+      <div class="question-frame">
+        <ul>
+          <li>Implement PHASE-04: TRISK page with company ranking, scatter, sensitivity filters, and first-paint disclaimer.</li>
+          <li>Implement PHASE-05: reports hub, methodology page, and shared branding polish.</li>
+          <li>Add a proper sidebar navigation summary or landing-page shortcuts once more pages are live.</li>
+          <li>Decide whether to add a lightweight <code>.gitignore</code> entry for Python <code>__pycache__</code> artifacts if none already exists in the repo.</li>
+        </ul>
+      </div>
+      <div class="footer-note">artifact generated for reflection, not presentation theater</div>
+    </section>
+  </main>
+  <script>
+    if (window.Chart) {
+      Chart.defaults.devicePixelRatio = 1;
+      Chart.defaults.animation = false;
+      Chart.defaults.resizeDelay = 150;
+      Chart.defaults.normalized = true;
+      Chart.defaults.maintainAspectRatio = false;
+      Chart.defaults.responsive = true;
+      new Chart(document.getElementById('phaseChart'), {
+        type: 'bar',
+        data: {
+          labels: ['Shell app', 'Helper modules', 'Stub pages', 'Implemented page', 'Tests'],
+          datasets: [{
+            label: 'Count',
+            data: [1, 3, 3, 1, 4],
+            backgroundColor: [
+              'rgba(0,229,255,0.70)',
+              'rgba(57,255,20,0.70)',
+              'rgba(124,255,178,0.70)',
+              'rgba(47,129,247,0.70)',
+              'rgba(255,176,0,0.70)'
+            ],
+            borderColor: ['#00E5FF', '#39FF14', '#7CFFB2', '#2F81F7', '#FFB000'],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          animation: false,
+          resizeDelay: 150,
+          normalized: true,
+          maintainAspectRatio: false,
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 1, color: '#8ea3ad' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+            x: { ticks: { color: '#8ea3ad' }, grid: { display: false } }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>
