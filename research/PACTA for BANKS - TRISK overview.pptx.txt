@@ -1,0 +1,882 @@
+PACTA for BANKS
+TRISKOverview
+
+PACTA for BANKS
+Portfolio Alignment
+2
+
+Overview
+Purpose: Measure the alignment of banks’ financial portfolios to various climate scenarios across a set of key climate-relevant sectors based on granular, physical asset-level data.
+How much the bank aligns with the climate scenarios can be valuable inputs to risk assessment & stress-testing.
+
+Scope:
+Sectors: 7 sectors, only cover the most emission-tensive segment in the value chain
+Financial assets: Loans (bonds/equity are covered in another tool)
+Outstanding amount
+Or Committed amount
+Time horizon: 5 years
+
+Accounting levels:
+Loan book level: Portfolio weighted approach based on size of exposure 🡪 To assess the overall contribution of the bank to the real-economy emissions & compare with the market.
+Company level: Unweighted approach which allocates absolute production values of a client to the portfolio 🡪 To identify the leading emitters in the portfolio.
+Mục đích của tool: đo lường mức độ tương thích, phù hợp (alignment) của danh mục cho vay của ngân hàng hoặc một khách hàng cụ thể trong danh mục đối với kịch bản khí hậu dưới 2.0 hoặc 1.5 độ C, dựa vào tài sản vật lý của công ty trong danh mục. Danh mục đó tương thích đến đâu so với kịch bản khí hậu thì sẽ là một cái input cho đánh giá rủi ro sau này. 
+
+Phạm vi của tool:
++ 7 sectors nặng đô nhất đối với khí hậu, chỉ tập trung vào mắt xích phát thải trọng yếu nhất trong chuỗi giá trị, ví dụ đvs than thì là khai thác, đvs điện thì là phát điện. 
++ Tài sản tài chính, riêng tool này chỉ cover loan, có thể ghi nhận dưới dạng dư nợ (outstanding amount) hoặc hạn mức (committed amount) – tùy vào mục đích của người phân tích. PACTA không nói cụ thể mối liên hệ với PCAF, không rõ cover những tài sản nào trong PCAF, nhưng em nghĩ là có thể bao gồm khoản vay doanh nghiệp, tài trợ dự án. Equity/Bond thì thuộc phạm vi của một tool khác là PACTA for Investors. 
++ Khung thời gian phân tích là 5 năm.
+
+PACTA tính toán và phân bổ kết quả thông qua hai cấp độ kế toán chính. 
+- Cấp độ Danh mục cho vay (loan book level), thông qua Phương pháp trọng số danh mục (Portfolio weighted approach). Sản lượng của một khách hàng sẽ được phân bổ vào danh mục dựa trên tỉ lệ quy mô dư nợ (exposure) mà ngân hàng cấp cho khách hàng đó. Cách tiếp cận đánh giá tổng thể mức độ đóng góp của ngân hàng đối với lượng phát thải trong nền kinh tế thực và cho phép ngân hàng so sánh trực tiếp với các tiêu chuẩn thị trường (market benchmarks) và mục tiêu theo kịch bản khí hậu. 
+- Cấp độ công ty, sử dụng Phương pháp không trọng số (Unweighted approach) - phân bổ tuyệt đối phát thải của khách hàng vào phân tích mà không điều chỉnh theo quy mô khoản vay. Mục tiêu chính của cấp độ này là nhằm xác định chính xác những đơn vị phát thải hàng đầu trong danh mục đầu tư. Có thể là trong portfolio của ngân hàng khách hàng đó chiếm tỉ lệ thấp, nhưng trên thực tế cá nhân họ phát thải rất nhiều, và trong dài hạn thì đó là một khách hàng tiềm năng của ngân hàng thì họ cũng cần xác định để có phương án tiếp cận và hỗ trợ. 
+3
+
+Methodology – Packages & Procedure
+r2dii.match
+r2dii.analysis
+r2dii.plot
+r2dii.data
+Dataset Templates
+Provides mock datasets and templates for loan books and asset-level data.
+r2dii.match
+Data Linking
+Uses fuzzy-matching algorithms to link bank clients to physical assets.
+r2dii.analysis
+Core Calculation
+Calculates 3 main metrics: Technology Mix, Production Trajectories, and Emission Intensity.
+r2dii.plot
+Visualization
+Generates standardized charts to visualize alignment with climate scenarios.
+PACKAGES:
+r2dii.data: gồm mock dataset để chạy thử. Trong trường hợp test tool này cho data ở Việt Nam thì hoàn toàn có thể refer đến package này để xây dựng data input template.
+r2dii.match: công cụ để match loanbook với asset-based company data (gọi là ABCD). VD: NH có công ty A trong danh mục cho vay, tool này sẽ match công ty A đấy với chính nó hoặc công ty mẹ trong dữ liệu ABCD theo thuật toán fuzzy matching. Trên loanbook thì chỉ có thể thấy cty A đang vay từ NH bao nhiêu, nhưng sau khi match xong với ABCD có thể thấy được công ty A đang hoạt động dựa trên những loại công nghệ nào, tỉ lệ là bao nhiêu, và kế hoạch sản xuất 5 năm đối với từng loại công nghệ. 
+r2dii.analysis: tính toán 3 metrics để đo lường alignment là Technology Mix, Volume Trajectory và Emission Intensity theo portfolio, market, và scenario.
+r2dii.plot: trực quan hóa kết quả
+
+TỔNG QUAN VỀ QUY TRÌNH
+Về Input: 
+(Lưu ý: vì PACTA là data-agnostic tool (dữ liệu bất khả tri) – bản thân nó không sở hữu bất kì dữ liệu input nào mà tất cả sẽ được chuẩn bị bởi người dùng)
+-   Loanbook: gồm một số data point quan trọng như thông tin loan-taker (tên, mã LEI, cty mẹ), outstanding amount, sector – Nguồn: Ngân hàng
+Asset-based company data (gọi tắt là ABCD): là production & technology profiles của công ty,  gồm một số data point quan trọng: thông tin cty, loại công nghệ, sản lượng tại base year và dự kiến trong 5 năm. – Nguồn: bên cung cấp dữ liệu thứ 3 (third party data provider, i.e. Asset Impact)
+Scenario data & region data: World Energy Outlook by IEA, European Commission’s Joint Research Centre (JRC) scenarios (tham khảo Pacta Scenario Support Document)
+
+Về quy trình: Gồm 2 bước chính
+Khớp danh mục cho vay của ngân hàng với ABCD.
+Tính toán 3 metrics cho portfolio, market benchmark (gồm data của tất cả các công ty thuộc ngành đó trong database ABCD) và scenario trong 5 năm
+4
+
+Methodology – Packages & Procedure
+Link to DeepWiki: here
+MODEL INPUT, PROCESS, OUTPUT
+
+1. Chuẩn bị 3 nguồn dữ liệu đầu vào
+Financial Portfolio: Danh mục cho vay hoặc đầu tư của tổ chức.
+Asset-Level Data (ABCD): Dữ liệu chi tiết về tài sản vật chất của các công ty.
+Climate Scenarios: Các kịch bản biến đổi khí hậu để làm mốc so sánh.
+
+2. Chạy tool khớp và tính toán
+r2dii.match: Khớp nối dữ liệu danh mục tài chính với dữ liệu tài sản thực thông qua các hàm như match_name() và prioritize()
+r2dii.analysis: Đưa dữ liệu đã khớp vào phân tích để tính toán mục tiêu thị phần (target_market_share) hoặc mục tiêu theo SDA (target_sda)
+
+Cụ thể data input/output cho hàm team có thể refer đến link DeepWiki đính kèm tại slide.
+
+3. Trực quan hóa kết quả 
+Sử dụng r2dii.plot để trực quan hóa dữ liệu.
+5
+
+Methodology – 3 Metrics & 2 Approaches
+The share of different technologies/fuels used in production. (%) 
+The change in current and projected production volumes of a technology in 5 years.
+(% increase/decrease)
+ The average CO2 emitted per product unit (tCO2e/product unit)
+Technology Mix
+Production Volume Trajectory
+Emission Intensity
+3 metrics
+Automotive
+Coal
+Oil & Gas
+Power
+Aviation
+Steel
+Cement
+Sectors
+3 CHỈ SỐ & 2 CÁCH TIẾP CẬN ĐO LƯỜNG ALIGNMENT
+
+Technology Mix và Production Volume Trajectory sẽ được sử dụng cho 4 sectors là Power, Oil & Gas, Coal và Automotive – là những sector đã có lộ trình công nghệ low-carbon rõ ràng. Còn Emission intensity sẽ được tính cho Cement, Steel và Aviation – những sector chưa có lộ trình công nghệ rõ ràng.
+
+- Technology Mix (Cơ cấu công nghệ): tính % của công nghệ hoặc nhiên liệu sử dụng theo sản lượng thực tế. VD: Dầu khí và than = năng lượng quy đổi GJ/ngày, Power = công suất lắp đặt là MW (mặc dù là sản lượng nhưng họ có nói là sản lượng đối với điện thì khó ghi nhận nên họ lấy công suất đại diện), Automotive = số lượng xe sản xuất.
+
+- Production Volume Trajectory (Lộ trình sản lượng): tính mức độ tăng hoặc giảm của sản lượng đối với một công nghệ cụ thể trong 5 năm. 
+
+- Emission intensity (Cường độ phát thải): tính bằng CO2 trên đơn vị sản lượng. 
+
+Cả 3 metrics này sẽ được tính cho portfolio, market benchmark và scenario. Kết quả cuối cùng sẽ tương tự như 3 cái hình ở trên. Lưu ý là tool có thể tính ở cấp độ portfolio (thể hiện ở hình minh họa), và có thể tính ở company level. 
+6
+
+Technology Mix
+Production Volume Trajectory
+Emission Intensity
+Methodology – 3 Metrics & 2 Approaches
+3 metrics
+Automotive
+Coal
+Oil & Gas
+Power
+Aviation
+Steel
+Cement
+Sectors
+2 approaches
+Market Share Approach
+Sectoral Decarbonization Approach
+Assume all the companies maintain their current market shares in the sector and the percentage of their decarbonization effort is the same with their market share. Each technology element (technology share or production volume) must change at the same rate as climate scenario. 
+Assume all companies in a specific sector must converge to the same level of carbon intensity, regardless of their starting points.
+CÁCH TIẾP CẬN ĐỂ TÍNH TARGET THEO KỊCH BẢN KHÍ HẬU ĐỐI VỚI 3 METRICS
+
+1. Market Share Approach (Áp dụng cho TM và PVJ): Giả sử tất cả các công ty trong danh mục cho vay sẽ giữ nguyên % thị phần của mình, và trách nhiệm giảm phát thải sẽ được chia cho cty theo % thị phần. VD Cty A chiếm 10% thị phần của ngành ô tô, thì cũng sẽ chịu trách nhiệm với 10% phát thải của ngành này. Cơ sở của cách tiếp cận này là: cơ cấu công nghệ và lộ trình sản lượng phải thay đổi cùng tốc độ với kịch bản khí hậu. 
+
+VD:
+Cơ cấu công nghệ ngành ô tô:
+Điểm xuất phát (Baseline 2020): Danh mục hiện đang có 16.5% là xe điện (Electric).
+Kế hoạch hiện tại (Portfolio 2025): Dựa trên kế hoạch sản xuất của các công ty trong danh mục, đến năm 2025, tỷ lệ này vẫn giữ nguyên ở mức 16.5%.
+Mục tiêu theo kịch bản (SDS Scenario 2025): Theo kịch bản Phát triển Bền vững SDS, để đạt mục tiêu khí hậu, tỷ trọng công nghệ xe điện trong danh mục cần phải đạt mức 17% vào năm 2025.
+🡪 Khoảng chênh lệch giữa 16.5% và 17% (mục tiêu SDS) chính là "Misalignment”
+
+Lộ trình sản lượng đối với NLTT ở ngành điện: Cdanh mục và thị trường đều có xu hướng giảm sản lượng đối 1.1% đối với NLTT, trong khi đáng ra theo kịch bản SDS phải tăng 10.8%.
+
+2. Sectoral Decarbonization Approach (theo SBTi, áp dụng với Emission Intensity): Cường độ phát thải của danh mục, không cần biết điểm xuất phát ở đâu, phải hội tụ về đúng với target của kịch bản khí hậu. 
+Lưu ý: Target của sector trong SDA là đối với global, tất cả các công ty trên toàn thế giới, mà trong PACTA chỉ có dataset của cty trong ABCD, nên họ sẽ có 1 bước điều chỉnh để tính target theo kiểu bottom-up chứ kphai top-down giống SBTi, nên mục tiêu sẽ là Adjusted Scenario Demo (theo hình minh họa)
+7
+
+Technology Mix
+Production Volume Trajectory
+Emission Intensity
+Methodology – 3 Metrics & 2 Approaches
+3 metrics
+Automotive
+Coal
+Oil & Gas
+Power
+Aviation
+Steel
+Cement
+Sectors
+2 approaches
+Market Share Approach
+Sectoral Decarbonization Approach
+Sector Market Share Target
+(for Low-Carbon Technologies)
+Technology Market Share Target
+(for High-Carbon Technologies)
+The target is set based on growth relative to total industry output.
+The target is based on the rate of reduction of technology in the scenario.
+Trong market share approach, cách set target cho loại công nghệ phát thải thấp và phát thải cao là khác nhau.
+
+Đối với công nghệ phát thải thấp: mục tiêu sẽ được đặt dựa trên lượng tăng trưởng so với tổng sản lượng toàn ngành (gọi là sector market share target). Mục tiêu bằng sản lượng công nghệ hiện tại cộng với một phần sản lượng bổ sung được tính dựa trên tỷ lệ gia tăng của công nghệ đó so với tổng ngành trong kịch bản. -- Tóm lại, ngay cả khi một ngân hàng hiện chưa cho vay đối với công nghệ phát thải thấp, họ vẫn được giao mục tiêu phải tăng trưởng công nghệ này dựa trên tổng quy mô cho vay trong ngành.
+
+Đối với công nghệ phát thải cao: mục tiêu được đặt dựa trên tốc độ giảm dần mà kịch bản khí hậu yêu cầu cho riêng công nghệ đó. Nó sẽ lấy giá trị sản xuất ban đầu của công nghệ trong danh mục nhân với tỷ lệ thị phần công nghệ -- Tóm lại là phân bổ nỗ lực giảm phát thải cho các đơn vị đang vận hành công nghệ đó, nếu danh mục không có công nghệ đó thì mục tiêu sẽ bằng 0.
+
+Tất cả các item này đều có công thức tính cụ thể, có thể tham khảo trong tài liệu methodology.
+8
+
+Demo with mock dataset from r2dii.data
+Link to HTML: here
+Download full Demo: here
+9
+
+Q&A, Discussion & References
+Q&A
+1. Regarding fuzzy name-matching, is there a recommended threshold we should use? Should we set this to 0.8 or 0.9 combined with manual review when dealing with real cases like BIDV or TCB?
+2. Have we identified any ABCD data providers that cover the local region?
+
+Discussion in case of application for Vietnamese banks
+ABCD sourcing options.
+Result applications – Integration with other risk assessment frameworks
+
+References
+i. PACTA for Banks Methodologyii. PACTA for Banks Packagesiii. Step-by-step Instructioniv. PACTA Scenario Support Documentv. PACTA for Banks Knowledge Hub
+vi. Katowice Bank 2020 Credit Portfolio Alignment (an application of PACTA for Banks)
+vii. ING’s Terra Approach (an application of PACTA for Banks)
+
+1. Nguồn dữ liệu ABCD:
+International + Specialized data provider: Asset Impact. 
+Pro: Có thể flug in tool này và dùng luôn.
+Cons:+ Độ phủ đối với SMEs: Chưa rõ về độ bao phủ của Asset Impact đối với các doanh nghiệp chưa niêm yết và SMEs tại Việt Nam. 
++ Mã LEI vs MST: 
+Về phía ngân hàng: Em không chắc hệ thống loanbook của các ngân hàng nội địa có ghi nhận mã LEI hay không.
+Về phía doanh nghiệp: Các công ty chỉ hoạt động nội địa thường khả năng cao là không đăng ký LEI.
+Local provider: Vietdata. Họ có dữ liệu báo cáo theo ngành. Tuy nhiên không rõ họ có dữ liệu chi tiết về capa + projected production của từng công ty thuộc ngành không.
+
+2. Ứng dụng của kết quả alignment: Output của PACTA không có định lượng về misalignment value mà chỉ đưa ra projection dựa trên thực tế và kịch bản khí hậu, cần kết hợp với các risk assessment/management framework để lượng hóa rủi ro.
+
+(Tham khảo Gemini)1. Khung rủi ro chuyển đổi (Transition Risk Framework)
+PACTA đo lường mức độ tiếp xúc của ngân hàng với các ngành thâm dụng carbon (thép, xi măng, ô tô, điện...). Khi bạn thấy một danh mục "lệch pha" với kịch bản $2^\circ\text{C}$, đó chính là dấu hiệu của rủi ro chuyển đổi.
+Cách kết hợp: Sử dụng kết quả PACTA làm đầu vào cho các mô hình Credit Scoring. Những doanh nghiệp có lộ trình giảm phát thải chậm hơn so với chuẩn PACTA sẽ bị áp mức rủi ro cao hơn, ảnh hưởng đến xác suất vỡ nợ (PD - Probability of Default).
+2. Khung TCFD (Task Force on Climate-related Financial Disclosures)
+TCFD là tiêu chuẩn vàng hiện nay để báo cáo và quản lý rủi ro khí hậu.
+Cách kết hợp: Kết quả PACTA giúp bạn hoàn thiện cột trụ "Metrics and Targets" của TCFD. Bạn có thể dùng dữ liệu này để thực hiện Scenario Analysis (Phân tích kịch bản) – một yêu cầu cốt lõi của TCFD – bằng cách xem xét giá trị tài sản sẽ thay đổi thế nào nếu các chính sách thuế carbon được áp dụng mạnh mẽ để ép danh mục về đúng lộ trình PACTA.
+3. Khung Stress Testing của các Ngân hàng Trung ương (NGFS)
+Mạng lưới xanh hóa hệ thống tài chính (NGFS) cung cấp các kịch bản chuẩn cho ngành ngân hàng.
+Cách kết hợp: Bạn lấy dữ liệu về công suất sản xuất và lộ trình công nghệ từ PACTA, sau đó "chạy" thử qua các kịch bản của NGFS (như Orderly, Disorderly, hoặc Hot House World). Điều này giúp ước tính tổn thất tín dụng dự kiến (ECL - Expected Credit Loss) trong các điều kiện khắc nghiệt.
+ 
+10
+
+TRISK - Climate Stress Test for Transition Risk
+11
+
+Why PACTA for Banks & TRISK?
+Objective: Integrate “climate” elements into credit risk assessment  
+
+Why should we use PACTA for Banks (portfolio alignment) & TRISK (climate stress-test) along with pre-introduced GHG inventory methodology? 
+
+Limitations of GHG inventory (including PCAF)
+Retrospective only: Identifies past emissions but fails to predict future financial vulnerability.
+Identical Emissions, Divergent Risks: Two firms with the same carbon footprint today may face vastly different risks due to future carbon taxes or shifting market demand.
+→ Simply disclosing emissions is insufficient to determine a bank’s true transition risk.
+
+The Synergy: PACTA for Banks & TRISK
+PACTA for Banks (forward-looking metrics): Distinguishes between clients who plan to transition and those who do not. This enables "Smart Divestment" - retaining clients while shifting capital away from transition laggards.
+TRISK (climate stress-test): Quantifies climate scenarios into concrete financial impact, providing the "why" and "how much" behind the risk.
+
+
+MAYBE YOU’VE MISSED THIS INFO
+PACTA for Banks: Open-source methodology / tool to measure lending portfolio alignment with climate scenarios
+TRISK: Open-source methodology / tool to perform climate stress test, assess potential financial loss caused by the shift to a low-carbon economy (quantify transition risk)
+Basel III: A global, voluntary regulatory framework on bank capital adequacy & market liquidity, designed to ensure banks maintain enough capital & liquidity to survive economic shocks. 
+Pillar 2 (Supervisory Review): This component allows regulators (like ECB or SBV) to mandate extra capital for risks not fully covered by standard formulas.
+→ this is where climate-risk buffer comes in.
+Previous version (Basel II) is currently mandatory for Vietnamese banks (Circular 41/2016/TT-NHNN), while Basel II is in SBV’s roadmap, expected full compliance by 2030. 
+IFRS 9: An international accounting standard for financial instruments that governs how banks classify & measure financial assessed
+ECL: Expected credit loss - IFRS 9 requires banks to set aside capital reserves, and specifically requires banks to use forward-looking metrics about future economic conditions while calculating ECL.
+→ this is where climate-scenarios come in.
+12
+
+BIDV’s Demand
+Key Driver
+Requirement
+Current Demand
+Strategic Value (PACTA / TRISK)
+IFRS 9 
+(ECL Provisioning)
+Integration of Forward-looking information to calculate Expected Credit Loss (ECL).
+Need to incorporate non-financial variables (e.g., climate risk) into the PD/LGD models of corporate clients/borrowers to satisfy international auditing standards.
+TRISK provides Stressed PD/LGD for corporate clients in FI’s portfolio based on climate scenarios (eg., NFGS), enabling quantitative inputs needed to adjust ECL provisioning for transition risks.
+Basel III (Pillar 2 - ICAAP)
+Mandate for Stress Testing and Internal Capital Adequacy Assessment Process (ICAAP) for all material risks.
+Need to develop a quantitative methodology to translate abstract climate scenarios into financial shocks to determine the necessary capital buffer for ICAAP.
+TRISK can be quantitative engine for Climate Stress Testing, outputting the ECL to establish scientific baseline needed to justify capital add-ons.
+Pillar 3 (Market Discipline)
+Disclosure of quantitative climate-related risks.
+Need to transition from qualitative to data-driven quantitative reports.
+PACTA provides Portfolio Alignment metrics, while TRISK delivers Value at Risk.
+Alignment from PACTA & TRISK to BIDV’s risk management roadmap
+In its 2024 annual report, BIDV mentioned "implementing, researching, and developing a roadmap for applying Basel III standards, ready to meet the government's roadmap," and is also in the process of "equipping itself with software solutions that meet IFRS 9 financial reporting standards."
+13
+
+Overview
+Purpose: Quantify potential loss by climate stress-test (ropagates the climate-adjusted economic impact to the asset value of firms and subsequently translates the impact into financial risk)
+
+Definition: TRISK = Value at Risk - a relative metric that measures the difference between a climate stress scenario and a baseline scenario. 
+For firms: the change in Net Present Value (NPV) & Probability at Default (PD)
+For FIs: Expected Credit Loss (ECL)
+
+Architecture: 3 layers connected by transmission channels
+Layer 1: Scenarios
+the sources of transition risks
+represented by a set of climate-adjusted economic parameter
+Layer 2: The real economy (client level)
+firm’s asset values under different scenarios
+represented by physical assets & ownership structures
+Layer 3: The financial system (portfolio level)
+the financial system represented by heterogeneous FIs and their balance sheets.
+in case of banks - loan portfolio
+(kịch bản vĩ mô → áp dụng vào để xem giá trị tài sản của từng công ty bị ảnh hưởng ra sao → cuối cùng tính toán xem hệ thống tài chính (các ngân hàng, quỹ đầu tư) sẽ gánh chịu rủi ro như thế nào.
+
+Pros:
+Sử dụng dữ liệu cực kỳ chi tiết đến từng tài sản vật lý (asset-level data).
+Tính toán được lợi thế cạnh tranh của công ty dựa trên chi phí công nghệ (ví dụ: công ty nào đang dùng năng lượng tái tạo rẻ hơn sẽ có lợi thế).
+Cân bằng được tác động giữa việc áp Thuế Carbon và sự thay đổi về nhu cầu của thị trường.
+Rất linh hoạt để có thể chạy thử nghiệm nhiều kịch bản (scenarios) khác nhau.
+
+14
+
+Methodology - 3 Layers & Transmission Channels
+Layer 1: Scenarios
+Translating macro scenarios to firms’ physical assets
+3 parameters: extracted from climate scenarios
+Production decarbonization pathway: production levels, specific to sector, technology, region, & scenario.
+Unit cost projections: unit cost of production, specific to sector, technology, region, & scenario
+Carbon tax pathway: tax cost (USD/tCO2e) for an unit of product
+Can be set to 0 for Vietnam in case of unclear pathway.
+
+Calibration: Adjust regional targets (top-down) to firm-specific targets (bottom-up) based on physical assets & projected market share)
+
+Scenarios:
+Baseline Scenario (s1): 
+Production pathway: First 5 years based on firms' production projections; the remaining time horizon is projected under the Current Policy Scenario (IEA)
+Carbon tax pathway: "No transition" scenario (NGFS).
+Unit cost projection: scenario-consistent
+Target Scenario (s2): Describes exactly how much production needs to be changed by sector/technology (e.g SDS).
+Stress Scenario (s3): Transition shock. 
+Production pathway: Firms continue to produce according to the baseline s1 until the shock year Z, then shift production toward the target s2 and overcompensate for previous misalignment. 
+Carbon tax pathway: "Disorderly transition" scenario (NGFS).
+Unit cost projection: scenario-consistent
+
+Scenario-specific production, unit cost, carbon tax trajectories
+Bank / Assumed
+Asset Impact
+Climate sources
+Finance & market data provider
+Layer 2: NPV khác một chút so, là sum of profits discounted to present 
+Ngoài ra là còn có cái hiệu chuẩn về dữ liệu nữa, một số cái chỉ số ở layer 2 sẽ được lấy từ thị trường
+data nào tiếp cận được, giả định/lấy từ NH/3rd provider
+
+15
+
+Methodology - 3 Layers
+Layer 1: Scenarios
+Layer 2: The Economy Converting trajectories into firm-level financial values
+Revenue is calculated based on:
+Projected Production
+Selling Price
+Pass-through Elasticity: The firm's pricing power to pass the carbon tax burden onto consumers → increases the final price customers pay.
+
+Carbon Emission
+Projected production
+Emission intensity
+
+
+Cost is calculated based on:
+Projected Production
+Technology Unit Cost: base production cost
+Carbon Tax: = Emission Intensity * Carbon Tax Rate (excluding the pass-through elasticity)
+Terminal Value: Capture the value of the firm beyond the finite stress-test horizon, assuming that after the shock period, profits enter a normalized state forever.
+Terminal Growth Rate: constant, long-term economic growth rate
+Firm Value (Net Present Value - NPV)
+NPV = Aggregated profits generated from individual physical assets, discounted to present.
+Expected Profit & Profit Margin
+Expected Profit = Revenue - Cost
+Stranded Assets
+Stranded Assets (in %) = (Carbon Emission - Carbon Budget) / Carbon Emission
+Carbon Budget
+Carbon budget of region
+Production volume of the region
+Projected production
+
+
+Scenario-specific production, unit cost, carbon tax trajectories
+Monte Carlo Simulation: Estimate average profits considering uncertainty.
+Ownership Structure Aggregation
+Discount Rate: calculated based on:
+Risk-Free Rate
+Covariance (beta): covariance between the firm's historical return & market return, divided by market return’s variance
+Expected Market Return (Risk Premium)
+Bank / Assumed
+Asset Impact
+Climate sources
+Finance & market data provider
+Layer 2: NPV khác một chút so, là sum of profits discounted to present 
+Ngoài ra là còn có cái hiệu chuẩn về dữ liệu nữa, một số cái chỉ số ở layer 2 sẽ được lấy từ thị trường
+data nào tiếp cận được, giả định/lấy từ NH/3rd provider
+16
+
+Methodology - 3 Layers
+Layer 2: The Economy
+Firm Value (Net Present Value - NPV)
+NPV = Aggregated profits generated from individual physical assets, discounted to present.
+Expected Profit & Profit Margin
+Expected Profit = Revenue - Cost
+Stranded Assets
+Stranded Assets (in %) = (Carbon Emission - Carbon Budget) / Carbon Emission
+Layer 3: The Financial System
+Convert firm-level valuation shocks into portfolio’s expected loss 
+Equity & Bond: available in the methodology, but not yet in scope for GTB.
+Loan
+
+Probability at Default (PD) (stress / baseline)
+Loss Given Default (LGD) (stress)
+TRISKloan (or ECL) = (PDstress - PDbaseline) x LGDstress x EaD
+Exposure at Default (or Outstanding amount)
+PD: The likelihood that a firm will be unable to meet its debt obligations. 
+PDstress - PDbaseline :  the additional default risk directly driven by the climate scenario.
+Calculated based on: Merton model & Distance to Default (DD)
+NPV
+Total Liabilities
+Debt Maturity
+Asset Volatility
+Expected Return (or Asset Drift)
+LGD: The actual percentage of loss on the total exposure when a firm defaults (i.e., the portion the bank "loses completely" after liquidating the collateral).
+Calculated based on: Adding the minimum loss floor (loss given default threshold) to the financial damage caused by the Stranded Asset from Layer 2.
+Bank / Assumed
+Asset Impact
+Climate sources
+Finance & market data provider
+Layer 2: NPV khác một chút so, là sum of profits discounted to present 
+17
+
+Methodology - Inputs & Outputs
+Parameter / Variable
+Value / Description
+Source (Demo)
+Source (VN)
+Layer 1 Input
+Layer 1 Output
+Layer 2 Input
+Layer 2 Output
+Layer 3 Input
+Layer 3 Output
+Time horizon [t, T] of climate stress test
+t = 2020, T = 2040
+Bank
+x
+All
+x
+All
+x
+All
+Shock Year, Z
+2030
+Bank
+x
+x
+x
+Set of Firms
+135 public firms - 8025 assets - Power Sector
+(ald_sector, scenario_geography, plan_sec_prod)
+Asset Impact
+Asset Impact
+x
+Production, unit cost, carbon tax trajectories based on scenarios
+x
+x
+Production levels
+ald_sector; ald_business_unit; ald_production_unit; plan_tech_prod
+Asset Impact
+Asset Impact
+x
+x
+x
+Asset emission intensity
+plan_emission_factor; emissions_factor_unit
+Asset Impact
+Asset Impact
+x
+x
+x
+Stress Scenario
+s1 = {baseline} until the introduction of “climate action” in shock year Z
+Asset Impact
+x
+x
+x
+from t = {2030, ..., 2040}, production change derived from s2 = {target}
+Climate sources
+x
+x
+x
+Unit cost developments
+Sustainable Development Scenario (SDS) by IEA, 2020
+Climate sources
+x
+x
+x
+Carbon tax trajectories {= 0} (in assumption of no carbon tax at all)
+NGFS
+Climate sources
+x
+x
+x
+Baseline Scenario
+Production over the period t = {2020, ..., 2025} calibrated on production plans
+Asset Impact
+Asset Impact
+x
+x
+x
+Production change for the remainder of the horizon t = {2025, ..., 2040}
+Current Policy Scenario (CPS) by IEA, 2020
+Climate sources
+x
+x
+x
+Unit cost developments
+CPS by IEA, 2020
+Climate sources
+x
+x
+x
+Carbon tax trajectories {= 0} (in assumption of no carbon tax at all)
+NGFS
+Climate sources
+x
+x
+x
+Discount rate
+Discount rate = 4.83% (Cost of equity with risk-free rate = 0.02, coveriance = 0.0073 and expected market return (risk premium) = 0.0387)
+Calculated via CAPM (Risk-free rate, Coveriance, Risk Premium from market)
+- Market data (for listed)
+- Bank's internal estimates (for private firms, based on credit rating/peers)
+x
+NPV
+x
+DD, PD, TRISK / ECL
+Profit margin
+Firm-specific
+Refinitiv Eikon dat
+Finance data providers
+x
+Estimated Profit, Profit Margin, NPV
+x
+DD, PD, TRISK / ECL
+Prices
+Prices = Cost x (1+ Average Profit Margin)
+Calculated
+Calculated
+x
+Estimated Profit, Profit Margin, NPV
+x
+DD, PD, TRISK / ECL
+Carbon budget
+466 Gt/CO2 (1.5 degree target)
+IEA
+Climate sources
+x
+Stranded Asset
+x
+LGD, TRISK / ECL
+Growth rate
+0.02
+World Bank average (2012-2022)
+World Bank or VN GSO
+x
+NPV
+x
+DD, PD, TRISK / ECL
+Dividend factor
+
+Dividend factor = 1 (assume all profits turn into dividend)
+Assumed
+Assumed
+x
+DD, PD, TRISK / ECL
+Volatility of asset
+Firm-specific
+Refinitiv Eikon dat
+Finance data providers
+x
+DD, PD, TRISK / ECL
+Asset drift
+Firm-specific
+Refinitiv Eikon dat
+Finance data providers
+x
+DD, PD, TRISK / ECL
+Maturity of financial instrument
+
+Global corporate average for sample portfolio
+Research: Chen, Ganum, Liu, Martinez, & Martinez Peria, 2019
+Bank
+x
+DD, PD, TRISK / ECL
+Loss given default threshold
+0.45
+Basel standards
+Basel standards / SBV / Bank
+x
+LGD, TRISK / ECL
+Firm's balance sheets
+Total equity = 1.87 trillion USD (Firm-specific)
+Refinitiv Eikon dat
+Finance data providers
+Total liabilities = 1.86 trillion USD (Firm-specific)
+Refinitiv Eikon dat
+Finance data providers
+x
+DD, PD, TRISK / ECL
+Exposure at default
+Firm-specific
+Bank
+x
+TRISK / ECL
+Input là gì, lấy ở đâu, để tính ra output gì, layer mấy
+
+CHÚ Ý CÁI MATURITY VÀ VẤN ĐỀ Ở VIỆT NAM NHA
+18
+
+Other Capabilities & Limitations
+Extended Scope:
+Other financial instruments: equity, bonds
+Systematic risk & second-round effects: 
+Captures Indirect Losses that occur when FIs hold securities issued by other FIs
+Foundation for systemic risks assessment.
+Country-level aggregation
+
+Treatment of Uncertainty & Sensitivity Analysis
+Mitigate both extrinsic and intrinsic uncertainties by running multiple "what-if" scenarios.
+Testing scenario-dependent parameters: Adjusting narrative-driven variables like the "Shock Year", carbon tax, and technology costs. → highlight cost of delayed actions
+Testing Scenario-Independent Parameters: Tweaking structural model inputs (e.g., discount rates, debt maturity, LGD thresholds). → prove the model's robustness and isolates methodological noise from actual climate impacts.
+
+Other Capabilities
+Limitations
+Layer 1: Scenarios
+No compounding effects: Risk drivers (demand changes, technology, carbon tax) are modeled in isolation, ignoring their potential to interact and amplify each other.
+
+Layer 2: The Economy
+Incomplete revenue: Valuation excludes income from non-core segments or financial investments.
+Rigid adaptation: Climate laggards cannot dynamically shift strategies to catch up.
+No feedback loops: Misses reverse economic impacts like systemic credit supply shocks from banks.
+
+Layer 3: The Financial System
+Underestimated tail risks: Relies on scenario-independent asset volatility and normal distribution assumptions.
+Passive banks: Assumes static balance sheets without proactive restructuring or reactive behavior.
+Non-standard PD: Probability of Default reflects the entire transition horizon, not a standard 1-year PD.
+19
+
+Model Mapping
+Packages: here		Deep Wiki: here
+Demo package: here	Vignette: here
+1. Data Input Stage
+6 CSV files are loaded into input_data_list read.R:1-20 :
+Production data (abcd_stress_test_input.csv)
+Scenario data (Scenarios_AnalysisInput.csv)
+Price data (price_data_long.csv)
+Financial data (prewrangled_financial_data_stress_test.csv)
+Capacity factors (prewrangled_capacity_factors.csv)
+Carbon prices (ngfs_carbon_price.csv)
+ 
+2. Data Processing Stage
+st_process() function validates and transforms data MIGRATE_process_data.R:340-440 :
+Validation: Checks data consistency and completeness
+Filtering: Filters by geography, scenarios, and time period
+Transformation: Processes production data and extends with scenario targets
+Power sector: Converts capacity to generation using capacity factors
+ 
+3. Model Calculation Stage
+run_trisk_model() executes 5 core calculations run_trisk.R:80-157 :
+Trajectory Calculation: Sets baseline and shock production pathways
+Net Profit Calculation: Computes profits with carbon tax impacts
+Annual Profit Calculation: Applies DCF valuation with terminal value
+Market Risk: Calculates Asset Value at Risk (VaR)
+Credit Risk: Computes Probability of Default changes using Merton model
+ 
+4. Output Generation Stage
+3 files are generated 04-read-the-outputs.Rmd:35-46 :
+crispy_output_*.csv: Summary risk metrics (NPV, PD changes)
+company_trajectories_*.csv: Detailed annual data
+log_file_*.txt: Run parameters and metadata
+
+20
+
+Model Mapping
+Packages: here		Deep Wiki: here
+Demo package: here	Vignette: here
+1. Data Input Stage
+6 CSV files are loaded into input_data_list read.R:1-20 :
+Production data (abcd_stress_test_input.csv)
+Scenario data (Scenarios_AnalysisInput.csv)
+Price data (price_data_long.csv)
+Financial data (prewrangled_financial_data_stress_test.csv)
+Capacity factors (prewrangled_capacity_factors.csv)
+Carbon prices (ngfs_carbon_price.csv)
+ 
+2. Data Processing Stage
+st_process() function validates and transforms data MIGRATE_process_data.R:340-440 :
+Validation: Checks data consistency and completeness
+Filtering: Filters by geography, scenarios, and time period
+Transformation: Processes production data and extends with scenario targets
+Power sector: Converts capacity to generation using capacity factors
+ 
+3. Model Calculation Stage
+run_trisk_model() executes 5 core calculations run_trisk.R:80-157 :
+Trajectory Calculation: Sets baseline and shock production pathways
+Net Profit Calculation: Computes profits with carbon tax impacts
+Annual Profit Calculation: Applies DCF valuation with terminal value
+Market Risk: Calculates Asset Value at Risk (VaR)
+Credit Risk: Computes Probability of Default changes using Merton model
+ 
+4. Output Generation Stage
+3 files are generated 04-read-the-outputs.Rmd:35-46 :
+crispy_output_*.csv: Summary risk metrics (NPV, PD changes)
+company_trajectories_*.csv: Detailed annual data
+log_file_*.txt: Run parameters and metadata
+
+21
+
+Demo Run & Model’s Difference
+Packages: here		Deep Wiki: here
+Demo package: here	Vignette: here
+Customize parameters
+To access the script, please download the Demo Package
+To run the analysis, please follow the Vignette
+Model’s Difference from Methodology
+Output (crispy_output_standard.csv)
+No output for stranded asset 
+2dii actively pruned their model due to the complexity of preparing inputs for stranded assets
+End results stopped at firms’ level: Firm’s PD, NPV
+22
+
+Opportunities & Challenges for Vietnamese Banks
+What MAY be POSSIBLE
+What MAY be TROUBLESOME
+Clarify debt maturity: 
+In the research paper, sensitivity analysis pointed out that if T=1, ECL for credit on the whole portfolio will be approximately 0.
+Concerns for VN Banks: Typical commercial loans in Vietnam is 1 year. Applying a 1-year horizon in the TRISK model may underestimate the long-term transition risk inherent in these portfolios.
+Potential next step: Need further research to determine an appropriate "economic life" proxy for revolving credit
+Find financial data provider:
+The model requires granular financial data (leverage, volatility, profit margins).
+Potential next steps:
+Listed companies: Find 3rd party data provider, scrape web page
+Unlisted company: Not sure if 3rd party provider can deal with this
+Employ Asset Impact database:
+Current data coverage is highly concentrated in the Power sector while data seems little in other sectors.
+Potential next step: If proceed with pilot phase, we can focus on the Power sector first. → Need to cross-reference bank’s client lists with the Asset Impact database to verify coverage.
+Customize to Vietnam context: The model is data-agnostic, allowing for full customization of input parameters to align with local market conditions.
+Expand codes to include Stranded Assets / ECL:
+Stranded Assets: If Asset Impact can provide comprehensive emission-intensity data, we can add codes to include Stranded Assets
+ECL: The model already carries the hard part, so it may be possible to add codes allowing input for outstanding amount & ECL calculation based on TRISK formula. 
+This may be resolved with Thea’s model (later version of this package)
+Figure: Asset Impact Coverage of Vietnamese companies
+Asset Impact demo data: here 
+23
+
+2dii TRISK vs Thea TRISK (pending)
+24
+
+Case Study
+25
+
+KBC Bank - Belgium
+Portfolio alignment
+KBC claimed to have been using PACTA since 2019 (in combination with PCAF, EU taxonomy), to evaluate lending portfolios in carbon-intensive sectors
+PACTA sectors
+Expanded sectors: Agriculture, Real Estates (combined methodology with PCAF & EU Taxonomy), Aluminium
+KBC complied with PACTA’s core principle: matching exposure to physical assets
+All sectors applied SDA approach (SBTi)
+Outputs of alignment assessment are one of the inputs for internal risk assessment & stress-testing framework
+KBC Sustainability Report (2024): here
+KBC Methodology Explained (2024): here
+KBC Risk Report (2024): here
+26
+
+KBC Bank - Belgium
+Climate stress test & Risk assessment
+KBC mentioned the use of PACTA as one of the methodology employed in risk measurement & stress testing
+Internal framework:
+Environmental Risk Impact Map (ERIM): assess the materiality of risk type by scenario & time-horizon
+Integrated climate stress test 
+Reverse stress testing: capital adequacy assessment
+Scenario: highly elevated transition risk, disruptive policy, operational loss events.
+Output: corporate & SME PD downgrades across climate-vulnerable sectors and spillovers to equity markets
+ICAAP/ORSA & ILAAP stress test
+Assessing business model’s resilience:
+Scenario: mild/medium/severe climate risks on short-, medium-, longer-term
+Output: 
+Carbon-intensive clients: increased company’s cost, decreased creditworthiness, pressured production volumes
+KBC: OPEX, net interest income, ECL, RWA
+Similarity “logic” to TRISK model: 
+Use asset-level data as input, bottom-up approach
+Forward looking data instead of historical
+Transmission channels: 
+Converting shocks from macro climate scenarios to firm’s values 
+Converting firm-level PD, cost, etc. into ECL
+KBC Sustainability Report (2024): here
+KBC Methodology Explained (2024): here
+KBC Risk Report (2024): here
+27
+
+RCBC Bank - Philippines
+Portfolio alignment
+RCBC started employing both PCAF & PACTA (through an advisory engagement with IFC & 2DII, is the first in Asia) in 2021 for lending portfolio assessment. 
+PCAF: overall portfolio assessment
+PACTA: focused on Power Generation sector
+Output from PACTA will be input for E&S stress-testing
+
+
+Energy
+Climate stress test & Risk assessment
+Focused on lending portfolio for power generation sector
+Didn’t mentioned “TRISK” specifically, but mentioned “climate stress testing modules developed by 2DII”
+Included both transition & physical risks results in annual’s ICAAP report since 2023
+Similarity to TRISK model:
+Calculated PD & ECL
+
+Figure: RCBC Sustainability & Impact Report 2024 - Overal Portfolio’s Financed Emissions Assessment (PCAF) & Power Generation Portfolio Alignment Assessment (PACTA)
+Figure: RCBC Sustainability Report 2024 - Description on Metrics for Climate-Related Risks 
+RCBC Sustainability & Impact Report (2024): here & here
+2021: https://www.rcbc.com/uploads/media/RCBC-2021-Impact-Report_FINAL-26April2022.pdf
+2022: https://www.rcbc.com/uploads/media/RCBC-2022-SIR_30May-[P].pdf
+2024: https://www.rcbc.com/uploads/media/RCBC-Sustainability-and-Impact-Report-2024-FINAL-04JUNE2025.pdf
+https://www.rcbc.com/uploads/media/RCBC-Sustainability-Report-for-FY2024.pdf#:~:text=The%20analyses%20of%20both%20transition,Monitoring%20Through%20GHG%20Emission%20Reporting
+28
+
+CIMB Bank - Malaysia
+Piloting PACTA to build in-house capabilities
+CIMB established a roadmap to build in-house capabilities on Climate Scenarios Analysis (CSA) & Climate Risk Stress Testing (CRST)
+Started in 2021 with piloting the use of PACTA for Banks
+PACTA used as an initial step to get familiar with scenario analysis for carbon-intensive sectors
+
+Current model: CSA & CRST
+Dual-model:
+Corporates (No collateral)
+Property-backed Portfolio
+Sector scope: Expanded compared to PACTA, addition includes Palm Oil, Agriculture, Mining, Manufacturing (in general)
+Similarity “logic” to TRISK:
+Counterparty-level data & Asset level data
+Convert shocks to firm’s financial values (PD/LGD) and then bank’s ECL.
+CIMB Governance & Risk (2024): here
+https://www.cimb.com/content/dam/cimb/group/documents/sustainbility/sr24/cimb-sr-gr-2024.pdf
+29
+
+CIMB Bank - Malaysia
+CIMB Governance & Risk (2024): here
+https://www.cimb.com/content/dam/cimb/group/documents/sustainbility/sr24/cimb-sr-gr-2024.pdf
+30
+
+Research Paper - Japan
+Name: Measuring Climate Transition Risk under a Delayed Transition (An Exploratory Analysis of the Japanese Banking Sector) - Jakob Thoma (2022) (Co-founder of 2DII, now Sustainable Finance Observatory / Thea Finance Labs)
+Context: 
+Conducted under the Financial Research Center of Japan FSA Institute, published as a discussion paper. 
+A first-step, simplified climate transition stress test using the PACTA methodology to assess risk in the Japanese financial system & compliment earlier pilot exercises by JFSA and BOJ.
+Objectives: 
+Estimate the vulnerabilities (measured by changes in PD) that the Japanese financial sector may face under delayed climate transition scenarios.
+To examine the alignment of the banks' loan books with transition scenario targets.
+Scope:
+Sample loan portfolios from Japanese banks as of fiscal year 2020 (March 2021). ~ outstanding loan book size of 206.79 trillion JPY (15.32 trillion JPY successfully matched.)
+4 sectors: Automotive, Coal mining, Oil & gas extraction (upstream), and Power Generation.
+Methodology/Tool employed: PACTA for Banks, TRISK
+Findings: 
+Misalignment Drives Risk: Most sectors are misaligned with climate targets, driving higher risk (with exceptions for gas-fired power and hybrid autos).
+Most Vulnerable Sectors: Coal mining and oil & gas face the sharpest increases in default risks.
+Limited Absolute Impact: These high-risk sectors do not make up the largest share of the banks' total outstanding loans.
+Intra-Sector Variation: Risk levels vary widely among clients within the same sector, highlighting a clear opportunity for targeted client engagement.
+The Cost of Delay: Postponing climate action leads to more severe production corrections, sharply increasing financial risk.
+https://drive.google.com/file/d/1L62py2XHP585Sj6PXH0uEKiUXd59e9_C/view?usp=drive_link
+31
+
+Research Paper - Indonesia
+Name: Navigating Climate Transition: Evaluating Exposure & Resilience of Indonesia Banks’ Portfolios across High-Emitting Sectors - WWF, Bank Indonesia (2023)
+Context:
+First climate stress test in Indonesia, jointly conducted by Bank Indonesia Institute and WWF-Indonesia with technical support from the 1in1000 (TRISK) team.
+Serves as a pilot model to integrate climate risk assessment into regular financial stability reviews and future Financial Sector Assessment Programs (FSAP).
+Objective: Evaluate climate transition risks and their impact on bank credit portfolios within Indonesia’s high-emitting sectors.
+Scope:
+1,567 credit observations as of December 2022 from 13 major Indonesian banks
+101 unique companies identified within the banks' lending portfolios through the Asset Impact database (total outstanding amount: ~16 trillion USD)
+4 Sectors: Coal, Oil & Gas, Power, and Automotive
+Methodology/Tool employed: PACTA for Banks, TRISK
+Findings:
+Systemic Risk Surge: Most banks are projected to see a significant increase in Probability of Default (PD) and Expected Loss (EL) within high-emitting sectors.
+Highest Technical Risk: The Coal sector exhibits the highest average PD increase (45.2%) due to planned phase-outs to meet climate targets.
+Highest Financial Loss: The Power sector records the largest Expected Loss (EL) due to the banks' massive loan exposure in this industry.
+Bank-Specific Impact: State-owned banks (e.g., Bank D, E, I) face high EL in traditional energy , while Japanese-linked banks show higher exposure in the automotive sector.
+Policy Blind Spot: Current policies project a steady rise in coal production , creating a high-risk accumulation if a sudden, late transition is forced in the future.
+
+32
+
+Next Steps
+…
+33
+
+Tools are never “finished”. Just like iPhone, there is always a next version. Any suggestions from you would be valuable to that next version.
+34

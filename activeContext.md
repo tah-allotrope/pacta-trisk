@@ -420,3 +420,29 @@ When filtering data to a subset of metrics but providing `scale_*_manual()` mapp
 - [x] Confirmed `market_passthrough` is the most decision-relevant tested sensitivity for ranking shifts in this demo run, with the largest borrower-level score change observed for `PVN Power Corporation`
 - [x] Confirmed `shock_year` changes move relative severity among mid-ranked names, especially `PVN Power Corporation` and `Vietnam Hydropower JSC`, without displacing the top coal names
 - [ ] Remaining known issue: `Dung Quat LNG Power Consortium` still produces `NA` sensitivity outputs because the underlying zero-baseline edge case remains unresolved
+
+---
+
+## Phase 01: Host Selection and Data Contract (2026-04-26)
+
+**Goal:** Lock hosting, define data contract, snapshot artifacts.
+
+**Plan source:** `plans/2026-04-25-pacta-trisk-bank-showcase-dashboard-plan.md`
+
+**Grill Me answers:**
+- Public URL (no password gate), add prominent synthetic-data disclaimer
+- TRISK sensitivity grid: batch run needed in PHASE-04
+- Full scope, no fixed deadline
+- Custom domain: `pactavn.streamlit.app`
+- Aggregated views only (no raw loanbook rows)
+
+**Completed:**
+- [x] `docs/hosting-decision.md` — hosting comparison matrix, Streamlit Community Cloud recommended, `pactavn.streamlit.app` subdomain, Hugging Face Spaces fallback
+- [x] `dashboard/data/pacta/` — 6 CSVs + 9 PNGs from `synthesis_output/vietnam/`
+- [x] `dashboard/data/trisk/` — 10 CSVs + 3 PNGs from `synthesis_output/trisk/power_demo/`
+- [x] `dashboard/data/reports/` — 7 HTML reports from `reports/`
+- [x] `dashboard/data/README.md` — column-level provenance for every artifact
+- [x] `scripts/refresh_dashboard_data.R` — one-shot copy script to republish snapshot
+- [x] Total `dashboard/data/` size: ~2 MB (well under 100 MB limit)
+
+**Next phase:** PHASE-02 — Streamlit app scaffold (`dashboard/app.py`, pages, loaders, theme).
