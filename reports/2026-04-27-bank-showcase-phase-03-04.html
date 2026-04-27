@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phase Report :: Bank Showcase Phase 03-04</title>
+  <meta name="color-scheme" content="dark">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    async function initMermaid() {
+      const blocks = document.querySelectorAll('.mermaid');
+      if (!blocks.length) return;
+      mermaid.initialize({ startOnLoad: false, theme: 'dark', securityLevel: 'loose' });
+      await mermaid.run({ nodes: blocks });
+    }
+    const run = () => initMermaid().catch((error) => console.error('Mermaid render failed', error));
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run, { once: true });
+    else run();
+  </script>
+  <style>
+    :root {
+      --panel: rgba(13,13,13,0.88);
+      --panel-strong: rgba(19,19,19,0.96);
+      --line: rgba(0,245,255,0.26);
+      --text: #e9f6ff;
+      --muted: #8ea3ad;
+      --accent-blue: #00f5ff;
+      --accent-green: #39ff14;
+      --shadow: 0 14px 40px rgba(0,0,0,0.32);
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --narrative-font: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --technical-font: "Cascadia Code", Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(180deg, #050505 0%, #0d0d0d 36%, #090909 100%);
+      color: var(--text);
+      font-family: var(--narrative-font);
+      line-height: 1.6;
+    }
+    a { color: var(--accent-blue); }
+    code, pre, .technical, .pill, .metric-label, .metric-value, .repo-tag, .mermaid { font-family: var(--technical-font); }
+    .page-shell { width: min(1180px, calc(100vw - 32px)); margin: 0 auto; padding: 32px 0 72px; }
+    .hero, .section {
+      margin-bottom: 22px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .hero { background: var(--panel-strong); }
+    .hero-grid, .summary-grid, .metric-strip { display: grid; gap: 16px; }
+    .hero-grid { grid-template-columns: minmax(0, 1.55fr) minmax(260px, 0.85fr); }
+    .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .metric-strip { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 18px; }
+    .section-index {
+      color: var(--accent-green);
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+    }
+    .phase-title { margin: 0; font-size: clamp(2.4rem, 5vw, 4.5rem); line-height: 0.95; text-transform: uppercase; }
+    .hero-summary, .meta-label, .metric-label { color: var(--muted); }
+    .meta-card, .column-card, .diagram-frame, .technical-frame, .viz-frame, .question-frame, .metric {
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius-md);
+      background: rgba(7,7,7,0.82);
+      padding: 18px;
+    }
+    .meta-chip, .column-label { color: var(--accent-blue); font-weight: 700; }
+    .pill-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    .pill, .repo-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(0,245,255,0.24);
+      background: rgba(0,245,255,0.08);
+      color: var(--accent-blue);
+      font-size: 0.82rem;
+    }
+    .section-header { margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .section-title { margin: 0; font-size: clamp(1.2rem, 2vw, 1.7rem); }
+    .column-label { margin: 0 0 12px; font-size: 0.83rem; text-transform: uppercase; letter-spacing: 0.16em; }
+    .metric-value { margin-top: 8px; color: var(--accent-green); font-size: 1.2rem; font-weight: 700; }
+    .diagram-frame { overflow: auto; }
+    .diagram-frame .mermaid { min-width: 900px; }
+    .technical-frame table { width: 100%; border-collapse: collapse; }
+    .technical-frame th, .technical-frame td { padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); text-align: left; vertical-align: top; }
+    .technical-frame th { color: var(--accent-green); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.12em; }
+    .question-frame ul, .technical-frame ul, .column-card ul { margin: 0; padding-left: 20px; }
+    .question-frame li, .technical-frame li, .column-card li { margin-bottom: 8px; }
+    .viz-frame canvas { display: block; width: 100% !important; height: 320px !important; max-height: 320px; }
+    .footer-note { margin-top: 18px; text-align: right; color: rgba(142,163,173,0.72); font-size: 0.78rem; text-transform: uppercase; }
+    @media (max-width: 900px) { .hero-grid, .summary-grid, .metric-strip { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero">
+      <div class="hero-grid">
+        <div>
+          <div class="section-index">Phase Report / Personal Technical Artifact</div>
+          <h1 class="phase-title">Bank Showcase Phase 03-04</h1>
+          <p class="hero-summary">This artifact packages the already-implemented alignment and TRISK phases of the bank showcase dashboard, verifies that both interactive pages still run cleanly against the frozen snapshot, and records the current proof of that state.</p>
+          <div class="pill-row">
+            <span class="pill">project :: PACTA Vietnam</span>
+            <span class="pill">date :: 2026-04-27</span>
+          </div>
+          <div class="repo-tag">repo :: pacta-trisk</div>
+        </div>
+        <div>
+          <div class="meta-card"><div class="meta-label">Phase 03</div><div class="meta-chip">PACTA Alignment page verified</div></div>
+          <div class="meta-card"><div class="meta-label">Phase 04</div><div class="meta-chip">TRISK Risk page verified</div></div>
+          <div class="meta-card"><div class="meta-label">Verification</div><div class="meta-chip">7 tests passed + app booted</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header"><div class="section-index">01 / Input -> Output</div><h2 class="section-title">Input -> Output Summary</h2></div>
+      <div class="summary-grid">
+        <div class="column-card">
+          <div class="column-label">Inputs</div>
+          <ul>
+            <li>`plans/2026-04-25-pacta-trisk-bank-showcase-dashboard-plan.md` for the Phase 03 and Phase 04 requirements</li>
+            <li>Existing dashboard implementation in `dashboard/pages/1_PACTA_Alignment.py` and `dashboard/pages/2_TRISK_Risk.py`</li>
+            <li>Frozen snapshot data under `dashboard/data/pacta/` and `dashboard/data/trisk/`</li>
+            <li>Verification runs: `python -m pytest dashboard/tests`, `python -m streamlit run dashboard/app.py --server.headless true`, and `Rscript scripts/refresh_dashboard_data.R`</li>
+          </ul>
+        </div>
+        <div class="column-card">
+          <div class="column-label">Outputs</div>
+          <ul>
+            <li>Confirmed the PACTA Alignment page still covers the planned sector filter, chart/image pairing, closing figures, downloads, and methodology footnote</li>
+            <li>Confirmed the TRISK Risk page still covers the ranking chart/table, scatter, sensitivity explorer, inputs panel, disclaimer, and zip download</li>
+            <li>Generated `reports/2026-04-27-bank-showcase-phase-03-04.html`</li>
+            <li>Updated `activeContext.md` with the current packaging and verification record</li>
+          </ul>
+        </div>
+      </div>
+      <div class="metric-strip">
+        <div class="metric"><div class="metric-label">PACTA sectors surfaced</div><div class="metric-value">5</div></div>
+        <div class="metric"><div class="metric-label">TRISK sensitivity parameters</div><div class="metric-value">4</div></div>
+        <div class="metric"><div class="metric-label">Dashboard tests</div><div class="metric-value">7 passed</div></div>
+        <div class="metric"><div class="metric-label">Snapshot refresh</div><div class="metric-value">Passed</div></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header"><div class="section-index">02 / Logic Flow</div><h2 class="section-title">Logic Flow</h2></div>
+      <div class="diagram-frame technical"><div class="mermaid">flowchart LR
+        A[Read Phase 03 and 04 plan scope] --> B[Inspect current dashboard pages]
+        B --> C[Map PACTA page to plan tasks]
+        C --> D[Map TRISK page to plan tasks]
+        D --> E[Check current worktree and prior commits]
+        E --> F[Run pytest dashboard/tests]
+        F --> G[Boot Streamlit app headless]
+        G --> H[Refresh dashboard snapshot from source outputs]
+        H --> I[Record packaging results in activeContext.md]
+        I --> J[Generate HTML phase report]
+        J --> K[Commit focused packaging files]
+        K --> L[Push to origin/main]</div></div>
+    </section>
+
+    <section class="section">
+      <div class="section-header"><div class="section-index">03 / Math / Algorithm Used</div><h2 class="section-title">Math / Algorithm Used</h2></div>
+      <div class="technical-frame">
+        <p>No new PACTA or TRISK model computation was added in this pass. The packaging work validated the presentation layer that already sits on top of frozen artifacts.</p>
+        <ul>
+          <li>The PACTA page uses precomputed market-share and SDA outputs, then filters them by sector and technology for interactive presentation.</li>
+          <li>The TRISK page converts stored decimal deltas into display-oriented percent and basis-point values for chart readability, but does not recompute stress metrics.</li>
+          <li>The sensitivity explorer still uses pure filtering against the precomputed sensitivity grid, which satisfies the plan constraint of no live recomputation.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header"><div class="section-index">04 / Tools / Formulas / Methods</div><h2 class="section-title">Tools / Formulas / Methods</h2></div>
+      <div class="technical-frame">
+        <table>
+          <thead>
+            <tr><th>Surface</th><th>Method</th><th>Why it mattered</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Phase 03 page</td><td>Reviewed `dashboard/pages/1_PACTA_Alignment.py` against the plan task list and exit criteria</td><td>Confirmed the interactive alignment story still matches the intended scope</td></tr>
+            <tr><td>Phase 04 page</td><td>Reviewed `dashboard/pages/2_TRISK_Risk.py` against the plan task list and exit criteria</td><td>Confirmed the firm-level stress narrative is still complete and navigable</td></tr>
+            <tr><td>Pytest/AppTest</td><td>`python -m pytest dashboard/tests`</td><td>Proved the page modules and loaders still render without exception</td></tr>
+            <tr><td>Streamlit boot check</td><td>`python -m streamlit run dashboard/app.py --server.headless true`</td><td>Confirmed the app serves successfully as a long-running web process</td></tr>
+            <tr><td>Snapshot refresh</td><td>`Rscript scripts/refresh_dashboard_data.R`</td><td>Confirmed the frozen data contract for both phases is still reproducible</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header"><div class="section-index">05 / Results &amp; Visualizations</div><h2 class="section-title">Results &amp; Visualizations</h2></div>
+      <div class="viz-frame">
+        <canvas id="phaseStatusChart" aria-label="Phase verification chart" role="img"></canvas>
+      </div>
+      <div class="technical-frame" style="margin-top:16px;">
+        <ul>
+          <li>Phase 03 remains live through the PACTA page: portfolio overview, sector drilldown, static snapshot images, CSV downloads, and closing figures are all present.</li>
+          <li>Phase 04 remains live through the TRISK page: borrower ranking, NPV-vs-PD scatter, four-parameter sensitivity explorer, synthetic-assumption tables, and a zip download are all present.</li>
+          <li>The full page test suite still passes cleanly: `7 passed in 3.92s`.</li>
+          <li>The Streamlit boot check printed the local, network, and external URLs before timing out as expected for a persistent app process.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header"><div class="section-index">06 / Limitations / Second-Best Alternative</div><h2 class="section-title">Limitations / Second-Best Alternative</h2></div>
+      <div class="question-frame">
+        <ul>
+          <li>This packaging pass did not introduce new feature work because the requested phases were already implemented in the branch history.</li>
+          <li>The verification remained presentation-layer focused; it did not re-run the underlying PACTA or TRISK analytical pipelines beyond refreshing the dashboard snapshot from existing outputs.</li>
+          <li>Second-best alternative: change the Phase 03/04 code only to force a new implementation diff. Rejected because it would add churn without improving the requested outcome.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header"><div class="section-index">07 / Errors / Warnings / Flags</div><h2 class="section-title">Errors / Warnings / Flags Encountered</h2></div>
+      <div class="question-frame technical">
+        <ul>
+          <li>No failing tests were encountered.</li>
+          <li>The Streamlit boot command exceeded the tool timeout after the server had already started successfully; that is expected behavior for a long-running web process rather than a functional failure.</li>
+          <li>The worktree still contains unrelated Phase 06 deployment artifacts, screenshots, logs, and cache directories. They were intentionally left unmodified and excluded from the focused commit.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header"><div class="section-index">08 / Open Questions / Next Phase Seeds</div><h2 class="section-title">Open Questions / Next Phase Seeds</h2></div>
+      <div class="question-frame">
+        <ul>
+          <li>The natural next phase remains Phase 05/06 packaging or deployment cleanup, depending on whether the goal is repo hygiene or live-preview documentation.</li>
+          <li>The current worktree already suggests a partially executed deployment attempt; the next pass should separate reusable docs from local-only screenshots and logs.</li>
+          <li>If the next request is final delivery oriented, the deployment notes and demo script should be packaged into a focused Phase 05/06 commit rather than mixed with local artifacts.</li>
+        </ul>
+      </div>
+      <div class="footer-note">artifact generated for reflection, not presentation theater</div>
+    </section>
+  </main>
+
+  <script>
+    if (window.Chart) {
+      Chart.defaults.devicePixelRatio = 1;
+      Chart.defaults.animation = false;
+      Chart.defaults.resizeDelay = 150;
+      Chart.defaults.normalized = true;
+      Chart.defaults.maintainAspectRatio = false;
+      new Chart(document.getElementById('phaseStatusChart'), {
+        type: 'bar',
+        data: {
+          labels: ['PACTA page audit', 'TRISK page audit', 'Dashboard tests', 'Streamlit boot', 'Snapshot refresh'],
+          datasets: [{
+            label: 'Status',
+            data: [1, 1, 1, 1, 1],
+            backgroundColor: ['#00E5FF', '#39FF14', '#7CFFB2', '#2F81F7', '#FFB000'],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          animation: false,
+          resizeDelay: 150,
+          normalized: true,
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: () => 'Verified' } }
+          },
+          scales: {
+            y: {
+              min: 0,
+              max: 1,
+              ticks: { stepSize: 1, callback: (value) => value === 1 ? 'Verified' : 'Pending' },
+              grid: { color: 'rgba(255,255,255,0.08)' }
+            },
+            x: { grid: { color: 'rgba(255,255,255,0.08)' } }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>

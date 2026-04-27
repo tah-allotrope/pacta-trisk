@@ -540,3 +540,28 @@ When filtering data to a subset of metrics but providing `scale_*_manual()` mapp
 - [x] Re-ran `python -m pytest dashboard/tests` -> `7 passed`
 - [x] Re-ran `Rscript scripts/refresh_dashboard_data.R` and confirmed the snapshot was fully republished into `dashboard/data/`
 - [x] Generated phase artifact `reports/2026-04-27-bank-showcase-phase-01-02.html`
+
+---
+
+## Phase 03-04 Packaging + Report (2026-04-27)
+
+**Goal:** Package the already-implemented Bank Showcase phases 03 and 04, verify the live PACTA and TRISK dashboard pages still satisfy the plan intent, generate a phase report, and publish the resulting commit.
+
+### Planned Work
+
+- [x] Re-audit the repo against `plans/2026-04-25-pacta-trisk-bank-showcase-dashboard-plan.md` for Phase 03 and Phase 04 scope
+- [x] Confirm the required Phase 03 outputs still exist in the implemented dashboard pages and helpers
+- [x] Confirm the required Phase 04 outputs still exist in the implemented dashboard pages, helpers, and snapshot files
+- [x] Run verification for the full dashboard page set and snapshot refresh path
+- [x] Generate a phase report artifact for the packaged Phase 03-04 state
+- [ ] Commit and push only the relevant files for this packaging pass
+
+### Review / Results
+
+- [x] Confirmed the underlying implementation already existed in prior commits: `982e567` (Phase 02-03) and `03752de` (Phase 04-05)
+- [x] Re-validated the core Phase 03 files: `dashboard/pages/1_PACTA_Alignment.py`, `dashboard/lib/loaders.py`, `dashboard/lib/charts.py`, and the `dashboard/data/pacta/` snapshot
+- [x] Re-validated the core Phase 04 files: `dashboard/pages/2_TRISK_Risk.py`, `dashboard/lib/loaders.py`, `dashboard/lib/charts.py`, and the `dashboard/data/trisk/` snapshot
+- [x] Re-ran `python -m pytest dashboard/tests` -> `7 passed`
+- [x] Re-ran `python -m streamlit run dashboard/app.py --server.headless true` and confirmed the app served successfully before the expected long-running process timeout
+- [x] Re-ran `Rscript scripts/refresh_dashboard_data.R` and confirmed the PACTA/TRISK snapshot was fully republished into `dashboard/data/`
+- [x] Generated phase artifact `reports/2026-04-27-bank-showcase-phase-03-04.html`
