@@ -516,3 +516,27 @@ When filtering data to a subset of metrics but providing `scale_*_manual()` mapp
 ### Remaining Gaps
 
 - [ ] Phase 06 deployment and rehearsal tasks still remain: Streamlit Cloud setup, custom subdomain, smoke checklist on deployed URL, and demo script
+
+---
+
+## Phase 01-02 Packaging + Report (2026-04-27)
+
+**Goal:** Package the already-implemented Bank Showcase phases 01 and 02 into a clean artifact set, verify the frozen data contract and dashboard scaffold still work, generate a phase report, and publish the resulting commit.
+
+### Planned Work
+
+- [x] Re-audit the repo against `plans/2026-04-25-pacta-trisk-bank-showcase-dashboard-plan.md` for Phase 01 and Phase 02 scope
+- [x] Confirm the required Phase 01 outputs still exist: hosting decision, dashboard snapshot, and refresh script
+- [x] Confirm the required Phase 02 outputs still exist: Streamlit shell, pages, loaders, theme, README, and tests
+- [x] Run verification for the dashboard scaffold and snapshot refresh path
+- [x] Generate a phase report artifact for the packaged Phase 01-02 state
+- [ ] Commit and push only the relevant files for this packaging pass
+
+### Review / Results
+
+- [x] Confirmed the underlying implementation already existed in prior commits: `f65562f` (Phase 01) and `982e567` (Phase 02-03 scaffold work)
+- [x] Re-validated the core Phase 01 files: `docs/hosting-decision.md`, `dashboard/data/README.md`, `dashboard/data/`, and `scripts/refresh_dashboard_data.R`
+- [x] Re-validated the core Phase 02 files: `dashboard/app.py`, `dashboard/pages/`, `dashboard/lib/`, `dashboard/.streamlit/config.toml`, `dashboard/requirements.txt`, and `dashboard/tests/`
+- [x] Re-ran `python -m pytest dashboard/tests` -> `7 passed`
+- [x] Re-ran `Rscript scripts/refresh_dashboard_data.R` and confirmed the snapshot was fully republished into `dashboard/data/`
+- [x] Generated phase artifact `reports/2026-04-27-bank-showcase-phase-01-02.html`

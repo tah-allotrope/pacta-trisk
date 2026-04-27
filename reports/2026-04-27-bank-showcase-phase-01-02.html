@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phase Report :: Bank Showcase Phase 01-02</title>
+  <meta name="color-scheme" content="dark">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+    async function initMermaid() {
+      const blocks = document.querySelectorAll('.mermaid');
+      if (!blocks.length) return;
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'dark',
+        securityLevel: 'loose'
+      });
+      await mermaid.run({ nodes: blocks });
+    }
+
+    const run = () => initMermaid().catch((error) => console.error('Mermaid render failed', error));
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run, { once: true });
+    } else {
+      run();
+    }
+  </script>
+  <style>
+    :root {
+      --bg: #0d0d0d;
+      --bg-soft: #111111;
+      --panel: rgba(13, 13, 13, 0.88);
+      --panel-strong: rgba(19, 19, 19, 0.96);
+      --line: rgba(0, 245, 255, 0.26);
+      --text: #e9f6ff;
+      --muted: #8ea3ad;
+      --accent-blue: #00f5ff;
+      --accent-green: #39ff14;
+      --shadow: 0 14px 40px rgba(0, 0, 0, 0.32);
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --narrative-font: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --technical-font: "Cascadia Code", Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background: linear-gradient(180deg, #050505 0%, #0d0d0d 36%, #090909 100%);
+      color: var(--text);
+      font-family: var(--narrative-font);
+      line-height: 1.6;
+    }
+    a { color: var(--accent-blue); }
+    code, pre, .technical, .pill, .metric-label, .metric-value, .repo-tag, .mermaid { font-family: var(--technical-font); }
+    .page-shell { width: min(1180px, calc(100vw - 32px)); margin: 0 auto; padding: 32px 0 72px; }
+    .hero, .section {
+      margin-bottom: 22px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .hero { background: var(--panel-strong); }
+    .hero-grid, .summary-grid, .metric-strip { display: grid; gap: 16px; }
+    .hero-grid { grid-template-columns: minmax(0, 1.55fr) minmax(260px, 0.85fr); }
+    .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .metric-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 18px; }
+    .section-kicker, .section-index {
+      color: var(--accent-green);
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+    }
+    .phase-title { margin: 0; font-size: clamp(2.4rem, 5vw, 4.5rem); line-height: 0.95; text-transform: uppercase; }
+    .hero-summary, .meta-label, .metric-label { color: var(--muted); }
+    .meta-card, .column-card, .diagram-frame, .technical-frame, .viz-frame, .question-frame, .empty-state, .metric {
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius-md);
+      background: rgba(7, 7, 7, 0.82);
+      padding: 18px;
+    }
+    .meta-chip, .column-label { color: var(--accent-blue); font-weight: 700; }
+    .repo-tag, .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid rgba(0, 245, 255, 0.24);
+      border-radius: 999px;
+      background: rgba(0, 245, 255, 0.08);
+      color: var(--accent-blue);
+      font-size: 0.82rem;
+    }
+    .pill-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: end;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .section-title { margin: 0; font-size: clamp(1.2rem, 2vw, 1.7rem); }
+    .column-label { margin: 0 0 12px; font-size: 0.83rem; text-transform: uppercase; letter-spacing: 0.16em; }
+    .metric-value { margin-top: 8px; color: var(--accent-green); font-size: 1.2rem; font-weight: 700; }
+    .technical-frame table { width: 100%; border-collapse: collapse; }
+    .technical-frame th, .technical-frame td { padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); text-align: left; vertical-align: top; }
+    .technical-frame th { color: var(--accent-green); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.12em; }
+    .question-frame ul, .technical-frame ul, .column-card ul { margin: 0; padding-left: 20px; }
+    .question-frame li, .technical-frame li, .column-card li { margin-bottom: 8px; }
+    .viz-frame canvas { display: block; width: 100% !important; height: 280px !important; max-height: 280px; }
+    .footer-note { margin-top: 18px; text-align: right; color: rgba(142,163,173,0.72); font-size: 0.78rem; text-transform: uppercase; }
+    @media (max-width: 900px) {
+      .hero-grid, .summary-grid, .metric-strip { grid-template-columns: 1fr; }
+    }
+    @media print {
+      body { background: #fff; color: #111; }
+      .hero, .section, .meta-card, .column-card, .diagram-frame, .technical-frame, .viz-frame, .question-frame, .metric { box-shadow: none; background: #fff; color: #111; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero" id="phase-header">
+      <div class="hero-grid">
+        <div>
+          <p class="section-kicker">Phase Report / Personal Technical Artifact</p>
+          <h1 class="phase-title">Bank Showcase Phase 01-02</h1>
+          <p class="hero-summary">
+            This artifact packages the already-implemented first two phases of the PACTA + TRISK bank showcase plan: locking the free-tier hosting and snapshot contract, then validating the Streamlit scaffold that reads those frozen artifacts.
+          </p>
+          <div class="pill-row" aria-label="report metadata">
+            <span class="pill">project :: PACTA Vietnam</span>
+            <span class="pill">date :: 2026-04-27</span>
+          </div>
+          <div class="repo-tag">repo :: pacta-trisk</div>
+        </div>
+        <div>
+          <div class="meta-card">
+            <div class="meta-label">Project</div>
+            <div class="meta-chip">PACTA Vietnam</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Repository</div>
+            <div class="meta-chip">pacta-trisk</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Date</div>
+            <div class="meta-chip">2026-04-27</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="input-output-summary">
+      <div class="section-header">
+        <div>
+          <div class="section-index">01 / Input -> Output</div>
+          <h2 class="section-title">Input -> Output Summary</h2>
+        </div>
+      </div>
+      <div class="summary-grid">
+        <div class="column-card">
+          <p class="column-label">Inputs</p>
+          <ul>
+            <li>`plans/2026-04-25-pacta-trisk-bank-showcase-dashboard-plan.md` as the phase scope reference</li>
+            <li>Existing Phase 01 files: `docs/hosting-decision.md`, `dashboard/data/README.md`, `dashboard/data/`, `scripts/refresh_dashboard_data.R`</li>
+            <li>Existing Phase 02 files: `dashboard/app.py`, `dashboard/pages/`, `dashboard/lib/`, `.streamlit/config.toml`, `dashboard/requirements.txt`, `dashboard/tests/`</li>
+            <li>Live verification runs on 2026-04-27: `python -m pytest dashboard/tests` and `Rscript scripts/refresh_dashboard_data.R`</li>
+          </ul>
+        </div>
+        <div class="column-card">
+          <p class="column-label">Outputs</p>
+          <ul>
+            <li>Confirmed Phase 01 remains implemented and reproducible from source artifacts</li>
+            <li>Confirmed Phase 02 scaffold remains implemented and still boots cleanly via tests</li>
+            <li>New phase report artifact: `reports/2026-04-27-bank-showcase-phase-01-02.html`</li>
+            <li>Updated session memory in `activeContext.md` so the repo records this packaging and verification pass</li>
+          </ul>
+        </div>
+      </div>
+      <div class="metric-strip">
+        <div class="metric"><div class="metric-label">Phase 01 status</div><div class="metric-value">Verified</div></div>
+        <div class="metric"><div class="metric-label">Phase 02 status</div><div class="metric-value">Verified</div></div>
+        <div class="metric"><div class="metric-label">Dashboard tests</div><div class="metric-value">7 passed</div></div>
+      </div>
+    </section>
+
+    <section class="section" id="logic-flow">
+      <div class="section-header">
+        <div>
+          <div class="section-index">02 / Logic Flow</div>
+          <h2 class="section-title">Logic Flow</h2>
+        </div>
+      </div>
+      <div class="diagram-frame technical">
+        <div class="mermaid">flowchart LR
+          A[Read bank showcase plan] --> B[Audit repo for Phase 01 artifacts]
+          B --> C[Audit repo for Phase 02 scaffold artifacts]
+          C --> D[Check current worktree and recent commits]
+          D --> E[Run pytest dashboard/tests]
+          E --> F[Run refresh_dashboard_data.R]
+          F --> G[Record results in activeContext.md]
+          G --> H[Generate HTML phase report]
+          H --> I[Commit only relevant files]
+          I --> J[Push to origin/main]</div>
+      </div>
+    </section>
+
+    <section class="section" id="math-algorithm-used">
+      <div class="section-header">
+        <div>
+          <div class="section-index">03 / Math / Algorithm Used</div>
+          <h2 class="section-title">Math / Algorithm Used</h2>
+        </div>
+      </div>
+      <div class="technical-frame">
+        <p>No new analytical math was introduced in this packaging pass. The work was verification-oriented.</p>
+        <ul>
+          <li>Phase 01 validation was file-contract based: confirm the frozen `dashboard/data/` bundle still matches the plan and can be regenerated from pipeline outputs.</li>
+          <li>Phase 02 validation was behavior-based: confirm the Streamlit shell and page modules still render through the existing smoke tests.</li>
+          <li>The most material algorithmic behavior remains upstream in the existing app: cached CSV loading, Plotly chart wrappers, and page rendering through Streamlit's test harness.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" id="tools-formulas-methods">
+      <div class="section-header">
+        <div>
+          <div class="section-index">04 / Tools / Formulas / Methods</div>
+          <h2 class="section-title">Tools / Formulas / Methods</h2>
+        </div>
+      </div>
+      <div class="technical-frame technical">
+        <table>
+          <thead>
+            <tr><th>Surface</th><th>Method</th><th>Why it mattered</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Git history</td><td>Checked recent commits to confirm Phase 01 and 02 had already been implemented in `f65562f` and `982e567`</td><td>Prevented redundant code changes and kept the work minimal</td></tr>
+            <tr><td>Dashboard tests</td><td>`python -m pytest dashboard/tests`</td><td>Provided current proof that the scaffold still renders and the loaders still return data</td></tr>
+            <tr><td>Snapshot refresh</td><td>`Rscript scripts/refresh_dashboard_data.R`</td><td>Proved the Phase 01 frozen data contract is still reproducible from source outputs</td></tr>
+            <tr><td>Session memory</td><td>Updated `activeContext.md`</td><td>Left a durable repo-local record of what was verified and produced in this pass</td></tr>
+            <tr><td>Reporting</td><td>Generated a self-contained HTML artifact in `reports/`</td><td>Satisfied the explicit request to evoke the report workflow for this phase package</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="results-visualizations">
+      <div class="section-header">
+        <div>
+          <div class="section-index">05 / Results &amp; Visualizations</div>
+          <h2 class="section-title">Results &amp; Visualizations</h2>
+        </div>
+      </div>
+      <div class="viz-frame">
+        <canvas id="phaseStatusChart" aria-label="Phase verification chart" role="img"></canvas>
+      </div>
+      <div class="technical-frame" style="margin-top:16px;">
+        <ul>
+          <li>Phase 01 is present and reproducible: hosting decision, data snapshot, data README, and refresh script all exist and the refresh command completed successfully.</li>
+          <li>Phase 02 is present and functioning: app shell, loaders, chart helpers, theme config, README, and tests all exist.</li>
+          <li>The dashboard verification suite passed cleanly: `7 passed in 7.82s`.</li>
+          <li>The refresh script recopied both PACTA and TRISK snapshot files and figures into `dashboard/data/` without missing-file failures.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" id="limitations-second-best-alternative">
+      <div class="section-header">
+        <div>
+          <div class="section-index">06 / Limitations / Second-Best Alternative</div>
+          <h2 class="section-title">Limitations / Second-Best Alternative</h2>
+        </div>
+      </div>
+      <div class="question-frame">
+        <ul>
+          <li>This pass did not add new Phase 01 or Phase 02 product functionality because those phases were already implemented in the current branch history.</li>
+          <li>The verification scope stayed intentionally narrow: repo artifact audit, test run, and snapshot refresh. It did not re-run the entire end-to-end Streamlit deployment flow.</li>
+          <li>Second-best alternative: re-open and edit Phase 01/02 code only to create a new implementation diff. That would have produced unnecessary churn and higher risk without improving the requested scope.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" id="errors-warnings-flags-encountered">
+      <div class="section-header">
+        <div>
+          <div class="section-index">07 / Errors / Warnings / Flags</div>
+          <h2 class="section-title">Errors / Warnings / Flags Encountered</h2>
+        </div>
+      </div>
+      <div class="question-frame technical">
+        <ul>
+          <li>No test failures were encountered in the dashboard verification suite.</li>
+          <li>No missing-file errors were reported by `scripts/refresh_dashboard_data.R` during this run.</li>
+          <li>The worktree contained unrelated untracked Phase 06 deployment artifacts and runtime caches. They were intentionally left untouched and excluded from the focused commit for this request.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" id="open-questions-next-phase-seeds">
+      <div class="section-header">
+        <div>
+          <div class="section-index">08 / Open Questions / Next Phase Seeds</div>
+          <h2 class="section-title">Open Questions / Next Phase Seeds</h2>
+        </div>
+      </div>
+      <div class="question-frame">
+        <ul>
+          <li>Phase 06 deployment artifacts are present in the worktree but not yet packaged into a clean commit stream for publication.</li>
+          <li>If the next request is deployment-focused, the remaining work is to separate reusable docs and config from local screenshots, logs, and caches.</li>
+          <li>If the next request is product-focused, the most natural continuation is production hardening rather than additional Phase 01/02 work.</li>
+        </ul>
+      </div>
+      <div class="footer-note">artifact generated for reflection, not presentation theater</div>
+    </section>
+  </main>
+
+  <script>
+    if (window.Chart) {
+      Chart.defaults.devicePixelRatio = 1;
+      Chart.defaults.animation = false;
+      Chart.defaults.resizeDelay = 150;
+      Chart.defaults.normalized = true;
+      Chart.defaults.maintainAspectRatio = false;
+      const ctx = document.getElementById('phaseStatusChart');
+      if (ctx) {
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['Phase 01 audit', 'Phase 02 audit', 'Dashboard tests', 'Snapshot refresh'],
+            datasets: [{
+              label: 'Status',
+              data: [1, 1, 1, 1],
+              backgroundColor: ['#00E5FF', '#39FF14', '#7CFFB2', '#2F81F7'],
+              borderColor: ['#00E5FF', '#39FF14', '#7CFFB2', '#2F81F7'],
+              borderWidth: 1
+            }]
+          },
+          options: {
+            animation: false,
+            resizeDelay: 150,
+            normalized: true,
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: () => 'Verified'
+                }
+              }
+            },
+            scales: {
+              y: {
+                min: 0,
+                max: 1,
+                ticks: {
+                  stepSize: 1,
+                  callback: (value) => value === 1 ? 'Verified' : 'Pending'
+                },
+                grid: { color: 'rgba(255,255,255,0.08)' }
+              },
+              x: {
+                grid: { color: 'rgba(255,255,255,0.08)' }
+              }
+            }
+          }
+        });
+      }
+    }
+  </script>
+</body>
+</html>
