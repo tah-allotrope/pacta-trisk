@@ -590,3 +590,28 @@ When filtering data to a subset of metrics but providing `scale_*_manual()` mapp
 - [x] Confirmed generated runnable packages in `output/trisk_inputs/power_demo/`, `output/trisk_inputs/cement_demo/`, and `output/trisk_inputs/steel_demo/`
 - [x] Resolved two verification issues during the phase: `purrr::imap()` argument order and cement/steel weighted-mean aggregation
 - [x] Generated phase artifact `reports/2026-04-28-trisk-multisector-phases-1-2.html`
+
+---
+
+## TRISK Multisector Phases 03-04 (2026-04-29)
+
+**Goal:** Implement the shared sector-aware TRISK runner, generate standardized cement and steel result folders, republish the dashboard snapshot into a manifest-backed multisector layout, and update the TRISK dashboard page to switch sectors cleanly.
+
+### Planned Work
+
+- [x] Extract the shared TRISK run logic into a reusable sector-aware script while preserving `scripts/trisk_power_demo.R` as a stable wrapper
+- [x] Run and verify power, cement, and steel TRISK result folders with the same artifact contract
+- [x] Refactor `scripts/refresh_dashboard_data.R` to publish sector folders plus `dashboard/data/trisk/manifest.csv`
+- [x] Refactor the dashboard loaders and TRISK page to use the new sector-aware snapshot layout
+- [x] Refresh the snapshot, run dashboard tests, and package a report artifact for the completed phases 03-04 work
+
+### Review / Results
+
+- [x] Added `scripts/trisk_sector_demo.R` as the shared package-backed runner for `power`, `cement`, and `steel`
+- [x] Replaced `scripts/trisk_power_demo.R` with a thin compatibility wrapper that continues to run the power sector path
+- [x] Generated and verified standardized result folders in `synthesis_output/trisk/power_demo/`, `synthesis_output/trisk/cement_demo/`, and `synthesis_output/trisk/steel_demo/`
+- [x] Updated `scripts/refresh_dashboard_data.R` to publish `dashboard/data/trisk/<sector>/` plus `dashboard/data/trisk/manifest.csv`
+- [x] Refactored `dashboard/lib/loaders.py` and `dashboard/pages/2_TRISK_Risk.py` for a manifest-backed sector selector and sector-specific ZIP exports
+- [x] Updated `dashboard/app.py`, `dashboard/data/README.md`, `dashboard/tests/test_loaders.py`, and `dashboard/tests/test_smoke.py` for the new multisector TRISK contract
+- [x] Verified the snapshot refresh with `& "C:\Program Files\R\R-4.5.2\bin\Rscript.exe" scripts/refresh_dashboard_data.R`
+- [x] Verified the dashboard with `python -m pytest dashboard/tests` -> `9 passed`

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dashboard.lib.loaders import load_pacta_alignment_tables, load_trisk_tables
+from dashboard.lib.loaders import load_pacta_alignment_tables, load_trisk_sector_tables, load_trisk_tables
 
 
 def test_pacta_loaders_return_dataframes() -> None:
@@ -11,6 +11,14 @@ def test_pacta_loaders_return_dataframes() -> None:
 
 def test_trisk_loaders_return_dataframes() -> None:
     tables = load_trisk_tables()
+    assert tables["manifest"].empty is False
     assert tables["company_summary"].empty is False
     assert tables["company_trajectories_latest"].empty is False
     assert tables["sensitivity_results"].empty is False
+
+
+def test_trisk_sector_loader_returns_dataframes() -> None:
+    tables = load_trisk_sector_tables("cement")
+    assert tables["company_summary"].empty is False
+    assert tables["company_trajectories_latest"].empty is False
+    assert tables["combined"].empty is False

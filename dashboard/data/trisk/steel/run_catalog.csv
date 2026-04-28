@@ -1,0 +1,10 @@
+run_label,parameter_name,parameter_value,run_path
+base,base,base,C:/Users/tukum/Downloads/pacta-trisk/synthesis_output/trisk/steel_demo/runs/base/20260428_235023__9e4371b4-1dde-4600-9c3c-1ebccc805c44
+shock_year_2027,shock_year,2027,C:/Users/tukum/Downloads/pacta-trisk/synthesis_output/trisk/steel_demo/runs/shock_year_2027/20260428_235024__e5958b27-2ce0-4201-b9ee-ee10561f28d4
+shock_year_2029,shock_year,2029,C:/Users/tukum/Downloads/pacta-trisk/synthesis_output/trisk/steel_demo/runs/shock_year_2029/20260428_235026__92b69da1-caae-40a0-9c9e-fbb9151c06ac
+discount_rate_0.06,discount_rate,0.06,C:/Users/tukum/Downloads/pacta-trisk/synthesis_output/trisk/steel_demo/runs/discount_rate_0.06/20260428_235027__5a7dd723-e356-4955-8496-80c3fc5471bb
+discount_rate_0.10,discount_rate,0.10,C:/Users/tukum/Downloads/pacta-trisk/synthesis_output/trisk/steel_demo/runs/discount_rate_0.10/20260428_235028__a88e01ff-1a88-42cb-a95a-35831e500692
+risk_free_rate_0.02,risk_free_rate,0.02,C:/Users/tukum/Downloads/pacta-trisk/synthesis_output/trisk/steel_demo/runs/risk_free_rate_0.02/20260428_235030__45f6de0f-0f3d-4ac7-9f90-53229d5c8062
+risk_free_rate_0.04,risk_free_rate,0.04,C:/Users/tukum/Downloads/pacta-trisk/synthesis_output/trisk/steel_demo/runs/risk_free_rate_0.04/20260428_235031__25f5ef71-7200-4563-a2b2-ea924ab26b67
+market_passthrough_0.15,market_passthrough,0.15,C:/Users/tukum/Downloads/pacta-trisk/synthesis_output/trisk/steel_demo/runs/market_passthrough_0.15/20260428_235032__dba5e56a-b4b8-45c8-a667-ffde51924af3
+market_passthrough_0.35,market_passthrough,0.35,C:/Users/tukum/Downloads/pacta-trisk/synthesis_output/trisk/steel_demo/runs/market_passthrough_0.35/20260428_235033__1269363f-bdc6-4fc9-ac1b-0c7e6e147725

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phase Report :: TRISK Multisector Phases 3-4</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+  <style>
+    :root {
+      --bg: #09101f;
+      --panel: #121b31;
+      --panel-2: #0d1527;
+      --line: #2d446f;
+      --text: #eaf1ff;
+      --muted: #9fb0d5;
+      --accent: #7dd3fc;
+      --accent-2: #86efac;
+      --warn: #fbbf24;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(180deg, #050913 0%, var(--bg) 100%);
+      color: var(--text);
+      line-height: 1.55;
+    }
+    .page { width: min(1100px, calc(100vw - 32px)); margin: 0 auto; padding: 24px 0 48px; }
+    .hero, .section {
+      background: rgba(18, 27, 49, 0.94);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 18px;
+    }
+    .hero h1, .section h2 { margin-top: 0; }
+    .meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+    .pill {
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      color: var(--accent);
+      background: rgba(125, 211, 252, 0.08);
+      font-size: 0.9rem;
+    }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+    .card {
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+    }
+    .label { color: var(--muted); font-size: 0.9rem; }
+    .value { font-size: 1.5rem; font-weight: 700; color: var(--accent); }
+    ul { margin: 0; padding-left: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.95rem; }
+    th, td { border: 1px solid var(--line); padding: 8px 10px; text-align: left; vertical-align: top; }
+    th { color: var(--accent); background: rgba(125, 211, 252, 0.06); }
+    .muted { color: var(--muted); }
+    .good { color: var(--accent-2); }
+    .warn { color: var(--warn); }
+    .viz-frame { height: 320px; margin-top: 12px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 14px; padding: 12px; }
+    .mermaid { overflow: auto; background: var(--panel-2); border: 1px solid var(--line); border-radius: 14px; padding: 8px; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <section class="hero">
+      <p class="muted">Phase Report</p>
+      <h1>TRISK Multisector Phases 3-4</h1>
+      <p>Completed the shared sector-aware TRISK runner and the manifest-backed dashboard snapshot so the TRISK page now switches cleanly across power, cement, and steel with verified sector-specific results.</p>
+      <div class="meta">
+        <span class="pill">project :: PACTA Vietnam</span>
+        <span class="pill">repo :: pacta-trisk</span>
+        <span class="pill">date :: 2026-04-29</span>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>1. Phase Header</h2>
+      <div class="grid">
+        <div class="card"><div class="label">Primary outcome</div><div class="value">Shared Runner + Manifest UI</div></div>
+        <div class="card"><div class="label">TRISK sectors live</div><div class="value">3</div></div>
+        <div class="card"><div class="label">Automated tests</div><div class="value good">9 passed</div></div>
+        <div class="card"><div class="label">Snapshot contract</div><div class="value">sector folders</div></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>2. Input -&gt; Output Summary</h2>
+      <ul>
+        <li>Input state: phase-1/2 multisector input packages already existed for `power`, `cement`, and `steel`.</li>
+        <li>Runner output: `scripts/trisk_sector_demo.R` now drives package-backed TRISK runs for all supported sectors, while `scripts/trisk_power_demo.R` remains the stable power wrapper.</li>
+        <li>Result output: `synthesis_output/trisk/power_demo/`, `cement_demo/`, and `steel_demo/` now all emit the same file contract.</li>
+        <li>Snapshot output: `dashboard/data/trisk/manifest.csv` plus sector folders `power/`, `cement/`, and `steel/`.</li>
+        <li>UI output: `dashboard/pages/2_TRISK_Risk.py` now exposes a sector selector and sector-specific ZIP downloads.</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>3. Logic Flow</h2>
+      <div class="mermaid">flowchart LR
+        A[Shared sector inputs ready] --> B[Extract generic TRISK runner]
+        B --> C[Keep power wrapper stable]
+        C --> D[Run power, cement, steel demos]
+        D --> E[Publish manifest-backed snapshot]
+        E --> F[Refactor loaders and TRISK page]
+        F --> G[Refresh snapshot and run tests]
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>4. Math / Algorithm Used</h2>
+      <ul>
+        <li>The shared runner keeps the existing one-parameter-at-a-time sensitivity grid over `shock_year`, `discount_rate`, `risk_free_rate`, and `market_passthrough` for every sector.</li>
+        <li>Power still joins borrower-level PACTA market-share gaps into the prioritization score.</li>
+        <li>Cement and steel join sector-level SDA context from `06_vn_sda_alignment_2030.csv`, carrying that value onto borrower rows with explicit `alignment_context` labeling.</li>
+        <li>The prioritization score remains the same weighted composite of NPV deterioration, PD change, and alignment context magnitude.</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>5. Tools / Formulas / Methods</h2>
+      <ul>
+        <li>Used `trisk.model` 2.6.1 through the repo’s R environment for package-backed runs.</li>
+        <li>Verified with the repo’s documented full R executable path because `Rscript` is not available on PATH in this shell.</li>
+        <li>Protected the new snapshot contract with loader tests and Streamlit smoke tests.</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>6. Results &amp; Visualizations</h2>
+      <table>
+        <thead>
+          <tr><th>Sector</th><th>Runner</th><th>Snapshot folder</th><th>Alignment context mode</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>power</td><td>`scripts/trisk_power_demo.R` wrapper</td><td>`dashboard/data/trisk/power/`</td><td>Borrower-level market-share</td></tr>
+          <tr><td>cement</td><td>`scripts/trisk_sector_demo.R cement`</td><td>`dashboard/data/trisk/cement/`</td><td>Sector-level SDA</td></tr>
+          <tr><td>steel</td><td>`scripts/trisk_sector_demo.R steel`</td><td>`dashboard/data/trisk/steel/`</td><td>Sector-level SDA</td></tr>
+        </tbody>
+      </table>
+      <div class="viz-frame">
+        <canvas id="phaseChart"></canvas>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>7. Limitations / Second-Best Alternative</h2>
+      <ul>
+        <li>Cement and steel still rely on sector-level SDA context rather than borrower-level SDA alignment.</li>
+        <li>The dashboard now consumes the new manifest-backed layout, but phase 5 still needs end-to-end documentation and broader manual validation.</li>
+        <li>Second-best alternative not chosen: keep a flat snapshot root and add sector prefixes to filenames. That would make the loader and page logic more brittle than a folder-plus-manifest contract.</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>8. Errors / Warnings / Flags Encountered</h2>
+      <ul>
+        <li><span class="warn">Resolved test issue:</span> the new sector selector needed an explicit widget key for Streamlit test control.</li>
+        <li><span class="warn">Resolved snapshot issue:</span> old flat TRISK files were still present in `dashboard/data/trisk/` from earlier runs, so the refresh path was cleaned to leave only sector folders plus `manifest.csv`.</li>
+        <li><span class="warn">Environment warning:</span> R emitted `package 'fs' was built under R version 4.5.3`, but the sector runs completed successfully.</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>9. Open Questions / Next Phase Seeds</h2>
+      <ul>
+        <li>Phase 5 should document the exact end-to-end rerun flow for inputs, sector runs, snapshot publish, and app verification.</li>
+        <li>The TRISK page still uses `use_container_width`, which Streamlit warns will be deprecated after 2025-12-31.</li>
+        <li>If better SDA detail becomes available later, cement and steel prioritization can move from sector context to borrower-level alignment.</li>
+      </ul>
+    </section>
+  </div>
+
+  <script>
+    Chart.defaults.devicePixelRatio = 1;
+    Chart.defaults.animation = false;
+    Chart.defaults.resizeDelay = 150;
+    Chart.defaults.normalized = true;
+    Chart.defaults.maintainAspectRatio = false;
+
+    new Chart(document.getElementById('phaseChart'), {
+      type: 'bar',
+      data: {
+        labels: ['power', 'cement', 'steel'],
+        datasets: [
+          { label: 'Result folders', data: [1, 1, 1], backgroundColor: '#7dd3fc' },
+          { label: 'Snapshot folders', data: [1, 1, 1], backgroundColor: '#86efac' }
+        ]
+      },
+      options: {
+        animation: false,
+        resizeDelay: 150,
+        normalized: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: '#eaf1ff' } } },
+        scales: {
+          x: { ticks: { color: '#eaf1ff' }, grid: { color: '#2d446f' } },
+          y: { ticks: { color: '#eaf1ff', precision: 0 }, grid: { color: '#2d446f' } }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

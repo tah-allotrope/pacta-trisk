@@ -12,6 +12,7 @@ DATA_DIR = ROOT / "data"
 PACTA_DIR = DATA_DIR / "pacta"
 TRISK_DIR = DATA_DIR / "trisk"
 REPORTS_DIR = DATA_DIR / "reports"
+TRISK_MANIFEST = TRISK_DIR / "manifest.csv"
 
 
 @st.cache_data(show_spinner=False)
@@ -37,6 +38,10 @@ def trisk_path(name: str) -> Path:
     return TRISK_DIR / name
 
 
+def trisk_sector_path(sector: str, name: str) -> Path:
+    return TRISK_DIR / sector / name
+
+
 def reports_path(name: str) -> Path:
     return REPORTS_DIR / name
 
@@ -53,20 +58,30 @@ def load_pacta_alignment_tables() -> dict[str, pd.DataFrame]:
 
 
 def load_trisk_tables() -> dict[str, pd.DataFrame]:
+    manifest = load_csv(TRISK_MANIFEST)
+    default_sector = manifest.iloc[0]["sector"]
     return {
-        "assets": load_csv(trisk_path("assets.csv")),
-        "company_summary": load_csv(trisk_path("company_summary.csv")),
-        "company_trajectories_latest": load_csv(trisk_path("company_trajectories_latest.csv")),
-        "npv_results": load_csv(trisk_path("npv_results_latest.csv")),
-        "pd_results": load_csv(trisk_path("pd_results_latest.csv")),
-        "pd_summary": load_csv(trisk_path("pd_summary.csv")),
-        "financial_features": load_csv(trisk_path("financial_features.csv")),
-        "carbon_price": load_csv(trisk_path("ngfs_carbon_price.csv")),
-        "run_catalog": load_csv(trisk_path("run_catalog.csv")),
-        "scenarios": load_csv(trisk_path("scenarios.csv")),
-        "sensitivity_results": load_csv(trisk_path("sensitivity_results.csv")),
-        "sensitivity_summary": load_csv(trisk_path("sensitivity_summary.csv")),
-        "combined": load_csv(trisk_path("top_borrowers_alignment_trisk.csv")),
+        "manifest": manifest,
+        "default_sector": pd.DataFrame({"sector": [default_sector]}),
+        **load_trisk_sector_tables(default_sector),
+    }
+
+
+def load_trisk_sector_tables(sector: str) -> dict[str, pd.DataFrame]:
+    return {
+        "assets": load_csv(trisk_sector_path(sector, "assets.csv")),
+        "company_summary": load_csv(trisk_sector_path(sector, "company_summary.csv")),
+        "company_trajectories_latest": load_csv(trisk_sector_path(sector, "company_trajectories_latest.csv")),
+        "npv_results": load_csv(trisk_sector_path(sector, "npv_results_latest.csv")),
+        "pd_results": load_csv(trisk_sector_path(sector, "pd_results_latest.csv")),
+        "pd_summary": load_csv(trisk_sector_path(sector, "pd_summary.csv")),
+        "financial_features": load_csv(trisk_sector_path(sector, "financial_features.csv")),
+        "carbon_price": load_csv(trisk_sector_path(sector, "ngfs_carbon_price.csv")),
+        "run_catalog": load_csv(trisk_sector_path(sector, "run_catalog.csv")),
+        "scenarios": load_csv(trisk_sector_path(sector, "scenarios.csv")),
+        "sensitivity_results": load_csv(trisk_sector_path(sector, "sensitivity_results.csv")),
+        "sensitivity_summary": load_csv(trisk_sector_path(sector, "sensitivity_summary.csv")),
+        "combined": load_csv(trisk_sector_path(sector, "top_borrowers_alignment_trisk.csv")),
     }
 
 

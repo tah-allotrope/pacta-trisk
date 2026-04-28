@@ -1,9 +1,0 @@
-run_label,parameter_name,parameter_value,borrower_count,average_npv_change,average_pd_change,average_priority_delta,max_priority_delta,max_priority_delta_company,min_priority_delta,min_priority_delta_company,top_ranked_company
-discount_rate_0.06,discount_rate,0.06,12,-0.3194988324987771,0.0750653143591302,-0.033013314020257166,0.0219029982658121,Vietnam Hydropower JSC,-0.2565014170408304,PVN Power Corporation,Nghi Son Power LLC
-discount_rate_0.10,discount_rate,0.10,12,-0.31704397823924924,0.06644435182022139,0.02111116134794422,0.20929664319663743,PVN Power Corporation,-0.02150040383776286,Vinacomin Power JSC,Nghi Son Power LLC
-market_passthrough_0.15,market_passthrough,0.15,12,-0.3226567771507505,0.07157270862319344,0.3178101418709071,3.347591723521674,PVN Power Corporation,-0.033565958120039596,Vietnam Hydropower JSC,Nghi Son Power LLC
-market_passthrough_0.35,market_passthrough,0.35,12,-0.31365614664433933,0.06908765553708991,-0.31619268448553545,0.033752206907440296,Vietnam Hydropower JSC,-3.3264241002272,PVN Power Corporation,Nghi Son Power LLC
-risk_free_rate_0.02,risk_free_rate,0.02,12,-0.31815646189754493,0.07486226546746409,-0.024441595900303998,0.2713278710028817,PVN Power Corporation,-0.6423808691605188,Vinacomin Power JSC,Nghi Son Power LLC
-risk_free_rate_0.04,risk_free_rate,0.04,12,-0.31815646189754493,0.06601634561165291,-0.04174670526607812,0.35079509802511666,Vinacomin Power JSC,-0.4197013018261373,PVN Power Corporation,Nghi Son Power LLC
-shock_year_2027,shock_year,2027,12,-0.3059671059053429,0.07143734245658186,0.025931189014134787,2.0106665731527897,PVN Power Corporation,-1.0992046429555948,Vietnam Hydropower JSC,Nghi Son Power LLC
-shock_year_2029,shock_year,2029,12,-0.32450518533285344,0.06748230137757023,0.19082865278375447,2.7881801978467884,Vietnam Hydropower JSC,-1.1263943384018802,PVN Power Corporation,Nghi Son Power LLC

@@ -1,0 +1,10 @@
+run_label,parameter_name,parameter_value,run_path
+base,base,base,C:/Users/tukum/Downloads/pacta-trisk/synthesis_output/trisk/cement_demo/runs/base/20260428_235023__e331fcc1-6101-4664-81f3-0845e63612e9
+shock_year_2027,shock_year,2027,C:/Users/tukum/Downloads/pacta-trisk/synthesis_output/trisk/cement_demo/runs/shock_year_2027/20260428_235025__da39a4b9-5f2b-4695-998c-28adda0d0dd1
+shock_year_2029,shock_year,2029,C:/Users/tukum/Downloads/pacta-trisk/synthesis_output/trisk/cement_demo/runs/shock_year_2029/20260428_235026__b5d987e9-2173-4af3-8c01-d01b6ab5b85c
+discount_rate_0.06,discount_rate,0.06,C:/Users/tukum/Downloads/pacta-trisk/synthesis_output/trisk/cement_demo/runs/discount_rate_0.06/20260428_235027__894d4155-ed66-4151-a7b5-81af3273da68
+discount_rate_0.10,discount_rate,0.10,C:/Users/tukum/Downloads/pacta-trisk/synthesis_output/trisk/cement_demo/runs/discount_rate_0.10/20260428_235028__67839b5c-0d10-423f-b2fe-ed9c79ea008c
+risk_free_rate_0.02,risk_free_rate,0.02,C:/Users/tukum/Downloads/pacta-trisk/synthesis_output/trisk/cement_demo/runs/risk_free_rate_0.02/20260428_235030__c1143c26-dd69-4584-a240-6337cf3542c1
+risk_free_rate_0.04,risk_free_rate,0.04,C:/Users/tukum/Downloads/pacta-trisk/synthesis_output/trisk/cement_demo/runs/risk_free_rate_0.04/20260428_235031__e87f86f4-f1f4-437c-b7b5-4cc826a82b81
+market_passthrough_0.15,market_passthrough,0.15,C:/Users/tukum/Downloads/pacta-trisk/synthesis_output/trisk/cement_demo/runs/market_passthrough_0.15/20260428_235032__89dbc3de-44c5-4b9b-a85d-8d52127be1ef
+market_passthrough_0.35,market_passthrough,0.35,C:/Users/tukum/Downloads/pacta-trisk/synthesis_output/trisk/cement_demo/runs/market_passthrough_0.35/20260428_235033__71368c25-32c0-4469-b756-8ab1b91173e4

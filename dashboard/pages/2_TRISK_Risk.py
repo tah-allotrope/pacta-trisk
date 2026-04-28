@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from io import BytesIO
+from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile
 
 import pandas as pd
@@ -8,7 +9,7 @@ import streamlit as st
 
 from dashboard.lib.branding import apply_page_frame, footer_note, public_demo_banner
 from dashboard.lib.charts import npv_var_scatter, ranked_bar, trajectory_line
-from dashboard.lib.loaders import TRISK_DIR, load_markdown_text, load_trisk_tables
+from dashboard.lib.loaders import TRISK_DIR, load_trisk_sector_tables, load_trisk_tables
 
 
 DISCLAIMER = (
@@ -17,21 +18,47 @@ DISCLAIMER = (
 )
 
 
-def _build_zip() -> bytes:
+def _build_sector_zip(sector: str) -> bytes:
     buffer = BytesIO()
+    sector_dir = TRISK_DIR / sector
     with ZipFile(buffer, mode="w", compression=ZIP_DEFLATED) as zf:
-        for path in sorted(TRISK_DIR.iterdir()):
+        for path in sorted(sector_dir.iterdir()):
             if path.is_file():
-                zf.write(path, arcname=path.name)
+                zf.write(path, arcname=f"{sector}/{path.name}")
     buffer.seek(0)
     return buffer.read()
 
 
-apply_page_frame("TRISK Risk", "Firm-level transition-stress view for the Vietnam synthetic power book.")
+def _build_full_zip() -> bytes:
+    buffer = BytesIO()
+    with ZipFile(buffer, mode="w", compression=ZIP_DEFLATED) as zf:
+        for path in sorted(TRISK_DIR.rglob("*")):
+            if path.is_file():
+                zf.write(path, arcname=str(path.relative_to(TRISK_DIR)))
+    buffer.seek(0)
+    return buffer.read()
+
+
+apply_page_frame("TRISK Risk", "Firm-level transition-stress view across the Vietnam synthetic power, cement, and steel books.")
 public_demo_banner()
 st.error(DISCLAIMER)
 
-tables = load_trisk_tables()
+base_tables = load_trisk_tables()
+manifest = base_tables["manifest"].copy()
+sector_options = manifest["sector"].tolist()
+default_sector = base_tables["default_sector"].iloc[0]["sector"]
+
+selected_sector = st.selectbox(
+    "Sector",
+    sector_options,
+    index=sector_options.index(default_sector),
+    key="trisk_sector",
+    format_func=lambda value: manifest.loc[manifest["sector"] == value, "label"].iloc[0],
+)
+
+tables = load_trisk_sector_tables(selected_sector)
+sector_row = manifest.loc[manifest["sector"] == selected_sector].iloc[0]
+
 company_summary = tables["company_summary"].copy()
 pd_summary = tables["pd_summary"].copy()
 sensitivity = tables["sensitivity_results"].copy()
@@ -49,12 +76,15 @@ company_summary["technology_mix"] = company_summary["company_id"].map(
 company_summary["npv_change_pct"] = company_summary["npv_change"] * 100
 company_summary["pd_change_bp"] = company_summary["pd_change"] * 10000
 
-col1, col2, col3, col4 = st.columns(4)
 valid_rows = company_summary[company_summary["npv_change"].notna()].copy()
-col1.metric("Borrowers in pilot", int(valid_rows["company_name"].nunique()))
+
+st.info(sector_row["disclaimer"])
+
+col1, col2, col3, col4 = st.columns(4)
+col1.metric("Borrowers in view", int(valid_rows["company_name"].nunique()))
 col2.metric("Worst NPV change", f"{valid_rows['npv_change_pct'].min():.1f}%")
 col3.metric("Largest PD change", f"{valid_rows['pd_change_bp'].max():.0f} bp")
-col4.metric("Stable top-ranked name", sensitivity_summary["top_ranked_company"].mode().iloc[0])
+col4.metric("Top-ranked name", combined["company_name"].iloc[0])
 
 st.subheader("Company ranking")
 left, right = st.columns([1.1, 1])
@@ -66,19 +96,24 @@ with left:
             x="npv_change_pct",
             y="company_name",
             color="technology_mix",
-            title="NPV change ranking under stress scenario",
+            title=f"NPV change ranking under stress scenario ({sector_row['label']})",
         ),
         use_container_width=True,
     )
 with right:
-    ranking_table = valid_rows[
-        ["company_name", "assets", "technology_mix", "npv_baseline", "npv_shock", "npv_change_pct", "pd_change_bp"]
-    ].sort_values("npv_change_pct")
+    ranking_columns = ["company_name", "assets", "technology_mix", "npv_baseline", "npv_shock", "npv_change_pct", "pd_change_bp"]
+    if "alignment_context" in combined.columns:
+        ranking_columns.append("alignment_context")
+    ranking_table = valid_rows.merge(
+        combined[[column for column in ["company_id", "alignment_context"] if column in combined.columns]],
+        on="company_id",
+        how="left",
+    )[ranking_columns].sort_values("npv_change_pct")
     st.dataframe(ranking_table, use_container_width=True, hide_index=True)
     st.download_button(
-        "Download TRISK company summary CSV",
+        f"Download {selected_sector} TRISK company summary CSV",
         valid_rows.to_csv(index=False).encode("utf-8"),
-        file_name="trisk_company_summary.csv",
+        file_name=f"trisk_{selected_sector}_company_summary.csv",
         mime="text/csv",
     )
 
@@ -92,7 +127,7 @@ st.plotly_chart(
         y="pd_change_bp",
         color="technology_group",
         hover_name="company_name",
-        title="NPV deterioration vs PD change",
+        title=f"NPV deterioration vs PD change ({sector_row['label']})",
     ),
     use_container_width=True,
 )
@@ -120,24 +155,24 @@ with s1:
         use_container_width=True,
     )
 with s2:
+    sensitivity_columns = [
+        "company_name",
+        "npv_change_pct",
+        "pd_change_bp",
+        "stress_priority_score",
+        "delta_priority_vs_base",
+    ]
+    if "alignment_context" in selected_sensitivity.columns:
+        sensitivity_columns.append("alignment_context")
     st.dataframe(
-        selected_sensitivity[
-            [
-                "company_name",
-                "npv_change_pct",
-                "pd_change_bp",
-                "stress_priority_score",
-                "delta_priority_vs_base",
-            ]
-        ].sort_values("stress_priority_score", ascending=False),
+        selected_sensitivity[sensitivity_columns].sort_values("stress_priority_score", ascending=False),
         use_container_width=True,
         hide_index=True,
     )
 
 st.subheader("Trajectory detail")
 company_name = st.selectbox("Borrower", sorted(valid_rows["company_name"].unique().tolist()))
-company_traj = tables["company_trajectories_latest"]
-company_slice = company_traj[company_traj["company_name"] == company_name].copy()
+company_slice = trajectories[trajectories["company_name"] == company_name].copy()
 company_slice["scenario_pathway_delta"] = company_slice["production_shock_scenario"] - company_slice["production_baseline_scenario"]
 company_slice["series"] = company_slice["technology"].str.replace("Cap", "", regex=False)
 st.plotly_chart(
@@ -167,16 +202,25 @@ with in3:
     st.markdown("**Carbon price curve**")
     st.dataframe(carbon_price, use_container_width=True, hide_index=True)
 
-st.download_button(
-    "Download all TRISK results (zip)",
-    _build_zip(),
-    file_name="trisk_results_bundle.zip",
-    mime="application/zip",
-)
+download_left, download_right = st.columns(2)
+with download_left:
+    st.download_button(
+        f"Download {selected_sector} TRISK results (zip)",
+        _build_sector_zip(selected_sector),
+        file_name=f"trisk_{selected_sector}_results_bundle.zip",
+        mime="application/zip",
+    )
+with download_right:
+    st.download_button(
+        "Download full TRISK multisector snapshot (zip)",
+        _build_full_zip(),
+        file_name="trisk_multisector_results_bundle.zip",
+        mime="application/zip",
+    )
 
 with st.expander("How to interpret this page"):
     st.markdown(
-        "The top of the page shows which borrowers deteriorate most under the synthetic stress scenario. "
+        "The top of the page shows which borrowers deteriorate most under the synthetic stress scenario for the selected sector. "
         "The sensitivity section then shows how that ranking moves when one model setting changes at a time. "
         "The inputs panel makes the synthetic assumptions explicit so a bank audience can see what drives the results."
     )

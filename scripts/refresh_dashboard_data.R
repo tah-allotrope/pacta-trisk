@@ -1,75 +1,119 @@
 #!/usr/bin/env Rscript
 # refresh_dashboard_data.R
-# One-shot copy/rename script to republish the dashboard data snapshot
-# from current pipeline outputs. Run after any pipeline re-run.
+# Republish the dashboard data snapshot from current pipeline outputs.
 # Usage: Rscript scripts/refresh_dashboard_data.R
 
-source_files <- list(
-  pacta = c(
-    "synthesis_output/vietnam/02_vn_matched_prioritized.csv",
-    "synthesis_output/vietnam/04_vn_ms_company.csv",
-    "synthesis_output/vietnam/04_vn_ms_portfolio.csv",
-    "synthesis_output/vietnam/05_vn_sda_portfolio.csv",
-    "synthesis_output/vietnam/06_vn_ms_alignment_2030.csv",
-    "synthesis_output/vietnam/06_vn_sda_alignment_2030.csv"
-  ),
-  trisk = c(
-    "output/trisk_inputs/power_demo/assets.csv",
-    "synthesis_output/trisk/power_demo/company_summary.csv",
-    "synthesis_output/trisk/power_demo/company_trajectories_latest.csv",
-    "output/trisk_inputs/power_demo/financial_features.csv",
-    "output/trisk_inputs/power_demo/ngfs_carbon_price.csv",
-    "synthesis_output/trisk/power_demo/npv_results_latest.csv",
-    "synthesis_output/trisk/power_demo/pd_results_latest.csv",
-    "synthesis_output/trisk/power_demo/pd_summary.csv",
-    "synthesis_output/trisk/power_demo/run_catalog.csv",
-    "output/trisk_inputs/power_demo/scenarios.csv",
-    "synthesis_output/trisk/power_demo/sensitivity_results.csv",
-    "synthesis_output/trisk/power_demo/sensitivity_summary.csv",
-    "synthesis_output/trisk/power_demo/top_borrowers_alignment_trisk.csv"
-  ),
-  reports = c(
-    "reports/PACTA_Vietnam_Bank_Report.html",
-    "reports/PACTA_Alignment_Report.html",
-    "reports/PACTA_Synthesis_Report.html",
-    "reports/PACTA_Comparison_Report.html",
-    "reports/2026-04-16-final-vietnam-bank-trisk-demo.html",
-    "reports/2026-04-16-trisk-power-pilot.html",
-    "reports/2026-04-16-pacta-baseline-stabilization.html"
-  )
-)
+suppressPackageStartupMessages({
+  library(readr)
+  library(tibble)
+})
 
-dest_dirs <- list(
-  pacta = "dashboard/data/pacta",
-  trisk = "dashboard/data/trisk",
-  reports = "dashboard/data/reports"
-)
-
-copy_pngs <- list(
-  pacta = list(src = "synthesis_output/vietnam", dest = "dashboard/data/pacta"),
-  trisk = list(src = "synthesis_output/trisk/power_demo/figures", dest = "dashboard/data/trisk")
-)
-
-for (group in names(source_files)) {
-  dest_dir <- dest_dirs[[group]]
-  if (!dir.exists(dest_dir)) dir.create(dest_dir, recursive = TRUE)
-  for (f in source_files[[group]]) {
-    if (file.exists(f)) {
-      file.copy(f, dest_dir, overwrite = TRUE)
-      message(sprintf("  [OK] %s -> %s", f, dest_dir))
-    } else {
-      message(sprintf("  [MISS] %s not found", f))
-    }
+clear_dir <- function(path) {
+  if (dir.exists(path)) {
+    unlink(list.files(path, full.names = TRUE, all.files = TRUE, no.. = TRUE), recursive = TRUE, force = TRUE)
   }
 }
 
-for (group in names(copy_pngs)) {
-  info <- copy_pngs[[group]]
-  pngs <- list.files(info$src, pattern = "\\.png$", full.names = TRUE)
+copy_file <- function(src, dest_dir) {
+  if (!dir.exists(dest_dir)) dir.create(dest_dir, recursive = TRUE, showWarnings = FALSE)
+  if (file.exists(src)) {
+    file.copy(src, dest_dir, overwrite = TRUE)
+    message(sprintf("  [OK] %s -> %s", src, dest_dir))
+  } else {
+    message(sprintf("  [MISS] %s not found", src))
+  }
+}
+
+copy_png_group <- function(src_dir, dest_dir) {
+  if (!dir.exists(src_dir)) {
+    message(sprintf("  [MISS] %s not found", src_dir))
+    return(invisible(NULL))
+  }
+  if (!dir.exists(dest_dir)) dir.create(dest_dir, recursive = TRUE, showWarnings = FALSE)
+  pngs <- list.files(src_dir, pattern = "\\.png$", full.names = TRUE)
   for (f in pngs) {
-    file.copy(f, info$dest, overwrite = TRUE)
-    message(sprintf("  [OK] %s -> %s", f, info$dest))
+    file.copy(f, dest_dir, overwrite = TRUE)
+    message(sprintf("  [OK] %s -> %s", f, dest_dir))
   }
 }
+
+pacta_files <- c(
+  "synthesis_output/vietnam/02_vn_matched_prioritized.csv",
+  "synthesis_output/vietnam/04_vn_ms_company.csv",
+  "synthesis_output/vietnam/04_vn_ms_portfolio.csv",
+  "synthesis_output/vietnam/05_vn_sda_portfolio.csv",
+  "synthesis_output/vietnam/06_vn_ms_alignment_2030.csv",
+  "synthesis_output/vietnam/06_vn_sda_alignment_2030.csv"
+)
+
+report_files <- c(
+  "reports/PACTA_Vietnam_Bank_Report.html",
+  "reports/PACTA_Alignment_Report.html",
+  "reports/PACTA_Synthesis_Report.html",
+  "reports/PACTA_Comparison_Report.html",
+  "reports/2026-04-16-final-vietnam-bank-trisk-demo.html",
+  "reports/2026-04-16-trisk-power-pilot.html",
+  "reports/2026-04-16-pacta-baseline-stabilization.html",
+  "reports/2026-04-28-trisk-multisector-phases-1-2.html"
+)
+
+trisk_sector_files <- c(
+  "assets.csv",
+  "company_summary.csv",
+  "company_trajectories_latest.csv",
+  "financial_features.csv",
+  "ngfs_carbon_price.csv",
+  "npv_results_latest.csv",
+  "params_latest.csv",
+  "pd_results_latest.csv",
+  "pd_summary.csv",
+  "run_catalog.csv",
+  "scenarios.csv",
+  "sensitivity_results.csv",
+  "sensitivity_summary.csv",
+  "top_borrowers_alignment_trisk.csv"
+)
+
+trisk_manifest <- tribble(
+  ~sector,  ~label,  ~folder,       ~price_unit,            ~pathway_unit, ~alignment_mode, ~disclaimer,
+  "power",  "Power",  "power",     "USD/MWh-equivalent", "MW",         "borrower_ms",  "Borrower-level PACTA market-share gaps are available for power.",
+  "cement", "Cement", "cement",    "USD/unit-equivalent", "tonnes",     "sector_sda",   "Cement currently uses sector-level SDA context, not borrower-specific alignment.",
+  "steel",  "Steel",  "steel",     "USD/unit-equivalent", "tonnes",     "sector_sda",   "Steel currently uses sector-level SDA context, not borrower-specific alignment."
+)
+
+for (f in pacta_files) {
+  copy_file(f, "dashboard/data/pacta")
+}
+
+copy_png_group("synthesis_output/vietnam", "dashboard/data/pacta")
+
+for (f in report_files) {
+  copy_file(f, "dashboard/data/reports")
+}
+
+if (!dir.exists("dashboard/data/trisk")) dir.create("dashboard/data/trisk", recursive = TRUE)
+clear_dir("dashboard/data/trisk")
+
+for (i in seq_len(nrow(trisk_manifest))) {
+  sector <- trisk_manifest$sector[[i]]
+  src_root <- file.path("synthesis_output", "trisk", paste0(sector, "_demo"))
+  input_root <- file.path("output", "trisk_inputs", paste0(sector, "_demo"))
+  dest_root <- file.path("dashboard", "data", "trisk", sector)
+  if (!dir.exists(dest_root)) dir.create(dest_root, recursive = TRUE, showWarnings = FALSE)
+
+  for (name in trisk_sector_files) {
+    src <- if (name %in% c("assets.csv", "financial_features.csv", "ngfs_carbon_price.csv", "scenarios.csv")) {
+      file.path(input_root, name)
+    } else {
+      file.path(src_root, name)
+    }
+    copy_file(src, dest_root)
+  }
+
+  copy_png_group(file.path(src_root, "figures"), dest_root)
+}
+
+write_csv(trisk_manifest, file.path("dashboard", "data", "trisk", "manifest.csv"))
+message("  [OK] dashboard/data/trisk/manifest.csv written")
 
 message("Dashboard data snapshot refreshed.")

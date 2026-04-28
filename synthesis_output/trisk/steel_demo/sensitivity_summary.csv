@@ -1,0 +1,9 @@
+run_label,parameter_name,parameter_value,borrower_count,average_npv_change,average_pd_change,average_priority_delta,max_priority_delta,max_priority_delta_company,min_priority_delta,min_priority_delta_company,top_ranked_company
+discount_rate_0.06,discount_rate,0.06,2,-0.19167787820278726,0.04955958923581118,0,0,Hoa Phat Group JSC,0,Hoa Phat Group JSC,Hoa Phat Group JSC
+discount_rate_0.10,discount_rate,0.10,2,-0.19292422608318932,0.045398326473481077,0,0,Hoa Phat Group JSC,0,Hoa Phat Group JSC,Hoa Phat Group JSC
+market_passthrough_0.15,market_passthrough,0.15,2,-0.2331997818259923,0.05819000236534007,0,0,Hoa Phat Group JSC,0,Hoa Phat Group JSC,Hoa Phat Group JSC
+market_passthrough_0.35,market_passthrough,0.35,2,-0.15151717659615332,0.03704437336380874,0,0,Hoa Phat Group JSC,0,Hoa Phat Group JSC,Hoa Phat Group JSC
+risk_free_rate_0.02,risk_free_rate,0.02,2,-0.19235847921107282,0.04977775248849109,0,0,Hoa Phat Group JSC,0,Hoa Phat Group JSC,Hoa Phat Group JSC
+risk_free_rate_0.04,risk_free_rate,0.04,2,-0.19235847921107282,0.04461828599759195,0,0,Hoa Phat Group JSC,0,Hoa Phat Group JSC,Hoa Phat Group JSC
+shock_year_2027,shock_year,2027,2,-0.18459443112618645,0.04755431621230939,0,0,Hoa Phat Group JSC,0,Hoa Phat Group JSC,Hoa Phat Group JSC
+shock_year_2029,shock_year,2029,2,-0.2011163974252289,0.04727290179787076,0,0,Hoa Phat Group JSC,0,Hoa Phat Group JSC,Hoa Phat Group JSC

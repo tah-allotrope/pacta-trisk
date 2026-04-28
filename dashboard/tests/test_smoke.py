@@ -21,6 +21,13 @@ def test_trisk_page_renders() -> None:
     assert not at.exception
 
 
+def test_trisk_page_allows_sector_switch() -> None:
+    at = AppTest.from_file("dashboard/pages/2_TRISK_Risk.py")
+    at.run()
+    at.selectbox(key="trisk_sector").select("cement").run()
+    assert not at.exception
+
+
 def test_reports_page_renders() -> None:
     at = AppTest.from_file("dashboard/pages/3_Reports.py")
     at.run()

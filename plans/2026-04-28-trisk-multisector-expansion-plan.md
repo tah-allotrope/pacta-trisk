@@ -107,11 +107,11 @@ Refactor the TRISK input builder so it can emit valid per-sector input packages 
 Produce standardized TRISK result folders for cement and steel so the dashboard can switch sectors without special-case file handling.
 
 **Tasks**
-- [ ] TASK-03-01: Extract the shared run logic from `scripts/trisk_power_demo.R` into a generic runner surface, preferably `scripts/trisk_sector_demo.R`, that accepts a sector and output root while preserving the current power run behavior.
-- [ ] TASK-03-02: Keep `scripts/trisk_power_demo.R` as a thin wrapper or compatibility entrypoint that calls the shared runner with `sector = "power"`.
-- [ ] TASK-03-03: Add cement and steel runs that write the same artifact set used today by power: `company_summary.csv`, `top_borrowers_alignment_trisk.csv`, `params_latest.csv`, `pd_summary.csv`, `npv_results_latest.csv`, `pd_results_latest.csv`, `company_trajectories_latest.csv`, `sensitivity_results.csv`, `sensitivity_summary.csv`, `run_catalog.csv`, and `figures/`.
-- [ ] TASK-03-04: Adjust the alignment-context join logic so power still uses company-level market-share alignment from `synthesis_output/vietnam/04_vn_ms_company.csv`, while cement and steel use the SDA alignment context available in `synthesis_output/vietnam/06_vn_sda_alignment_2030.csv` until a company-level SDA source exists.
-- [ ] TASK-03-05: Confirm the same sensitivity grid semantics across sectors for `shock_year`, `discount_rate`, `risk_free_rate`, and `market_passthrough`, even if the absolute values are interpreted differently by sector.
+- [x] TASK-03-01: Extract the shared run logic from `scripts/trisk_power_demo.R` into a generic runner surface, preferably `scripts/trisk_sector_demo.R`, that accepts a sector and output root while preserving the current power run behavior.
+- [x] TASK-03-02: Keep `scripts/trisk_power_demo.R` as a thin wrapper or compatibility entrypoint that calls the shared runner with `sector = "power"`.
+- [x] TASK-03-03: Add cement and steel runs that write the same artifact set used today by power: `company_summary.csv`, `top_borrowers_alignment_trisk.csv`, `params_latest.csv`, `pd_summary.csv`, `npv_results_latest.csv`, `pd_results_latest.csv`, `company_trajectories_latest.csv`, `sensitivity_results.csv`, `sensitivity_summary.csv`, `run_catalog.csv`, and `figures/`.
+- [x] TASK-03-04: Adjust the alignment-context join logic so power still uses company-level market-share alignment from `synthesis_output/vietnam/04_vn_ms_company.csv`, while cement and steel use the SDA alignment context available in `synthesis_output/vietnam/06_vn_sda_alignment_2030.csv` until a company-level SDA source exists.
+- [x] TASK-03-05: Confirm the same sensitivity grid semantics across sectors for `shock_year`, `discount_rate`, `risk_free_rate`, and `market_passthrough`, even if the absolute values are interpreted differently by sector.
 
 **Files / Surfaces**
 - `scripts/trisk_power_demo.R` - Current power-only runner that should become a stable wrapper or baseline script.
@@ -123,9 +123,9 @@ Produce standardized TRISK result folders for cement and steel so the dashboard 
 - PHASE-02.
 
 **Exit Criteria**
-- [ ] Cement and steel TRISK runs complete and emit the same file contract as the existing power demo.
-- [ ] `scripts/trisk_power_demo.R` still works as a documented power-sector entrypoint.
-- [ ] The ranking outputs clearly distinguish borrower-level stress results from sector-level SDA context where borrower-level alignment is not available.
+- [x] Cement and steel TRISK runs complete and emit the same file contract as the existing power demo.
+- [x] `scripts/trisk_power_demo.R` still works as a documented power-sector entrypoint.
+- [x] The ranking outputs clearly distinguish borrower-level stress results from sector-level SDA context where borrower-level alignment is not available.
 
 **Phase Risks**
 - **RISK-03-01:** Repeating a sector-level SDA gap across borrowers could be mistaken for company-level alignment evidence. Mitigation: expose SDA context in separate columns and copy, and do not label it as a company-specific alignment score.
@@ -135,11 +135,11 @@ Produce standardized TRISK result folders for cement and steel so the dashboard 
 Publish the multi-sector outputs into the dashboard snapshot and update the loader and page contracts so the UI can switch sectors cleanly.
 
 **Tasks**
-- [ ] TASK-04-01: Extend `scripts/refresh_dashboard_data.R` to copy each sector's TRISK files into `dashboard/data/trisk/<sector>/` and generate `dashboard/data/trisk/manifest.csv` describing available sectors, display labels, units, and disclaimers.
-- [ ] TASK-04-02: Refactor `dashboard/lib/loaders.py` so `load_trisk_tables()` can read a selected sector from the new snapshot layout instead of one global flat folder.
-- [ ] TASK-04-03: Update `dashboard/pages/2_TRISK_Risk.py` to add a sector selector, load the selected sector's tables, update metric labels and trajectory copy, and preserve `power` as the default selection.
-- [ ] TASK-04-04: Adjust the ZIP export and downloads so the user can export either the selected sector bundle or the manifest-aware full TRISK snapshot.
-- [ ] TASK-04-05: Update `dashboard/app.py` and `dashboard/data/README.md` to reflect that the TRISK tab now covers `power`, `cement`, and `steel` rather than only the power pilot.
+- [x] TASK-04-01: Extend `scripts/refresh_dashboard_data.R` to copy each sector's TRISK files into `dashboard/data/trisk/<sector>/` and generate `dashboard/data/trisk/manifest.csv` describing available sectors, display labels, units, and disclaimers.
+- [x] TASK-04-02: Refactor `dashboard/lib/loaders.py` so `load_trisk_tables()` can read a selected sector from the new snapshot layout instead of one global flat folder.
+- [x] TASK-04-03: Update `dashboard/pages/2_TRISK_Risk.py` to add a sector selector, load the selected sector's tables, update metric labels and trajectory copy, and preserve `power` as the default selection.
+- [x] TASK-04-04: Adjust the ZIP export and downloads so the user can export either the selected sector bundle or the manifest-aware full TRISK snapshot.
+- [x] TASK-04-05: Update `dashboard/app.py` and `dashboard/data/README.md` to reflect that the TRISK tab now covers `power`, `cement`, and `steel` rather than only the power pilot.
 
 **Files / Surfaces**
 - `scripts/refresh_dashboard_data.R` - Snapshot publisher that must move from flat power-only copies to sector-aware copies.
@@ -151,9 +151,9 @@ Publish the multi-sector outputs into the dashboard snapshot and update the load
 - PHASE-03.
 
 **Exit Criteria**
-- [ ] `dashboard/data/trisk/manifest.csv` exists and each listed sector folder contains a complete TRISK snapshot.
-- [ ] The TRISK page renders for `power`, `cement`, and `steel` without file-not-found errors.
-- [ ] The default `power` experience remains intact apart from the new sector selector and copy updates.
+- [x] `dashboard/data/trisk/manifest.csv` exists and each listed sector folder contains a complete TRISK snapshot.
+- [x] The TRISK page renders for `power`, `cement`, and `steel` without file-not-found errors.
+- [x] The default `power` experience remains intact apart from the new sector selector and copy updates.
 
 **Phase Risks**
 - **RISK-04-01:** Changing the snapshot layout may break any code that still assumes flat `dashboard/data/trisk/*.csv` paths. Mitigation: isolate the layout change behind `dashboard/lib/loaders.py` and keep all direct file access out of page code.

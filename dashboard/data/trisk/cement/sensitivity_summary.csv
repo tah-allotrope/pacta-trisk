@@ -1,0 +1,9 @@
+run_label,parameter_name,parameter_value,borrower_count,average_npv_change,average_pd_change,average_priority_delta,max_priority_delta,max_priority_delta_company,min_priority_delta,min_priority_delta_company,top_ranked_company
+discount_rate_0.06,discount_rate,0.06,2,-0.3338221947584197,0.054122586795636085,0,0,VICEM,0,VICEM,VICEM
+discount_rate_0.10,discount_rate,0.10,2,-0.33235891028023296,0.04955791610530996,0,0,VICEM,0,VICEM,VICEM
+market_passthrough_0.15,market_passthrough,0.15,2,-0.36256774002991266,0.057460487502469126,0,0,VICEM,0,VICEM,VICEM
+market_passthrough_0.35,market_passthrough,0.35,2,-0.30347348327747775,0.046059656176192953,0,0,VICEM,0,VICEM,VICEM
+risk_free_rate_0.02,risk_free_rate,0.02,2,-0.33302061165369523,0.057528441251295304,0,0,VICEM,0,VICEM,VICEM
+risk_free_rate_0.04,risk_free_rate,0.04,2,-0.33302061165369523,0.04605401753811399,0,0,VICEM,0,VICEM,VICEM
+shock_year_2027,shock_year,2027,2,-0.28091840589995004,0.044158585620400426,0,0,VICEM,0,VICEM,VICEM
+shock_year_2029,shock_year,2029,2,-0.41832206066818695,0.06547775181832205,0,0,VICEM,0,VICEM,VICEM

@@ -51,7 +51,7 @@ guide_1.markdown(
     "**1. Start with PACTA**  \nSee where the portfolio is misaligned against Vietnam and global transition pathways."
 )
 guide_2.markdown(
-    "**2. Move to TRISK**  \nSee which power borrowers absorb the largest value and credit deterioration under the stress scenario."
+    "**2. Move to TRISK**  \nCompare which power, cement, and steel borrowers absorb the largest value and credit deterioration under the stress scenario."
 )
 guide_3.markdown(
     "**3. Finish with evidence**  \nUse Reports and Methodology for the longer-form narrative, assumptions, and source traceability."
@@ -64,7 +64,9 @@ with st.expander("Current snapshot inventory", expanded=True):
         st.write(", ".join(sorted(pacta.keys())))
     with c2:
         st.write("**TRISK**")
-        st.write(", ".join(sorted(trisk.keys())))
+        sector_list = ", ".join(trisk["manifest"]["label"].tolist())
+        st.write(f"Sectors: {sector_list}")
+        st.write(", ".join(sorted(key for key in trisk.keys() if key not in {"manifest", "default_sector"})))
 
 st.success("All planned dashboard pages are now implemented for the client-facing demo scope. Use the sidebar to move from alignment to stress to supporting artifacts.")
 

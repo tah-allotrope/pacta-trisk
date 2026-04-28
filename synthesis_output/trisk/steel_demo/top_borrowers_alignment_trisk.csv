@@ -1,0 +1,3 @@
+company_id,company_name,sector,assets,npv_baseline,npv_shock,npv_difference,npv_change,pd_baseline,pd_shock,pd_change,mean_abs_alignment_gap_pp,worst_alignment_gap_pp,alignment_context,stress_priority_score
+VN_ABCD_022,Hoa Phat Group JSC,Steel,5,8703975404.98696,3893746979.1054688,-4810228425.881491,-0.5526472906995419,0.22030135823418903,0.3373357725119266,0.11703441427773756,7.2,7.2,"Sector-level SDA gap (steel, 2030)",95
+VN_ABCD_023,Pomina Group,Steel,5,1155808609.9335737,1349903933.8487942,194095323.9152205,0.16793033227739623,0.3731316707359653,0.35070591214553426,-0.022425758590431055,7.2,7.2,"Sector-level SDA gap (steel, 2030)",5
