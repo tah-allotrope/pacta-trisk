@@ -1,0 +1,13 @@
+company_id,company_name,asset_id,asset_name,country_iso2,production_year,sector,technology,capacity,capacity_factor,emission_factor,production_unit,technology_type
+VN_ABCD_020,VICEM,VN_ABCD_020_IntegratedFacility_2025,VICEM :: IntegratedFacility :: 2025,VN,2025,Cement,IntegratedFacility,12500000,1,0.82,tonnes,carbontech
+VN_ABCD_020,VICEM,VN_ABCD_020_IntegratedFacility_2026,VICEM :: IntegratedFacility :: 2026,VN,2026,Cement,IntegratedFacility,12500000,1,0.806,tonnes,carbontech
+VN_ABCD_020,VICEM,VN_ABCD_020_IntegratedFacility_2027,VICEM :: IntegratedFacility :: 2027,VN,2027,Cement,IntegratedFacility,12800000,1,0.791,tonnes,carbontech
+VN_ABCD_020,VICEM,VN_ABCD_020_IntegratedFacility_2028,VICEM :: IntegratedFacility :: 2028,VN,2028,Cement,IntegratedFacility,13000000,1,0.776,tonnes,carbontech
+VN_ABCD_020,VICEM,VN_ABCD_020_IntegratedFacility_2029,VICEM :: IntegratedFacility :: 2029,VN,2029,Cement,IntegratedFacility,13000000,1,0.76,tonnes,carbontech
+VN_ABCD_020,VICEM,VN_ABCD_020_IntegratedFacility_2030,VICEM :: IntegratedFacility :: 2030,VN,2030,Cement,IntegratedFacility,13200000,1,0.745,tonnes,carbontech
+VN_ABCD_021,Holcim Group,VN_ABCD_021_IntegratedFacility_2025,Holcim Group :: IntegratedFacility :: 2025,VN,2025,Cement,IntegratedFacility,7000000,1,0.72,tonnes,carbontech
+VN_ABCD_021,Holcim Group,VN_ABCD_021_IntegratedFacility_2026,Holcim Group :: IntegratedFacility :: 2026,VN,2026,Cement,IntegratedFacility,7100000,1,0.706,tonnes,carbontech
+VN_ABCD_021,Holcim Group,VN_ABCD_021_IntegratedFacility_2027,Holcim Group :: IntegratedFacility :: 2027,VN,2027,Cement,IntegratedFacility,7200000,1,0.693,tonnes,carbontech
+VN_ABCD_021,Holcim Group,VN_ABCD_021_IntegratedFacility_2028,Holcim Group :: IntegratedFacility :: 2028,VN,2028,Cement,IntegratedFacility,7300000,1,0.679,tonnes,carbontech
+VN_ABCD_021,Holcim Group,VN_ABCD_021_IntegratedFacility_2029,Holcim Group :: IntegratedFacility :: 2029,VN,2029,Cement,IntegratedFacility,7400000,1,0.666,tonnes,carbontech
+VN_ABCD_021,Holcim Group,VN_ABCD_021_IntegratedFacility_2030,Holcim Group :: IntegratedFacility :: 2030,VN,2030,Cement,IntegratedFacility,7500000,1,0.653,tonnes,carbontech

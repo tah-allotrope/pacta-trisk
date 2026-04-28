@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phase Report :: TRISK Multisector Phases 1-2</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #121933;
+      --panel-2: #0f1730;
+      --line: #29406d;
+      --text: #e8eefc;
+      --muted: #9fb0d8;
+      --accent: #69d2ff;
+      --accent-2: #86efac;
+      --warn: #fbbf24;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(180deg, #070b16 0%, var(--bg) 100%);
+      color: var(--text);
+      line-height: 1.55;
+    }
+    .page {
+      width: min(1100px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 24px 0 48px;
+    }
+    .hero, .section {
+      background: rgba(18, 25, 51, 0.92);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 18px;
+    }
+    .hero h1, .section h2 { margin-top: 0; }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .pill {
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      color: var(--accent);
+      background: rgba(105, 210, 255, 0.08);
+      font-size: 0.9rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+    .card {
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+    }
+    .label { color: var(--muted); font-size: 0.9rem; }
+    .value { font-size: 1.5rem; font-weight: 700; color: var(--accent); }
+    ul { margin: 0; padding-left: 20px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 0.95rem;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th { color: var(--accent); background: rgba(105, 210, 255, 0.06); }
+    .muted { color: var(--muted); }
+    .good { color: var(--accent-2); }
+    .warn { color: var(--warn); }
+    .viz-frame {
+      height: 320px;
+      margin-top: 12px;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+    }
+    .mermaid {
+      overflow: auto;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 8px;
+    }
+    @media print {
+      body { background: #fff; color: #000; }
+      .hero, .section, .card, .viz-frame, .mermaid { box-shadow: none; background: #fff; color: #000; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <section class="hero">
+      <p class="muted">Phase Report</p>
+      <h1>TRISK Multisector Phases 1-2</h1>
+      <p>Locked the three-sector TRISK input contract and refactored the input builder so the repo now emits runnable input packages for <code>power</code>, <code>cement</code>, and <code>steel</code> from one script.</p>
+      <div class="meta">
+        <span class="pill">project :: PACTA Vietnam</span>
+        <span class="pill">repo :: pacta-trisk</span>
+        <span class="pill">date :: 2026-04-28</span>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>1. Phase Header</h2>
+      <div class="grid">
+        <div class="card"><div class="label">Primary goal</div><div class="value">Contract + Generator</div></div>
+        <div class="card"><div class="label">Sectors covered</div><div class="value">3</div></div>
+        <div class="card"><div class="label">New runnable folders</div><div class="value">2</div></div>
+        <div class="card"><div class="label">Verification status</div><div class="value good">Passed</div></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>2. Input -&gt; Output Summary</h2>
+      <ul>
+        <li>Input context: `data/vietnam_abcd.csv`, `data/vietnam_scenario_ms.csv`, and `data/vietnam_scenario_co2.csv` plus the accepted plan defaults on SDA context and power-script compatibility.</li>
+        <li>Implementation output: `scripts/trisk_prepare_inputs.R` now contains a shared `sector_specs` contract, sector-aware asset/scenario builders, and financial assumptions for cement and steel borrowers.</li>
+        <li>Documentation output: `docs/trisk_multisector_contract.md` records sector mappings, output layout, SDA context rules, and scenario translation rules.</li>
+        <li>Generated artifacts: `output/trisk_inputs/power_demo/`, `output/trisk_inputs/cement_demo/`, `output/trisk_inputs/steel_demo/`, plus sector CSV snapshots in `data/`.</li>
+        <li>Planning output: `plans/2026-04-28-trisk-multisector-expansion-plan.md` was updated to accept the recommended defaults and mark phases 1 and 2 complete.</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>3. Logic Flow</h2>
+      <div class="mermaid">flowchart LR
+        A[Accept plan defaults] --> B[Define sector contract]
+        B --> C[Refactor input builder]
+        C --> D[Add cement and steel financial assumptions]
+        D --> E[Generate sector input folders]
+        E --> F[Fix verification bugs]
+        F --> G[Validate power, cement, steel outputs]
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>4. Math / Algorithm Used</h2>
+      <ul>
+        <li>Power remains on the existing market-share pathway logic: baseline production is derived from capacity and capacity factor, then scaled by `tmsr` / `smsp` from `data/vietnam_scenario_ms.csv`.</li>
+        <li>Cement and steel use SDA emission-intensity pathways from `data/vietnam_scenario_co2.csv`.</li>
+        <li>For cement and steel, `scenario_price` is a synthetic unit-price curve increased by the intensity reduction required versus the sector baseline.</li>
+        <li>`scenario_pathway` and `scenario_capacity_factor` are derived from the ratio between target intensity and the sector baseline intensity, with different multipliers for `carbontech` and `greentech` technologies.</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>5. Tools / Formulas / Methods</h2>
+      <ul>
+        <li>Edited files with `apply_patch` to keep the changes explicit and reviewable.</li>
+        <li>Used `read`, `grep`, and targeted PowerShell commands to inspect actual repo data before codifying mappings.</li>
+        <li>Verified generation with `& "C:\Program Files\R\R-4.5.2\bin\Rscript.exe" scripts/trisk_prepare_inputs.R` because `Rscript` is not on PATH in this shell.</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>6. Results &amp; Visualizations</h2>
+      <table>
+        <thead>
+          <tr><th>Sector</th><th>Asset rows</th><th>Companies</th><th>Scenario rows</th><th>Carbon price rows</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>power</td><td>96</td><td>13</td><td>72</td><td>6</td></tr>
+          <tr><td>cement</td><td>12</td><td>2</td><td>18</td><td>6</td></tr>
+          <tr><td>steel</td><td>12</td><td>2</td><td>36</td><td>6</td></tr>
+        </tbody>
+      </table>
+      <div class="viz-frame">
+        <canvas id="sectorChart"></canvas>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>7. Limitations / Second-Best Alternative</h2>
+      <ul>
+        <li>Phases 1 and 2 stop at input generation; no sector TRISK runs or dashboard changes landed yet.</li>
+        <li>Cement and steel still rely on synthetic scenario translation and will need clear labeling in later phases.</li>
+        <li>Second-best alternative not chosen: separate `trisk_cement_demo.R` and `trisk_steel_demo.R` clones. That would be faster short term but would duplicate the power-only assumptions instead of centralizing them behind one sector contract.</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>8. Errors / Warnings / Flags Encountered</h2>
+      <ul>
+        <li><span class="warn">Environment warning:</span> `Rscript` is not on PATH, so verification had to use the full executable path.</li>
+        <li><span class="warn">Resolved bug 1:</span> the first refactor wired `purrr::imap()` argument order incorrectly, which produced an invalid output path.</li>
+        <li><span class="warn">Resolved bug 2:</span> the first cement/steel aggregation attempted to reuse a just-summarized column as its own weight vector, which broke weighted means for sectors with multiple borrowers.</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>9. Open Questions / Next Phase Seeds</h2>
+      <ul>
+        <li>Phase 3: extract the shared run logic from `scripts/trisk_power_demo.R` into a sector-aware runner while preserving the existing power command.</li>
+        <li>Phase 4: publish sector snapshots into `dashboard/data/trisk/&lt;sector&gt;/` and make the loader/UI manifest-aware.</li>
+        <li>Later validation: confirm that the cement and steel scenario translations produce credible downstream TRISK outputs once the sector runners exist.</li>
+      </ul>
+    </section>
+  </div>
+
+  <script>
+    Chart.defaults.devicePixelRatio = 1;
+    Chart.defaults.animation = false;
+    Chart.defaults.resizeDelay = 150;
+    Chart.defaults.normalized = true;
+    Chart.defaults.maintainAspectRatio = false;
+
+    new Chart(document.getElementById('sectorChart'), {
+      type: 'bar',
+      data: {
+        labels: ['power', 'cement', 'steel'],
+        datasets: [
+          { label: 'Asset rows', data: [96, 12, 12], backgroundColor: '#69d2ff' },
+          { label: 'Scenario rows', data: [72, 18, 36], backgroundColor: '#86efac' }
+        ]
+      },
+      options: {
+        animation: false,
+        resizeDelay: 150,
+        normalized: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: '#e8eefc' } } },
+        scales: {
+          x: { ticks: { color: '#e8eefc' }, grid: { color: '#29406d' } },
+          y: { ticks: { color: '#e8eefc' }, grid: { color: '#29406d' } }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

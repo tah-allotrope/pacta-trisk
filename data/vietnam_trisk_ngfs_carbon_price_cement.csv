@@ -1,0 +1,7 @@
+year,model,scenario,scenario_geography,variable,unit,carbon_tax
+2025,synthetic_vietnam_demo,cement_intensity_transition,Vietnam,Price|Carbon,USD/t CO2,12
+2026,synthetic_vietnam_demo,cement_intensity_transition,Vietnam,Price|Carbon,USD/t CO2,18
+2027,synthetic_vietnam_demo,cement_intensity_transition,Vietnam,Price|Carbon,USD/t CO2,26
+2028,synthetic_vietnam_demo,cement_intensity_transition,Vietnam,Price|Carbon,USD/t CO2,34
+2029,synthetic_vietnam_demo,cement_intensity_transition,Vietnam,Price|Carbon,USD/t CO2,42
+2030,synthetic_vietnam_demo,cement_intensity_transition,Vietnam,Price|Carbon,USD/t CO2,50

@@ -565,3 +565,28 @@ When filtering data to a subset of metrics but providing `scale_*_manual()` mapp
 - [x] Re-ran `python -m streamlit run dashboard/app.py --server.headless true` and confirmed the app served successfully before the expected long-running process timeout
 - [x] Re-ran `Rscript scripts/refresh_dashboard_data.R` and confirmed the PACTA/TRISK snapshot was fully republished into `dashboard/data/`
 - [x] Generated phase artifact `reports/2026-04-27-bank-showcase-phase-03-04.html`
+
+---
+
+## TRISK Multisector Phases 01-02 (2026-04-28)
+
+**Goal:** Accept the recommended defaults in the multisector expansion plan, lock the sector contract for `power`, `cement`, and `steel`, and implement the first two phases by refactoring the TRISK input builder to emit runnable sector packages.
+
+### Planned Work
+
+- [x] Update `plans/2026-04-28-trisk-multisector-expansion-plan.md` to accept the recommended defaults and clear the open questions
+- [x] Document the phase-1 sector contract, mapping rules, output layout, and SDA translation logic
+- [x] Refactor `scripts/trisk_prepare_inputs.R` from a power-only builder into a shared multi-sector input generator
+- [x] Extend synthetic financial features to cover cement and steel borrowers
+- [x] Generate and verify runnable input folders for `power`, `cement`, and `steel`
+- [x] Generate a phase report artifact for the completed phases 01-02 work
+
+### Review / Results
+
+- [x] Added `docs/trisk_multisector_contract.md` to pin the sector contract, folder layout, technology mappings, and SDA-to-TRISK translation rules
+- [x] Replaced the power-only mapping logic in `scripts/trisk_prepare_inputs.R` with a shared `sector_specs` contract and sector-aware builders for `assets`, `scenarios`, and carbon price curves
+- [x] Extended `data/vietnam_trisk_financial_features.csv` generation to include `VN_ABCD_020` through `VN_ABCD_023`
+- [x] Verified the generator with `& "C:\Program Files\R\R-4.5.2\bin\Rscript.exe" scripts/trisk_prepare_inputs.R`
+- [x] Confirmed generated runnable packages in `output/trisk_inputs/power_demo/`, `output/trisk_inputs/cement_demo/`, and `output/trisk_inputs/steel_demo/`
+- [x] Resolved two verification issues during the phase: `purrr::imap()` argument order and cement/steel weighted-mean aggregation
+- [x] Generated phase artifact `reports/2026-04-28-trisk-multisector-phases-1-2.html`
