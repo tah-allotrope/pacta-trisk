@@ -615,3 +615,30 @@ When filtering data to a subset of metrics but providing `scale_*_manual()` mapp
 - [x] Updated `dashboard/app.py`, `dashboard/data/README.md`, `dashboard/tests/test_loaders.py`, and `dashboard/tests/test_smoke.py` for the new multisector TRISK contract
 - [x] Verified the snapshot refresh with `& "C:\Program Files\R\R-4.5.2\bin\Rscript.exe" scripts/refresh_dashboard_data.R`
 - [x] Verified the dashboard with `python -m pytest dashboard/tests` -> `9 passed`
+
+---
+
+## TRISK Multisector Phase 05 (2026-04-29)
+
+**Goal:** Close the multisector expansion by verifying the full rerun path end to end, updating operator/demo/deploy docs, and leaving a clean handoff for future snapshot refreshes.
+
+### Planned Work
+
+- [x] Re-run the multisector TRISK generation flow and refresh the dashboard snapshot
+- [x] Re-run dashboard verification tests against the manifest-backed snapshot
+- [x] Run a local Streamlit smoke check and manually switch the TRISK page across `power`, `cement`, and `steel`
+- [x] Update operator-facing docs with exact rerun commands and sector caveats
+- [x] Record the final handoff note and known v1 limitations here
+
+### Review / Results
+
+- [x] Re-ran `& "C:\Program Files\R\R-4.5.2\bin\Rscript.exe" scripts/trisk_prepare_inputs.R`
+- [x] Re-ran `& "C:\Program Files\R\R-4.5.2\bin\Rscript.exe" scripts/trisk_power_demo.R`
+- [x] Re-ran `& "C:\Program Files\R\R-4.5.2\bin\Rscript.exe" scripts/trisk_sector_demo.R cement`
+- [x] Re-ran `& "C:\Program Files\R\R-4.5.2\bin\Rscript.exe" scripts/trisk_sector_demo.R steel`
+- [x] Re-ran `& "C:\Program Files\R\R-4.5.2\bin\Rscript.exe" scripts/refresh_dashboard_data.R`
+- [x] Re-ran `python -m pytest dashboard/tests` -> `9 passed`
+- [x] Re-ran `python -m streamlit run dashboard/app.py --server.headless true` and manually verified the TRISK page switched correctly across `power`, `cement`, and `steel`
+- [x] Confirmed sector-specific caveat copy: borrower-level market-share context for `power`; sector-level SDA context for `cement` and `steel`
+- [x] Updated `dashboard/README.md`, `docs/demo-script.md`, and `docs/streamlit-deploy.md` with the exact multisector rerun flow and deployment/demo notes
+- [x] Remaining intentional limitation: `automotive` is still deferred, and `cement` / `steel` remain sector-context demos rather than borrower-specific SDA implementations

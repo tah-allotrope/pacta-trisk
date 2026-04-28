@@ -1,7 +1,7 @@
 ---
 title: "TRISK Multi-Sector Expansion"
 date: "2026-04-28"
-status: "in_progress"
+status: "completed"
 request: "multiphase for trisk expansion to other sectors idea found in the future planning ideas md"
 plan_type: "multi-phase"
 research_inputs:
@@ -163,11 +163,11 @@ Publish the multi-sector outputs into the dashboard snapshot and update the load
 Prove the multi-sector expansion works end to end, document the operator workflow, and leave a reproducible handoff path for future reruns.
 
 **Tasks**
-- [ ] TASK-05-01: Run the input builder and all supported sector runs in sequence, then refresh the dashboard snapshot from those outputs.
-- [ ] TASK-05-02: Update or add dashboard tests so the app shell and TRISK page still render under the new manifest-driven loader contract.
-- [ ] TASK-05-03: Run local Streamlit smoke validation against `dashboard/app.py`, switching manually between `power`, `cement`, and `steel` in the TRISK page.
-- [ ] TASK-05-04: Update operator-facing docs with the exact rerun commands and any sector-specific caveats, including the fact that cement and steel currently use sector-level SDA context in the dashboard.
-- [ ] TASK-05-05: Capture a short review note summarizing data assumptions, known caveats, and any sectors intentionally left for a later phase.
+- [x] TASK-05-01: Run the input builder and all supported sector runs in sequence, then refresh the dashboard snapshot from those outputs.
+- [x] TASK-05-02: Update or add dashboard tests so the app shell and TRISK page still render under the new manifest-driven loader contract.
+- [x] TASK-05-03: Run local Streamlit smoke validation against `dashboard/app.py`, switching manually between `power`, `cement`, and `steel` in the TRISK page.
+- [x] TASK-05-04: Update operator-facing docs with the exact rerun commands and any sector-specific caveats, including the fact that cement and steel currently use sector-level SDA context in the dashboard.
+- [x] TASK-05-05: Capture a short review note summarizing data assumptions, known caveats, and any sectors intentionally left for a later phase.
 
 **Files / Surfaces**
 - `dashboard/tests/test_smoke.py` - Existing smoke harness that should keep protecting the app shell and TRISK page render path.
@@ -179,9 +179,18 @@ Prove the multi-sector expansion works end to end, document the operator workflo
 - PHASE-04.
 
 **Exit Criteria**
-- [ ] The documented rerun path regenerates multi-sector inputs, multi-sector outputs, and the dashboard snapshot without manual file copying.
-- [ ] Automated dashboard smoke tests pass.
-- [ ] Local app validation confirms the TRISK page can switch sectors and present the correct sector-specific files and caveats.
+- [x] The documented rerun path regenerates multi-sector inputs, multi-sector outputs, and the dashboard snapshot without manual file copying.
+- [x] Automated dashboard smoke tests pass.
+- [x] Local app validation confirms the TRISK page can switch sectors and present the correct sector-specific files and caveats.
+
+**Review / Results**
+- [x] Re-ran the full multisector generation chain with `scripts/trisk_prepare_inputs.R`, `scripts/trisk_power_demo.R`, `scripts/trisk_sector_demo.R cement`, and `scripts/trisk_sector_demo.R steel`
+- [x] Re-ran `scripts/refresh_dashboard_data.R` and confirmed `dashboard/data/trisk/manifest.csv` plus sector folders were republished from the latest outputs
+- [x] Re-ran `python -m pytest dashboard/tests` -> `9 passed`
+- [x] Verified `python -m streamlit run dashboard/app.py --server.headless true` locally and manually switched the TRISK page across `power`, `cement`, and `steel`
+- [x] Confirmed sector-specific caveat copy and download labels render correctly for `power`, `cement`, and `steel`
+- [x] Updated operator-facing docs in `dashboard/README.md`, `docs/demo-script.md`, and `docs/streamlit-deploy.md`
+- [x] Final handoff note: `power` remains the borrower-level market-share baseline, while `cement` and `steel` remain v1 sector-level SDA-context demos; `automotive` stays intentionally deferred
 
 **Phase Risks**
 - **RISK-05-01:** The end-to-end multi-sector run may be slow enough that regressions are discovered late. Mitigation: validate each sector independently first, then run the full snapshot refresh and app smoke checks as the final gate.
