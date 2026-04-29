@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Final Report :: TRISK Multi-Sector Expansion</title>
+  <meta name="color-scheme" content="dark light">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+    async function initMermaid() {
+      const blocks = document.querySelectorAll('.mermaid');
+      if (!blocks.length) return;
+
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'base',
+        securityLevel: 'loose',
+        themeVariables: {
+          primaryColor: '#f3ead9',
+          primaryTextColor: '#1f1912',
+          primaryBorderColor: '#9d6b37',
+          lineColor: '#3b6f76',
+          secondaryColor: '#efe4d0',
+          tertiaryColor: '#ffffff',
+          background: '#fbf7f1',
+          mainBkg: '#fbf7f1',
+          nodeBorder: '#9d6b37',
+          clusterBkg: '#f7efdf',
+          clusterBorder: '#3b6f76',
+          edgeLabelBackground: '#fbf7f1'
+        }
+      });
+
+      await mermaid.run({ nodes: blocks });
+    }
+
+    const run = () => initMermaid().catch((error) => console.error('Mermaid render failed', error));
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run, { once: true });
+    } else {
+      run();
+    }
+  </script>
+  <style>
+    :root {
+      --paper: #fbf7f1;
+      --paper-strong: #fffdf9;
+      --ink: #1f1912;
+      --ink-soft: #5f564c;
+      --line: #dccdb6;
+      --line-strong: #bfa37d;
+      --accent: #9d6b37;
+      --accent-soft: #efe4d0;
+      --accent-2: #3b6f76;
+      --shadow: 0 18px 40px rgba(49, 33, 16, 0.08);
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+      --page-width: 1040px;
+      --display-font: Georgia, "Times New Roman", serif;
+      --body-font: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --mono-font: "Cascadia Code", Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(157, 107, 55, 0.09), transparent 26%),
+        radial-gradient(circle at 88% 10%, rgba(59, 111, 118, 0.08), transparent 22%),
+        linear-gradient(180deg, #f7f1e7 0%, #fbf7f1 28%, #f6efe5 100%);
+      font-family: var(--body-font);
+      line-height: 1.65;
+      letter-spacing: 0.01em;
+    }
+
+    a { color: var(--accent-2); }
+
+    code,
+    pre,
+    .technical,
+    .meta-chip,
+    .section-index,
+    .eyebrow,
+    .stat-label,
+    .stat-value,
+    .mermaid {
+      font-family: var(--mono-font);
+    }
+
+    .page-shell {
+      width: min(var(--page-width), calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 28px 0 56px;
+    }
+
+    .hero {
+      padding: 34px;
+      border: 1px solid rgba(159, 123, 79, 0.28);
+      border-radius: 30px;
+      background:
+        linear-gradient(135deg, rgba(157, 107, 55, 0.1), transparent 34%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.86)),
+        var(--paper-strong);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.85fr);
+      gap: 24px;
+      align-items: end;
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .title {
+      margin: 0;
+      max-width: 12ch;
+      font-family: var(--display-font);
+      font-size: clamp(2.8rem, 5vw, 4.8rem);
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+      text-wrap: balance;
+    }
+
+    .lede {
+      margin: 18px 0 0;
+      max-width: 60ch;
+      color: var(--ink-soft);
+      font-size: 1rem;
+    }
+
+    .takeaway {
+      margin-top: 22px;
+      padding: 18px 20px;
+      border-left: 4px solid var(--accent-2);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      background: rgba(59, 111, 118, 0.08);
+      color: #20373a;
+      font-size: 1.02rem;
+    }
+
+    .meta-grid { display: grid; gap: 12px; }
+
+    .meta-card,
+    .section,
+    .subcard,
+    .empty-state {
+      border: 1px solid rgba(95, 72, 46, 0.12);
+      background: rgba(255, 253, 249, 0.88);
+      box-shadow: var(--shadow);
+    }
+
+    .meta-card {
+      padding: 16px 18px;
+      border-radius: var(--radius-md);
+    }
+
+    .meta-label {
+      color: var(--ink-soft);
+      font-size: 0.76rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .meta-chip {
+      margin-top: 8px;
+      color: var(--accent);
+      font-size: 1rem;
+      font-weight: 700;
+      word-break: break-word;
+    }
+
+    .section {
+      margin-top: 22px;
+      padding: 24px;
+      border-radius: var(--radius-lg);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px 18px;
+      align-items: end;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-index {
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .section-title {
+      margin: 0;
+      font-family: var(--display-font);
+      font-size: clamp(1.45rem, 2vw, 2rem);
+      line-height: 1.05;
+    }
+
+    .summary-grid,
+    .dual-grid,
+    .phase-grid,
+    .stat-grid,
+    .appendix-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .summary-grid,
+    .dual-grid,
+    .phase-grid,
+    .appendix-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .subcard {
+      padding: 18px;
+      border-radius: var(--radius-md);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .subcard h3,
+    .subcard h4 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+      line-height: 1.2;
+    }
+
+    .subcard p:first-child,
+    .subcard ul:first-child,
+    .subcard ol:first-child { margin-top: 0; }
+
+    .stat-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin-top: 16px;
+    }
+
+    .stat {
+      padding: 14px 16px;
+      border: 1px solid rgba(59, 111, 118, 0.16);
+      border-radius: var(--radius-sm);
+      background: rgba(59, 111, 118, 0.06);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .stat-label {
+      color: var(--ink-soft);
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .stat-value {
+      margin-top: 8px;
+      color: var(--accent-2);
+      font-size: 1.18rem;
+      font-weight: 700;
+    }
+
+    .narrative,
+    .chart-frame,
+    .technical-frame,
+    .diagram-frame,
+    .viz-frame {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.54);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .diagram-frame {
+      overflow-x: auto;
+      overflow-y: auto;
+      overscroll-behavior-x: contain;
+      overscroll-behavior-y: contain;
+      max-height: min(70vh, 720px);
+    }
+
+    .chart-frame,
+    .viz-frame { overflow: hidden; }
+
+    .mermaid {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      color: var(--ink);
+    }
+
+    .mermaid svg {
+      display: block;
+      width: auto !important;
+      min-width: 100%;
+      max-width: none !important;
+      height: auto !important;
+    }
+
+    .diagram-frame.compact-diagram {
+      padding: 12px;
+      max-height: min(62vh, 560px);
+    }
+
+    .diagram-frame.compact-diagram .mermaid { min-width: 900px; }
+
+    .chart-frame canvas,
+    .technical-frame > canvas,
+    .viz-frame canvas,
+    canvas.report-chart {
+      display: block;
+      width: 100% !important;
+      max-width: 100%;
+      height: 300px !important;
+      min-height: 300px;
+      max-height: 300px;
+    }
+
+    .technical-frame table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+    }
+
+    .technical-frame th,
+    .technical-frame td {
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      text-align: left;
+    }
+
+    .technical-frame th {
+      color: var(--accent);
+      font-size: 0.76rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .empty-state {
+      padding: 20px;
+      border-radius: var(--radius-md);
+      text-align: center;
+      color: var(--ink-soft);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .empty-state strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--accent);
+      font-size: 0.84rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    ul,
+    ol {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    li { margin-bottom: 8px; }
+    p:last-child,
+    li:last-child { margin-bottom: 0; }
+
+    .footer-note {
+      margin-top: 18px;
+      color: rgba(95, 86, 76, 0.74);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      text-align: right;
+    }
+
+    @media (max-width: 920px) {
+      .hero-grid,
+      .summary-grid,
+      .dual-grid,
+      .phase-grid,
+      .stat-grid,
+      .appendix-grid { grid-template-columns: 1fr; }
+      .title { max-width: none; }
+    }
+
+    @media (max-width: 640px) {
+      .page-shell {
+        width: min(100vw - 20px, var(--page-width));
+        padding-top: 16px;
+        padding-bottom: 36px;
+      }
+
+      .hero,
+      .section {
+        padding: 18px;
+        border-radius: 20px;
+      }
+
+      .title { font-size: clamp(2.1rem, 12vw, 3.2rem); }
+    }
+
+    @media print {
+      :root {
+        --paper: #ffffff;
+        --paper-strong: #ffffff;
+        --ink: #111111;
+        --ink-soft: #444444;
+        --line: #d6d1c8;
+      }
+
+      @page {
+        size: A4;
+        margin: 14mm;
+      }
+
+      body { background: #ffffff; }
+      .page-shell { width: 100%; max-width: none; padding: 0; }
+
+      .hero,
+      .meta-card,
+      .section,
+      .subcard,
+      .narrative,
+      .chart-frame,
+      .technical-frame,
+      .diagram-frame,
+      .viz-frame,
+      .empty-state,
+      .stat {
+        background: #ffffff;
+        box-shadow: none;
+      }
+
+      .hero,
+      .section {
+        margin-top: 0;
+        margin-bottom: 10mm;
+      }
+
+      .diagram-frame {
+        overflow: visible;
+        max-height: none;
+      }
+
+      .diagram-frame.compact-diagram .mermaid { min-width: 0; }
+
+      .section-header,
+      .takeaway {
+        break-after: avoid;
+        page-break-after: avoid;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero" id="title-hero">
+      <div class="hero-grid">
+        <div>
+          <p class="eyebrow">Final Report / Shareable Analysis Artifact</p>
+          <h1 class="title">TRISK Multi-Sector Expansion</h1>
+          <p class="lede">
+            A presentation-ready synthesis of the completed multi-phase expansion from a power-only TRISK pilot to a sector-switchable demo spanning power, cement, and steel.
+          </p>
+          <div class="takeaway">The repository now supports one manifest-driven TRISK workflow across three sectors, while keeping power as the borrower-level regression baseline and labeling cement and steel honestly as v1 sector-context demos.</div>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-card">
+            <div class="meta-label">Project</div>
+            <div class="meta-chip">PACTA Vietnam</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Repository</div>
+            <div class="meta-chip">pacta-trisk</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Date</div>
+            <div class="meta-chip">2026-04-29</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="executive-summary">
+      <div class="section-header">
+        <div>
+          <div class="section-index">01 / Executive Summary</div>
+          <h2 class="section-title">Executive Summary</h2>
+        </div>
+      </div>
+      <div class="summary-grid">
+        <div class="subcard">
+          <h3>What changed</h3>
+          <p>The TRISK demo moved from a single hardcoded power flow to a reusable multi-sector pattern that generates inputs, runs sector demos, republishes dashboard snapshots, and exposes a sector selector in the Streamlit UI.</p>
+        </div>
+        <div class="subcard">
+          <h3>Why it matters</h3>
+          <p>A bank audience can now compare transition stress views for <code>power</code>, <code>cement</code>, and <code>steel</code> without leaving <code>dashboard/pages/2_TRISK_Risk.py</code>, which makes the demo feel like one product instead of three disconnected experiments.</p>
+        </div>
+        <div class="subcard">
+          <h3>Most important design choice</h3>
+          <p>The implementation kept PACTA as the upstream alignment layer and TRISK as the downstream stress layer, but accepted sector-level SDA context for cement and steel rather than pretending borrower-level alignment evidence existed where the repo does not yet have it.</p>
+        </div>
+        <div class="subcard">
+          <h3>Recommended direction</h3>
+          <p>Use the current three-sector setup as the production demo baseline, preserve power as the regression reference, and treat any future sector expansion as a repeat of the manifest-plus-sector-spec pattern rather than a return to cloned scripts or flat dashboard files.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="background-objective">
+      <div class="section-header">
+        <div>
+          <div class="section-index">02 / Background &amp; Objective</div>
+          <h2 class="section-title">Background &amp; Objective</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p>The starting point was a power-only TRISK pilot. Input preparation in <code>scripts/trisk_prepare_inputs.R</code>, the runner in <code>scripts/trisk_power_demo.R</code>, and the dashboard loader path in <code>dashboard/lib/loaders.py</code> were all structured around one sector and one flat set of CSV outputs.</p>
+        <p>The objective of the multi-phase effort was to expand that pilot into a broader transition-risk stress demo covering <code>power</code>, <code>cement</code>, and <code>steel</code> while preserving the existing power experience as a regression baseline. The target user outcome was explicit: a bank-facing dashboard where the TRISK page could switch sector views, downloads, tables, charts, and caveats without leaving the same page.</p>
+        <p>This mattered because the repo already contained the raw ingredients for a broader story: sector rows in <code>data/vietnam_abcd.csv</code>, scenario trajectories in <code>data/vietnam_scenario_co2.csv</code>, company-level power alignment outputs, and sector-level cement and steel SDA outputs. The work was therefore not about inventing a new methodology, but about turning scattered sector evidence into one coherent product surface.</p>
+      </div>
+    </section>
+
+    <section class="section" id="inputs-scope">
+      <div class="section-header">
+        <div>
+          <div class="section-index">03 / Inputs &amp; Scope</div>
+          <h2 class="section-title">Inputs &amp; Scope</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Primary Inputs</h3>
+          <ul>
+            <li>The plan itself: <code>plans/2026-04-28-trisk-multisector-expansion-plan.md</code>, marked <code>completed</code>.</li>
+            <li>Research direction from <code>research/future_planning_ideas.md</code> and <code>research/2026-04-08_integration-trisk-model-existing.md</code>.</li>
+            <li>Source data and sector scenarios in <code>data/vietnam_abcd.csv</code> and <code>data/vietnam_scenario_co2.csv</code>.</li>
+            <li>Alignment context from <code>synthesis_output/vietnam/04_vn_ms_company.csv</code> for power and <code>synthesis_output/vietnam/06_vn_sda_alignment_2030.csv</code> for cement and steel.</li>
+            <li>Dashboard surfaces including <code>dashboard/lib/loaders.py</code>, <code>dashboard/pages/2_TRISK_Risk.py</code>, and <code>dashboard/data/README.md</code>.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Scope Boundary</h3>
+          <ul>
+            <li>In scope: standardizing the sector contract, generating sector-specific TRISK inputs and outputs, publishing sector snapshots, updating the TRISK dashboard page, verifying the flow, and documenting rerun commands.</li>
+            <li>Explicitly out of scope: automotive TRISK support, pipeline orchestration or scheduling, engagement-page work, swapping out <code>trisk.model</code>, and recalibrating the synthetic Vietnam bank dataset beyond what the cement and steel placeholders required.</li>
+            <li>Decision boundary: phase 1 of multi-sector support stops at <code>power</code>, <code>cement</code>, and <code>steel</code>.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="assumptions-constraints">
+      <div class="section-header">
+        <div>
+          <div class="section-index">04 / Assumptions &amp; Constraints</div>
+          <h2 class="section-title">Assumptions &amp; Constraints</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Assumptions That Enabled Delivery</h3>
+          <ul>
+            <li>The repo stayed on the newer four-input <code>trisk.model::run_trisk()</code> contract instead of reverting to the older six-CSV interface.</li>
+            <li><code>data/vietnam_abcd.csv</code> already held enough cement and steel borrower rows to support a first demo covering VICEM, Holcim Group, Hoa Phat Group JSC, and Pomina Group.</li>
+            <li><code>data/vietnam_scenario_co2.csv</code> served as the v1 scenario source for cement and steel, with emission-intensity pathways translated into TRISK scenario inputs.</li>
+            <li>Power could continue to represent borrower-level market-share alignment, while cement and steel would use sector-level SDA context rather than borrower-specific scores.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Constraints That Shaped The Design</h3>
+          <ul>
+            <li>The dashboard loader and TRISK page previously assumed one flat file layout, so the data contract and UI contract had to change together.</li>
+            <li>The repo only exposed sector-level cement and steel SDA outputs, which limited how strongly the dashboard could claim borrower-specific combined alignment-and-stress rankings.</li>
+            <li>Power outputs had to remain stable enough to act as a regression baseline during refactoring.</li>
+            <li>The final product needed to stay operator-friendly: reproducible via command-line reruns and discoverable through a manifest instead of filename guesswork.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="methodology">
+      <div class="section-header">
+        <div>
+          <div class="section-index">05 / Methodology</div>
+          <h2 class="section-title">Methodology</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p>The work followed a disciplined sequence from contract definition to full-system validation. First, the plan locked the meaning of each sector through explicit <code>sector_specs</code>, folder conventions, scenario translation rules, and an agreed rule for how cement and steel alignment context would appear next to TRISK outputs. That prevented later code changes from re-deciding sector semantics mid-implementation.</p>
+        <p>Second, the input builder was refactored so each supported sector could emit the same runnable package shape: <code>assets.csv</code>, <code>financial_features.csv</code>, <code>scenarios.csv</code>, and <code>ngfs_carbon_price.csv</code>. Third, the runner layer was generalized so power remained a stable wrapper while cement and steel could produce the same downstream artifact set.</p>
+        <p>Fourth, the dashboard snapshot and loader contract were redesigned around <code>dashboard/data/trisk/&lt;sector&gt;/</code> plus <code>manifest.csv</code>, which moved sector discovery out of page code and into a declared data contract. Finally, the work was closed by replaying the full generation chain, refreshing the snapshot, running <code>pytest</code> smoke coverage, and manually checking Streamlit behavior across all three sectors.</p>
+      </div>
+      <div class="stat-grid">
+        <div class="stat">
+          <div class="stat-label">Orientation</div>
+          <div class="stat-value">multi-phase</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Supported sectors</div>
+          <div class="stat-value">3</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Recorded test result</div>
+          <div class="stat-value">9 passed</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="phase-analysis">
+      <div class="section-header">
+        <div>
+          <div class="section-index">06 / Phase-by-Phase Analysis</div>
+          <h2 class="section-title">Phase-by-Phase Analysis</h2>
+        </div>
+      </div>
+      <div class="phase-grid">
+        <div class="subcard">
+          <h3>PHASE-01 / Contract Before Code</h3>
+          <p>The first phase deliberately front-loaded semantics: inventorying cement and steel rows, defining sector mappings, locking the folder structure, and deciding that cement and steel would ship with sector-level SDA context in v1. This phase matters because it turned a fuzzy expansion request into one explicit data and UI contract.</p>
+        </div>
+        <div class="subcard">
+          <h3>PHASE-02 / Multi-Sector Input Builder</h3>
+          <p>The hardcoded power mapping in <code>scripts/trisk_prepare_inputs.R</code> was replaced with shared sector logic. The result was a reusable builder that could emit inspectable data files and runnable input folders for power, cement, and steel while re-running the power path as a regression check.</p>
+        </div>
+        <div class="subcard">
+          <h3>PHASE-03 / Shared Runner And Standard Outputs</h3>
+          <p>The power-only runner behavior was extracted into a generic sector runner while <code>scripts/trisk_power_demo.R</code> stayed as the stable compatibility entrypoint. This phase standardized the output contract so each sector could publish the same borrower summaries, result tables, sensitivity outputs, run catalog, and figures.</p>
+        </div>
+        <div class="subcard">
+          <h3>PHASE-04 / Manifest-Driven Dashboard</h3>
+          <p>The data publishing layer shifted from one flat folder to sector-specific snapshot directories plus <code>manifest.csv</code>. That change enabled <code>dashboard/lib/loaders.py</code> and the TRISK page to discover sectors, switch copy and labels, and export either the selected sector bundle or the full snapshot cleanly.</p>
+        </div>
+        <div class="subcard">
+          <h3>PHASE-05 / Verification And Handoff</h3>
+          <p>The final phase re-ran the full generation chain, refreshed dashboard data, executed dashboard tests with <code>9 passed</code>, and manually validated Streamlit sector switching for power, cement, and steel. This phase converted a technically complete refactor into an operationally believable deliverable.</p>
+        </div>
+        <div class="subcard">
+          <h3>What Changed Across Phases</h3>
+          <p>The project moved from sector-specific code and implicit file naming to a single declared contract. The important transition was not just “more sectors”; it was a shift toward a pattern where each sector becomes a configuration and publishing problem rather than a new script family.</p>
+        </div>
+      </div>
+      <div class="diagram-frame compact-diagram" style="margin-top: 16px;">
+        <div class="mermaid">flowchart LR
+          A[PHASE-01<br/>Lock sector contract] --> B[PHASE-02<br/>Build per-sector inputs]
+          B --> C[PHASE-03<br/>Run shared TRISK outputs]
+          C --> D[PHASE-04<br/>Publish manifest snapshot and UI selector]
+          D --> E[PHASE-05<br/>Verify rerun path and handoff]
+          A -. decision .-> F[Cement and steel use sector-level SDA context in v1]
+          F --> C
+          C --> G[Power remains borrower-level baseline]
+          D --> H[Dashboard switches power / cement / steel]
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="findings-recommendation">
+      <div class="section-header">
+        <div>
+          <div class="section-index">07 / Findings &amp; Recommendation</div>
+          <h2 class="section-title">Findings &amp; Recommendation</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p><strong>Finding 1:</strong> The repo now has a coherent three-sector operating model. Inputs, runs, snapshot publication, and dashboard loading all align around one sector-aware contract rather than a collection of power assumptions.</p>
+        <p><strong>Finding 2:</strong> The strongest methodological boundary is still the alignment evidence gap outside power. Power can show borrower-level market-share alignment context, but cement and steel currently rely on sector-level SDA context. The implementation handled that correctly by exposing it as context rather than mislabeling it as borrower-specific truth.</p>
+        <p><strong>Finding 3:</strong> The manifest-based snapshot is the key productization step. It reduced coupling between generated files and the dashboard page, and it creates a repeatable way to add future sectors without teaching UI code about filename conventions.</p>
+        <p><strong>Rejected alternative:</strong> The plan explicitly did not choose per-sector cloned scripts and flat dashboard filenames. That alternative would have delivered short-term speed at the cost of duplicated business logic and fragile UI inference.</p>
+        <p><strong>Recommendation:</strong> Keep the present implementation as the new demo baseline. Treat future sector additions, richer company-level SDA derivations, and any automotive work as follow-on phases built on the current manifest-plus-sector-spec pattern. Do not weaken the labeling discipline that currently distinguishes stress results from sector context.</p>
+      </div>
+    </section>
+
+    <section class="section" id="implementation-path">
+      <div class="section-header">
+        <div>
+          <div class="section-index">08 / Implementation Path</div>
+          <h2 class="section-title">Implementation Path</h2>
+        </div>
+      </div>
+      <div class="phase-grid">
+        <div class="subcard">
+          <h3>Current Operating Sequence</h3>
+          <ol>
+            <li>Run <code>Rscript scripts/trisk_prepare_inputs.R</code>.</li>
+            <li>Run <code>Rscript scripts/trisk_power_demo.R</code>.</li>
+            <li>Run <code>Rscript scripts/trisk_sector_demo.R cement</code>.</li>
+            <li>Run <code>Rscript scripts/trisk_sector_demo.R steel</code>.</li>
+            <li>Run <code>Rscript scripts/refresh_dashboard_data.R</code>.</li>
+          </ol>
+        </div>
+        <div class="subcard">
+          <h3>Quality Gates</h3>
+          <ol>
+            <li>Check that each sector input folder contains the four required TRISK input files.</li>
+            <li>Check that each <code>synthesis_output/trisk/&lt;sector&gt;_demo/</code> folder contains the full standardized artifact set.</li>
+            <li>Run <code>python -m pytest dashboard/tests</code> and keep the smoke suite green.</li>
+            <li>Run Streamlit and manually switch sectors on the TRISK page before handoff.</li>
+          </ol>
+        </div>
+        <div class="subcard">
+          <h3>Natural Owner Split</h3>
+          <p>Data and scenario maintenance logically sits with the R pipeline surfaces, while presentation and download behavior sit with the dashboard loader and page surfaces. The manifest is the handshake point between those concerns.</p>
+        </div>
+        <div class="subcard">
+          <h3>Best Follow-On Enhancement</h3>
+          <p>If the next priority is credibility rather than breadth, the highest-value extension is company-level SDA derivation for cement and steel. If the next priority is breadth, the current architecture can accept another sector by extending <code>sector_specs</code>, publishing a new snapshot folder, and updating the manifest.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="risks-open-questions">
+      <div class="section-header">
+        <div>
+          <div class="section-index">09 / Risks / Open Questions</div>
+          <h2 class="section-title">Risks / Open Questions</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Known Risks</h3>
+          <ul>
+            <li>Cement and steel results remain more synthetic than power because their pricing and financial assumptions are less mature.</li>
+            <li>Users may over-read repeated SDA context as borrower-level evidence unless labels and caveat text stay explicit.</li>
+            <li>End-to-end reruns can be slow enough that regressions appear late if teams skip sector-by-sector intermediate checks.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Open Questions</h3>
+          <ul>
+            <li>When should company-level SDA derivation for cement and steel move from deferred research to implemented scope?</li>
+            <li>Should future sector additions keep the same placeholder financial-feature pattern, or is it time to introduce a more explicit assumption registry?</li>
+            <li>When automotive is eventually added, can the current scenario-translation approach generalize cleanly, or will that sector require a new contract layer?</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="appendices-evidence">
+      <div class="section-header">
+        <div>
+          <div class="section-index">10 / Appendices / Evidence Notes</div>
+          <h2 class="section-title">Appendices / Evidence Notes</h2>
+        </div>
+      </div>
+      <div class="appendix-grid">
+        <div class="technical-frame">
+          <h3>Evidence Snapshot</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Evidence</th>
+                <th>Recorded in plan</th>
+                <th>Why it matters</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Plan status</td>
+                <td><code>completed</code></td>
+                <td>Confirms the report is summarizing a finished multi-phase effort rather than a proposal.</td>
+              </tr>
+              <tr>
+                <td>Sector coverage</td>
+                <td><code>power</code>, <code>cement</code>, <code>steel</code></td>
+                <td>Defines the delivered scope and the dashboard selector target set.</td>
+              </tr>
+              <tr>
+                <td>Automated verification</td>
+                <td><code>python -m pytest dashboard/tests</code> - <code>9 passed</code></td>
+                <td>Shows the manifest-driven loader and page changes were not left untested.</td>
+              </tr>
+              <tr>
+                <td>Manual verification</td>
+                <td>Local Streamlit run with sector switching across all three sectors</td>
+                <td>Confirms the user-facing TRISK workflow works beyond static file generation.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="technical-frame">
+          <h3>Key Files And Commands</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Surface</th>
+                <th>Role</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>scripts/trisk_prepare_inputs.R</code></td>
+                <td>Sector-aware TRISK input generation.</td>
+              </tr>
+              <tr>
+                <td><code>scripts/trisk_power_demo.R</code> and <code>scripts/trisk_sector_demo.R</code></td>
+                <td>Stable power wrapper plus shared sector runner.</td>
+              </tr>
+              <tr>
+                <td><code>scripts/refresh_dashboard_data.R</code></td>
+                <td>Publishes sector snapshots and the dashboard manifest.</td>
+              </tr>
+              <tr>
+                <td><code>dashboard/lib/loaders.py</code> and <code>dashboard/pages/2_TRISK_Risk.py</code></td>
+                <td>Manifest-driven loading and sector-switching UI behavior.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="footer-note">designed for html first, printable without reconstruction</div>
+    </section>
+  </main>
+  <script>
+    (function() {
+      const chartCanvases = document.querySelectorAll('canvas');
+      chartCanvases.forEach((canvas) => {
+        canvas.classList.add('report-chart');
+        const parent = canvas.parentElement;
+        if (parent && parent.classList.contains('technical-frame') && !parent.classList.contains('chart-frame')) {
+          parent.classList.add('chart-frame');
+        }
+      });
+    })();
+
+    if (window.Chart) {
+      Chart.defaults.devicePixelRatio = 1;
+      Chart.defaults.animation = false;
+      Chart.defaults.resizeDelay = 150;
+      Chart.defaults.normalized = true;
+      Chart.defaults.maintainAspectRatio = false;
+      Chart.defaults.responsive = true;
+      window.__REPORT_CHART_DEFAULTS__ = {
+        animation: false,
+        resizeDelay: 150,
+        normalized: true,
+        maintainAspectRatio: false,
+        responsive: true
+      };
+    }
+  </script>
+</body>
+</html>
