@@ -214,18 +214,22 @@ Lock the new feature behind tests, refresh the deployed snapshot, and produce a 
 
 ## Grill Me
 1. **Q-001:** Should `carbon_price_family` in v1 be three NGFS-named aliases over existing repo curves, or do we need to ingest fresh NGFS Phase V curve files before launch?
+   - **Decision:** Accepted recommended default.
    - **Recommended default:** Three NGFS-named aliases mapped onto the existing `cement_intensity_transition`, `steel_intensity_transition`, and `increasing_carbon_tax_50` curves; defer real NGFS ingestion to a follow-up.
    - **Why this matters:** Determines whether PHASE-01 needs an additional data-ingestion sub-phase and whether `dashboard/data/trisk/grid/` includes new carbon curve files.
    - **If answered differently:** Add a sub-phase under PHASE-01 to ingest, validate, and snapshot real NGFS curves; grid generation runtime grows; the docs/methodology copy must change to claim NGFS rather than illustrative curves.
 2. **Q-002:** Should the operator-only live-rerun path be in v1 at all, or split to a follow-up?
+   - **Decision:** Accepted recommended default.
    - **Recommended default:** Keep PHASE-04 in scope but ship behind the env flag so the public path is fully decoupled.
    - **Why this matters:** PHASE-04 is the largest non-precomputed surface; cutting it shortens delivery and reduces deployment risk.
    - **If answered differently:** Drop PHASE-04, fold its docs into a follow-up plan, and reduce PHASE-05 verification to precomputed-only.
 3. **Q-003:** Is single-session save/load adequate, or do we need cross-session persistence (e.g. `dashboard/data/saved_scenarios/<user>.json`)?
+   - **Decision:** Accepted recommended default.
    - **Recommended default:** Single-session via `st.session_state` for v1.
    - **Why this matters:** Cross-session persistence implies a notion of user identity, which the dashboard does not currently have.
    - **If answered differently:** Adds an auth dependency and a writable storage path; pushes scope toward Idea 1's intake/auth work and changes deployment posture.
 4. **Q-004:** Are 3-value lever discretizations acceptable for the demo, or do bankers expect finer granularity?
+   - **Decision:** Accepted recommended default.
    - **Recommended default:** 3 values per lever for v1 (243 cells).
    - **Why this matters:** Drives PHASE-02 runtime and the precomputed grid size.
    - **If answered differently:** 5-value grids push to 3,125 cells per sector and require either downsampling, parallelization, or a hybrid lookup-plus-live-rerun strategy.

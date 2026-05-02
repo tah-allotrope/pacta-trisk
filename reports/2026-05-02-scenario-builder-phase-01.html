@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phase Report :: Scenario Builder Phase 01</title>
+  <meta name="color-scheme" content="dark">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+    async function initMermaid() {
+      const blocks = document.querySelectorAll('.mermaid');
+      if (!blocks.length) return;
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'dark',
+        securityLevel: 'loose'
+      });
+      await mermaid.run({ nodes: blocks });
+    }
+
+    const run = () => initMermaid().catch((error) => console.error('Mermaid render failed', error));
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run, { once: true });
+    } else {
+      run();
+    }
+  </script>
+  <style>
+    :root {
+      --bg: #0d0d0d;
+      --panel: #141414;
+      --panel-soft: #1a1a1a;
+      --line: rgba(0, 245, 255, 0.22);
+      --line-soft: rgba(255, 255, 255, 0.08);
+      --text: #e8f6ff;
+      --muted: #9ab0ba;
+      --accent: #00f5ff;
+      --accent-2: #39ff14;
+      --radius: 18px;
+      --shadow: 0 14px 40px rgba(0, 0, 0, 0.28);
+      --sans: "Segoe UI", Arial, sans-serif;
+      --mono: "Cascadia Code", Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #070707 0%, #0d0d0d 100%);
+      color: var(--text);
+      font-family: var(--sans);
+      line-height: 1.6;
+    }
+    main {
+      width: min(1120px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 28px 0 56px;
+    }
+    section {
+      margin-top: 20px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .hero {
+      background:
+        radial-gradient(circle at top right, rgba(0, 245, 255, 0.12), transparent 28%),
+        radial-gradient(circle at top left, rgba(57, 255, 20, 0.07), transparent 20%),
+        var(--panel);
+    }
+    .kicker, .index, .pill, code, pre, .meta-value {
+      font-family: var(--mono);
+    }
+    .kicker, .index {
+      font-size: 0.78rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent-2);
+      margin: 0 0 10px;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(2.3rem, 5vw, 4.3rem);
+      line-height: 0.95;
+      text-transform: uppercase;
+      letter-spacing: -0.05em;
+    }
+    h2 {
+      margin: 0;
+      font-size: 1.45rem;
+    }
+    p { margin: 0 0 12px; }
+    .muted { color: var(--muted); }
+    .hero-grid, .summary-grid, .metric-grid, .two-col {
+      display: grid;
+      gap: 16px;
+    }
+    .hero-grid {
+      grid-template-columns: minmax(0, 1.6fr) minmax(280px, 0.9fr);
+      align-items: end;
+    }
+    .summary-grid, .two-col {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .metric-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      margin-top: 16px;
+    }
+    .card, .frame, .metric {
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      background: var(--panel-soft);
+    }
+    .card, .frame { padding: 16px; }
+    .metric {
+      padding: 14px;
+      background: rgba(0, 245, 255, 0.05);
+    }
+    .metric-label {
+      color: var(--muted);
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+    .metric-value {
+      margin-top: 8px;
+      color: var(--accent-2);
+      font-family: var(--mono);
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+    .card h3 {
+      margin: 0 0 10px;
+      color: var(--accent);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+    ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+    li { margin-bottom: 8px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.96rem;
+    }
+    th, td {
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--line-soft);
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      color: var(--accent-2);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+    .meta-stack {
+      display: grid;
+      gap: 12px;
+    }
+    .meta {
+      padding: 14px;
+      border: 1px solid var(--line-soft);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .meta-label {
+      color: var(--muted);
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      margin-bottom: 6px;
+    }
+    .meta-value {
+      color: var(--accent);
+      font-weight: 700;
+      word-break: break-word;
+    }
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 12px;
+      border: 1px solid rgba(57, 255, 20, 0.22);
+      border-radius: 999px;
+      background: rgba(57, 255, 20, 0.06);
+      color: #d8ffd1;
+      font-size: 0.82rem;
+    }
+    .frame canvas {
+      width: 100% !important;
+      height: 300px !important;
+      max-height: 300px;
+      display: block;
+    }
+    .footer-note {
+      margin-top: 16px;
+      color: rgba(154, 176, 186, 0.72);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      text-align: right;
+    }
+    @media (max-width: 900px) {
+      .hero-grid, .summary-grid, .two-col, .metric-grid { grid-template-columns: 1fr; }
+    }
+    @media print {
+      body { background: #fff; color: #111; }
+      section { box-shadow: none; background: #fff; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero" id="phase-header">
+      <div class="hero-grid">
+        <div>
+          <p class="kicker">Phase Report / Personal Technical Artifact</p>
+          <h1>Scenario Builder Phase 01</h1>
+          <p class="muted">Phase 01 locked the public precomputed-grid contract before any generator or UI work, so later phases can build against a deterministic `scenario_id`, stable artifact layout, and manifest gating rule.</p>
+          <div class="pill-row">
+            <span class="pill">project :: PACTA Vietnam</span>
+            <span class="pill">date :: 2026-05-02</span>
+            <span class="pill">scope :: contract + schema</span>
+          </div>
+        </div>
+        <div class="meta-stack">
+          <div class="meta">
+            <div class="meta-label">Project</div>
+            <div class="meta-value">PACTA Vietnam</div>
+          </div>
+          <div class="meta">
+            <div class="meta-label">Repository</div>
+            <div class="meta-value">tah-allotrope/pacta-trisk</div>
+          </div>
+          <div class="meta">
+            <div class="meta-label">Date</div>
+            <div class="meta-value">2026-05-02</div>
+          </div>
+        </div>
+      </div>
+      <div class="metric-grid">
+        <div class="metric">
+          <div class="metric-label">Levers Locked</div>
+          <div class="metric-value">5</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Sectors Covered</div>
+          <div class="metric-value">3</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Scenarios / Sector</div>
+          <div class="metric-value">243</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Defaults Accepted</div>
+          <div class="metric-value">4</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="input-output-summary">
+      <div class="index">01 / Input -> Output</div>
+      <h2>Input -> Output Summary</h2>
+      <div class="summary-grid" style="margin-top:16px;">
+        <div class="card">
+          <h3>Inputs</h3>
+          <ul>
+            <li>`plans/2026-05-02-interactive-scenario-builder-plan.md` as the Phase 01 source of truth</li>
+            <li>`docs/trisk_multisector_contract.md` as the existing multisector baseline contract</li>
+            <li>`dashboard/data/trisk/manifest.csv` as the snapshot registry that the future Scenario Builder will read</li>
+            <li>User decision to accept all four recommended Grill Me defaults</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Outputs</h3>
+          <ul>
+            <li>New contract doc: `docs/trisk_scenario_grid_contract.md`</li>
+            <li>Manifest schema extension: `grid_available` column defaulted to `false`</li>
+            <li>Plan updated to record the accepted defaults inline</li>
+            <li>This phase artifact: `reports/2026-05-02-scenario-builder-phase-01.html`</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="logic-flow">
+      <div class="index">02 / Logic Flow</div>
+      <h2>Logic Flow</h2>
+      <div class="frame" style="margin-top:16px; overflow:auto;">
+        <div class="mermaid">flowchart LR
+          A[Accept 4 recommended defaults] --> B[Review existing TRISK multisector contract]
+          B --> C[Define 5-lever scenario grid]
+          C --> D[Lock deterministic scenario_id format]
+          D --> E[Specify grid artifacts and schemas]
+          E --> F[Extend manifest with grid_available false]
+          F --> G[Record implementation state in activeContext]
+          G --> H[Package phase as HTML report]
+        </div>
+      </div>
+    </section>
+
+    <section id="math-algorithm-used">
+      <div class="index">03 / Math / Algorithm Used</div>
+      <h2>Math / Algorithm Used</h2>
+      <div class="frame" style="margin-top:16px;">
+        <p>The only material algorithmic decision in Phase 01 was the grid definition itself.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Concept</th>
+              <th>Rule</th>
+              <th>Why It Matters</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Grid size</td>
+              <td>`3 x 3 x 3 x 3 x 3 = 243` scenario combinations per sector</td>
+              <td>Keeps the public snapshot path tractable while still giving bankers visible lever movement</td>
+            </tr>
+            <tr>
+              <td>Identifier encoding</td>
+              <td>`s{shock_year}_d{discount_rate}_rf{risk_free_rate}_mp{market_passthrough}_c{carbon_price_family}`</td>
+              <td>Lets the dashboard, exports, and deep links all address the same precomputed row deterministically</td>
+            </tr>
+            <tr>
+              <td>Baseline comparison</td>
+              <td>Use the existing `base` row in `sensitivity_results.csv`; do not generate a synthetic baseline scenario_id</td>
+              <td>Reuses the current TRISK snapshot contract instead of forking it</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="tools-formulas-methods">
+      <div class="index">04 / Tools / Formulas / Methods</div>
+      <h2>Tools / Formulas / Methods</h2>
+      <div class="frame" style="margin-top:16px;">
+        <table>
+          <thead>
+            <tr>
+              <th>Surface</th>
+              <th>Method Used</th>
+              <th>Outcome</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Plan acceptance</td>
+              <td>Recorded explicit decision lines under all four Grill Me questions</td>
+              <td>Removed the open ambiguity before implementation</td>
+            </tr>
+            <tr>
+              <td>Contract definition</td>
+              <td>New markdown spec with lever table, alias mapping, file layout, schemas, and compatibility rules</td>
+              <td>Created one source of truth for Phase 02 generator work and Phase 03 loader work</td>
+            </tr>
+            <tr>
+              <td>Manifest gating</td>
+              <td>Added `grid_available` as a backward-compatible boolean column defaulted to `false`</td>
+              <td>Established the future loader guard without breaking current sectors</td>
+            </tr>
+            <tr>
+              <td>Session packaging</td>
+              <td>Updated `activeContext.md` and produced a phase HTML artifact using the report workflow</td>
+              <td>Left a reviewable record of what Phase 01 actually changed</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="results-visualizations">
+      <div class="index">05 / Results &amp; Visualizations</div>
+      <h2>Results &amp; Visualizations</h2>
+      <div class="two-col" style="margin-top:16px;">
+        <div class="frame">
+          <canvas id="phaseChart" aria-label="Phase 01 contract constants" role="img"></canvas>
+        </div>
+        <div class="card">
+          <h3>Key Results</h3>
+          <ul>
+            <li>The public Scenario Builder path is now defined as a snapshot-only lookup problem, not an on-demand compute problem.</li>
+            <li>The banker-facing carbon-price selector is locked to three names while remaining honest that v1 reuses existing repo curves.</li>
+            <li>The manifest now has a clean future gate for sectors whose precomputed grid has not yet been generated.</li>
+            <li>Phase 02 can proceed without reopening scope on levers, IDs, or artifact naming.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="limitations-second-best-alternative">
+      <div class="index">06 / Limitations / Second-Best Alternative</div>
+      <h2>Limitations / Second-Best Alternative</h2>
+      <div class="frame" style="margin-top:16px;">
+        <ul>
+          <li>Phase 01 does not generate any grid artifacts yet; it only locks the contract those artifacts must satisfy.</li>
+          <li>The NGFS family names are aliases over existing curves, so methodology text must stay precise and avoid implying fresh NGFS Phase V ingestion.</li>
+          <li>No loader or UI code consumes `grid_available` yet; that value is preparatory metadata until later phases land.</li>
+          <li>Second-best alternative considered in the plan: require live R reruns for all interactivity. It was rejected because the public Streamlit deployment cannot run R.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="errors-warnings-flags-encountered">
+      <div class="index">07 / Errors / Warnings / Flags</div>
+      <h2>Errors / Warnings / Flags Encountered</h2>
+      <div class="frame" style="margin-top:16px;">
+        <ul>
+          <li>No blocking implementation errors occurred during Phase 01.</li>
+          <li>Git reported standard Windows line-ending warnings (`LF will be replaced by CRLF`) on touched text files; these are environmental warnings, not content failures.</li>
+          <li>The main repository root had unrelated dirty files, so the work was intentionally completed inside the clean git worktree `claude/interesting-jones-31a6ad` to avoid mixing changes.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="open-questions-next-phase-seeds">
+      <div class="index">08 / Open Questions / Next Phase Seeds</div>
+      <h2>Open Questions / Next Phase Seeds</h2>
+      <div class="frame" style="margin-top:16px;">
+        <ul>
+          <li>Implement `scripts/trisk_scenario_grid.R` so the documented 243-cell grid is actually generated for `power`, `cement`, and `steel`.</li>
+          <li>Extend `scripts/refresh_dashboard_data.R` so `grid_available` flips to `true` only when `dashboard/data/trisk/grid/<sector>/` exists.</li>
+          <li>Add Python-side parsing and validation tests for `scenario_id` round-trips and missing-grid behavior.</li>
+          <li>Keep the operator-only live-rerun path separate from the public snapshot path when Phase 04 is implemented.</li>
+        </ul>
+      </div>
+      <div class="footer-note">artifact generated for reflection, not presentation theater</div>
+    </section>
+  </main>
+  <script>
+    if (window.Chart) {
+      Chart.defaults.devicePixelRatio = 1;
+      Chart.defaults.animation = false;
+      Chart.defaults.resizeDelay = 150;
+      Chart.defaults.normalized = true;
+      Chart.defaults.maintainAspectRatio = false;
+
+      new Chart(document.getElementById('phaseChart'), {
+        type: 'bar',
+        data: {
+          labels: ['Levers', 'Sectors', 'Scenarios/Sector', 'Manifest Additions', 'Defaults Accepted'],
+          datasets: [{
+            label: 'Phase 01 Constants',
+            data: [5, 3, 243, 1, 4],
+            backgroundColor: [
+              'rgba(0, 245, 255, 0.65)',
+              'rgba(57, 255, 20, 0.65)',
+              'rgba(0, 245, 255, 0.65)',
+              'rgba(57, 255, 20, 0.65)',
+              'rgba(0, 245, 255, 0.65)'
+            ],
+            borderColor: [
+              '#00f5ff',
+              '#39ff14',
+              '#00f5ff',
+              '#39ff14',
+              '#00f5ff'
+            ],
+            borderWidth: 1.5
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: false,
+          resizeDelay: 150,
+          normalized: true,
+          plugins: {
+            legend: {
+              labels: { color: '#e8f6ff' }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: '#9ab0ba' },
+              grid: { color: 'rgba(255,255,255,0.06)' }
+            },
+            y: {
+              beginAtZero: true,
+              ticks: { color: '#9ab0ba' },
+              grid: { color: 'rgba(255,255,255,0.06)' }
+            }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>
