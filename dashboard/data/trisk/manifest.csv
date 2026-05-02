@@ -1,4 +1,4 @@
-sector,label,folder,price_unit,pathway_unit,alignment_mode,disclaimer
-power,Power,power,USD/MWh-equivalent,MW,borrower_ms,Borrower-level PACTA market-share gaps are available for power.
-cement,Cement,cement,USD/unit-equivalent,tonnes,sector_sda,"Cement currently uses sector-level SDA context, not borrower-specific alignment."
-steel,Steel,steel,USD/unit-equivalent,tonnes,sector_sda,"Steel currently uses sector-level SDA context, not borrower-specific alignment."
+sector,label,folder,price_unit,pathway_unit,alignment_mode,grid_available,disclaimer
+power,Power,power,USD/MWh-equivalent,MW,borrower_ms,false,Borrower-level PACTA market-share gaps are available for power.
+cement,Cement,cement,USD/unit-equivalent,tonnes,sector_sda,false,"Cement currently uses sector-level SDA context, not borrower-specific alignment."
+steel,Steel,steel,USD/unit-equivalent,tonnes,sector_sda,false,"Steel currently uses sector-level SDA context, not borrower-specific alignment."

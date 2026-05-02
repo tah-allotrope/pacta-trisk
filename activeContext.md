@@ -642,3 +642,27 @@ When filtering data to a subset of metrics but providing `scale_*_manual()` mapp
 - [x] Confirmed sector-specific caveat copy: borrower-level market-share context for `power`; sector-level SDA context for `cement` and `steel`
 - [x] Updated `dashboard/README.md`, `docs/demo-script.md`, and `docs/streamlit-deploy.md` with the exact multisector rerun flow and deployment/demo notes
 - [x] Remaining intentional limitation: `automotive` is still deferred, and `cement` / `steel` remain sector-context demos rather than borrower-specific SDA implementations
+
+---
+
+## Interactive Scenario Builder Phase 01 (2026-05-02)
+
+**Goal:** Accept the recommended defaults from the new Scenario Builder plan, lock the scenario-grid contract, extend the TRISK manifest with grid availability metadata, and package the phase with a report artifact.
+
+### Planned Work
+
+- [x] Record the accepted Grill Me defaults in the phase plan
+- [x] Write `docs/trisk_scenario_grid_contract.md` with lever values, `scenario_id` format, file layout, and artifact schemas
+- [x] Extend `dashboard/data/trisk/manifest.csv` with backward-compatible `grid_available = false`
+- [x] Verify the new contract against the existing multisector contract and manifest snapshot
+- [x] Generate a phase report artifact for the completed Phase 01 work
+- [ ] Commit and push the isolated Phase 01 changes
+
+### Review / Results
+
+- [x] Updated `plans/2026-05-02-interactive-scenario-builder-plan.md` so the four Grill Me questions are explicitly accepted at their recommended defaults
+- [x] Added `docs/trisk_scenario_grid_contract.md` to define the precomputed scenario-grid contract for `power`, `cement`, and `steel`
+- [x] Extended `dashboard/data/trisk/manifest.csv` with a new `grid_available` column defaulted to `false` for all existing sectors
+- [x] Verified the worked example `scenario_id` documents a full parse/build round-trip and that the new contract does not contradict `docs/trisk_multisector_contract.md`
+- [x] Generated phase report artifact `reports/2026-05-02-scenario-builder-phase-01.html`
+- [ ] Commit pushed to the branch once staging and git verification complete
