@@ -666,3 +666,30 @@ When filtering data to a subset of metrics but providing `scale_*_manual()` mapp
 - [x] Verified the worked example `scenario_id` documents a full parse/build round-trip and that the new contract does not contradict `docs/trisk_multisector_contract.md`
 - [x] Generated phase report artifact `reports/2026-05-02-scenario-builder-phase-01.html`
 - [ ] Commit pushed to the branch once staging and git verification complete
+
+---
+
+## Interactive Scenario Builder Phase 02 (2026-05-02)
+
+**Goal:** Generate the precomputed multi-parameter TRISK grid for `power`, `cement`, and `steel`, publish it into the dashboard snapshot, and package the phase with a report artifact.
+
+### Planned Work
+
+- [x] Merge Phase 01 onto the main line and prune the temporary topic branch/worktree where possible
+- [x] Refactor `scripts/trisk_sector_demo.R` to expose reusable helpers without changing its current CLI behavior
+- [x] Create `scripts/trisk_scenario_grid.R` to build the 243-scenario grid per sector with cache-skip behavior and metadata
+- [x] Extend `scripts/refresh_dashboard_data.R` to publish `dashboard/data/trisk/grid/<sector>/` and flip `grid_available = true` only for generated sectors
+- [x] Smoke-run the grid generator for `power` first, then run all three sectors and refresh the dashboard snapshot
+- [x] Verify the generated grid artifacts and package the Phase 02 report
+- [ ] Commit and push the main-line Phase 01 + Phase 02 changes
+
+### Review / Results
+
+- [x] Merged Phase 01 changes into the clean main-line worktree derived from `origin/main`
+- [ ] Old topic worktree/branch pruned after merge
+- [x] Added reusable TRISK helper functions for grid generation
+- [x] Generated `synthesis_output/trisk/grid/<sector>/` artifacts including `scenarios.csv`, `borrower_results.parquet`, and `grid_meta.json`
+- [x] Refreshed `dashboard/data/trisk/grid/<sector>/` and updated manifest `grid_available` flags from generated outputs
+- [x] Verified Phase 02 outputs via smoke runs and snapshot inspection
+- [x] Generated a new Phase 02 report artifact under `reports/`
+- [ ] Committed and pushed the merged Phase 01 + Phase 02 state to `main`

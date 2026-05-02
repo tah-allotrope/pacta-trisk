@@ -1,0 +1,11 @@
+run_id,company_id,company_name,sector,term,pd_baseline,pd_shock,baseline_scenario,target_scenario,scenario_geography,carbon_price_model,risk_free_rate,discount_rate,growth_rate,div_netprofit_prop_coef,shock_year,market_passthrough
+cf317b46-d2f2-4a2c-b693-389e073b47b0,VN_ABCD_022,Hoa Phat Group JSC,Steel,1,0.03165599114967643,0.2772419148189236,VN_PDP8_BASELINE,VN_NZE_STRESS,Vietnam,steel_intensity_transition,0.04,0.06,0.02,1,2028,0.15
+cf317b46-d2f2-4a2c-b693-389e073b47b0,VN_ABCD_022,Hoa Phat Group JSC,Steel,2,0.09301910510173561,0.3346037690140007,VN_PDP8_BASELINE,VN_NZE_STRESS,Vietnam,steel_intensity_transition,0.04,0.06,0.02,1,2028,0.15
+cf317b46-d2f2-4a2c-b693-389e073b47b0,VN_ABCD_022,Hoa Phat Group JSC,Steel,3,0.13844809013446846,0.36076013908553184,VN_PDP8_BASELINE,VN_NZE_STRESS,Vietnam,steel_intensity_transition,0.04,0.06,0.02,1,2028,0.15
+cf317b46-d2f2-4a2c-b693-389e073b47b0,VN_ABCD_022,Hoa Phat Group JSC,Steel,4,0.17150890896356885,0.3762861015242218,VN_PDP8_BASELINE,VN_NZE_STRESS,Vietnam,steel_intensity_transition,0.04,0.06,0.02,1,2028,0.15
+cf317b46-d2f2-4a2c-b693-389e073b47b0,VN_ABCD_022,Hoa Phat Group JSC,Steel,5,0.19655438801314418,0.38673163036330216,VN_PDP8_BASELINE,VN_NZE_STRESS,Vietnam,steel_intensity_transition,0.04,0.06,0.02,1,2028,0.15
+cf317b46-d2f2-4a2c-b693-389e073b47b0,VN_ABCD_023,Pomina Group,Steel,1,0.1468149335267498,0.10770487248824967,VN_PDP8_BASELINE,VN_NZE_STRESS,Vietnam,steel_intensity_transition,0.04,0.06,0.02,1,2028,0.15
+cf317b46-d2f2-4a2c-b693-389e073b47b0,VN_ABCD_023,Pomina Group,Steel,2,0.23834536812871776,0.19904985375940987,VN_PDP8_BASELINE,VN_NZE_STRESS,Vietnam,steel_intensity_transition,0.04,0.06,0.02,1,2028,0.15
+cf317b46-d2f2-4a2c-b693-389e073b47b0,VN_ABCD_023,Pomina Group,Steel,3,0.28918516901864955,0.25312921090841223,VN_PDP8_BASELINE,VN_NZE_STRESS,Vietnam,steel_intensity_transition,0.04,0.06,0.02,1,2028,0.15
+cf317b46-d2f2-4a2c-b693-389e073b47b0,VN_ABCD_023,Pomina Group,Steel,4,0.3229683908931159,0.2898813244454532,VN_PDP8_BASELINE,VN_NZE_STRESS,Vietnam,steel_intensity_transition,0.04,0.06,0.02,1,2028,0.15
+cf317b46-d2f2-4a2c-b693-389e073b47b0,VN_ABCD_023,Pomina Group,Steel,5,0.3477766700109446,0.3171476480878177,VN_PDP8_BASELINE,VN_NZE_STRESS,Vietnam,steel_intensity_transition,0.04,0.06,0.02,1,2028,0.15

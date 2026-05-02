@@ -4,6 +4,7 @@
 # Usage: Rscript scripts/refresh_dashboard_data.R
 
 suppressPackageStartupMessages({
+  library(dplyr)
   library(readr)
   library(tibble)
 })
@@ -35,6 +36,24 @@ copy_png_group <- function(src_dir, dest_dir) {
     file.copy(f, dest_dir, overwrite = TRUE)
     message(sprintf("  [OK] %s -> %s", f, dest_dir))
   }
+}
+
+copy_dir_contents <- function(src_dir, dest_dir) {
+  if (!dir.exists(src_dir)) {
+    message(sprintf("  [MISS] %s not found", src_dir))
+    return(FALSE)
+  }
+
+  if (!dir.exists(dest_dir)) dir.create(dest_dir, recursive = TRUE, showWarnings = FALSE)
+  files <- list.files(src_dir, full.names = TRUE, all.files = TRUE, no.. = TRUE)
+  if (length(files) == 0) {
+    message(sprintf("  [MISS] %s is empty", src_dir))
+    return(FALSE)
+  }
+
+  file.copy(files, dest_dir, recursive = TRUE, overwrite = TRUE)
+  message(sprintf("  [OK] %s -> %s", src_dir, dest_dir))
+  TRUE
 }
 
 pacta_files <- c(
@@ -75,10 +94,10 @@ trisk_sector_files <- c(
 )
 
 trisk_manifest <- tribble(
-  ~sector,  ~label,  ~folder,       ~price_unit,            ~pathway_unit, ~alignment_mode, ~disclaimer,
-  "power",  "Power",  "power",     "USD/MWh-equivalent", "MW",         "borrower_ms",  "Borrower-level PACTA market-share gaps are available for power.",
-  "cement", "Cement", "cement",    "USD/unit-equivalent", "tonnes",     "sector_sda",   "Cement currently uses sector-level SDA context, not borrower-specific alignment.",
-  "steel",  "Steel",  "steel",     "USD/unit-equivalent", "tonnes",     "sector_sda",   "Steel currently uses sector-level SDA context, not borrower-specific alignment."
+  ~sector,  ~label,  ~folder,       ~price_unit,            ~pathway_unit, ~alignment_mode, ~grid_available, ~disclaimer,
+  "power",  "Power",  "power",     "USD/MWh-equivalent", "MW",         "borrower_ms",  FALSE,            "Borrower-level PACTA market-share gaps are available for power.",
+  "cement", "Cement", "cement",    "USD/unit-equivalent", "tonnes",     "sector_sda",   FALSE,            "Cement currently uses sector-level SDA context, not borrower-specific alignment.",
+  "steel",  "Steel",  "steel",     "USD/unit-equivalent", "tonnes",     "sector_sda",   FALSE,            "Steel currently uses sector-level SDA context, not borrower-specific alignment."
 )
 
 for (f in pacta_files) {
@@ -93,6 +112,9 @@ for (f in report_files) {
 
 if (!dir.exists("dashboard/data/trisk")) dir.create("dashboard/data/trisk", recursive = TRUE)
 clear_dir("dashboard/data/trisk")
+
+grid_root <- file.path("dashboard", "data", "trisk", "grid")
+dir.create(grid_root, recursive = TRUE, showWarnings = FALSE)
 
 for (i in seq_len(nrow(trisk_manifest))) {
   sector <- trisk_manifest$sector[[i]]
@@ -111,6 +133,14 @@ for (i in seq_len(nrow(trisk_manifest))) {
   }
 
   copy_png_group(file.path(src_root, "figures"), dest_root)
+
+  grid_src_root <- file.path("synthesis_output", "trisk", "grid", sector)
+  grid_dest_root <- file.path(grid_root, sector)
+  grid_present <- copy_dir_contents(grid_src_root, grid_dest_root)
+  trisk_manifest$grid_available[[i]] <- isTRUE(grid_present) &&
+    file.exists(file.path(grid_dest_root, "scenarios.csv")) &&
+    file.exists(file.path(grid_dest_root, "borrower_results.parquet")) &&
+    file.exists(file.path(grid_dest_root, "grid_meta.json"))
 }
 
 write_csv(trisk_manifest, file.path("dashboard", "data", "trisk", "manifest.csv"))

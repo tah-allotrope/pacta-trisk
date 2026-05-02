@@ -1,0 +1,2 @@
+baseline_scenario,target_scenario,scenario_geography,carbon_price_model,risk_free_rate,discount_rate,growth_rate,div_netprofit_prop_coef,shock_year,market_passthrough,run_id
+VN_PDP8_BASELINE,VN_NZE_STRESS,Vietnam,cement_intensity_transition,0.04,0.06,0.02,1,2028,0.15,f3a78bf0-c1d9-4697-b7dd-6d81ce6a690b

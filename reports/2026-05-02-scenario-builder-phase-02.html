@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phase Report :: Scenario Builder Phase 02</title>
+  <meta name="color-scheme" content="dark">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    async function initMermaid() {
+      const blocks = document.querySelectorAll('.mermaid');
+      if (!blocks.length) return;
+      mermaid.initialize({ startOnLoad: false, theme: 'dark', securityLevel: 'loose' });
+      await mermaid.run({ nodes: blocks });
+    }
+    const run = () => initMermaid().catch((error) => console.error('Mermaid render failed', error));
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run, { once: true });
+    } else {
+      run();
+    }
+  </script>
+  <style>
+    :root {
+      --bg: #0d0d0d;
+      --panel: #141414;
+      --panel-soft: #1a1a1a;
+      --line: rgba(0,245,255,0.22);
+      --line-soft: rgba(255,255,255,0.08);
+      --text: #e8f6ff;
+      --muted: #9ab0ba;
+      --accent: #00f5ff;
+      --accent-2: #39ff14;
+      --radius: 18px;
+      --shadow: 0 14px 40px rgba(0,0,0,0.28);
+      --sans: "Segoe UI", Arial, sans-serif;
+      --mono: "Cascadia Code", Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #070707 0%, #0d0d0d 100%);
+      color: var(--text);
+      font-family: var(--sans);
+      line-height: 1.6;
+    }
+    main {
+      width: min(1120px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 28px 0 56px;
+    }
+    section {
+      margin-top: 20px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .hero {
+      background:
+        radial-gradient(circle at top right, rgba(0,245,255,0.12), transparent 28%),
+        radial-gradient(circle at top left, rgba(57,255,20,0.07), transparent 20%),
+        var(--panel);
+    }
+    .kicker, .index, .pill, code, .meta-value {
+      font-family: var(--mono);
+    }
+    .kicker, .index {
+      font-size: 0.78rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent-2);
+      margin: 0 0 10px;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(2.3rem, 5vw, 4.3rem);
+      line-height: 0.95;
+      text-transform: uppercase;
+      letter-spacing: -0.05em;
+    }
+    h2 { margin: 0; font-size: 1.45rem; }
+    p { margin: 0 0 12px; }
+    .muted { color: var(--muted); }
+    .hero-grid, .summary-grid, .metric-grid, .two-col {
+      display: grid;
+      gap: 16px;
+    }
+    .hero-grid {
+      grid-template-columns: minmax(0, 1.6fr) minmax(280px, 0.9fr);
+      align-items: end;
+    }
+    .summary-grid, .two-col {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .metric-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      margin-top: 16px;
+    }
+    .card, .frame, .metric {
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      background: var(--panel-soft);
+    }
+    .card, .frame { padding: 16px; }
+    .metric {
+      padding: 14px;
+      background: rgba(0,245,255,0.05);
+    }
+    .metric-label {
+      color: var(--muted);
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+    .metric-value {
+      margin-top: 8px;
+      color: var(--accent-2);
+      font-family: var(--mono);
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+    .card h3 {
+      margin: 0 0 10px;
+      color: var(--accent);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+    ul { margin: 0; padding-left: 20px; }
+    li { margin-bottom: 8px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.96rem;
+    }
+    th, td {
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--line-soft);
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      color: var(--accent-2);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+    .meta-stack { display: grid; gap: 12px; }
+    .meta {
+      padding: 14px;
+      border: 1px solid var(--line-soft);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.02);
+    }
+    .meta-label {
+      color: var(--muted);
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      margin-bottom: 6px;
+    }
+    .meta-value {
+      color: var(--accent);
+      font-weight: 700;
+      word-break: break-word;
+    }
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 12px;
+      border: 1px solid rgba(57,255,20,0.22);
+      border-radius: 999px;
+      background: rgba(57,255,20,0.06);
+      color: #d8ffd1;
+      font-size: 0.82rem;
+    }
+    .frame canvas {
+      width: 100% !important;
+      height: 300px !important;
+      max-height: 300px;
+      display: block;
+    }
+    .footer-note {
+      margin-top: 16px;
+      color: rgba(154,176,186,0.72);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      text-align: right;
+    }
+    @media (max-width: 900px) {
+      .hero-grid, .summary-grid, .two-col, .metric-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <div class="hero-grid">
+        <div>
+          <p class="kicker">Phase Report / Personal Technical Artifact</p>
+          <h1>Scenario Builder Phase 02</h1>
+          <p class="muted">Phase 02 turned the contract into runnable artifacts: a cached 243-scenario grid per sector, published parquet snapshots for the dashboard, and manifest flags that now truthfully advertise grid availability.</p>
+          <div class="pill-row">
+            <span class="pill">project :: PACTA Vietnam</span>
+            <span class="pill">date :: 2026-05-02</span>
+            <span class="pill">scope :: generator + snapshot</span>
+          </div>
+        </div>
+        <div class="meta-stack">
+          <div class="meta">
+            <div class="meta-label">Project</div>
+            <div class="meta-value">PACTA Vietnam</div>
+          </div>
+          <div class="meta">
+            <div class="meta-label">Repository</div>
+            <div class="meta-value">tah-allotrope/pacta-trisk</div>
+          </div>
+          <div class="meta">
+            <div class="meta-label">Date</div>
+            <div class="meta-value">2026-05-02</div>
+          </div>
+        </div>
+      </div>
+      <div class="metric-grid">
+        <div class="metric">
+          <div class="metric-label">Sectors Published</div>
+          <div class="metric-value">3</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Scenarios / Sector</div>
+          <div class="metric-value">243</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Published Grid Files</div>
+          <div class="metric-value">9</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Manifest Flags True</div>
+          <div class="metric-value">3</div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="index">01 / Input -> Output</div>
+      <h2>Input -> Output Summary</h2>
+      <div class="summary-grid" style="margin-top:16px;">
+        <div class="card">
+          <h3>Inputs</h3>
+          <ul>
+            <li>Phase 01 contract doc and accepted grid defaults</li>
+            <li>Existing `scripts/trisk_sector_demo.R` runner and multisector snapshot contract</li>
+            <li>Sector input packages under `output/trisk_inputs/<sector>_demo/`</li>
+            <li>Existing baseline sensitivity outputs used for delta-vs-base calculations</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Outputs</h3>
+          <ul>
+            <li>Refactored `scripts/trisk_sector_demo.R` with reusable helper functions</li>
+            <li>New `scripts/trisk_scenario_grid.R` generator with cache reuse and `grid_meta.json` output</li>
+            <li>Published `dashboard/data/trisk/grid/<sector>/{scenarios.csv,borrower_results.parquet,grid_meta.json}`</li>
+            <li>Updated `dashboard/data/trisk/manifest.csv` with `grid_available=TRUE` for all three sectors</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="index">02 / Logic Flow</div>
+      <h2>Logic Flow</h2>
+      <div class="frame" style="margin-top:16px; overflow:auto;">
+        <div class="mermaid">flowchart LR
+          A[Merge Phase 01 onto main line] --> B[Refactor sector demo into reusable helpers]
+          B --> C[Build 5-lever cartesian scenario grid]
+          C --> D[Create extended grid-only input packages]
+          D --> E[Run power smoke test]
+          E --> F[Fix sector mapping and 2030 interpolation issues]
+          F --> G[Generate all 3 sector grids with cache reuse]
+          G --> H[Refresh dashboard snapshot]
+          H --> I[Verify row counts and grid_available flags]
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="index">03 / Math / Algorithm Used</div>
+      <h2>Math / Algorithm Used</h2>
+      <div class="frame" style="margin-top:16px;">
+        <table>
+          <thead>
+            <tr>
+              <th>Concept</th>
+              <th>Rule</th>
+              <th>Impact</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Grid cardinality</td>
+              <td>`3 x 3 x 3 x 3 x 3 = 243` scenarios per sector</td>
+              <td>Produced the full public snapshot lookup space promised by Phase 01</td>
+            </tr>
+            <tr>
+              <td>Borrower row counts</td>
+              <td>`power = 243 x 13 = 3159`; `cement = 243 x 2 = 486`; `steel = 243 x 2 = 486`</td>
+              <td>Confirmed parquet output sizes are consistent with the current borrower sets</td>
+            </tr>
+            <tr>
+              <td>Shock-year compatibility fix</td>
+              <td>Extended grid-only scenario and carbon-price inputs to `max(shock_year) + 2` years</td>
+              <td>Resolved the `trisk.model` interpolation failure at `shock_year = 2030` without changing the base demo inputs</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <div class="index">04 / Tools / Formulas / Methods</div>
+      <h2>Tools / Formulas / Methods</h2>
+      <div class="frame" style="margin-top:16px;">
+        <table>
+          <thead>
+            <tr>
+              <th>Surface</th>
+              <th>Method</th>
+              <th>Outcome</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>`scripts/trisk_sector_demo.R`</td>
+              <td>Lifted path resolution, alignment loading, run execution, and output writing into reusable functions</td>
+              <td>Kept the old CLI intact while enabling a second caller for the grid generator</td>
+            </tr>
+            <tr>
+              <td>`scripts/trisk_scenario_grid.R`</td>
+              <td>Built deterministic IDs, generated sector grids, reused cached run folders, and wrote parquet/JSON artifacts</td>
+              <td>Created the new precomputed lookup layer for the future Scenario Builder page</td>
+            </tr>
+            <tr>
+              <td>`scripts/refresh_dashboard_data.R`</td>
+              <td>Copied `synthesis_output/trisk/grid/<sector>/` into `dashboard/data/trisk/grid/<sector>/` and set manifest booleans from the published artifacts</td>
+              <td>Made the dashboard snapshot self-describing for grid availability</td>
+            </tr>
+            <tr>
+              <td>Verification</td>
+              <td>Power-only smoke run, full three-sector run, parquet row-count check, manifest inspection</td>
+              <td>Proved the outputs exist and match the expected grid size</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <div class="index">05 / Results &amp; Visualizations</div>
+      <h2>Results &amp; Visualizations</h2>
+      <div class="two-col" style="margin-top:16px;">
+        <div class="frame">
+          <canvas id="phaseTwoChart" aria-label="Phase 02 output counts" role="img"></canvas>
+        </div>
+        <div class="card">
+          <h3>Verified Results</h3>
+          <ul>
+            <li>All three sectors now publish `scenarios.csv`, `borrower_results.parquet`, and `grid_meta.json` under both synthesis output and dashboard snapshot paths.</li>
+            <li>`dashboard/data/trisk/manifest.csv` now reports `grid_available=TRUE` for `power`, `cement`, and `steel`.</li>
+            <li>The generator can rerun incrementally because cached run folders are reused instead of recomputed.</li>
+            <li>The public snapshot path remains R-free even though the grid build itself still happens in R offline.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="index">06 / Limitations / Second-Best Alternative</div>
+      <h2>Limitations / Second-Best Alternative</h2>
+      <div class="frame" style="margin-top:16px;">
+        <ul>
+          <li>The generator currently publishes the full `runs/` and `input/` subdirectories into the dashboard snapshot grid path. That is acceptable for now but can be trimmed later if snapshot size matters.</li>
+          <li>The three carbon-price families still map onto existing curves, so scenario-family differentiation is naming-level rather than curve-level in v1.</li>
+          <li>The old topic worktree could not be fully deleted automatically because of a Windows file lock; the merged implementation itself is unaffected.</li>
+          <li>Second-best alternative would have been to reduce the grid or skip `2030`, but extending the grid-only inputs was the cleaner fix because it preserved the approved contract.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <div class="index">07 / Errors / Warnings / Flags</div>
+      <h2>Errors / Warnings / Flags Encountered</h2>
+      <div class="frame" style="margin-top:16px;">
+        <ul>
+          <li>Missing R package: `arrow` was not installed initially; installed it into the user library to support parquet output.</li>
+          <li>Implementation bug: the first grid build failed because `sector` was shadowed inside `mutate()`, breaking carbon-price model mapping.</li>
+          <li>Model/runtime bug: `shock_year = 2030` failed inside `trisk.model` because the synthetic inputs did not extend far enough for interpolation.</li>
+          <li>Windows file-lock issue: cached parquet rewrites failed until the generator was changed to skip complete sectors and use a temp-file swap.</li>
+          <li>Non-blocking warnings remained from package build versions and TRISK's Merton-model row filtering.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <div class="index">08 / Open Questions / Next Phase Seeds</div>
+      <h2>Open Questions / Next Phase Seeds</h2>
+      <div class="frame" style="margin-top:16px;">
+        <ul>
+          <li>Phase 03 can now implement `load_trisk_grid(sector)` and the Scenario Builder page directly against the published parquet snapshots.</li>
+          <li>Consider trimming `input/` and `runs/` from `dashboard/data/trisk/grid/` if the dashboard only needs the three top-level artifacts.</li>
+          <li>Add tests for scenario ID round-trips, grid schema presence, and manifest/grid consistency.</li>
+          <li>Finish cleanup of the old merged topic worktree once the Windows file lock is released.</li>
+        </ul>
+      </div>
+      <div class="footer-note">artifact generated for reflection, not presentation theater</div>
+    </section>
+  </main>
+  <script>
+    if (window.Chart) {
+      Chart.defaults.devicePixelRatio = 1;
+      Chart.defaults.animation = false;
+      Chart.defaults.resizeDelay = 150;
+      Chart.defaults.normalized = true;
+      Chart.defaults.maintainAspectRatio = false;
+
+      new Chart(document.getElementById('phaseTwoChart'), {
+        type: 'bar',
+        data: {
+          labels: ['Power Rows', 'Cement Rows', 'Steel Rows', 'Manifest TRUE Flags'],
+          datasets: [{
+            label: 'Phase 02 Output Counts',
+            data: [3159, 486, 486, 3],
+            backgroundColor: [
+              'rgba(0,245,255,0.65)',
+              'rgba(57,255,20,0.65)',
+              'rgba(0,245,255,0.65)',
+              'rgba(57,255,20,0.65)'
+            ],
+            borderColor: ['#00f5ff', '#39ff14', '#00f5ff', '#39ff14'],
+            borderWidth: 1.5
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: false,
+          resizeDelay: 150,
+          normalized: true,
+          plugins: { legend: { labels: { color: '#e8f6ff' } } },
+          scales: {
+            x: { ticks: { color: '#9ab0ba' }, grid: { color: 'rgba(255,255,255,0.06)' } },
+            y: { beginAtZero: true, ticks: { color: '#9ab0ba' }, grid: { color: 'rgba(255,255,255,0.06)' } }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+run_id,company_id,company_name,sector,term,pd_baseline,pd_shock,baseline_scenario,target_scenario,scenario_geography,carbon_price_model,risk_free_rate,discount_rate,growth_rate,div_netprofit_prop_coef,shock_year,market_passthrough
+f04d2a45-f9fa-417d-974e-3833cf0261cf,VN_ABCD_020,VICEM,Cement,1,0.0386221916142615,0.13626453317724063,VN_PDP8_BASELINE,VN_NZE_STRESS,Vietnam,cement_intensity_transition,0.03,0.1,0.02,1,2030,0.35
+f04d2a45-f9fa-417d-974e-3833cf0261cf,VN_ABCD_020,VICEM,Cement,2,0.10511649909064336,0.217868118546105,VN_PDP8_BASELINE,VN_NZE_STRESS,Vietnam,cement_intensity_transition,0.03,0.1,0.02,1,2030,0.35
+f04d2a45-f9fa-417d-974e-3833cf0261cf,VN_ABCD_020,VICEM,Cement,3,0.15247036541869297,0.2613219849369499,VN_PDP8_BASELINE,VN_NZE_STRESS,Vietnam,cement_intensity_transition,0.03,0.1,0.02,1,2030,0.35
+f04d2a45-f9fa-417d-974e-3833cf0261cf,VN_ABCD_020,VICEM,Cement,4,0.18647752185268684,0.28906150823474697,VN_PDP8_BASELINE,VN_NZE_STRESS,Vietnam,cement_intensity_transition,0.03,0.1,0.02,1,2030,0.35
+f04d2a45-f9fa-417d-974e-3833cf0261cf,VN_ABCD_020,VICEM,Cement,5,0.2121082254992821,0.30865988645123077,VN_PDP8_BASELINE,VN_NZE_STRESS,Vietnam,cement_intensity_transition,0.03,0.1,0.02,1,2030,0.35
+f04d2a45-f9fa-417d-974e-3833cf0261cf,VN_ABCD_021,Holcim Group,Cement,1,5.9603589684043e-5,0.0047395016601524675,VN_PDP8_BASELINE,VN_NZE_STRESS,Vietnam,cement_intensity_transition,0.03,0.1,0.02,1,2030,0.35
+f04d2a45-f9fa-417d-974e-3833cf0261cf,VN_ABCD_021,Holcim Group,Cement,2,0.0028440112901378933,0.030128782062745607,VN_PDP8_BASELINE,VN_NZE_STRESS,Vietnam,cement_intensity_transition,0.03,0.1,0.02,1,2030,0.35
+f04d2a45-f9fa-417d-974e-3833cf0261cf,VN_ABCD_021,Holcim Group,Cement,3,0.010891671578231454,0.058157412589631474,VN_PDP8_BASELINE,VN_NZE_STRESS,Vietnam,cement_intensity_transition,0.03,0.1,0.02,1,2030,0.35
+f04d2a45-f9fa-417d-974e-3833cf0261cf,VN_ABCD_021,Holcim Group,Cement,4,0.021784304854726155,0.08203985476252595,VN_PDP8_BASELINE,VN_NZE_STRESS,Vietnam,cement_intensity_transition,0.03,0.1,0.02,1,2030,0.35
+f04d2a45-f9fa-417d-974e-3833cf0261cf,VN_ABCD_021,Holcim Group,Cement,5,0.03338076603531859,0.10156127351040767,VN_PDP8_BASELINE,VN_NZE_STRESS,Vietnam,cement_intensity_transition,0.03,0.1,0.02,1,2030,0.35

@@ -1,0 +1,2 @@
+baseline_scenario,target_scenario,scenario_geography,carbon_price_model,risk_free_rate,discount_rate,growth_rate,div_netprofit_prop_coef,shock_year,market_passthrough,run_id
+VN_PDP8_BASELINE,VN_NZE_STRESS,Vietnam,increasing_carbon_tax_50,0.03,0.06,0.02,1,2030,0.25,7d1f02d4-3dba-4d26-a4ce-19683111594f
