@@ -29,8 +29,8 @@ TRISK, Reports, and Methodology are scaffolded so later phases can add the deepe
 st.markdown(
     """
 <div class="what-new-card">
-  <strong>What's new:</strong> the TRISK Risk, Reports, and Methodology pages are now live, so the dashboard tells the full portfolio -> sector alignment -> borrower stress -> evidence narrative.
-  The latest anchor artifact is <code>2026-04-16-final-vietnam-bank-trisk-demo.html</code> in the Reports tab.
+  <strong>What's new:</strong> the <strong>Scenario Builder</strong> page (sidebar item 5) is now live — drive shock year, discount rate, risk-free rate, market passthrough, and carbon-price family to see borrower rankings shift in real time.
+  Save, load, and export scenarios for walkthroughs.
 </div>
 """,
     unsafe_allow_html=True,
@@ -42,7 +42,7 @@ trisk = load_trisk_tables()
 col1, col2, col3, col4 = st.columns(4)
 col1.metric("PACTA tables", len(pacta))
 col2.metric("TRISK tables", len(trisk))
-col3.metric("Available pages", 4)
+col3.metric("Available pages", 5)
 col4.metric("Deployment target", "pactavn")
 
 st.markdown("## How to read this demo")

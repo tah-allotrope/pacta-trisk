@@ -85,6 +85,19 @@ def load_trisk_sector_tables(sector: str) -> dict[str, pd.DataFrame]:
     }
 
 
+@st.cache_data(show_spinner=False)
+def load_parquet(path: str | Path) -> pd.DataFrame:
+    return pd.read_parquet(path)
+
+
+def load_trisk_grid(sector: str) -> dict[str, pd.DataFrame]:
+    grid_dir = TRISK_DIR / "grid" / sector
+    return {
+        "scenarios": load_csv(grid_dir / "scenarios.csv"),
+        "borrower_results": load_parquet(grid_dir / "borrower_results.parquet"),
+    }
+
+
 def list_report_files() -> list[Path]:
     return sorted(REPORTS_DIR.glob("*.html"))
 

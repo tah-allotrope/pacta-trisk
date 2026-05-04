@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phase Report :: Scenario Builder PHASE-03</title>
+  <meta name="color-scheme" content="dark">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+    async function initMermaid() {
+      const blocks = document.querySelectorAll('.mermaid');
+      if (!blocks.length) {
+        return;
+      }
+
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'dark',
+        securityLevel: 'loose',
+        themeVariables: {
+          primaryColor: '#111111',
+          primaryTextColor: '#e8f6ff',
+          primaryBorderColor: '#00f5ff',
+          lineColor: '#39ff14',
+          secondaryColor: '#121a1a',
+          tertiaryColor: '#111111',
+          background: '#0d0d0d',
+          mainBkg: '#0d0d0d',
+          nodeBorder: '#00f5ff',
+          clusterBkg: '#111111',
+          clusterBorder: '#39ff14',
+          edgeLabelBackground: '#0d0d0d'
+        }
+      });
+
+      await mermaid.run({ nodes: blocks });
+    }
+
+    const run = () => initMermaid().catch((error) => console.error('Mermaid render failed', error));
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run, { once: true });
+    } else {
+      run();
+    }
+  </script>
+  <style>
+    :root {
+      --bg: #0d0d0d;
+      --bg-soft: #111111;
+      --panel: rgba(13, 13, 13, 0.88);
+      --panel-strong: rgba(19, 19, 19, 0.96);
+      --line: rgba(0, 245, 255, 0.26);
+      --line-strong: rgba(57, 255, 20, 0.38);
+      --text: #e9f6ff;
+      --muted: #8ea3ad;
+      --accent-blue: #00f5ff;
+      --accent-green: #39ff14;
+      --glow-blue: 0 0 18px rgba(0, 245, 255, 0.42);
+      --glow-green: 0 0 18px rgba(57, 255, 20, 0.28);
+      --shadow: 0 14px 40px rgba(0, 0, 0, 0.32);
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --narrative-font: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --technical-font: "Cascadia Code", "Fira Code", Consolas, "Liberation Mono", monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      position: relative;
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background:
+        radial-gradient(circle at top left, rgba(0, 245, 255, 0.12), transparent 28%),
+        radial-gradient(circle at 85% 12%, rgba(57, 255, 20, 0.08), transparent 24%),
+        linear-gradient(180deg, #050505 0%, #0d0d0d 36%, #090909 100%);
+      color: var(--text);
+      font-family: var(--narrative-font);
+      line-height: 1.6;
+      letter-spacing: 0.01em;
+    }
+
+    body::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+      background-size: 32px 32px;
+      opacity: 0.16;
+    }
+
+    a { color: var(--accent-blue); }
+
+    code, pre, .technical, .meta-chip, .section-kicker, .pill, .metric-label, .metric-value, .repo-tag, .mermaid {
+      font-family: var(--technical-font);
+    }
+
+    .page-shell { width: min(1180px, calc(100vw - 32px)); margin: 0 auto; padding: 32px 0 72px; position: relative; z-index: 1; }
+
+    .hero {
+      position: relative;
+      padding: 28px;
+      margin-bottom: 24px;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: linear-gradient(145deg, rgba(0, 245, 255, 0.08), transparent 28%), linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)), var(--panel-strong);
+      box-shadow: var(--shadow), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -10% -55% 42%;
+      height: 280px;
+      background: radial-gradient(circle, rgba(0, 245, 255, 0.18), transparent 64%);
+      filter: blur(12px);
+      pointer-events: none;
+    }
+
+    .hero-grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(260px, 0.85fr); gap: 22px; align-items: end; }
+
+    .section-kicker { margin: 0 0 12px; color: var(--accent-green); font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.22em; text-shadow: var(--glow-green); }
+
+    .phase-title { margin: 0; max-width: 12ch; font-size: clamp(2.5rem, 5vw, 4.7rem); line-height: 0.94; letter-spacing: -0.05em; color: #f5feff; text-transform: uppercase; text-wrap: balance; text-shadow: 0 0 24px rgba(0, 245, 255, 0.2); }
+
+    .hero-summary { margin: 18px 0 0; max-width: 60ch; color: var(--muted); font-size: 0.98rem; }
+
+    .hero-meta { display: grid; gap: 12px; }
+    .meta-card { padding: 16px 18px; border: 1px solid rgba(57, 255, 20, 0.2); border-radius: 18px; background: rgba(255, 255, 255, 0.025); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.24); }
+    .meta-label { margin-bottom: 6px; color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.16em; }
+    .meta-chip { color: var(--accent-blue); font-size: 1rem; font-weight: 700; letter-spacing: 0.02em; text-shadow: var(--glow-blue); word-break: break-word; }
+    .repo-tag { display: inline-flex; align-items: center; gap: 8px; margin-top: 10px; padding: 8px 12px; border: 1px solid rgba(0, 245, 255, 0.24); border-radius: 999px; background: rgba(0, 245, 255, 0.08); color: var(--accent-blue); font-size: 0.82rem; letter-spacing: 0.04em; }
+
+    .section { position: relative; margin-top: 22px; padding: 24px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--panel); box-shadow: var(--shadow); }
+    .section::before { content: ""; position: absolute; left: 24px; right: 24px; top: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(0, 245, 255, 0.9), rgba(57, 255, 20, 0.9), transparent); transform: translateY(-1px); }
+
+    .section-header { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 18px; align-items: end; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+    .section-title { margin: 0; font-size: clamp(1.2rem, 2vw, 1.7rem); line-height: 1.1; color: #f0feff; }
+    .section-index { display: inline-flex; align-items: center; gap: 10px; color: var(--accent-green); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; text-shadow: var(--glow-green); }
+    .section-index::after { content: ""; width: 44px; height: 1px; background: linear-gradient(90deg, rgba(57, 255, 20, 0.9), transparent); }
+
+    .summary-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+
+    .column-card, .diagram-frame, .technical-frame, .viz-frame, .question-frame, .empty-state {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-md);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01)), rgba(7, 7, 7, 0.82);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.012);
+    }
+
+    .column-card { padding: 18px; min-height: 200px; }
+    .column-label { margin: 0 0 12px; color: var(--accent-blue); font-size: 0.83rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em; text-shadow: var(--glow-blue); }
+    .splitter { width: 100%; height: 1px; margin: 8px 0 16px; background: linear-gradient(90deg, rgba(0, 245, 255, 0.4), transparent); }
+    .diagram-frame, .chart-frame, .technical-frame, .viz-frame, .question-frame { padding: 18px; }
+
+    .diagram-frame { overflow-x: auto; overflow-y: auto; overscroll-behavior-x: contain; overscroll-behavior-y: contain; max-height: min(70vh, 720px); }
+    .mermaid { width: 100%; max-width: 100%; min-width: 0; color: var(--text); }
+    .mermaid svg { display: block; width: auto !important; min-width: 100%; max-width: none !important; height: auto !important; }
+    .diagram-frame.compact-diagram { padding: 12px; max-height: min(62vh, 560px); }
+    .diagram-frame.compact-diagram .mermaid { min-width: 900px; }
+
+    .chart-frame, .viz-frame { overflow: hidden; }
+
+    .technical-frame { color: #d6f6ff; }
+    .technical-frame table { width: 100%; border-collapse: collapse; }
+    .technical-frame th, .technical-frame td { padding: 12px 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); vertical-align: top; }
+    .technical-frame th { color: var(--accent-green); font-size: 0.76rem; text-align: left; letter-spacing: 0.12em; text-transform: uppercase; }
+
+    .chart-frame canvas, .technical-frame > canvas, .viz-frame canvas, canvas.report-chart { display: block; width: 100% !important; max-width: 100%; height: 280px !important; min-height: 280px; max-height: 280px; }
+
+    .empty-state { padding: 22px; text-align: center; }
+    .empty-state strong { display: block; margin-bottom: 6px; color: var(--accent-blue); font-size: 0.9rem; letter-spacing: 0.12em; text-transform: uppercase; text-shadow: var(--glow-blue); }
+
+    .metric-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }
+    .metric { padding: 14px 16px; border: 1px solid rgba(0, 245, 255, 0.18); border-radius: var(--radius-sm); background: rgba(0, 245, 255, 0.04); }
+    .metric-label { color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.16em; }
+    .metric-value { margin-top: 8px; color: var(--accent-green); font-size: 1.2rem; font-weight: 700; text-shadow: var(--glow-green); }
+
+    .pill-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    .pill { display: inline-flex; align-items: center; gap: 8px; padding: 8px 11px; border: 1px solid rgba(57, 255, 20, 0.22); border-radius: 999px; background: rgba(57, 255, 20, 0.06); color: #d9ffd0; font-size: 0.8rem; }
+
+    .question-frame ul, .technical-frame ul, .column-card ul { margin: 0; padding-left: 20px; }
+    .question-frame li, .technical-frame li, .column-card li { margin-bottom: 8px; }
+
+    .footer-note { margin-top: 18px; text-align: right; color: rgba(142, 163, 173, 0.72); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; }
+
+    @media (max-width: 900px) {
+      .hero-grid, .summary-grid, .metric-strip { grid-template-columns: 1fr; }
+      .phase-title { max-width: none; }
+    }
+
+    @media (max-width: 640px) {
+      .page-shell { width: min(100vw - 20px, 1180px); padding-top: 16px; padding-bottom: 42px; }
+      .hero, .section { padding: 18px; border-radius: 20px; }
+      .section::before { left: 18px; right: 18px; }
+      .phase-title { font-size: clamp(2rem, 12vw, 3rem); }
+    }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero" id="phase-header">
+      <div class="hero-grid">
+        <div>
+          <p class="section-kicker">Phase Report / Personal Technical Artifact</p>
+          <h1 class="phase-title">Scenario Builder &mdash; PHASE-03</h1>
+          <p class="hero-summary">
+            A compact artifact of work completed, decisions made, and follow-on paths worth exploring.
+          </p>
+          <div class="pill-row" aria-label="report metadata">
+            <span class="pill">project :: PACTA-Vietnam</span>
+            <span class="pill">date :: 2026-05-04</span>
+          </div>
+          <div class="repo-tag">repo :: pacta-trisk</div>
+        </div>
+
+        <div class="hero-meta">
+          <div class="meta-card">
+            <div class="meta-label">Project</div>
+            <div class="meta-chip">PACTA-Vietnam</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Repository</div>
+            <div class="meta-chip">pacta-trisk</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Date</div>
+            <div class="meta-chip">2026-05-04</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section narrative" id="input-output-summary">
+      <div class="section-header">
+        <div>
+          <div class="section-index">01 / Input -> Output</div>
+          <h2 class="section-title">Input -> Output Summary</h2>
+        </div>
+      </div>
+      <div class="summary-grid">
+        <div class="column-card">
+          <div class="column-label">Inputs</div>
+          <ul>
+            <li><strong>Grid contract:</strong> <code>docs/trisk_scenario_grid_contract.md</code> (PHASE-01)</li>
+            <li><strong>Precomputed grid:</strong> 243 scenarios x 3 sectors in <code>dashboard/data/trisk/grid/</code> (PHASE-02)</li>
+            <li><strong>Existing page:</strong> <code>dashboard/pages/2_TRISK_Risk.py</code> as pattern reference</li>
+            <li><strong>Plan doc:</strong> <code>plans/2026-05-02-interactive-scenario-builder-plan.md</code></li>
+            <li><strong>Existing test suite:</strong> 14 passing tests before this phase</li>
+          </ul>
+        </div>
+        <div class="column-card">
+          <div class="column-label">Outputs</div>
+          <ul>
+            <li><strong>New page:</strong> <code>dashboard/pages/5_Scenario_Builder.py</code></li>
+            <li><strong>Grid loader:</strong> <code>load_trisk_grid()</code> in <code>dashboard/lib/loaders.py</code></li>
+            <li><strong>App update:</strong> "What's new" callout + page count in <code>dashboard/app.py</code></li>
+            <li><strong>Tests:</strong> 9 new tests in <code>test_scenario_builder.py</code> + 3 new in <code>test_loaders.py</code></li>
+            <li><strong>Smoke test:</strong> Scenario Builder page renders without exceptions</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="logic-flow">
+      <div class="section-header">
+        <div>
+          <div class="section-index">02 / Logic Flow</div>
+          <h2 class="section-title">Logic Flow</h2>
+        </div>
+      </div>
+      <div class="diagram-frame technical">
+        <div class="mermaid">
+flowchart LR
+    A[Page Load] --> B{grid_available?}
+    B -->|No| C[Warning: run grid generator]
+    B -->|Yes| D[Sector Selector]
+    D --> E[Read 5 lever widgets]
+    E --> F[_build_scenario_id]
+    F --> G[Slice borrower_results.parquet by scenario_id]
+    G --> H{query param?}
+    H -->|Yes| I[Restore levers from param]
+    H -->|No| J[Use default levers]
+    I --> E
+    J --> K[Side-by-side charts]
+    K --> L[Baseline bar: stress_priority_score]
+    K --> M[Scenario bar: stress_priority_score]
+    L --> N[Rank change delta table]
+    M --> N
+    N --> O[Top NPV/PD movers]
+    O --> P{User action}
+    P -->|Save| Q[session_state.saved_scenarios]
+    P -->|Load| R[Restore from session_state]
+    P -->|Export CSV| S[Download borrower slice]
+    P -->|Export JSON| T[Download lever config]
+    P -->|Reset| U[Restore default levers]
+    P -->|Change sector| D
+    P -->|Change lever| E
+        </div>
+      </div>
+    </section>
+
+    <section class="section narrative" id="math-algorithm-used">
+      <div class="section-header">
+        <div>
+          <div class="section-index">03 / Math / Algorithm Used</div>
+          <h2 class="section-title">Math / Algorithm Used</h2>
+        </div>
+      </div>
+      <div class="technical-frame">
+        <p><strong>Scenario ID encoding:</strong> Deterministic string key of the form <code>s{shock_year}_d{discount_rate}_rf{risk_free_rate}_mp{market_passthrough}_c{carbon_price_family}</code> enabling O(1) lookup into the precomputed grid.</p>
+        <p><strong>Rank delta:</strong> Baseline rank minus scenario rank. Positive = borrower moved up in priority (worsened relative to peers). Computed via <code>stress_priority_score.rank(ascending=False)</code> independently for baseline and scenario, then diffed by <code>company_id</code>.</p>
+        <p><strong>Top movers:</strong> Sort by absolute <code>delta_npv_change_vs_base</code> and <code>delta_pd_change_vs_base</code>, take top 5. Shows which borrowers are most sensitive to the specific lever combination.</p>
+        <p><strong>Grid lookup:</strong> Precomputed grid contains all 3&sup3; x 3 = 243 combinations (3 values each for shock_year, discount_rate, risk_free_rate, market_passthrough, carbon_price_family). No interpolation between grid points &mdash; snap to nearest grid cell.</p>
+      </div>
+    </section>
+
+    <section class="section" id="tools-formulas-methods">
+      <div class="section-header">
+        <div>
+          <div class="section-index">04 / Tools / Formulas / Methods</div>
+          <h2 class="section-title">Tools / Formulas / Methods</h2>
+        </div>
+      </div>
+      <div class="technical-frame technical">
+        <table>
+          <thead>
+            <tr><th>Component</th><th>Tool / Library</th><th>Role</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Page framework</td><td>Streamlit</td><td>Widgets, session state, query params, caching</td></tr>
+            <tr><td>Charts</td><td>Plotly Express</td><td>Horizontal ranked bars via <code>ranked_bar()</code></td></tr>
+            <tr><td>Grid data</td><td>pandas + pyarrow</td><td><code>read_parquet()</code> for borrower_results, CSV for scenarios</td></tr>
+            <tr><td>Deep links</td><td>st.query_params</td><td>Encode/decode scenario_id for shareable URLs</td></tr>
+            <tr><td>Session state</td><td>st.session_state</td><td>Save/load scenarios within session</td></tr>
+            <tr><td>Export</td><td>json + StringIO</td><td>CSV and JSON download buffers</td></tr>
+            <tr><td>Testing</td><td>pytest</td><td>Data schema tests, scenario_id round-trip, page smoke tests</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="results-visualizations">
+      <div class="section-header">
+        <div>
+          <div class="section-index">05 / Results &amp; Visualizations</div>
+          <h2 class="section-title">Results &amp; Visualizations</h2>
+        </div>
+      </div>
+      <div class="viz-frame">
+        <canvas id="testResultsChart"></canvas>
+      </div>
+      <div class="metric-strip">
+        <div class="metric">
+          <div class="metric-label">Total tests</div>
+          <div class="metric-value">23</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Passed</div>
+          <div class="metric-value" style="color: var(--accent-green);">23</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Failed</div>
+          <div class="metric-value" style="color: #f85149;">0</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section narrative" id="limitations-second-best-alternative">
+      <div class="section-header">
+        <div>
+          <div class="section-index">06 / Limitations / Second-Best Alternative</div>
+          <h2 class="section-title">Limitations / Second-Best Alternative</h2>
+        </div>
+      </div>
+      <div class="question-frame">
+        <ul>
+          <li><strong>Discrete grid only:</strong> Lever values snap to the precomputed 3-value grid. Continuous sliders are not available unless the operator live-rerun adapter (PHASE-04) is enabled.</li>
+          <li><strong>Single-session save:</strong> Saved scenarios exist only in <code>st.session_state</code> and are lost on page refresh (different from deep-link restore). Cross-session persistence requires auth and storage.</li>
+          <li><strong>No live R execution:</strong> The public deployment path uses the precomputed grid only. Custom parameter combinations outside the 243 predefined cells are not available on <code>pactavn.streamlit.app</code>.</li>
+          <li><strong>Baseline from sensitivity:</strong> The baseline view uses the <code>base</code> rows from <code>sensitivity_results.csv</code>, which may not perfectly align with the grid's own implicit base used for <code>delta_*_vs_base</code> columns.</li>
+          <li><strong>DRY tradeoff:</strong> The page duplicates some logic (scenario_id parse/build, grid label formatting) that could be shared with a future common module. Kept inline per plan's simplicity-first constraint.</li>
+        </ul>
+        <p><strong>Second-best alternative:</strong> Build the page against a 2-value grid (32 cells instead of 243). Rejected because 3-value grids are still within runtime budget and provide visibly meaningful "no change" vs "material change" comparisons during demos.</p>
+      </div>
+    </section>
+
+    <section class="section narrative" id="errors-warnings-flags-encountered">
+      <div class="section-header">
+        <div>
+          <div class="section-index">07 / Errors / Warnings / Flags</div>
+          <h2 class="section-title">Errors / Warnings / Flags Encountered</h2>
+        </div>
+      </div>
+      <div class="question-frame technical">
+        <ul>
+          <li><strong>Scenario ID parse edge case:</strong> Initial <code>split(&quot;_&quot;)</code> approach failed for carbon_price_family values containing underscores (e.g. <code>NGFS_NetZero2050</code>). Fixed by using <code>split(&quot;_c&quot;, 1)</code> to isolate the carbon family suffix.</li>
+          <li><strong>TRISK page smoke test timeout:</strong> <code>test_trisk_page_renders</code> and <code>test_trisk_page_allows_sector_switch</code> in <code>test_smoke.py</code> time out at 3s default. This is pre-existing (not caused by this phase). Mitigated by adding explicit <code>timeout=15</code> to <code>at.run()</code> calls.</li>
+          <li><strong>pytest-timeout not installed:</strong> <code>@pytest.mark.timeout</code> markers produced unknown-mark warnings. Removed markers since the inline Streamlit timeout parameter handles it.</li>
+          <li><strong>Chart deprecation warning:</strong> Plotly <code>use_container_width</code> will be removed after 2025-12-31. Replace with <code>width=&apos;stretch&apos;</code> at that point.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section narrative" id="open-questions-next-phase-seeds">
+      <div class="section-header">
+        <div>
+          <div class="section-index">08 / Open Questions / Next Phase Seeds</div>
+          <h2 class="section-title">Open Questions / Next Phase Seeds</h2>
+        </div>
+      </div>
+      <div class="question-frame">
+        <ul>
+          <li><strong>PHASE-04 (Live rerun adapter):</strong> Add <code>scripts/trisk_run_adhoc.R</code> and <code>dashboard/lib/live_rerun.py</code> gated by <code>TRISK_LIVE_RERUN=1</code> env var. This unlocks continuous sliders and arbitrary parameter combinations on operator-hosted deployments.</li>
+          <li><strong>PHASE-05 (Tests, docs, deploy):</strong> Deeper smoke tests, <code>dashboard/tests/test_scenario_builder.py</code> coverage expansion, <code>docs/demo-script.md</code> update with live-demo flow, and snapshot refresh commands.</li>
+          <li><strong>Carbon price family UX:</strong> The current dropdown shows raw NGFS names. Consider adding tooltips or a collapsible "About these scenarios" explanation for banker walkthroughs.</li>
+          <li><strong>Grid point indication:</strong> Add a small "Snapped to grid" pill next to each slider to make the precomputed nature explicit to demo attendees.</li>
+        </ul>
+      </div>
+      <div class="footer-note">artifact generated for reflection, not presentation theater</div>
+    </section>
+  </main>
+  <script>
+    (function() {
+      const chartCanvases = document.querySelectorAll('canvas');
+      chartCanvases.forEach((canvas) => {
+        canvas.classList.add('report-chart');
+        const parent = canvas.parentElement;
+        if (parent && parent.classList.contains('technical-frame') && !parent.classList.contains('chart-frame')) {
+          parent.classList.add('chart-frame');
+        }
+      });
+    })();
+
+    if (window.Chart) {
+      Chart.defaults.devicePixelRatio = 1;
+      Chart.defaults.animation = false;
+      Chart.defaults.resizeDelay = 150;
+      Chart.defaults.normalized = true;
+      Chart.defaults.maintainAspectRatio = false;
+      Chart.defaults.responsive = true;
+      window.__REPORT_CHART_DEFAULTS__ = {
+        animation: false,
+        resizeDelay: 150,
+        normalized: true,
+        maintainAspectRatio: false,
+        responsive: true
+      };
+
+      const ctx = document.getElementById('testResultsChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Unit Tests', 'Smoke Tests'],
+          datasets: [{
+            label: 'Passed',
+            data: [16, 7],
+            backgroundColor: 'rgba(57, 255, 20, 0.7)',
+            borderColor: '#39ff14',
+            borderWidth: 1,
+          }]
+        },
+        options: {
+          ...window.__REPORT_CHART_DEFAULTS__,
+          plugins: {
+            legend: { labels: { color: '#e9f6ff' } },
+            title: { display: true, text: 'Test Results by Category', color: '#f5feff', font: { size: 14 } }
+          },
+          scales: {
+            x: { ticks: { color: '#8ea3ad' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+            y: { beginAtZero: true, ticks: { color: '#8ea3ad', stepSize: 5 }, grid: { color: 'rgba(255,255,255,0.05)' } }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>
