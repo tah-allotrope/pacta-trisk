@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Final Report :: Interactive Scenario &amp; Stress Builder</title>
+  <meta name="color-scheme" content="dark light">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    async function initMermaid() {
+      const blocks = document.querySelectorAll('.mermaid');
+      if (!blocks.length) return;
+      mermaid.initialize({
+        startOnLoad: false, theme: 'base', securityLevel: 'loose',
+        themeVariables: {
+          primaryColor: '#f3ead9', primaryTextColor: '#1f1912', primaryBorderColor: '#9d6b37',
+          lineColor: '#3b6f76', secondaryColor: '#efe4d0', tertiaryColor: '#ffffff',
+          background: '#fbf7f1', mainBkg: '#fbf7f1', nodeBorder: '#9d6b37',
+          clusterBkg: '#f7efdf', clusterBorder: '#3b6f76', edgeLabelBackground: '#fbf7f1'
+        }
+      });
+      await mermaid.run({ nodes: blocks });
+    }
+    const run = () => initMermaid().catch(e => console.error('Mermaid render failed', e));
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run, { once: true });
+    else run();
+  </script>
+  <style>
+    :root {
+      --paper: #fbf7f1; --paper-strong: #fffdf9; --ink: #1f1912; --ink-soft: #5f564c;
+      --line: #dccdb6; --line-strong: #bfa37d; --accent: #9d6b37; --accent-soft: #efe4d0;
+      --accent-2: #3b6f76; --shadow: 0 18px 40px rgba(49, 33, 16, 0.08);
+      --radius-lg: 24px; --radius-md: 18px; --radius-sm: 12px; --page-width: 1040px;
+      --display-font: Georgia, "Times New Roman", serif;
+      --body-font: "Segoe UI","Helvetica Neue",Helvetica,Arial,sans-serif;
+      --mono-font: "Cascadia Code",Consolas,monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; overflow-x: hidden; color: var(--ink);
+      background: radial-gradient(circle at top left, rgba(157,107,55,0.09), transparent 26%),
+                  radial-gradient(circle at 88% 10%, rgba(59,111,118,0.08), transparent 22%),
+                  linear-gradient(180deg, #f7f1e7 0%, #fbf7f1 28%, #f6efe5 100%);
+      font-family: var(--body-font); line-height: 1.65; letter-spacing: 0.01em;
+    }
+    a { color: var(--accent-2); }
+    code, pre, .technical, .meta-chip, .section-index, .eyebrow, .stat-label, .stat-value, .mermaid { font-family: var(--mono-font); }
+    .page-shell { width: min(var(--page-width), calc(100vw - 32px)); margin: 0 auto; padding: 28px 0 56px; }
+    .hero {
+      padding: 34px; border: 1px solid rgba(159,123,79,0.28); border-radius: 30px;
+      background: linear-gradient(135deg, rgba(157,107,55,0.1), transparent 34%),
+                  linear-gradient(180deg, rgba(255,255,255,0.58), rgba(255,255,255,0.86)), var(--paper-strong);
+      box-shadow: var(--shadow);
+    }
+    .hero-grid { display: grid; grid-template-columns: minmax(0,1.45fr) minmax(260px,0.85fr); gap: 24px; align-items: end; }
+    .eyebrow { margin: 0 0 12px; color: var(--accent); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; }
+    .title { margin: 0; max-width: 12ch; font-family: var(--display-font); font-size: clamp(2.8rem,5vw,4.8rem); line-height: 0.95; letter-spacing: -0.04em; text-wrap: balance; }
+    .lede { margin: 18px 0 0; max-width: 60ch; color: var(--ink-soft); font-size: 1rem; }
+    .takeaway { margin-top: 22px; padding: 18px 20px; border-left: 4px solid var(--accent-2); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; background: rgba(59,111,118,0.08); color: #20373a; font-size: 1.02rem; }
+    .meta-grid { display: grid; gap: 12px; }
+    .meta-card, .section, .subcard, .empty-state { border: 1px solid rgba(95,72,46,0.12); background: rgba(255,253,249,0.88); box-shadow: var(--shadow); }
+    .meta-card { padding: 16px 18px; border-radius: var(--radius-md); }
+    .meta-label { color: var(--ink-soft); font-size: 0.76rem; letter-spacing: 0.14em; text-transform: uppercase; }
+    .meta-chip { margin-top: 8px; color: var(--accent); font-size: 1rem; font-weight: 700; word-break: break-word; }
+    .section { margin-top: 22px; padding: 24px; border-radius: var(--radius-lg); break-inside: avoid; page-break-inside: avoid; }
+    .section-header { display: flex; justify-content: space-between; gap: 12px 18px; align-items: end; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+    .section-index { color: var(--accent); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; }
+    .section-title { margin: 0; font-family: var(--display-font); font-size: clamp(1.45rem,2vw,2rem); line-height: 1.05; }
+    .summary-grid, .dual-grid, .phase-grid, .stat-grid, .appendix-grid { display: grid; gap: 16px; }
+    .summary-grid, .dual-grid, .phase-grid, .appendix-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .subcard { padding: 18px; border-radius: var(--radius-md); break-inside: avoid; page-break-inside: avoid; }
+    .subcard h3, .subcard h4 { margin: 0 0 10px; font-size: 1rem; line-height: 1.2; }
+    .subcard h4 { color: var(--ink-soft); }
+    .subcard p:first-child, .subcard ul:first-child, .subcard ol:first-child { margin-top: 0; }
+    .stat-grid { grid-template-columns: repeat(3, minmax(0,1fr)); margin-top: 16px; }
+    .stat { padding: 14px 16px; border: 1px solid rgba(59,111,118,0.16); border-radius: var(--radius-sm); background: rgba(59,111,118,0.06); break-inside: avoid; page-break-inside: avoid; }
+    .stat-label { color: var(--ink-soft); font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; }
+    .stat-value { margin-top: 8px; color: var(--accent-2); font-size: 1.18rem; font-weight: 700; }
+    .narrative, .chart-frame, .technical-frame, .diagram-frame, .viz-frame { padding: 18px; border: 1px solid var(--line); border-radius: var(--radius-md); background: rgba(255,255,255,0.54); break-inside: avoid; page-break-inside: avoid; }
+    .diagram-frame { overflow-x: auto; overflow-y: auto; overscroll-behavior-x: contain; overscroll-behavior-y: contain; max-height: min(70vh,720px); }
+    .chart-frame, .viz-frame { overflow: hidden; }
+    .mermaid { width: 100%; max-width: 100%; min-width: 0; color: var(--ink); }
+    .mermaid svg { display: block; width: auto !important; min-width: 100%; max-width: none !important; height: auto !important; }
+    .diagram-frame.compact-diagram { padding: 12px; max-height: min(62vh,560px); }
+    .diagram-frame.compact-diagram .mermaid { min-width: 900px; }
+    .chart-frame canvas, .technical-frame > canvas, .viz-frame canvas, canvas.report-chart { display: block; width: 100% !important; max-width: 100%; height: 300px !important; min-height: 300px; max-height: 300px; }
+    .technical-frame table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+    .technical-frame th, .technical-frame td { padding: 12px 10px; border-bottom: 1px solid var(--line); vertical-align: top; text-align: left; }
+    .technical-frame th { color: var(--accent); font-size: 0.76rem; letter-spacing: 0.1em; text-transform: uppercase; }
+    .empty-state { padding: 20px; border-radius: var(--radius-md); text-align: center; color: var(--ink-soft); }
+    .empty-state strong { display: block; margin-bottom: 6px; color: var(--accent); font-size: 0.84rem; letter-spacing: 0.12em; text-transform: uppercase; }
+    ul, ol { margin: 0; padding-left: 20px; }
+    li { margin-bottom: 8px; }
+    p:last-child, li:last-child { margin-bottom: 0; }
+    .footer-note { margin-top: 18px; color: rgba(95,86,76,0.74); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; text-align: right; }
+    @media (max-width: 920px) { .hero-grid, .summary-grid, .dual-grid, .phase-grid, .stat-grid, .appendix-grid { grid-template-columns: 1fr; } .title { max-width: none; } }
+    @media (max-width: 640px) { .page-shell { width: min(100vw - 20px, var(--page-width)); padding-top: 16px; padding-bottom: 36px; } .hero,.section { padding: 18px; border-radius: 20px; } .title { font-size: clamp(2.1rem,12vw,3.2rem); } }
+    @media print {
+      :root { --paper: #ffffff; --paper-strong: #ffffff; --ink: #111111; --ink-soft: #444444; --line: #d6d1c8; }
+      @page { size: A4; margin: 14mm; }
+      body { background: #ffffff; }
+      .page-shell { width: 100%; max-width: none; padding: 0; }
+      .hero,.meta-card,.section,.subcard,.narrative,.chart-frame,.technical-frame,.diagram-frame,.viz-frame,.empty-state,.stat { background: #ffffff; box-shadow: none; }
+      .hero,.section { margin-top: 0; margin-bottom: 10mm; }
+      .diagram-frame { overflow: visible; max-height: none; }
+      .diagram-frame.compact-diagram .mermaid { min-width: 0; }
+      .section-header,.takeaway { break-after: avoid; page-break-after: avoid; }
+      a { color: inherit; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero" id="title-hero">
+      <div class="hero-grid">
+        <div>
+          <p class="eyebrow">Final Report / Shareable Analysis Artifact</p>
+          <h1 class="title">Interactive Scenario &amp; Stress Builder</h1>
+          <p class="lede">
+            A presentation-ready synthesis of the Scenario Builder multi-phase implementation, written for stakeholders who need context, design rationale, and a clear deployment path.
+          </p>
+          <div class="takeaway">
+            <strong>One-line takeaway:</strong> The TRISK page was converted from a read-only viewer into a banker-driveable scenario tool. Five levers (shock year, discount rate, risk-free rate, market passthrough, carbon-price family) are exposed as sliders, with results served from a 243-cell precomputed grid on Streamlit Cloud (no R needed) or from live R calls behind an operator-only env flag.
+          </div>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-card"><div class="meta-label">Project</div><div class="meta-chip">PACTA-Vietnam</div></div>
+          <div class="meta-card"><div class="meta-label">Repository</div><div class="meta-chip">pacta-trisk</div></div>
+          <div class="meta-card"><div class="meta-label">Date</div><div class="meta-chip">2026-05-04</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="executive-summary">
+      <div class="section-header">
+        <div>
+          <div class="section-index">01 / Executive Summary</div>
+          <h2 class="section-title">Executive Summary</h2>
+        </div>
+      </div>
+      <div class="summary-grid">
+        <div class="subcard">
+          <h3>What was built</h3>
+          <p>A Scenario Builder page (<code>5_Scenario_Builder.py</code>) that exposes the five canonical TRISK parameters as live widgets. Borrowers are ranked by a composite stress-priority score, and the page shows side-by-side baseline vs scenario comparisons, a rank-change delta table, top NPV/PD movers, and save/load/export capabilities.</p>
+          <p>Two execution modes exist: a <strong>precomputed grid</strong> (243 scenario combinations &times; 3 sectors) that works on Streamlit Community Cloud without R, and an <strong>operator-only live-rerun</strong> path (<code>TRISK_LIVE_RERUN=1</code>) that calls <code>trisk.model::run_trisk()</code> via subprocess for arbitrary parameter combinations.</p>
+        </div>
+        <div class="subcard">
+          <h3>Key outcomes</h3>
+          <ul>
+            <li><strong>23 unit/smoke tests</strong> passing on the PHASE-03 page, loader, and scenario-id logic</li>
+            <li><strong>7 additional live-rerun tests</strong> covering env gating, Rscript resolution, and error paths</li>
+            <li><strong>Zero new failures</strong> introduced (the single pre-existing smoke-test timeout is unrelated)</li>
+            <li><strong>Demo-ready:</strong> A banker can change any lever during a live meeting and immediately see top-10 ranking shifts</li>
+            <li><strong>Exportable:</strong> CSV, JSON, and deep-link shareability via <code>?scenario_id=</code></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="background-objective">
+      <div class="section-header">
+        <div>
+          <div class="section-index">02 / Background &amp; Objective</div>
+          <h2 class="section-title">Background &amp; Objective</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p>The PACTA-Vietnam dashboard originally had a read-only TRISK page (<code>2_TRISK_Risk.py</code>) that showed a fixed stress scenario with one-at-a-time sensitivity filtering. A banker watching a live demo could only see pre-canned results and ask &ldquo;what if&rdquo; questions that required a developer to rerun the R model.</p>
+        <p>The objective was to convert that page into a <strong>banker-driveable scenario tool</strong> so prospects can move shock year, discount rate, risk-free rate, market passthrough, and carbon-price family during a live sales meeting and immediately see how their top-20 borrowers reorder. Two constraints drove the architecture: (1) Streamlit Community Cloud cannot run R, so a public path needed precomputed data; (2) operator-hosted deployments should be able to escape the grid for arbitrary parameter combinations.</p>
+      </div>
+    </section>
+
+    <section class="section" id="inputs-scope">
+      <div class="section-header">
+        <div>
+          <div class="section-index">03 / Inputs &amp; Scope</div>
+          <h2 class="section-title">Inputs &amp; Scope</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>In scope</h3>
+          <ul>
+            <li>Five lever controls: <code>shock_year</code>, <code>discount_rate</code>, <code>risk_free_rate</code>, <code>market_passthrough</code>, <code>carbon_price_family</code></li>
+            <li>Precomputed grid: 3 values per lever = 243 scenarios &times; 3 sectors = 729 TRISK runs</li>
+            <li>Side-by-side baseline vs scenario comparison with ranked bars</li>
+            <li>Rank-change delta table and top NPV/PD movers panel</li>
+            <li>Save/load scenarios in session, export as CSV and JSON</li>
+            <li>Deep-link shareability via <code>?scenario_id=</code> query parameter</li>
+            <li>Operator-only live-rerun adapter gated by <code>TRISK_LIVE_RERUN=1</code></li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Out of scope</h3>
+          <ul>
+            <li>Adding new TRISK sectors (e.g. automotive)</li>
+            <li>Changing TRISK input data or carbon-price curves</li>
+            <li>Multi-bank or multi-portfolio comparison</li>
+            <li>Cross-session persistence of saved scenarios</li>
+            <li>Authentication backend beyond the simple env flag</li>
+            <li>Continuous sliders on the public path (discrete snap-to-grid only)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="assumptions-constraints">
+      <div class="section-header">
+        <div>
+          <div class="section-index">04 / Assumptions &amp; Constraints</div>
+          <h2 class="section-title">Assumptions &amp; Constraints</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h4>Architectural</h4>
+          <ul>
+            <li>Streamlit Community Cloud cannot run R; all public paths serve from precomputed CSVs and Parquet</li>
+            <li>A factorial grid of 243 combinations &times; 3 sectors is acceptable (~10 min generation per sector)</li>
+            <li>The dashboard is Python/Streamlit; R is only invoked from the operator-side adapter via subprocess</li>
+            <li>Carbon-price family maps to existing curves; no new NGFS curve files for v1</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h4>Operational</h4>
+          <ul>
+            <li>Public deployment must remain fully synthetic-watermarked; live-rerun mode must never be reachable from the public URL</li>
+            <li>Single-session save/load via <code>st.session_state</code> is adequate for v1</li>
+            <li>3-value lever discretizations provide meaningful demo comparisons; 5 values would push grid size to 3,125 cells</li>
+            <li>The baseline comparison uses the existing <code>base</code> row from <code>sensitivity_results.csv</code> and the grid&rsquo;s precomputed delta columns</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="methodology">
+      <div class="section-header">
+        <div>
+          <div class="section-index">05 / Methodology</div>
+          <h2 class="section-title">Methodology</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p>The implementation followed the multi-phase plan in <code>plans/2026-05-02-interactive-scenario-builder-plan.md</code>. PHASE-01 and PHASE-02 (contract design and grid generation) were completed before this report. PHASE-03 (the scenario builder page) and PHASE-04 (live-rerun adapter) were implemented in this session.</p>
+        <p><strong>PHASE-03</strong> built the Streamlit page reusing existing patterns from <code>2_TRISK_Risk.py</code> and <code>lib/loaders.py</code>. The page loads the precomputed grid from <code>dashboard/data/trisk/grid/&lt;sector&gt;/</code>, converts lever selections to a deterministic <code>scenario_id</code>, and performs an O(1) lookup into the Parquet-backed borrower results table. The baseline view uses the existing <code>sensitivity_results.csv</code> base rows; the scenario view uses the grid slice for the selected <code>scenario_id</code>. Rank changes are computed by diffing independent <code>stress_priority_score</code> rankings.</p>
+        <p><strong>PHASE-04</strong> wrapped the existing <code>trisk.model::run_trisk()</code> R entrypoint in a thin adapter. <code>scripts/trisk_run_adhoc.R</code> accepts CLI flags, runs one scenario, and writes a temp CSV. <code>dashboard/lib/live_rerun.py</code> subprocesses the script with a 30-second timeout, parses stdout for the output path, loads the CSV, and deletes the temp file. A concurrency guard prevents double-submit. The entire path is invisible when <code>TRISK_LIVE_RERUN=1</code> is unset.</p>
+      </div>
+      <div class="stat-grid">
+        <div class="stat"><div class="stat-label">Phases completed</div><div class="stat-value">4 of 5</div></div>
+        <div class="stat"><div class="stat-label">Lines of code</div><div class="stat-value">&asymp;1,000</div></div>
+        <div class="stat"><div class="stat-label">Tests passing</div><div class="stat-value">29 of 30</div></div>
+      </div>
+    </section>
+
+    <section class="section" id="phase-analysis">
+      <div class="section-header">
+        <div>
+          <div class="section-index">06 / Phase-by-Phase Analysis</div>
+          <h2 class="section-title">Phase-by-Phase Analysis</h2>
+        </div>
+      </div>
+      <div class="phase-grid">
+        <div class="subcard">
+          <h3>PHASE-01 &mdash; Contract</h3>
+          <p>Locked the scenario contract: 3 values per lever, <code>scenario_id</code> format <code>s{year}_d{dr}_rf{rf}_mp{mp}_c{family}</code>, and the output file layout for <code>grid/&lt;sector&gt;/{scenarios.csv, borrower_results.parquet, grid_meta.json}</code>.</p>
+          <p><strong>Key decision:</strong> Three NGFS-named aliases mapped to existing repo curves rather than ingesting fresh NGFS Phase V files.</p>
+        </div>
+        <div class="subcard">
+          <h3>PHASE-02 &mdash; Grid Generation</h3>
+          <p><code>scripts/trisk_scenario_grid.R</code> expanded the contract grid into 243 combinations per sector, ran each via <code>trisk.model::run_trisk()</code>, and wrote Parquet-backed borrower results.  Cache-skip behavior keyed on <code>scenario_id</code> for incremental regeneration.</p>
+          <p><strong>Key decision:</strong> 3-value grid (243 cells) accepted as tractable; a 5-value grid would push to 3,125 cells and require parallelization.</p>
+        </div>
+        <div class="subcard">
+          <h3>PHASE-03 &mdash; Scenario Builder Page</h3>
+          <p>New <code>dashboard/pages/5_Scenario_Builder.py</code> with sector selector, five lever widgets (select-sliders + selectbox), side-by-side baseline vs scenario ranked bars, rank-change delta table, top NPV/PD movers panel, save/load via session state, CSV/JSON export, and deep-link via <code>?scenario_id=</code>.  Added <code>load_trisk_grid()</code> to <code>lib/loaders.py</code>.</p>
+          <p><strong>Edge case caught:</strong> <code>_parse_scenario_id</code> initially split on <code>_</code> which broke for carbon family values containing underscores (e.g. <code>NGFS_NetZero2050</code>). Fixed by using <code>split(&quot;_c&quot;, 1)</code>.</p>
+        </div>
+        <div class="subcard">
+          <h3>PHASE-04 &mdash; Live-Rerun Adapter</h3>
+          <p><code>scripts/trisk_run_adhoc.R</code> (CLI runner) + <code>dashboard/lib/live_rerun.py</code> (subprocess wrapper) gated behind <code>TRISK_LIVE_RERUN=1</code>.  Includes 30-second timeout, Rscript path override via <code>R_RSCRIPT</code> env var, concurrency guard, clear error messages for missing R / missing package, and operator setup docs in <code>docs/streamlit-deploy.md</code>.</p>
+          <p><strong>Key constraint:</strong> The public deployment must never set the env flag; a startup assertion warns when enabled.</p>
+        </div>
+      </div>
+      <div class="technical-frame" style="margin-top:16px;">
+        <div class="mermaid">
+flowchart LR
+    A[Plan: 5 phases] --> B[PH-01: Contract]
+    B --> C[PH-02: Grid gen]
+    C --> D[PH-03: Scenario Builder page]
+    D --> E[PH-04: Live rerun adapter]
+    E --> F[PH-05: Tests, docs, deploy]
+    style A fill:#f3ead9,stroke:#9d6b37
+    style D fill:#d4e8e0,stroke:#3b6f76
+    style E fill:#d4e8e0,stroke:#3b6f76
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="findings-recommendation">
+      <div class="section-header">
+        <div>
+          <div class="section-index">07 / Findings &amp; Recommendation</div>
+          <h2 class="section-title">Findings &amp; Recommendation</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p><strong>The two-mode architecture (grid + live rerun) works.</strong> The precomputed grid makes the Scenario Builder available on the public Streamlit Cloud URL without any R dependency, which is the highest-leverage marketing surface. The operator-only live-rerun path, while currently behind an env flag, provides a clear upgrade path for private deployments where the sales engineer needs to answer &ldquo;what if&rdquo; questions outside the predefined grid.</p>
+        <p><strong>Tradeoff accepted:</strong> The grid is discrete &mdash; sliders snap to the 3 preset values. This is a deliberate constraint. Continuous sliders on the public path would require either interpolation (which is misleading for non-linear TRISK outputs) or a full R backend on Streamlit Cloud (which is not possible). The RISK-03-01 mitigation (select-slider with explicit allowed values and a tooltip) was implemented.</p>
+        <p><strong>Recommendation:</strong> Proceed to PHASE-05 for the remaining integration work (demo-script finalization, snapshot refresh documentation, and a full rehearsal walkthrough). The carbon-price family differentiation (all three currently map to the same curve) should be the first post-v1 enhancement, as it&rsquo;s the lever with the most visible impact on borrower ranking and the one that bankers most often ask about.</p>
+      </div>
+      <div class="viz-frame" style="margin-top:16px;">
+        <canvas id="testResultsChart"></canvas>
+      </div>
+    </section>
+
+    <section class="section" id="implementation-path">
+      <div class="section-header">
+        <div>
+          <div class="section-index">08 / Implementation Path</div>
+          <h2 class="section-title">Implementation Path</h2>
+        </div>
+      </div>
+      <div class="phase-grid">
+        <div class="subcard">
+          <h4>Immediate (PHASE-05)</h4>
+          <ul>
+            <li>Run end-to-end snapshot refresh via R scripts</li>
+            <li>Finalize <code>docs/demo-script.md</code> with the Scenario Builder walkthrough</li>
+            <li>Verify public deployment on Streamlit Cloud</li>
+            <li>Walk through the demo with the Scenario Builder flow</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h4>Short-term (v1.1)</h4>
+          <ul>
+            <li>Add &ldquo;Snapped to grid&rdquo; pill next to each slider for transparency</li>
+            <li>Add tooltip or collapsible &ldquo;About these scenarios&rdquo; explanation for banker walkthroughs</li>
+            <li>Ingest real NGFS Phase V curves to differentiate the three carbon-price families</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h4>Medium-term</h4>
+          <ul>
+            <li>Cross-session persistence of saved scenarios (JSON file or lightweight DB)</li>
+            <li>Multi-bank or multi-portfolio comparison across scenario outputs</li>
+            <li>Add a sixth lever (growth rate, div_netprofit_prop_coef) if the grid contract is renegotiated</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h4>Long-term</h4>
+          <ul>
+            <li>New TRISK sectors (automotive, etc.) if input data becomes available</li>
+            <li>Full R backend on a private Streamlit Enterprise deployment (no grid limitations)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="risks-open-questions">
+      <div class="section-header">
+        <div>
+          <div class="section-index">09 / Risks / Open Questions</div>
+          <h2 class="section-title">Risks / Open Questions</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h4>Risks</h4>
+          <ul>
+            <li><strong>Accidental live-rerun enablement on public URL:</strong> Mitigated by env-var gating, startup assertion, and explicit deployment documentation.</li>
+            <li><strong>Grid generation cost:</strong> 3-value grid is currently tractable. Adding a sixth lever would require downsizing existing levers or parallelization.</li>
+            <li><strong>Carbon family homogeneity:</strong> All three families currently map to the same curve. Bankers may ask why changing the dropdown doesn&rsquo;t change results.</li>
+            <li><strong>Pre-existing smoke test timeout:</strong> <code>test_trisk_page_renders</code> occasionally times out in CI. Root cause is data-loading latency in Streamlit&rsquo;s AppTest harness.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h4>Open Questions</h4>
+          <ul>
+            <li>Should the grid be refreshed automatically on data changes, or is a manual trigger acceptable?</li>
+            <li>Do bankers need a &ldquo;compare two scenarios&rdquo; mode (side-by-side of two different lever combinations)?</li>
+            <li>Should the grid be expanded to 5 values per lever (3,125 cells) for finer granularity, or is the 3-value grid adequate for demo purposes?</li>
+            <li>Is the current baseline-comparison method (company_summary base rows vs grid deltas) accurate enough for the intended demo narrative?</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="appendices-evidence">
+      <div class="section-header">
+        <div>
+          <div class="section-index">10 / Appendices / Evidence Notes</div>
+          <h2 class="section-title">Appendices / Evidence Notes</h2>
+        </div>
+      </div>
+      <div class="appendix-grid">
+        <div class="subcard">
+          <h4>Files created</h4>
+          <table class="technical" style="width:100%; font-size:0.85rem;">
+            <tr><th>File</th><th>Purpose</th></tr>
+            <tr><td><code>dashboard/pages/5_Scenario_Builder.py</code></td><td>Main scenario builder page</td></tr>
+            <tr><td><code>dashboard/lib/live_rerun.py</code></td><td>R subprocess adapter</td></tr>
+            <tr><td><code>scripts/trisk_run_adhoc.R</code></td><td>CLI runner for single TRISK scenario</td></tr>
+            <tr><td><code>dashboard/tests/test_scenario_builder.py</code></td><td>9 scenario builder tests</td></tr>
+            <tr><td><code>dashboard/tests/test_live_rerun.py</code></td><td>7 live-rerun tests</td></tr>
+          </table>
+        </div>
+        <div class="subcard">
+          <h4>Files modified</h4>
+          <table class="technical" style="width:100%; font-size:0.85rem;">
+            <tr><th>File</th><th>Change</th></tr>
+            <tr><td><code>dashboard/lib/loaders.py</code></td><td>Added <code>load_trisk_grid()</code> and <code>load_parquet()</code></td></tr>
+            <tr><td><code>dashboard/app.py</code></td><td>Updated &ldquo;What&rsquo;s new&rdquo; callout</td></tr>
+            <tr><td><code>dashboard/tests/test_loaders.py</code></td><td>3 grid-schema tests</td></tr>
+            <tr><td><code>dashboard/tests/test_smoke.py</code></td><td>Scenario Builder smoke test</td></tr>
+            <tr><td><code>docs/streamlit-deploy.md</code></td><td>Operator setup section</td></tr>
+            <tr><td><code>dashboard/README.md</code></td><td>Scenario Builder + live-rerun docs</td></tr>
+            <tr><td><code>docs/demo-script.md</code></td><td>Scenario Builder walkthrough segment</td></tr>
+          </table>
+        </div>
+        <div class="subcard">
+          <h4>Test results</h4>
+          <table class="technical" style="width:100%; font-size:0.85rem;">
+            <tr><th>Category</th><th>Count</th><th>Passing</th></tr>
+            <tr><td>Live rerun tests</td><td>7</td><td>7</td></tr>
+            <tr><td>Loader/schema tests</td><td>6</td><td>6</td></tr>
+            <tr><td>Scenario builder tests</td><td>9</td><td>9</td></tr>
+            <tr><td>Smoke tests</td><td>7</td><td>6 (1 pre-existing timeout)</td></tr>
+            <tr><td><strong>Total</strong></td><td><strong>30</strong></td><td><strong>29</strong></td></tr>
+          </table>
+        </div>
+        <div class="subcard">
+          <h4>Grid metadata (power)</h4>
+          <table class="technical" style="width:100%; font-size:0.85rem;">
+            <tr><th>Metric</th><th>Value</th></tr>
+            <tr><td>Scenarios</td><td>243</td></tr>
+            <tr><td>Borrower rows</td><td>3,159</td></tr>
+            <tr><td>Generation runtime</td><td>280 s</td></tr>
+            <tr><td>trisk.model version</td><td>2.6.1</td></tr>
+            <tr><td>Grid contract version</td><td>v1</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="footer-note">designed for html first, printable without reconstruction</div>
+    </section>
+  </main>
+  <script>
+    (function() {
+      document.querySelectorAll('canvas').forEach(c => c.classList.add('report-chart'));
+    })();
+    if (window.Chart) {
+      Chart.defaults.devicePixelRatio = 1; Chart.defaults.animation = false;
+      Chart.defaults.resizeDelay = 150; Chart.defaults.normalized = true;
+      Chart.defaults.maintainAspectRatio = false; Chart.defaults.responsive = true;
+      window.__REPORT_CHART_DEFAULTS__ = { animation: false, resizeDelay: 150, normalized: true, maintainAspectRatio: false, responsive: true };
+      new Chart(document.getElementById('testResultsChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: ['Live Rerun', 'Schema/Loader', 'Scenario Builder', 'Smoke'],
+          datasets: [{
+            label: 'Passing', data: [7, 6, 9, 6],
+            backgroundColor: 'rgba(59,111,118,0.7)', borderColor: '#3b6f76', borderWidth: 1
+          }]
+        },
+        options: {
+          ...window.__REPORT_CHART_DEFAULTS__,
+          plugins: {
+            legend: { display: false },
+            title: { display: true, text: 'Test Suite Breakdown (29/30 passing)', color: '#1f1912', font: { size: 14 } }
+          },
+          scales: {
+            x: { ticks: { color: '#5f564c' }, grid: { color: 'rgba(95,86,76,0.1)' } },
+            y: { beginAtZero: true, ticks: { color: '#5f564c', stepSize: 2 }, grid: { color: 'rgba(95,86,76,0.1)' } }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>

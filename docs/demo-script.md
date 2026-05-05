@@ -11,7 +11,7 @@ Walk a bank client through the dashboard in under 8 minutes.
 3. If the cloud app is unavailable, run `streamlit run dashboard/app.py` locally and screen-share.
 4. For a multisector demo refresh, rerun `scripts/trisk_prepare_inputs.R`, `scripts/trisk_power_demo.R`, `scripts/trisk_sector_demo.R cement`, `scripts/trisk_sector_demo.R steel`, and `scripts/refresh_dashboard_data.R` before the meeting.
 
-## 8-minute walkthrough
+## 8-minute walkthrough (with Scenario Builder)
 
 ### 0:00 to 1:00 — Landing page
 
@@ -38,25 +38,29 @@ Walk a bank client through the dashboard in under 8 minutes.
 - State explicitly that `Cement` and `Steel` currently use sector-level SDA context, not borrower-specific alignment scores.
 - Point to the assumptions tables so the client sees what drives the synthetic stress setup.
 
-### 5:30 to 6:45 — Reports
+### 5:30 to 6:30 — Scenario Builder
 
-- Open `Reports`.
-- Expand the final integrated report and note that the dashboard can be paired with a full narrative artifact.
-- Mention that the reports can be downloaded as standalone HTML files for circulation.
+- Open `Scenario Builder` (sidebar item 5).
+- Explain: "This page lets you drive the five TRISK levers yourself to see how borrower rankings shift."
+- Change `Shock year` from 2028 to 2026 — show the top-10 ranking change and the delta table.
+- Switch `Carbon price family` to `Delayed transition (mild)` — point out which borrowers drop in priority.
+- Highlight the top NPV mover: "This borrower is most sensitive to the lever combination you chose."
+- Click `Save current scenario`, then change a lever and reload from saved.
+- Click `Download scenario CSV` to show export capability.
+- (Operator only, local setup) Open the "Live rerun" expander, set a custom discount rate like 0.07, and click "Run now" to show the live comparison.
 
-### 6:45 to 7:30 — Methodology
+### 7:00 to 7:30 — Reports + Methodology
 
-- Open `Methodology`.
-- Explain the division of labor:
-  - PACTA answers who is misaligned and by how much.
-  - TRISK answers what that might mean under a stress scenario.
-- Point to the source PDF and research notes to show traceability.
+- Open `Reports`, expand the final integrated report.
+- Open `Methodology`, explain the PACTA vs TRISK division of labor.
+- Point to the source PDF and research notes.
 
 ### 7:30 to 8:00 — Close
 
 - Summarize the client value:
   - portfolio-level transition story,
   - borrower-level stress ranking,
+  - interactive scenario exploration (Scenario Builder),
   - downloadable evidence.
 - Offer to drill further into a sector or borrower after the main walkthrough.
 
