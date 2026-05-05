@@ -49,6 +49,67 @@ python -m pytest dashboard/tests
 python -m streamlit run dashboard/app.py --server.headless true
 ```
 
+## Live-rerun operator setup (PHASE-04)
+
+The Scenario Builder page supports an optional operator-only live-rerun mode that bypasses the precomputed grid and calls the R TRISK model directly.
+
+### Prerequisites
+
+- R (4.x) installed locally with the `trisk.model` package available in the user library.
+- The R packages `dplyr`, `readr`, `tibble`, `tidyr`, `fs`, `ggplot2`, `purrr`, `scales` installed.
+
+### Enabling live rerun
+
+Set two environment variables before starting the Streamlit app:
+
+```bash
+set TRISK_LIVE_RERUN=1
+set R_RSCRIPT=C:\Program Files\R\R-4.5.2\bin\Rscript.exe
+streamlit run dashboard/app.py
+```
+
+On PowerShell:
+
+```powershell
+$env:TRISK_LIVE_RERUN = "1"
+$env:R_RSCRIPT = "C:\Program Files\R\R-4.5.2\bin\Rscript.exe"
+streamlit run dashboard/app.py
+```
+
+On Linux/macOS:
+
+```bash
+export TRISK_LIVE_RERUN=1
+export R_RSCRIPT=/usr/bin/Rscript
+streamlit run dashboard/app.py
+```
+
+If `R_RSCRIPT` is not set, the app defaults to `Rscript` on PATH.
+
+### What the live-rerun path does
+
+1. A "Live rerun (operator only)" expander appears in the Scenario Builder page.
+2. The operator sets continuous (free-entry) values for all five levers.
+3. Clicking "Run now" invokes `scripts/trisk_run_adhoc.R` via subprocess.
+4. `trisk_run_adhoc.R` calls `trisk.model::run_trisk()` with the given parameters, writes borrower results to a temp CSV, and prints the path to stdout.
+5. The Python adapter reads the CSV, displays the result as a side-by-side comparison with the nearest grid cell, and deletes the temp file.
+
+### Safety
+
+- **Never set `TRISK_LIVE_RERUN=1` on Streamlit Community Cloud.** The public deployment has no R runtime and the env var check will prevent the expander from appearing. Setting it would cause import errors at startup.
+- The subprocess has a 30-second hard timeout. If the R call hangs, the UI shows a clear timeout error.
+- A concurrency guard prevents multiple simultaneous reruns from the same session.
+
+### Verifying the operator setup
+
+```powershell
+$env:TRISK_LIVE_RERUN = "1"
+$env:R_RSCRIPT = "C:\Program Files\R\R-4.5.2\bin\Rscript.exe"
+& "$env:R_RSCRIPT" scripts/trisk_run_adhoc.R --sector=power --shock_year=2028 --discount_rate=0.08 --risk_free_rate=0.03 --market_passthrough=0.25 --carbon_price_family=NGFS_NetZero2050
+```
+
+If R and trisk.model are installed correctly, a CSV path is printed to stdout.
+
 ## Constraints
 
 - This environment can prepare the repo and verify locally, but Streamlit Community Cloud deployment still requires a browser-authenticated step unless a dedicated Streamlit API/CLI is available.

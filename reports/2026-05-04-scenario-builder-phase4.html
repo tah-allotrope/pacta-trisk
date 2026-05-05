@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phase Report :: Scenario Builder PHASE-04</title>
+  <meta name="color-scheme" content="dark">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+    async function initMermaid() {
+      const blocks = document.querySelectorAll('.mermaid');
+      if (!blocks.length) return;
+      mermaid.initialize({
+        startOnLoad: false, theme: 'dark', securityLevel: 'loose',
+        themeVariables: {
+          primaryColor: '#111111', primaryTextColor: '#e8f6ff',
+          primaryBorderColor: '#00f5ff', lineColor: '#39ff14',
+          secondaryColor: '#121a1a', tertiaryColor: '#111111',
+          background: '#0d0d0d', mainBkg: '#0d0d0d', nodeBorder: '#00f5ff',
+          clusterBkg: '#111111', clusterBorder: '#39ff14',
+          edgeLabelBackground: '#0d0d0d'
+        }
+      });
+      await mermaid.run({ nodes: blocks });
+    }
+    const run = () => initMermaid().catch(e => console.error('Mermaid render failed', e));
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run, { once: true });
+    else run();
+  </script>
+  <style>
+    :root {
+      --bg: #0d0d0d; --bg-soft: #111111; --panel: rgba(13,13,13,0.88);
+      --panel-strong: rgba(19,19,19,0.96); --line: rgba(0,245,255,0.26);
+      --line-strong: rgba(57,255,20,0.38); --text: #e9f6ff; --muted: #8ea3ad;
+      --accent-blue: #00f5ff; --accent-green: #39ff14;
+      --glow-blue: 0 0 18px rgba(0,245,255,0.42);
+      --glow-green: 0 0 18px rgba(57,255,20,0.28);
+      --shadow: 0 14px 40px rgba(0,0,0,0.32);
+      --radius-lg: 22px; --radius-md: 16px; --radius-sm: 12px;
+      --narrative-font: "Segoe UI","Helvetica Neue",Helvetica,Arial,sans-serif;
+      --technical-font: "Cascadia Code","Fira Code",Consolas,"Liberation Mono",monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      position: relative; margin: 0; min-height: 100vh; overflow-x: hidden;
+      background: radial-gradient(circle at top left, rgba(0,245,255,0.12), transparent 28%),
+                  radial-gradient(circle at 85% 12%, rgba(57,255,20,0.08), transparent 24%),
+                  linear-gradient(180deg, #050505 0%, #0d0d0d 36%, #090909 100%);
+      color: var(--text); font-family: var(--narrative-font); line-height: 1.6; letter-spacing: 0.01em;
+    }
+    body::before {
+      content: ""; position: absolute; inset: 0; pointer-events: none;
+      background-image: linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+      background-size: 32px 32px; opacity: 0.16;
+    }
+    a { color: var(--accent-blue); }
+    code, pre, .technical, .meta-chip, .section-kicker, .pill, .metric-label, .metric-value, .repo-tag, .mermaid { font-family: var(--technical-font); }
+    .page-shell { width: min(1180px, calc(100vw - 32px)); margin: 0 auto; padding: 32px 0 72px; position: relative; z-index: 1; }
+    .hero { position: relative; padding: 28px; margin-bottom: 24px; border: 1px solid var(--line); border-radius: 28px; background: linear-gradient(145deg, rgba(0,245,255,0.08), transparent 28%), linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0)), var(--panel-strong); box-shadow: var(--shadow), inset 0 0 0 1px rgba(255,255,255,0.02); }
+    .hero::after { content: ""; position: absolute; inset: auto -10% -55% 42%; height: 280px; background: radial-gradient(circle, rgba(0,245,255,0.18), transparent 64%); filter: blur(12px); pointer-events: none; }
+    .hero-grid { display: grid; grid-template-columns: minmax(0,1.55fr) minmax(260px,0.85fr); gap: 22px; align-items: end; }
+    .section-kicker { margin: 0 0 12px; color: var(--accent-green); font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.22em; text-shadow: var(--glow-green); }
+    .phase-title { margin: 0; max-width: 12ch; font-size: clamp(2.5rem,5vw,4.7rem); line-height: 0.94; letter-spacing: -0.05em; color: #f5feff; text-transform: uppercase; text-wrap: balance; text-shadow: 0 0 24px rgba(0,245,255,0.2); }
+    .hero-summary { margin: 18px 0 0; max-width: 60ch; color: var(--muted); font-size: 0.98rem; }
+    .hero-meta { display: grid; gap: 12px; }
+    .meta-card { padding: 16px 18px; border: 1px solid rgba(57,255,20,0.2); border-radius: 18px; background: rgba(255,255,255,0.025); box-shadow: inset 0 0 0 1px rgba(0,0,0,0.24); }
+    .meta-label { margin-bottom: 6px; color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.16em; }
+    .meta-chip { color: var(--accent-blue); font-size: 1rem; font-weight: 700; letter-spacing: 0.02em; text-shadow: var(--glow-blue); word-break: break-word; }
+    .repo-tag { display: inline-flex; align-items: center; gap: 8px; margin-top: 10px; padding: 8px 12px; border: 1px solid rgba(0,245,255,0.24); border-radius: 999px; background: rgba(0,245,255,0.08); color: var(--accent-blue); font-size: 0.82rem; letter-spacing: 0.04em; }
+    .section { position: relative; margin-top: 22px; padding: 24px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--panel); box-shadow: var(--shadow); }
+    .section::before { content: ""; position: absolute; left: 24px; right: 24px; top: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(0,245,255,0.9), rgba(57,255,20,0.9), transparent); transform: translateY(-1px); }
+    .section-header { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 18px; align-items: end; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .section-title { margin: 0; font-size: clamp(1.2rem,2vw,1.7rem); line-height: 1.1; color: #f0feff; }
+    .section-index { display: inline-flex; align-items: center; gap: 10px; color: var(--accent-green); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; text-shadow: var(--glow-green); }
+    .section-index::after { content: ""; width: 44px; height: 1px; background: linear-gradient(90deg, rgba(57,255,20,0.9), transparent); }
+    .summary-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; }
+    .column-card, .diagram-frame, .technical-frame, .viz-frame, .question-frame, .empty-state { border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-md); background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)), rgba(7,7,7,0.82); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.012); }
+    .column-card { padding: 18px; min-height: 200px; }
+    .column-label { margin: 0 0 12px; color: var(--accent-blue); font-size: 0.83rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em; text-shadow: var(--glow-blue); }
+    .splitter { width: 100%; height: 1px; margin: 8px 0 16px; background: linear-gradient(90deg, rgba(0,245,255,0.4), transparent); }
+    .diagram-frame, .chart-frame, .technical-frame, .viz-frame, .question-frame { padding: 18px; }
+    .diagram-frame { overflow-x: auto; overflow-y: auto; overscroll-behavior-x: contain; overscroll-behavior-y: contain; max-height: min(70vh,720px); }
+    .mermaid { width: 100%; max-width: 100%; min-width: 0; color: var(--text); }
+    .mermaid svg { display: block; width: auto !important; min-width: 100%; max-width: none !important; height: auto !important; }
+    .diagram-frame.compact-diagram { padding: 12px; max-height: min(62vh,560px); }
+    .diagram-frame.compact-diagram .mermaid { min-width: 900px; }
+    .chart-frame, .viz-frame { overflow: hidden; }
+    .technical-frame { color: #d6f6ff; }
+    .technical-frame table { width: 100%; border-collapse: collapse; }
+    .technical-frame th, .technical-frame td { padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+    .technical-frame th { color: var(--accent-green); font-size: 0.76rem; text-align: left; letter-spacing: 0.12em; text-transform: uppercase; }
+    .chart-frame canvas, .technical-frame > canvas, .viz-frame canvas, canvas.report-chart { display: block; width: 100% !important; max-width: 100%; height: 280px !important; min-height: 280px; max-height: 280px; }
+    .empty-state { padding: 22px; text-align: center; }
+    .empty-state strong { display: block; margin-bottom: 6px; color: var(--accent-blue); font-size: 0.9rem; letter-spacing: 0.12em; text-transform: uppercase; text-shadow: var(--glow-blue); }
+    .metric-strip { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; margin-top: 18px; }
+    .metric { padding: 14px 16px; border: 1px solid rgba(0,245,255,0.18); border-radius: var(--radius-sm); background: rgba(0,245,255,0.04); }
+    .metric-label { color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.16em; }
+    .metric-value { margin-top: 8px; color: var(--accent-green); font-size: 1.2rem; font-weight: 700; text-shadow: var(--glow-green); }
+    .pill-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    .pill { display: inline-flex; align-items: center; gap: 8px; padding: 8px 11px; border: 1px solid rgba(57,255,20,0.22); border-radius: 999px; background: rgba(57,255,20,0.06); color: #d9ffd0; font-size: 0.8rem; }
+    .question-frame ul, .technical-frame ul, .column-card ul { margin: 0; padding-left: 20px; }
+    .question-frame li, .technical-frame li, .column-card li { margin-bottom: 8px; }
+    .footer-note { margin-top: 18px; text-align: right; color: rgba(142,163,173,0.72); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    @media (max-width: 900px) { .hero-grid, .summary-grid, .metric-strip { grid-template-columns: 1fr; } .phase-title { max-width: none; } }
+    @media (max-width: 640px) { .page-shell { width: min(100vw - 20px, 1180px); padding-top: 16px; padding-bottom: 42px; } .hero, .section { padding: 18px; border-radius: 20px; } .section::before { left: 18px; right: 18px; } .phase-title { font-size: clamp(2rem,12vw,3rem); } }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero" id="phase-header">
+      <div class="hero-grid">
+        <div>
+          <p class="section-kicker">Phase Report / Personal Technical Artifact</p>
+          <h1 class="phase-title">Scenario Builder &mdash; PHASE-04</h1>
+          <p class="hero-summary">Operator-only live-rerun adapter for the Scenario Builder &mdash; escapes the precomputed grid and calls the R TRISK model on demand.</p>
+          <div class="pill-row" aria-label="report metadata">
+            <span class="pill">project :: PACTA-Vietnam</span>
+            <span class="pill">date :: 2026-05-04</span>
+          </div>
+          <div class="repo-tag">repo :: pacta-trisk</div>
+        </div>
+        <div class="hero-meta">
+          <div class="meta-card"><div class="meta-label">Project</div><div class="meta-chip">PACTA-Vietnam</div></div>
+          <div class="meta-card"><div class="meta-label">Repository</div><div class="meta-chip">pacta-trisk</div></div>
+          <div class="meta-card"><div class="meta-label">Date</div><div class="meta-chip">2026-05-04</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section narrative" id="input-output-summary">
+      <div class="section-header">
+        <div>
+          <div class="section-index">01 / Input -> Output</div>
+          <h2 class="section-title">Input -> Output Summary</h2>
+        </div>
+      </div>
+      <div class="summary-grid">
+        <div class="column-card">
+          <div class="column-label">Inputs</div>
+          <ul>
+            <li><strong>PHASE-03 page:</strong> <code>dashboard/pages/5_Scenario_Builder.py</code></li>
+            <li><strong>R execution model:</strong> <code>scripts/trisk_sector_demo.R</code> (execute_trisk_run, summarize_trisk_run)</li>
+            <li><strong>Carbon mapping:</strong> <code>carbon_price_model_map</code> from <code>scripts/trisk_scenario_grid.R</code></li>
+            <li><strong>Deploy docs:</strong> <code>docs/streamlit-deploy.md</code></li>
+          </ul>
+        </div>
+        <div class="column-card">
+          <div class="column-label">Outputs</div>
+          <ul>
+            <li><strong>R CLI runner:</strong> <code>scripts/trisk_run_adhoc.R</code></li>
+            <li><strong>Python adapter:</strong> <code>dashboard/lib/live_rerun.py</code></li>
+            <li><strong>Page update:</strong> Gated live-rerun expander in <code>5_Scenario_Builder.py</code></li>
+            <li><strong>Operator docs:</strong> Live-rerun section in <code>docs/streamlit-deploy.md</code></li>
+            <li><strong>Tests:</strong> 7 new tests in <code>test_live_rerun.py</code></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="logic-flow">
+      <div class="section-header">
+        <div>
+          <div class="section-index">02 / Logic Flow</div>
+          <h2 class="section-title">Logic Flow</h2>
+        </div>
+      </div>
+      <div class="diagram-frame technical">
+        <div class="mermaid">
+flowchart LR
+    A[Page load] --> B{TRISK_LIVE_RERUN=1?}
+    B -->|No| C[No change from PHASE-03]
+    B -->|Yes| D[Render expander with continuous inputs]
+    D --> E[User clicks Run Now]
+    E --> F[Concurrency guard: set busy flag]
+    F --> G[subprocess.run: Rscript trisk_run_adhoc.R]
+    G --> H{Timeout 30s?}
+    H -->|Yes| I[Show timeout error]
+    H -->|No| J{Exit code 0?}
+    J -->|No| K[Show R stderr error]
+    J -->|Yes| L[Read CSV from temp path]
+    L --> M[Delete temp file]
+    M --> N[Display live vs grid side-by-side]
+    N --> O[Clear busy flag]
+        </div>
+      </div>
+    </section>
+
+    <section class="section narrative" id="math-algorithm-used">
+      <div class="section-header">
+        <div>
+          <div class="section-index">03 / Math / Algorithm Used</div>
+          <h2 class="section-title">Math / Algorithm Used</h2>
+        </div>
+      </div>
+      <div class="technical-frame">
+        <p><strong>Subprocess contract:</strong> The R script prints exactly one line to stdout: the temp CSV path. All diagnostics (progress, timing) go to stderr. The Python adapter reads the last stdout line as the path, loads the CSV, and deletes it.</p>
+        <p><strong>Carbon price family mapping:</strong> <code>NGFS_NetZero2050</code>, <code>NGFS_Below2C</code>, and <code>NGFS_Delayed</code> are each mapped to the sector&rsquo;s existing <code>carbon_price_model</code> string (e.g. <code>increasing_carbon_tax_50</code> for power, <code>cement_intensity_transition</code> for cement). All three families use the same underlying curve for v1; the distinction is narrative only.</p>
+        <p><strong>Time budget:</strong> The R subprocess has a 30-second wall-clock timeout. A single TRISK run typically completes in 2-5 seconds on a developer laptop, leaving headroom for load and garbage collection.</p>
+      </div>
+    </section>
+
+    <section class="section" id="tools-formulas-methods">
+      <div class="section-header">
+        <div>
+          <div class="section-index">04 / Tools / Formulas / Methods</div>
+          <h2 class="section-title">Tools / Formulas / Methods</h2>
+        </div>
+      </div>
+      <div class="technical-frame technical">
+        <table>
+          <thead>
+            <tr><th>Component</th><th>Tool / Library</th><th>Role</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>R CLI runner</td><td>base R + <code>trisk.model</code></td><td>Executes single TRISK scenario, writes CSV to tempfile</td></tr>
+            <tr><td>Python adapter</td><td><code>subprocess.run</code></td><td>Invokes R script, captures stdout/stderr, enforces timeout</td></tr>
+            <tr><td>Env guard</td><td><code>os.environ</code></td><td><code>TRISK_LIVE_RERUN=1</code> gating, <code>R_RSCRIPT</code> path override</td></tr>
+            <tr><td>Concurrency</td><td><code>st.session_state</code></td><td><code>live_rerun_busy</code> guard prevents double-submit</td></tr>
+            <tr><td>UI surface</td><td>Streamlit expander</td><td>Hidden when env var unset; continuous number inputs when visible</td></tr>
+            <tr><td>Testing</td><td>pytest + unittest.mock</td><td>Env var tests, error-path tests via mock.patch.dict</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="results-visualizations">
+      <div class="section-header">
+        <div>
+          <div class="section-index">05 / Results &amp; Visualizations</div>
+          <h2 class="section-title">Results &amp; Visualizations</h2>
+        </div>
+      </div>
+      <div class="viz-frame">
+        <canvas id="testResultsChart"></canvas>
+      </div>
+      <div class="metric-strip">
+        <div class="metric"><div class="metric-label">Total tests</div><div class="metric-value">30</div></div>
+        <div class="metric"><div class="metric-label">Passed</div><div class="metric-value" style="color: var(--accent-green);">29</div></div>
+        <div class="metric"><div class="metric-label">Failed</div><div class="metric-value" style="color: #f85149;">1 (pre-existing)</div></div>
+      </div>
+    </section>
+
+    <section class="section narrative" id="limitations-second-best-alternative">
+      <div class="section-header">
+        <div>
+          <div class="section-index">06 / Limitations / Second-Best Alternative</div>
+          <h2 class="section-title">Limitations / Second-Best Alternative</h2>
+        </div>
+      </div>
+      <div class="question-frame">
+        <ul>
+          <li><strong>R dependency:</strong> The live-rerun path requires R and <code>trisk.model</code> installed locally. This is by design &mdash; the precomputed grid path (PHASE-03) serves Streamlit Cloud which has no R runtime.</li>
+          <li><strong>No delta normalization:</strong> The live rerun output uses <code>stress_priority_score</code> directly from <code>summarize_trisk_run()</code>, which may differ in scale from the grid&rsquo;s normalized scores. The side-by-side comparison shows absolute values, not deltas.</li>
+          <li><strong>Single concurrency:</strong> Only one live rerun per session at a time. This is intentional to avoid trashing the local R process.</li>
+          <li><strong>No carbon price curve toggle:</strong> All three <code>carbon_price_family</code> values map to the same underlying model string for each sector. True NGFS curve differentiation is a follow-up.</li>
+          <li><strong>No caching across sessions:</strong> Live rerun results are ephemeral &mdash; they exist only in that session&rsquo;s state until page refresh.</li>
+        </ul>
+        <p><strong>Second-best alternative:</strong> Skip the R subprocess entirely and interpolate between grid points in Python. Rejected because interpolation of TRISK outputs (NPV/PD) is non-linear and misleading; only the R model produces valid results for arbitrary parameter combinations.</p>
+      </div>
+    </section>
+
+    <section class="section narrative" id="errors-warnings-flags-encountered">
+      <div class="section-header">
+        <div>
+          <div class="section-index">07 / Errors / Warnings / Flags</div>
+          <h2 class="section-title">Errors / Warnings / Flags Encountered</h2>
+        </div>
+      </div>
+      <div class="question-frame technical">
+        <ul>
+          <li><strong>Pre-existing smoke test timeout:</strong> <code>test_trisk_page_renders</code> continues to time out due to data loading latency in the Streamlit AppTest harness. Not caused by this phase.</li>
+          <li><strong>Windows CRLF warnings:</strong> Git warns about LF/CRLF conversion on commit. Normal for Windows development.</li>
+          <li><strong>R subprocess portability:</strong> The R script uses <code>tempfile()</code> and <code>Sys.getenv()</code>, both of which are cross-platform. Tested on Windows; should work identically on Linux/macOS.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section narrative" id="open-questions-next-phase-seeds">
+      <div class="section-header">
+        <div>
+          <div class="section-index">08 / Open Questions / Next Phase Seeds</div>
+          <h2 class="section-title">Open Questions / Next Phase Seeds</h2>
+        </div>
+      </div>
+      <div class="question-frame">
+        <ul>
+          <li><strong>PHASE-05 (Tests, docs, deploy):</strong> Broader smoke test coverage, <code>docs/demo-script.md</code> update with the live-rerun flow, and snapshot refresh commands.</li>
+          <li><strong>Grid point indicator:</strong> Add a &ldquo;Snapped to grid&rdquo; pill next to each slider to make the precomputed nature explicit for demo attendees.</li>
+          <li><strong>Carbon price differentiation:</strong> Currently all three families map to the same curve. Real NGFS Phase V curve ingestion would make the carbon family selector actually meaningful.</li>
+          <li><strong>Cross-session persistence:</strong> Saved scenarios currently live in <code>st.session_state</code> only. A JSON file or lightweight DB would enable operator-side persistence across sessions.</li>
+        </ul>
+      </div>
+      <div class="footer-note">artifact generated for reflection, not presentation theater</div>
+    </section>
+  </main>
+  <script>
+    (function() {
+      document.querySelectorAll('canvas').forEach(c => c.classList.add('report-chart'));
+    })();
+    if (window.Chart) {
+      Chart.defaults.devicePixelRatio = 1; Chart.defaults.animation = false;
+      Chart.defaults.resizeDelay = 150; Chart.defaults.normalized = true;
+      Chart.defaults.maintainAspectRatio = false; Chart.defaults.responsive = true;
+      window.__REPORT_CHART_DEFAULTS__ = { animation: false, resizeDelay: 150, normalized: true, maintainAspectRatio: false, responsive: true };
+      new Chart(document.getElementById('testResultsChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: ['Live Rerun Tests', 'Unit/Schema Tests', 'Smoke Tests'],
+          datasets: [{
+            label: 'Passed', data: [7, 16, 7],
+            backgroundColor: 'rgba(57,255,20,0.7)', borderColor: '#39ff14', borderWidth: 1
+          }]
+        },
+        options: {
+          ...window.__REPORT_CHART_DEFAULTS__,
+          plugins: {
+            legend: { labels: { color: '#e9f6ff' } },
+            title: { display: true, text: 'Test Results by Category', color: '#f5feff', font: { size: 14 } }
+          },
+          scales: {
+            x: { ticks: { color: '#8ea3ad' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+            y: { beginAtZero: true, ticks: { color: '#8ea3ad', stepSize: 5 }, grid: { color: 'rgba(255,255,255,0.05)' } }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>

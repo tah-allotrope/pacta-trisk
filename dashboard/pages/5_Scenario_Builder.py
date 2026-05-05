@@ -9,6 +9,7 @@ import streamlit as st
 from dashboard.lib.branding import apply_page_frame, footer_note, public_demo_banner
 from dashboard.lib.charts import ranked_bar
 from dashboard.lib.loaders import load_trisk_grid, load_trisk_sector_tables, load_trisk_tables
+from dashboard.lib.live_rerun import is_live_rerun_enabled, run_adhoc_trisk
 
 DISCLAIMER = (
     "PD changes shown here are scenario-horizon shock summaries from the synthetic TRISK setup, "
@@ -340,5 +341,123 @@ with e2:
         file_name=f"scenario_{current_sid}.json",
         mime="application/json",
     )
+
+if is_live_rerun_enabled():
+    with st.expander("Live rerun (operator only)", expanded=False):
+        st.markdown(
+            "Bypass the precomputed grid and run an arbitrary parameter combination "
+            "via the TRISK R model. Requires R and `trisk.model` installed locally."
+        )
+        lr_cols = st.columns(5)
+        with lr_cols[0]:
+            lr_shock = st.number_input(
+                "Shock year",
+                min_value=2024, max_value=2035, value=shock_year, step=1,
+                key="lr_shock_year",
+            )
+        with lr_cols[1]:
+            lr_discount = st.number_input(
+                "Discount rate",
+                min_value=0.01, max_value=0.20, value=discount_rate, step=0.01, format="%.2f",
+                key="lr_discount_rate",
+            )
+        with lr_cols[2]:
+            lr_rf = st.number_input(
+                "Risk-free rate",
+                min_value=0.005, max_value=0.10, value=risk_free_rate, step=0.005, format="%.3f",
+                key="lr_risk_free_rate",
+            )
+        with lr_cols[3]:
+            lr_mp = st.number_input(
+                "Market passthrough",
+                min_value=0.0, max_value=1.0, value=market_passthrough, step=0.05, format="%.2f",
+                key="lr_market_passthrough",
+            )
+        with lr_cols[4]:
+            lr_carbon = st.selectbox(
+                "Carbon price family",
+                options=lever_values["carbon_price_family"],
+                index=lever_values["carbon_price_family"].index(carbon_price_family),
+                format_func=lambda v: CARBON_PRICE_LABELS.get(v, v),
+                key="lr_carbon_family",
+            )
+
+        busy = st.session_state.get("live_rerun_busy", False)
+        run_btn = st.button(
+            "Run now",
+            type="primary",
+            disabled=busy,
+            key="lr_run_btn",
+        )
+
+        if run_btn and not busy:
+            st.session_state["live_rerun_busy"] = True
+            st.rerun()
+
+        if busy:
+            with st.spinner("Running TRISK model... this may take a moment."):
+                try:
+                    result = run_adhoc_trisk(
+                        sector=selected_sector,
+                        shock_year=int(lr_shock),
+                        discount_rate=float(lr_discount),
+                        risk_free_rate=float(lr_rf),
+                        market_passthrough=float(lr_mp),
+                        carbon_price_family=lr_carbon,
+                    )
+                    st.session_state["live_rerun_result"] = result
+                    st.session_state["live_rerun_error"] = None
+                except Exception as exc:
+                    st.session_state["live_rerun_result"] = None
+                    st.session_state["live_rerun_error"] = str(exc)
+                finally:
+                    st.session_state["live_rerun_busy"] = False
+                    st.rerun()
+
+        lr_error = st.session_state.get("live_rerun_error")
+        if lr_error:
+            st.error(f"Live rerun failed: {lr_error}")
+
+        lr_result = st.session_state.get("live_rerun_result")
+        if lr_result and lr_result["success"]:
+            lr_df = lr_result["data"].copy()
+            st.success(f"Live rerun completed: {len(lr_df)} borrowers.")
+
+            if "npv_change" in lr_df.columns and "npv_change_pct" not in lr_df.columns:
+                lr_df["npv_change_pct"] = lr_df["npv_change"]
+            if "pd_change" in lr_df.columns and "pd_change_pct" not in lr_df.columns:
+                lr_df["pd_change_pct"] = lr_df["pd_change"]
+
+            st.subheader("Live-rerun comparison (vs grid)")
+            lr_left, lr_right = st.columns(2)
+            with lr_left:
+                grid_top = scenario_data.sort_values("stress_priority_score", ascending=False).head(10)
+                st.markdown("**Grid scenario (precomputed)**")
+                st.plotly_chart(
+                    ranked_bar(
+                        grid_top,
+                        x="stress_priority_score", y="company_name",
+                        color="company_name",
+                        title="Grid result",
+                    ),
+                    use_container_width=True,
+                )
+            with lr_right:
+                lr_top = lr_df.sort_values("stress_priority_score", ascending=False).head(10)
+                st.markdown("**Live rerun**")
+                st.plotly_chart(
+                    ranked_bar(
+                        lr_top,
+                        x="stress_priority_score", y="company_name",
+                        color="company_name",
+                        title="Live result",
+                    ),
+                    use_container_width=True,
+                )
+
+        lr_stderr = lr_result["stderr"] if lr_result and lr_result.get("stderr") else ""
+        if lr_stderr:
+            with st.expander("R subprocess diagnostics"):
+                st.code(lr_stderr[:2000])
 
 footer_note()
