@@ -3,6 +3,7 @@ from __future__ import annotations
 import streamlit as st
 
 from dashboard.lib.branding import apply_page_frame, footer_note, public_demo_banner
+from dashboard.lib.intake import is_intake_enabled
 from dashboard.lib.loaders import load_pacta_alignment_tables, load_trisk_tables
 
 
@@ -69,5 +70,8 @@ with st.expander("Current snapshot inventory", expanded=True):
         st.write(", ".join(sorted(key for key in trisk.keys() if key not in {"manifest", "default_sector"})))
 
 st.success("All planned dashboard pages are now implemented for the client-facing demo scope. Use the sidebar to move from alignment to stress to supporting artifacts.")
+
+if is_intake_enabled():
+    st.sidebar.success("Intake Wizard enabled (operator mode)")
 
 footer_note()
