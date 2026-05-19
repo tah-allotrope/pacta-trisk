@@ -1,0 +1,5 @@
+counterparty_name,exposure_vnd,sector_code,sector_code_system,credit_limit_vnd,lei,tax_id,parent_name,parent_id,currency
+Cong ty CP Nhiet Dien Vinh Tan,800000000000,D3511,VSIC,960000000000,,0301452948,Tap doan Dien luc Viet Nam (EVN),EVN_001,VND
+Cong ty CP O to Truong Hai,450000000000,2910,ISIC,540000000000,5493000IBP32UQZ0KL24,0301452949,Tap doan Truong Hai (THACO),THACO_001,VND
+Cong ty CP Xi mang VICEM Ha Tien,320000000000,2394,ISIC,384000000000,,0301452950,Tong cong ty Xi mang VICEM,VICEM_001,VND
+Cong ty CP Thep Hoa Phat,510000000000,2410,ISIC,612000000000,,0301452951,Tap doan Hoa Phat,HOA_PHAT_001,VND
