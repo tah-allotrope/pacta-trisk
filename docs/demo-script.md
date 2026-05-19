@@ -72,6 +72,16 @@ If the live Streamlit app is unavailable during the demo:
 2. Screen-share the local app.
 3. If local Streamlit also fails, open the latest integrated HTML report and continue the narrative from that static artifact.
 
+## Intake demo segment (operator only)
+
+This segment is for operator-side walkthroughs only (behind `BYOL_INTAKE=1`).
+
+1. Download the template: open `intake/templates/loanbook_template.csv` or `.xlsx`
+2. Upload the template file to the Intake Wizard page
+3. Show the validation summary — highlight the sector distribution
+4. Download `normalized_loanbook.csv`
+5. Explain: "This normalized file can now flow directly into the PACTA pipeline the same way `data/vietnam_loanbook.csv` does."
+
 ## Known caveats to say out loud
 
 - The full dashboard uses synthetic portfolio, borrower, and scenario data.

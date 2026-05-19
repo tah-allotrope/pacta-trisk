@@ -23,6 +23,34 @@ streamlit run dashboard/app.py
 - `3_Reports.py` — implemented
 - `4_Methodology.py` — implemented
 - `5_Scenario_Builder.py` — implemented with precomputed grid mode and optional live-rerun path
+- `6_Intake_Wizard.py` — implemented (operator only, gated behind `BYOL_INTAKE=1`)
+
+## Intake Wizard (operator only)
+
+The **Intake Wizard** (`6_Intake_Wizard.py`) is an operator-only page gated behind `BYOL_INTAKE=1`.
+
+### Flow
+
+1. Upload a CSV or XLSX file conforming to the intake schema (see `intake/SCHEMA.md`)
+2. Click "Validate & Map" — the script runs `scripts/intake_validate_and_map.R` via subprocess
+3. Review the validation summary, error table, and match preview (color-coded by score)
+4. Download `normalized_loanbook.csv` or the full output bundle as ZIP
+
+### Setup
+
+```bash
+set BYOL_INTAKE=1
+streamlit run dashboard/app.py
+```
+
+### Requirements
+
+- R with packages: `dplyr`, `readr`, `stringi`, `r2dii.match`, `r2dii.data`, `tibble`
+- Python packages: `openpyxl` (added to `requirements.txt`)
+
+### Privacy
+
+See `docs/intake_privacy.md` for the full privacy posture. No raw client data is committed to git. The page is invisible on the public deployment.
 
 ## Public demo mode
 
