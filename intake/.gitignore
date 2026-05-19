@@ -1,0 +1,14 @@
+# Block all raw client data files
+*.xlsx
+*.xls
+*.csv
+
+# Except template files in the templates directory
+!templates/*.csv
+!templates/*.xlsx
+
+# Ignore generated outputs
+output/
+
+# Block Excel temp files
+~$*
