@@ -1,7 +1,7 @@
 ---
 title: "BIDV Framework Comparison and Decision 263 Compliance Mapping"
 date: "2026-05-22"
-status: "draft"
+status: "completed"
 request: "GAP-01 + GAP-02 from the BIDV gap analysis: build a structured evaluation matrix comparing 5-7 leading portfolio alignment frameworks against BIDV's context, and a Decision 263 compliance mapping document linking the repo's PACTA+TRISK outputs to Vietnam's GHG quota regime for thermal power, steel, and cement."
 plan_type: "multi-phase"
 research_inputs:
@@ -49,17 +49,17 @@ Produce two tightly coupled advisory documents that form the intellectual core o
 Gather authoritative information on (a) the 7 portfolio alignment frameworks to be compared, and (b) Vietnam's Decision 263 requirements, producing two research briefs that serve as the evidence base for the subsequent documents.
 
 **Tasks**
-- [ ] TASK-01-01: Research PCAF methodology — data requirements, sector coverage, output types, implementation complexity, cost, open-source tooling. Focus on PCAF's relationship to PACTA (PCAF = emissions accounting, PACTA = alignment assessment). Document the PCAF Standard v3 scope and its treatment of thermal power, steel, and cement asset classes.
-- [ ] TASK-01-02: Research SBTi Financial Institutions framework — target-setting methodology, sector-specific SDA and convergence approaches, data requirements for power/steel/cement, validation process, cost/time commitment, public tools (SBTi Target Validation Tool). Note SBTi's 2024 updates to financial institution targets.
-- [ ] TASK-01-03: Research GFANZ sector pathways — Net Zero Banking Alliance (NZBA) guidelines, sector-specific transition plans for power/steel/cement, reporting requirements, how GFANZ pathways relate to IEA NZE and NGFS scenarios. Note that GFANZ is a voluntary commitment framework, not a quantitative tool.
-- [ ] TASK-01-04: Research NGFS climate scenarios as portfolio alignment inputs — NGFS Phase V scenario framework, how banks use NGFS for climate stress testing (supervisory vs. internal use), relationship to the repo's existing scenario grid (which uses NGFS-named aliases per `docs/trisk_scenario_grid_contract.md`), Vietnam-specific NGFS data availability.
-- [ ] TASK-01-05: Research TCFD/ISSB S2 as disclosure framework — TCFD's four pillars, ISSB IFRS S2 Climate-related Disclosures, how these create demand for the analytical outputs that PACTA/TRISK produce, Vietnam's adoption status (SBV green taxonomy, TCFD-equivalent requirements).
-- [ ] TASK-01-06: Research IFC Performance Standards and Equator Principles — relevance to Vietnamese commercial banks, E&S requirements for project finance in power/cement/steel, how IFC PS relates to portfolio-level climate risk tools.
-- [ ] TASK-01-07: Condense existing repo knowledge on PACTA and TRISK into comparison-ready summaries by extracting key dimensions from `docs/PACTA_Beginner_Guide.md`, `docs/TRISK_Demo_Assumptions.md`, and `research/2026-04-08_integration-trisk-model-existing.md`.
-- [ ] TASK-01-08: Research Decision 263 (Quyết định 263/QĐ-TTg) — scope of coverage (which sectors, which facility size thresholds), GHG inventory requirements (reporting since 2025), sector-specific emission quotas (thermal power, steel, cement), emission reduction plan requirements, enforcement mechanisms, relationship to Law on Environmental Protection 2020, MONRE implementation guidance. Use Vietnamese government sources, GIZ Vietnam publications, and World Bank/IFC advisory documents.
-- [ ] TASK-01-09: Research the SBV green taxonomy and its relationship to Decision 263 — how SBV classifies green/transition lending, what reporting Vietnamese commercial banks must do, how BIDV's climate risk management obligations relate to both Decision 263 (borrower-side) and SBV taxonomy (bank-side).
-- [ ] TASK-01-10: Write `research/2026-05-22_portfolio-alignment-frameworks.md` — structured research brief covering all 7 frameworks with consistent dimensions: purpose, methodology type, data inputs, sector coverage, output types, cost, open-source availability, Vietnam relevance.
-- [ ] TASK-01-11: Write `research/2026-05-22_decision263-vietnam-ghg.md` — structured research brief covering Decision 263 requirements, sector coverage, timeline, enforcement, and the regulatory landscape (Law on Environmental Protection, SBV taxonomy, MONRE guidance).
+- [x] TASK-01-01: Research PCAF methodology — data requirements, sector coverage, output types, implementation complexity, cost, open-source tooling. Focus on PCAF's relationship to PACTA (PCAF = emissions accounting, PACTA = alignment assessment). Document the PCAF Standard v3 scope and its treatment of thermal power, steel, and cement asset classes.
+- [x] TASK-01-02: Research SBTi Financial Institutions framework — target-setting methodology, sector-specific SDA and convergence approaches, data requirements for power/steel/cement, validation process, cost/time commitment, public tools (SBTi Target Validation Tool). Note SBTi's 2024 updates to financial institution targets.
+- [x] TASK-01-03: Research GFANZ sector pathways — Net Zero Banking Alliance (NZBA) guidelines, sector-specific transition plans for power/steel/cement, reporting requirements, how GFANZ pathways relate to IEA NZE and NGFS scenarios. Note that GFANZ is a voluntary commitment framework, not a quantitative tool.
+- [x] TASK-01-04: Research NGFS climate scenarios as portfolio alignment inputs — NGFS Phase V scenario framework, how banks use NGFS for climate stress testing (supervisory vs. internal use), relationship to the repo's existing scenario grid (which uses NGFS-named aliases per `docs/trisk_scenario_grid_contract.md`), Vietnam-specific NGFS data availability.
+- [x] TASK-01-05: Research TCFD/ISSB S2 as disclosure framework — TCFD's four pillars, ISSB IFRS S2 Climate-related Disclosures, how these create demand for the analytical outputs that PACTA/TRISK produce, Vietnam's adoption status (SBV green taxonomy, TCFD-equivalent requirements).
+- [x] TASK-01-06: Research IFC Performance Standards and Equator Principles — relevance to Vietnamese commercial banks, E&S requirements for project finance in power/cement/steel, how IFC PS relates to portfolio-level climate risk tools.
+- [x] TASK-01-07: Condense existing repo knowledge on PACTA and TRISK into comparison-ready summaries by extracting key dimensions from `docs/PACTA_Beginner_Guide.md`, `docs/TRISK_Demo_Assumptions.md`, and `research/2026-04-08_integration-trisk-model-existing.md`.
+- [x] TASK-01-08: Research Decision 263 (Quyết định 263/QĐ-TTg) — scope of coverage (which sectors, which facility size thresholds), GHG inventory requirements (reporting since 2025), sector-specific emission quotas (thermal power, steel, cement), emission reduction plan requirements, enforcement mechanisms, relationship to Law on Environmental Protection 2020, MONRE implementation guidance. Use Vietnamese government sources, GIZ Vietnam publications, and World Bank/IFC advisory documents.
+- [x] TASK-01-09: Research the SBV green taxonomy and its relationship to Decision 263 — how SBV classifies green/transition lending, what reporting Vietnamese commercial banks must do, how BIDV's climate risk management obligations relate to both Decision 263 (borrower-side) and SBV taxonomy (bank-side).
+- [x] TASK-01-10: Write `research/2026-05-22_portfolio-alignment-frameworks.md` — structured research brief covering all 7 frameworks with consistent dimensions: purpose, methodology type, data inputs, sector coverage, output types, cost, open-source availability, Vietnam relevance.
+- [x] TASK-01-11: Write `research/2026-05-22_decision263-vietnam-ghg.md` — structured research brief covering Decision 263 requirements, sector coverage, timeline, enforcement, and the regulatory landscape (Law on Environmental Protection, SBV taxonomy, MONRE guidance).
 
 **Files / Surfaces**
 - `research/2026-05-22_portfolio-alignment-frameworks.md` - New: framework research brief.
@@ -73,9 +73,9 @@ Gather authoritative information on (a) the 7 portfolio alignment frameworks to 
 - None. This phase is pure research.
 
 **Exit Criteria**
-- [ ] `research/2026-05-22_portfolio-alignment-frameworks.md` exists and covers all 7 frameworks with consistent dimensions.
-- [ ] `research/2026-05-22_decision263-vietnam-ghg.md` exists and documents Decision 263's sector coverage, quota structure, and timeline.
-- [ ] Each framework entry includes: purpose, methodology type, data inputs, sector coverage (power/steel/cement explicitly), output types, cost, open-source availability, and Vietnam relevance rating.
+- [x] `research/2026-05-22_portfolio-alignment-frameworks.md` exists and covers all 7 frameworks with consistent dimensions.
+- [x] `research/2026-05-22_decision263-vietnam-ghg.md` exists and documents Decision 263's sector coverage, quota structure, and timeline.
+- [x] Each framework entry includes: purpose, methodology type, data inputs, sector coverage (power/steel/cement explicitly), output types, cost, open-source availability, and Vietnam relevance rating.
 
 **Phase Risks**
 - **RISK-01-01:** Decision 263 text may be difficult to source in English. Mitigation: use Vietnamese-language official sources and cross-reference with GIZ/GTB advisory publications; document source URLs and access dates. Flag any requirements that could not be independently verified.
@@ -86,7 +86,7 @@ Gather authoritative information on (a) the 7 portfolio alignment frameworks to 
 Build a scored evaluation matrix comparing the 7 frameworks across dimensions relevant to BIDV, producing a clear primary/secondary recommendation with rationale.
 
 **Tasks**
-- [ ] TASK-02-01: Define the 10 evaluation dimensions for the comparison matrix:
+- [x] TASK-02-01: Define the 10 evaluation dimensions for the comparison matrix:
   1. Data input requirements (what BIDV needs to provide)
   2. Sector coverage (thermal power, steel, cement specifically)
   3. Vietnam regulatory compatibility (Decision 263, SBV taxonomy)
@@ -97,12 +97,12 @@ Build a scored evaluation matrix comparing the 7 frameworks across dimensions re
   8. Time to first results (from data preparation to actionable output)
   9. Complementarity with PCAF baseline (since Output 2.1 is PCAF-based)
   10. Maturity and institutional adoption (track record with ASEAN/emerging market banks)
-- [ ] TASK-02-02: Score each of the 7 frameworks across all 10 dimensions using a 3-level scale: Strong Fit (framework addresses this dimension well for BIDV), Partial Fit (framework addresses this but with limitations for BIDV's context), Weak Fit (framework does not meaningfully address this for BIDV). Include a one-line justification for each score.
-- [ ] TASK-02-03: Write a framework-by-framework evaluation narrative (one section per framework, ~200-400 words each) covering: what the framework does, how it works, what BIDV would need to use it, and its specific strengths/weaknesses for the Decision 263 context.
-- [ ] TASK-02-04: Write the recommendation section: primary framework recommendation (PACTA+TRISK for portfolio alignment and transition stress testing), secondary recommendation (PCAF as the prerequisite accounting layer, already in place as Output 2.1), tertiary recommendation (TCFD/ISSB S2 as the disclosure output framework). Include rationale anchored to the scored matrix.
-- [ ] TASK-02-05: Write the complementarity analysis: how the recommended stack (PCAF → PACTA → TRISK → TCFD/ISSB) creates a complete pipeline from emissions measurement through alignment assessment to risk quantification to external disclosure. Map this to BIDV's stated needs.
-- [ ] TASK-02-06: Write the limitations section: where the recommended approach falls short (e.g., PACTA requires asset-level data that may be incomplete, TRISK outputs are not regulatory PDs, no oil & gas coverage), and what BIDV should consider for future phases.
-- [ ] TASK-02-07: Save as `docs/bidv_framework_comparison.md` with the evaluation matrix as a markdown table, framework narratives, recommendation, complementarity analysis, and limitations.
+- [x] TASK-02-02: Score each of the 7 frameworks across all 10 dimensions using a 3-level scale: Strong Fit (framework addresses this dimension well for BIDV), Partial Fit (framework addresses this but with limitations for BIDV's context), Weak Fit (framework does not meaningfully address this for BIDV). Include a one-line justification for each score.
+- [x] TASK-02-03: Write a framework-by-framework evaluation narrative (one section per framework, ~200-400 words each) covering: what the framework does, how it works, what BIDV would need to use it, and its specific strengths/weaknesses for the Decision 263 context.
+- [x] TASK-02-04: Write the recommendation section: primary framework recommendation (PACTA+TRISK for portfolio alignment and transition stress testing), secondary recommendation (PCAF as the prerequisite accounting layer, already in place as Output 2.1), tertiary recommendation (TCFD/ISSB S2 as the disclosure output framework). Include rationale anchored to the scored matrix.
+- [x] TASK-02-05: Write the complementarity analysis: how the recommended stack (PCAF → PACTA → TRISK → TCFD/ISSB) creates a complete pipeline from emissions measurement through alignment assessment to risk quantification to external disclosure. Map this to BIDV's stated needs.
+- [x] TASK-02-06: Write the limitations section: where the recommended approach falls short (e.g., PACTA requires asset-level data that may be incomplete, TRISK outputs are not regulatory PDs, no oil & gas coverage), and what BIDV should consider for future phases.
+- [x] TASK-02-07: Save as `docs/bidv_framework_comparison.md` with the evaluation matrix as a markdown table, framework narratives, recommendation, complementarity analysis, and limitations.
 
 **Files / Surfaces**
 - `docs/bidv_framework_comparison.md` - New: the framework comparison deliverable.
@@ -114,11 +114,11 @@ Build a scored evaluation matrix comparing the 7 frameworks across dimensions re
 - PHASE-01 research briefs must be complete.
 
 **Exit Criteria**
-- [ ] `docs/bidv_framework_comparison.md` exists with a scored 7×10 evaluation matrix.
-- [ ] Each framework has a narrative section with BIDV-specific strengths/weaknesses.
-- [ ] The recommendation section clearly states primary/secondary/tertiary framework choices with rationale tied to matrix scores.
-- [ ] The complementarity analysis shows the PCAF → PACTA → TRISK → TCFD/ISSB pipeline.
-- [ ] Limitations are documented honestly, including where peer frameworks outperform the recommendation.
+- [x] `docs/bidv_framework_comparison.md` exists with a scored 7×10 evaluation matrix.
+- [x] Each framework has a narrative section with BIDV-specific strengths/weaknesses.
+- [x] The recommendation section clearly states primary/secondary/tertiary framework choices with rationale tied to matrix scores.
+- [x] The complementarity analysis shows the PCAF → PACTA → TRISK → TCFD/ISSB pipeline.
+- [x] Limitations are documented honestly, including where peer frameworks outperform the recommendation.
 
 **Phase Risks**
 - **RISK-02-01:** Evaluation may appear biased toward PACTA since the repo only implements PACTA. Mitigation: include genuine trade-off analysis; document specific scenarios where SBTi or PCAF may be better fits (e.g., SBTi for target validation, PCAF for multi-asset-class coverage). Acknowledge that the repo's implementation of PACTA+TRISK is both a strength (proven demonstration) and a potential bias source.
@@ -128,8 +128,8 @@ Build a scored evaluation matrix comparing the 7 frameworks across dimensions re
 Produce a mapping document that shows exactly how the repo's PACTA+TRISK outputs support BIDV's compliance with Decision 263, creating a direct line from regulatory requirements to analytical capabilities.
 
 **Tasks**
-- [ ] TASK-03-01: Write the Decision 263 overview section: what the decision requires, which sectors are covered, key dates (2025 inventory reporting, quota implementation timeline), enforcement mechanisms, relationship to Law on Environmental Protection 2020 (Article 91).
-- [ ] TASK-03-02: Build the sector mapping table:
+- [x] TASK-03-01: Write the Decision 263 overview section: what the decision requires, which sectors are covered, key dates (2025 inventory reporting, quota implementation timeline), enforcement mechanisms, relationship to Law on Environmental Protection 2020 (Article 91).
+- [x] TASK-03-02: Build the sector mapping table:
 
   | Decision 263 Sector | Facility Type | PACTA Sector | PACTA Technologies | TRISK Sector | TRISK Technologies | Repo Data Files |
   |---|---|---|---|---|---|---|
@@ -137,19 +137,19 @@ Produce a mapping document that shows exactly how the repo's PACTA+TRISK outputs
   | Steel | BF/BOF, EAF | `steel` | `open_hearth`, `electric` | `Steel` | `OpenHearth`, `ElectricArc` | `data/vietnam_abcd.csv`, `data/vietnam_scenario_co2.csv` |
   | Cement | Integrated | `cement` | `integrated facility` | `Cement` | `IntegratedFacility` | `data/vietnam_abcd.csv`, `data/vietnam_scenario_co2.csv` |
 
-- [ ] TASK-03-03: Build the compliance capability mapping: for each Decision 263 requirement (emission inventory, GHG quotas, emission reduction plans), show which repo capability addresses it:
+- [x] TASK-03-03: Build the compliance capability mapping: for each Decision 263 requirement (emission inventory, GHG quotas, emission reduction plans), show which repo capability addresses it:
   - Emission inventory → PCAF financed emissions baseline (Output 2.1) + PACTA matching (`scripts/pacta_vietnam_scenario.R`)
   - Sector-specific quotas → PACTA SDA analysis (emission intensity pathways in `data/vietnam_scenario_co2.csv`) + PACTA alignment gap calculation
   - Emission reduction plans → TRISK stress testing (scenario-based NPV/PD impact) + sector prioritization (to be built in GAP-03) + borrower engagement (to be built in GAP-07)
-- [ ] TASK-03-04: Write the "BIDV compliance stack" narrative: how PCAF (Output 2.1) + PACTA alignment + TRISK stress testing together form a three-layer compliance and risk management architecture that maps to Decision 263's three requirements (measure → compare → act).
-- [ ] TASK-03-05: Map the repo's synthetic borrowers to typical Decision 263 entities to demonstrate the analytical coverage:
+- [x] TASK-03-04: Write the "BIDV compliance stack" narrative: how PCAF (Output 2.1) + PACTA alignment + TRISK stress testing together form a three-layer compliance and risk management architecture that maps to Decision 263's three requirements (measure → compare → act).
+- [x] TASK-03-05: Map the repo's synthetic borrowers to typical Decision 263 entities to demonstrate the analytical coverage:
   - EVN subsidiaries (Vinh Tan, Duyen Hai, Mong Duong) → thermal power quota entities
   - VICEM → cement quota entity
   - Hoa Phat Group → steel quota entity
   - Vinacomin → coal mining (not directly Decision 263 but indirectly relevant)
-- [ ] TASK-03-06: Write the data availability assessment: what emissions data BIDV can expect from its Decision 263 clients (since they are legally required to collect and report emissions data from 2025), and how that data feeds into the PACTA+TRISK pipeline via the BYOL intake (`intake/SCHEMA.md`).
-- [ ] TASK-03-07: Write the gap acknowledgment: what Decision 263 requirements the current pipeline does NOT address (e.g., verification of borrower-reported emissions, quota trading mechanisms if implemented, facility-level vs. company-level analysis).
-- [ ] TASK-03-08: Save as `docs/bidv_decision263_mapping.md` with all sections above.
+- [x] TASK-03-06: Write the data availability assessment: what emissions data BIDV can expect from its Decision 263 clients (since they are legally required to collect and report emissions data from 2025), and how that data feeds into the PACTA+TRISK pipeline via the BYOL intake (`intake/SCHEMA.md`).
+- [x] TASK-03-07: Write the gap acknowledgment: what Decision 263 requirements the current pipeline does NOT address (e.g., verification of borrower-reported emissions, quota trading mechanisms if implemented, facility-level vs. company-level analysis).
+- [x] TASK-03-08: Save as `docs/bidv_decision263_mapping.md` with all sections above.
 
 **Files / Surfaces**
 - `docs/bidv_decision263_mapping.md` - New: the Decision 263 mapping deliverable.
@@ -163,11 +163,11 @@ Produce a mapping document that shows exactly how the repo's PACTA+TRISK outputs
 - PHASE-01 research briefs must be complete (especially the Decision 263 research brief).
 
 **Exit Criteria**
-- [ ] `docs/bidv_decision263_mapping.md` exists with Decision 263 overview, sector mapping table, compliance capability mapping, and data availability assessment.
-- [ ] The sector mapping table is consistent with `docs/trisk_multisector_contract.md`.
-- [ ] The compliance capability mapping covers all three Decision 263 requirements (inventory, quotas, reduction plans).
-- [ ] Gaps and limitations are honestly documented.
-- [ ] Source citations are provided for all Decision 263 requirements.
+- [x] `docs/bidv_decision263_mapping.md` exists with Decision 263 overview, sector mapping table, compliance capability mapping, and data availability assessment.
+- [x] The sector mapping table is consistent with `docs/trisk_multisector_contract.md`.
+- [x] The compliance capability mapping covers all three Decision 263 requirements (inventory, quotas, reduction plans).
+- [x] Gaps and limitations are honestly documented.
+- [x] Source citations are provided for all Decision 263 requirements.
 
 **Phase Risks**
 - **RISK-03-01:** Decision 263 implementation details (quota levels, facility size thresholds) may not be publicly available yet. Mitigation: document what is known from the decision text and MONRE guidance; flag specific quota levels as "TBD — subject to MONRE implementing regulations" where necessary. The mapping structure remains valid even without exact quota numbers.
@@ -177,11 +177,11 @@ Produce a mapping document that shows exactly how the repo's PACTA+TRISK outputs
 Verify internal consistency between the framework comparison and Decision 263 mapping, add cross-references, and confirm the documents are ready to feed into the final report generator (GAP-04).
 
 **Tasks**
-- [ ] TASK-04-01: Cross-reference the framework comparison's "Vietnam regulatory compatibility" scores against the Decision 263 mapping. Verify that the scoring is consistent — if PACTA scores "Strong Fit" on regulatory compatibility, the Decision 263 mapping must demonstrate that fit concretely.
-- [ ] TASK-04-02: Verify that every sector mentioned in the Decision 263 mapping has a corresponding entry in the framework comparison's sector coverage assessment.
-- [ ] TASK-04-03: Add a "How to Read These Documents Together" section to `docs/bidv_framework_comparison.md` that explains the relationship: the comparison evaluates frameworks → the mapping shows how the recommended framework connects to Decision 263 → together they form the advisory core of the final report.
-- [ ] TASK-04-04: Review all documents for consistency in terminology: Decision 263 sector names, PACTA sector names, TRISK sector names, technology names. Create a terminology note if needed.
-- [ ] TASK-04-05: Verify that the documents can be consumed by a report generator that reads markdown and produces HTML — no embedded binary assets, all tables in standard markdown format, all references as inline citations.
+- [x] TASK-04-01: Cross-reference the framework comparison's "Vietnam regulatory compatibility" scores against the Decision 263 mapping. Verify that the scoring is consistent — if PACTA scores "Strong Fit" on regulatory compatibility, the Decision 263 mapping must demonstrate that fit concretely.
+- [x] TASK-04-02: Verify that every sector mentioned in the Decision 263 mapping has a corresponding entry in the framework comparison's sector coverage assessment.
+- [x] TASK-04-03: Add a "How to Read These Documents Together" section to `docs/bidv_framework_comparison.md` that explains the relationship: the comparison evaluates frameworks → the mapping shows how the recommended framework connects to Decision 263 → together they form the advisory core of the final report.
+- [x] TASK-04-04: Review all documents for consistency in terminology: Decision 263 sector names, PACTA sector names, TRISK sector names, technology names. Create a terminology note if needed.
+- [x] TASK-04-05: Verify that the documents can be consumed by a report generator that reads markdown and produces HTML — no embedded binary assets, all tables in standard markdown format, all references as inline citations.
 
 **Files / Surfaces**
 - `docs/bidv_framework_comparison.md` - Update: add cross-references and "how to read" section.
@@ -193,10 +193,10 @@ Verify internal consistency between the framework comparison and Decision 263 ma
 - PHASE-02 and PHASE-03 must be complete.
 
 **Exit Criteria**
-- [ ] Framework comparison regulatory compatibility scores are consistent with Decision 263 mapping evidence.
-- [ ] All sector names and technology names are consistent across both documents.
-- [ ] Both documents contain cross-references to each other.
-- [ ] Documents are valid markdown with no formatting issues that would break HTML rendering.
+- [x] Framework comparison regulatory compatibility scores are consistent with Decision 263 mapping evidence.
+- [x] All sector names and technology names are consistent across both documents.
+- [x] Both documents contain cross-references to each other.
+- [x] Documents are valid markdown with no formatting issues that would break HTML rendering.
 
 **Phase Risks**
 - **RISK-04-01:** Inconsistencies discovered between documents may require rework in earlier phases. Mitigation: this is expected and accounted for — PHASE-04 is intentionally a review phase. Budget time for one revision pass on each document.
