@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Final Report :: BIDV Framework Comparison and Decision 263 Compliance Mapping</title>
+  <meta name="color-scheme" content="dark light">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+    async function initMermaid() {
+      const blocks = document.querySelectorAll('.mermaid');
+      if (!blocks.length) { return; }
+
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'base',
+        securityLevel: 'loose',
+        themeVariables: {
+          primaryColor: '#f3ead9',
+          primaryTextColor: '#1f1912',
+          primaryBorderColor: '#9d6b37',
+          lineColor: '#3b6f76',
+          secondaryColor: '#efe4d0',
+          tertiaryColor: '#ffffff',
+          background: '#fbf7f1',
+          mainBkg: '#fbf7f1',
+          nodeBorder: '#9d6b37',
+          clusterBkg: '#f7efdf',
+          clusterBorder: '#3b6f76',
+          edgeLabelBackground: '#fbf7f1'
+        }
+      });
+
+      await mermaid.run({ nodes: blocks });
+    }
+
+    const run = () => initMermaid().catch((error) => console.error('Mermaid render failed', error));
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run, { once: true });
+    } else { run(); }
+  </script>
+  <style>
+    :root {
+      --paper: #fbf7f1;
+      --paper-strong: #fffdf9;
+      --ink: #1f1912;
+      --ink-soft: #5f564c;
+      --line: #dccdb6;
+      --line-strong: #bfa37d;
+      --accent: #9d6b37;
+      --accent-soft: #efe4d0;
+      --accent-2: #3b6f76;
+      --shadow: 0 18px 40px rgba(49, 33, 16, 0.08);
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+      --page-width: 1040px;
+      --display-font: Georgia, "Times New Roman", serif;
+      --body-font: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --mono-font: "Cascadia Code", Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; overflow-x: hidden;
+      color: var(--ink);
+      background: radial-gradient(circle at top left, rgba(157,107,55,0.09), transparent 26%),
+                  radial-gradient(circle at 88% 10%, rgba(59,111,118,0.08), transparent 22%),
+                  linear-gradient(180deg, #f7f1e7 0%, #fbf7f1 28%, #f6efe5 100%);
+      font-family: var(--body-font); line-height: 1.65; letter-spacing: 0.01em;
+    }
+    a { color: var(--accent-2); }
+    code, pre, .technical, .meta-chip, .section-index, .eyebrow, .stat-label, .stat-value, .mermaid { font-family: var(--mono-font); }
+    .page-shell { width: min(var(--page-width), calc(100vw - 32px)); margin: 0 auto; padding: 28px 0 56px; }
+    .hero {
+      padding: 34px; border: 1px solid rgba(159,123,79,0.28); border-radius: 30px;
+      background: linear-gradient(135deg, rgba(157,107,55,0.1), transparent 34%),
+                  linear-gradient(180deg, rgba(255,255,255,0.58), rgba(255,255,255,0.86)), var(--paper-strong);
+      box-shadow: var(--shadow);
+    }
+    .hero-grid { display: grid; grid-template-columns: minmax(0,1.45fr) minmax(260px,0.85fr); gap: 24px; align-items: end; }
+    .eyebrow { margin: 0 0 12px; color: var(--accent); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; }
+    .title { margin: 0; max-width: 14ch; font-family: var(--display-font); font-size: clamp(2.8rem,5vw,4.8rem); line-height: 0.95; letter-spacing: -0.04em; text-wrap: balance; }
+    .lede { margin: 18px 0 0; max-width: 60ch; color: var(--ink-soft); font-size: 1rem; }
+    .takeaway { margin-top: 22px; padding: 18px 20px; border-left: 4px solid var(--accent-2); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; background: rgba(59,111,118,0.08); color: #20373a; font-size: 1.02rem; }
+    .meta-grid { display: grid; gap: 12px; }
+    .meta-card, .section, .subcard, .empty-state { border: 1px solid rgba(95,72,46,0.12); background: rgba(255,253,249,0.88); box-shadow: var(--shadow); }
+    .meta-card { padding: 16px 18px; border-radius: var(--radius-md); }
+    .meta-label { color: var(--ink-soft); font-size: 0.76rem; letter-spacing: 0.14em; text-transform: uppercase; }
+    .meta-chip { margin-top: 8px; color: var(--accent); font-size: 1rem; font-weight: 700; word-break: break-word; }
+    .section { margin-top: 22px; padding: 24px; border-radius: var(--radius-lg); break-inside: avoid; page-break-inside: avoid; }
+    .section-header { display: flex; justify-content: space-between; gap: 12px 18px; align-items: end; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+    .section-index { color: var(--accent); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; }
+    .section-title { margin: 0; font-family: var(--display-font); font-size: clamp(1.45rem,2vw,2rem); line-height: 1.05; }
+    .summary-grid, .dual-grid, .phase-grid, .stat-grid, .appendix-grid { display: grid; gap: 16px; }
+    .summary-grid, .dual-grid, .phase-grid, .appendix-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .subcard { padding: 18px; border-radius: var(--radius-md); break-inside: avoid; page-break-inside: avoid; }
+    .subcard h3, .subcard h4 { margin: 0 0 10px; font-size: 1rem; line-height: 1.2; }
+    .subcard p:first-child, .subcard ul:first-child, .subcard ol:first-child { margin-top: 0; }
+    .stat-grid { grid-template-columns: repeat(3, minmax(0,1fr)); margin-top: 16px; }
+    .stat { padding: 14px 16px; border: 1px solid rgba(59,111,118,0.16); border-radius: var(--radius-sm); background: rgba(59,111,118,0.06); break-inside: avoid; page-break-inside: avoid; }
+    .stat-label { color: var(--ink-soft); font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; }
+    .stat-value { margin-top: 8px; color: var(--accent-2); font-size: 1.18rem; font-weight: 700; }
+    .narrative, .chart-frame, .technical-frame, .diagram-frame, .viz-frame { padding: 18px; border: 1px solid var(--line); border-radius: var(--radius-md); background: rgba(255,255,255,0.54); break-inside: avoid; page-break-inside: avoid; }
+    .diagram-frame { overflow-x: auto; overflow-y: auto; overscroll-behavior-x: contain; overscroll-behavior-y: contain; max-height: min(70vh,720px); }
+    .chart-frame, .viz-frame { overflow: hidden; }
+    .mermaid { width: 100%; max-width: 100%; min-width: 0; color: var(--ink); }
+    .mermaid svg { display: block; width: auto !important; min-width: 100%; max-width: none !important; height: auto !important; }
+    .diagram-frame.compact-diagram { padding: 12px; max-height: min(62vh,560px); }
+    .diagram-frame.compact-diagram .mermaid { min-width: 900px; }
+    .chart-frame canvas, .technical-frame > canvas, .viz-frame canvas, canvas.report-chart { display: block; width: 100% !important; max-width: 100%; height: 300px !important; min-height: 300px; max-height: 300px; }
+    .technical-frame table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+    .technical-frame th, .technical-frame td { padding: 12px 10px; border-bottom: 1px solid var(--line); vertical-align: top; text-align: left; }
+    .technical-frame th { color: var(--accent); font-size: 0.76rem; letter-spacing: 0.1em; text-transform: uppercase; }
+    .empty-state { padding: 20px; border-radius: var(--radius-md); text-align: center; color: var(--ink-soft); break-inside: avoid; page-break-inside: avoid; }
+    .empty-state strong { display: block; margin-bottom: 6px; color: var(--accent); font-size: 0.84rem; letter-spacing: 0.12em; text-transform: uppercase; }
+    ul, ol { margin: 0; padding-left: 20px; }
+    li { margin-bottom: 8px; }
+    p:last-child, li:last-child { margin-bottom: 0; }
+    .footer-note { margin-top: 18px; color: rgba(95,86,76,0.74); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; text-align: right; }
+    .inline-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 12px 0; }
+    .inline-table th, .inline-table td { padding: 10px 8px; border-bottom: 1px solid var(--line); text-align: left; }
+    .inline-table th { color: var(--accent); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; }
+    .tag { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; margin: 2px; }
+    .tag-green { background: rgba(59,111,118,0.15); color: #20373a; }
+    .tag-amber { background: rgba(157,107,55,0.15); color: #6b4720; }
+    .tag-red { background: rgba(180,80,60,0.12); color: #7a3020; }
+    @media (max-width: 920px) {
+      .hero-grid, .summary-grid, .dual-grid, .phase-grid, .stat-grid, .appendix-grid { grid-template-columns: 1fr; }
+      .title { max-width: none; }
+    }
+    @media (max-width: 640px) {
+      .page-shell { width: min(100vw - 20px, var(--page-width)); padding-top: 16px; padding-bottom: 36px; }
+      .hero, .section { padding: 18px; border-radius: 20px; }
+      .title { font-size: clamp(2.1rem,12vw,3.2rem); }
+    }
+    @media print {
+      :root { --paper: #ffffff; --paper-strong: #ffffff; --ink: #111111; --ink-soft: #444444; --line: #d6d1c8; }
+      @page { size: A4; margin: 14mm; }
+      body { background: #ffffff; }
+      .page-shell { width: 100%; max-width: none; padding: 0; }
+      .hero, .meta-card, .section, .subcard, .narrative, .chart-frame, .technical-frame, .diagram-frame, .viz-frame, .empty-state, .stat { background: #ffffff; box-shadow: none; }
+      .hero, .section { margin-top: 0; margin-bottom: 10mm; }
+      .diagram-frame { overflow: visible; max-height: none; }
+      .diagram-frame.compact-diagram .mermaid { min-width: 0; }
+      .section-header, .takeaway { break-after: avoid; page-break-after: avoid; }
+      a { color: inherit; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+
+    <!-- 1. Title Hero -->
+    <section class="hero" id="title-hero">
+      <div class="hero-grid">
+        <div>
+          <p class="eyebrow">Final Report / Shareable Analysis Artifact</p>
+          <h1 class="title">BIDV Framework Comparison and Decision&nbsp;263 Compliance Mapping</h1>
+          <p class="lede">
+            A structured evaluation of 7 portfolio alignment and climate risk frameworks against BIDV&rsquo;s Decision&nbsp;263 obligations in thermal power, steel, and cement.
+          </p>
+          <div class="takeaway">Recommended framework stack: PCAF → PACTA+TRISK → IFRS S2 provides the complete measure-align-stress-disclose pipeline for BIDV. Three critical gaps closed across 4 phases.</div>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-card">
+            <div class="meta-label">Project</div>
+            <div class="meta-chip">PACTA Vietnam / BIDV Advisory</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Repository</div>
+            <div class="meta-chip">pacta-trisk</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Date</div>
+            <div class="meta-chip">2026-05-22</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Executive Summary -->
+    <section class="section" id="executive-summary">
+      <div class="section-header">
+        <div>
+          <div class="section-index">01 / Executive Summary</div>
+          <h2 class="section-title">Executive Summary</h2>
+        </div>
+      </div>
+      <div class="summary-grid">
+        <div class="subcard">
+          <h3>Frameworks Evaluated</h3>
+          <p>7 frameworks scored across 10 dimensions: PACTA for Banks, TRISK, PCAF, SBTi Financial Institutions, GFANZ/NZBA, NGFS Climate Scenarios, and IFRS&nbsp;S2 (TCFD successor).</p>
+        </div>
+        <div class="subcard">
+          <h3>What Was Missing</h3>
+          <p>The repo had strong analytical infrastructure — working PACTA and TRISK pipelines, a deployed dashboard — but <strong>zero content</strong> comparing frameworks or mapping outputs to Decision&nbsp;263 regulatory obligations. Three critical gaps (GAP-01, GAP-02, GAP-07) blocked delivery of a client-facing advisory report.</p>
+        </div>
+        <div class="subcard">
+          <h3>Recommendation</h3>
+          <p><strong>Three-layer stack:</strong> PCAF (prerequisite accounting, already in place as Output&nbsp;2.1) → <strong>PACTA+TRISK</strong> (primary analytical layer for alignment assessment and transition stress testing) → IFRS&nbsp;S2 (disclosure framework for investor-ready reporting). Complemented by GFANZ/NZBA governance, NGFS scenario inputs, and optional SBTi FI target validation.</p>
+        </div>
+        <div class="subcard">
+          <h3>Deliverables</h3>
+          <p>2 research briefs (<code>research/2026-05-22_portfolio-alignment-frameworks.md</code>, <code>research/2026-05-22_decision263-vietnam-ghg.md</code>), 1 framework comparison matrix (<code>docs/bidv_framework_comparison.md</code>), and 1 Decision&nbsp;263 compliance mapping (<code>docs/bidv_decision263_mapping.md</code>). All 4 phases completed, cross-validated, and committed.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Background & Objective -->
+    <section class="section" id="background-objective">
+      <div class="section-header">
+        <div>
+          <div class="section-index">02 / Background &amp; Objective</div>
+          <h2 class="section-title">Background &amp; Objective</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p><strong>Context.</strong> BIDV, Vietnam&rsquo;s largest state-owned commercial bank, faces a dual regulatory imperative. First, <strong>Decision&nbsp;263</strong> (2025) establishes mandatory GHG emission quotas for thermal power, steel, and cement facilities — sectors that constitute a material share of BIDV&rsquo;s lending book, with 20+ clients already mandated to report emissions. Second, the <strong>SBV Green Taxonomy</strong> (Decision&nbsp;1604/QĐ-NHNN, 2023) requires banks to classify their portfolios as green, transition, or non-green and report to the central bank.</p>
+        <p><strong>The problem.</strong> The pacta-trisk repo had mature analytical infrastructure — a working PACTA alignment pipeline for power, cement, and steel; a package-backed TRISK stress-test covering all three Decision&nbsp;263 sectors; an interactive scenario builder; and a deployed Streamlit dashboard. But it contained <strong>no content</strong> evaluating PACTA and TRISK against peer frameworks, no mapping of analytical outputs to regulatory requirements, and no advisory narrative that a bank&rsquo;s senior risk management or ESG team could act on. The repo was a demonstration tool, not a client deliverable.</p>
+        <p><strong>Objective.</strong> Close the three critical gaps (GAP-01, GAP-02, GAP-07) identified in the BIDV gap analysis by producing: (1) a structured framework comparison matrix with scored evaluation of 7 leading frameworks across dimensions relevant to BIDV; (2) a Decision&nbsp;263 compliance mapping showing how the repo&rsquo;s PACTA+TRISK outputs directly support BIDV&rsquo;s regulatory obligations. These deliverables form the intellectual core of the final BIDV Framework Recommendation Report (GAP-04).</p>
+      </div>
+    </section>
+
+    <!-- 4. Inputs & Scope -->
+    <section class="section" id="inputs-scope">
+      <div class="section-header">
+        <div>
+          <div class="section-index">03 / Inputs &amp; Scope</div>
+          <h2 class="section-title">Inputs &amp; Scope</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h4>Inputs</h4>
+          <ul>
+            <li><strong>Plan:</strong> <code>plans/2026-05-22-bidv-framework-comparison-decision263-plan.md</code> (4-phase blueprint)</li>
+            <li><strong>Gap analysis:</strong> <code>reports/2026-05-22-bidv-framework-recommendation-gap-analysis.md</code> (7 gaps, 3 critical)</li>
+            <li><strong>Existing research:</strong> PACTA-TRISK positioning analysis, TRISK demo assumptions, sector contracts, VSIC mapping</li>
+            <li><strong>Domain research:</strong> Web research on PCAF v3, SBTi FI, GFANZ/NZBA, NGFS Phase V, IFRS S2, IFC PS, Equator Principles, Decision&nbsp;263 regulatory texts</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h4>Scope</h4>
+          <table class="inline-table">
+            <tr><th>In Scope</th><th>Out of Scope</th></tr>
+            <tr><td>7-framework evaluation matrix (10 dimensions)</td><td>Building new analytical pipelines or running TRISK/PACTA</td></tr>
+            <tr><td>Decision&nbsp;263 compliance capability mapping</td><td>Ingesting real BIDV data</td></tr>
+            <tr><td>Research briefs with source citations</td><td>Dash board modifications or new code</td></tr>
+            <tr><td>Framework recommendation with rationale</td><td>Final compiled report (GAP-04, separate plan)</td></tr>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Assumptions & Constraints -->
+    <section class="section" id="assumptions-constraints">
+      <div class="section-header">
+        <div>
+          <div class="section-index">04 / Assumptions &amp; Constraints</div>
+          <h2 class="section-title">Assumptions &amp; Constraints</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h4>Assumptions</h4>
+          <ul>
+            <li><strong>ASM-001:</strong> Decision&nbsp;263 sectors (thermal power, steel, cement) map directly to the repo&rsquo;s three TRISK sectors and PACTA sectors</li>
+            <li><strong>ASM-002:</strong> BIDV&rsquo;s financed emissions baseline (Output&nbsp;2.1) is PCAF-based — the framework comparison positions PCAF as the accounting foundation</li>
+            <li><strong>ASM-003:</strong> 7 frameworks (PACTA, TRISK, PCAF, SBTi FI, GFANZ, NGFS, IFRS S2) cover the major categories without bloating the comparison</li>
+            <li><strong>ASM-004:</strong> BIDV&rsquo;s Decision&nbsp;263 clients are legally required to collect and report emissions data from 2025 — this data feeds into the PACTA+TRISK pipeline</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h4>Constraints</h4>
+          <ul>
+            <li><strong>CON-001:</strong> Decision&nbsp;263 regulatory text may not be fully available in English — flagged items that could not be independently verified</li>
+            <li><strong>CON-002:</strong> No new code or pipeline modifications — all outputs are markdown documents and research briefs</li>
+            <li><strong>DEC-001:</strong> Framework recommendation positions PACTA+TRISK as primary, PCAF as prerequisite, IFRS S2 as disclosure layer — reflects the repo&rsquo;s existing implementation</li>
+            <li><strong>DEC-002:</strong> Quota levels in Decision&nbsp;263 marked as &ldquo;TBD — subject to MONRE implementing regulations&rdquo; where not publicly available</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. Methodology -->
+    <section class="section" id="methodology">
+      <div class="section-header">
+        <div>
+          <div class="section-index">05 / Methodology</div>
+          <h2 class="section-title">Methodology</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p>The analysis progressed across four sequential phases, with research parallelized where possible:</p>
+        <p><strong>PHASE-01 — Domain Research.</strong> Three parallel subagents researched: (1) PCAF, SBTi FI, and GFANZ; (2) NGFS, TCFD/IFRS S2, and IFC Performance Standards; (3) Decision&nbsp;263 regulatory texts, SBV green taxonomy, and BIDV&rsquo;s dual obligations. Each framework was documented across 11 consistent dimensions (purpose, methodology type, data inputs, sector coverage, output types, cost, open-source availability, time to first results, Vietnam relevance, and institutional adoption). The two research briefs served as the evidence base for all downstream documents.</p>
+        <p><strong>PHASE-02 — Framework Comparison Matrix.</strong> The 7 frameworks were scored across 10 evaluation dimensions on a 3-level scale (Strong Fit / Partial Fit / Weak Fit). Each score includes a one-line justification anchored to BIDV&rsquo;s specific context. Framework-by-framework narratives (~200–400 words each) cover what the framework does, how it works, what BIDV would need, and its specific strengths and weaknesses. The recommendation section presents a three-layer stack with rationale tied to matrix scores.</p>
+        <p><strong>PHASE-03 — Decision&nbsp;263 Compliance Mapping.</strong> The mapping document traces each Decision&nbsp;263 requirement (emission inventory, sector-specific quotas, emission reduction plans) to specific repo capabilities, pipeline outputs, and data files. The sector mapping table aligns Decision&nbsp;263 sectors → PACTA sectors/technologies → TRISK sectors/technologies → repo data files. A three-layer compliance stack architecture (Measure → Compare → Act) shows the logical flow from regulatory requirement to analytical output.</p>
+        <p><strong>PHASE-04 — Cross-Validation.</strong> Both documents were cross-checked for consistency: regulatory compatibility scores in the framework comparison were verified against the Decision&nbsp;263 mapping evidence; sector and technology names were checked against <code>docs/trisk_multisector_contract.md</code>; and all cross-references were confirmed bidirectional.</p>
+      </div>
+      <div class="stat-grid">
+        <div class="stat">
+          <div class="stat-label">Phases</div>
+          <div class="stat-value">4</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Frameworks Evaluated</div>
+          <div class="stat-value">7</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Evaluation Dimensions</div>
+          <div class="stat-value">10</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. Phase-by-Phase Analysis -->
+    <section class="section" id="phase-analysis">
+      <div class="section-header">
+        <div>
+          <div class="section-index">06 / Phase-by-Phase Analysis</div>
+          <h2 class="section-title">Phase-by-Phase Analysis</h2>
+        </div>
+      </div>
+      <div class="phase-grid">
+        <div class="subcard">
+          <h3>PHASE-01&ensp;Domain Research</h3>
+          <p><strong>Parallel research</strong> using 3 subagents produced 2 research briefs: <code>research/2026-05-22_portfolio-alignment-frameworks.md</code> (~400 lines, 7 frameworks × 11 dimensions) and <code>research/2026-05-22_decision263-vietnam-ghg.md</code> (~230 lines, covering Decision&nbsp;263 quotas, SBV taxonomy, BIDV obligations, data sources). Flagged 6 items that could not be independently verified from English-language sources (quota levels, MONRE implementing circulars, penalty amounts).</p>
+        </div>
+        <div class="subcard">
+          <h3>PHASE-02&ensp;Framework Comparison Matrix</h3>
+          <p>Produced <code>docs/bidv_framework_comparison.md</code> (~430 lines) with a scored 7×10 matrix, 7 framework-by-framework narratives, a three-layer recommendation (PCAF → PACTA+TRISK → IFRS S2), complementarity analysis showing the complete pipeline, and an honest limitations section where peer frameworks outperform the recommendation (e.g., PCAF for data completeness, SBTi for credibility, NGFS for supervisory-grade scenarios).</p>
+        </div>
+        <div class="subcard">
+          <h3>PHASE-03&ensp;Decision&nbsp;263 Compliance Mapping</h3>
+          <p>Produced <code>docs/bidv_decision263_mapping.md</code> (~325 lines) with a sector mapping table (Decision&nbsp;263 → PACTA → TRISK → repo files), compliance capability mapping for all 3 requirements, a three-layer compliance stack architecture (Measure → Compare → Act), synthetic borrower mapping (EVN, VICEM, Hoa Phat), and explicit gap acknowledgment (verification, quota trading, facility-level analysis). Regulatory update note recommends re-validation against MONRE&rsquo;s latest guidance.</p>
+        </div>
+        <div class="subcard">
+          <h3>PHASE-04&ensp;Cross-Validation</h3>
+          <p>Verified internal consistency: all 7 framework regulatory compatibility scores match Decision&nbsp;263 mapping evidence; sector and technology names (coalcap → CoalCap, open_hearth → OpenHearth, etc.) consistent with <code>docs/trisk_multisector_contract.md</code>; cross-references confirmed bidirectional; pipeline flow consistent across both documents. No rework needed — cross-references were built into documents during writing.</p>
+        </div>
+      </div>
+
+      <!-- Optional Mermaid Block -->
+      <div class="diagram-frame compact-diagram" style="margin-top: 18px;">
+        <div class="mermaid">
+flowchart LR
+    A["PCAF&lt;br/>&lt;i&gt;Emissions Accounting&lt;/i&gt;"] -->
+    B["PACTA&lt;br/>&lt;i&gt;Portfolio Alignment&lt;/i&gt;"] -->
+    C["TRISK&lt;br/>&lt;i&gt;Transition Stress Testing&lt;/i&gt;"] -->
+    D["IFRS S2&lt;br/>&lt;i&gt;Climate Disclosure&lt;/i&gt;"]
+
+    E["NGFS&lt;br/>&lt;i&gt;Scenario Inputs&lt;/i&gt;"] -.-> B
+    E -.-> C
+
+    F["GFANZ/NZBA&lt;br/>&lt;i&gt;Governance Wrapper&lt;/i&gt;"] -.-> D
+
+    G["SBTi FI&lt;br/>&lt;i&gt;Target Validation&lt;/i&gt;"] -.-> B
+
+    style A fill:#efe4d0,stroke:#9d6b37
+    style B fill:#f3ead9,stroke:#9d6b37
+    style C fill:#f3ead9,stroke:#9d6b37
+    style D fill:#efe4d0,stroke:#9d6b37
+    style E fill:#dee8e6,stroke:#3b6f76
+    style F fill:#dee8e6,stroke:#3b6f76
+    style G fill:#dee8e6,stroke:#3b6f76
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. Findings & Recommendation -->
+    <section class="section" id="findings-recommendation">
+      <div class="section-header">
+        <div>
+          <div class="section-index">07 / Findings &amp; Recommendation</div>
+          <h2 class="section-title">Findings &amp; Recommendation</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p><strong>Finding 1 — PACTA+TRISK is the strongest fit for BIDV&rsquo;s Decision&nbsp;263 context.</strong> With 8 out of 10 dimensions scored Strong Fit, PACTA is the highest-scored framework in the evaluation. TRISK scores 5 Strong Fit dimensions and is the only framework that translates alignment gaps into borrower-level financial risk metrics (NPV and PD changes). Together, they form a complete analytical pipeline from alignment assessment to stress testing.</p>
+        <p><strong>Finding 2 — PCAF is the mandatory prerequisite.</strong> Already in place as Output&nbsp;2.1, PCAF provides the emissions accounting foundation that PACTA, TRISK, SBTi, and IFRS S2 all depend on. It scored 7 Strong Fit dimensions and is the lowest-barrier entry point for BIDV&rsquo;s climate risk capabilities.</p>
+        <p><strong>Finding 3 — IFRS S2 creates the disclosure demand.</strong> With 5 Strong Fit dimensions, IFRS S2 is the disclosure framework that turns analytical outputs into investor-ready reporting. Vietnam&rsquo;s regulatory trajectory (SBV taxonomy, SSC sustainability disclosure roadmap) is aligned with ISSB adoption. This creates both regulatory pressure and a clear implementation pathway.</p>
+        <p><strong>Finding 4 — No single framework covers all dimensions.</strong> The evaluation confirms that a single-framework approach would leave critical gaps. PACTA does not produce financial risk metrics (requires TRISK). PCAF measures but does not align or stress-test. SBTi validates but does not produce analytical outputs. NGFS provides scenarios but not portfolio-level analysis. The recommended stack is an integrated pipeline where each layer&rsquo;s outputs are the next layer&rsquo;s inputs.</p>
+        <p><strong>Recommendation.</strong> BIDV should adopt the three-layer stack:</p>
+        <ul>
+          <li><strong>Layer 1 (Prerequisite):</strong> Continue using PCAF for financed emissions accounting. Build on the existing Output&nbsp;2.1 baseline.</li>
+          <li><strong>Layer 2 (Primary analytical):</strong> Deploy PACTA for portfolio alignment assessment against PDP8 and NDC targets. Add TRISK for borrower-level transition stress testing. The pacta-trisk repo already demonstrates this pipeline with synthetic Vietnamese bank data.</li>
+          <li><strong>Layer 3 (Disclosure):</strong> Build toward IFRS S2-aligned climate disclosure, using PACTA/TRISK analytical outputs as the evidence base for scenario analysis and financed emissions reporting.</li>
+        </ul>
+        <p><strong>Complementary frameworks:</strong> Join GFANZ/NZBA for governance and peer learning when ready for a public net-zero commitment. Use NGFS scenarios for more sophisticated macroeconomic stress testing. Consider SBTi FI target validation after PCAF data quality improves.</p>
+      </div>
+
+      <!-- Optional Charts Block -->
+      <div class="chart-frame" style="margin-top: 18px;">
+        <canvas id="strongFitChart"></canvas>
+      </div>
+      <p style="margin-top: 8px; color: var(--ink-soft); font-size: 0.78rem;">Number of &ldquo;Strong Fit&rdquo; scores per framework across 10 evaluation dimensions. Higher indicates more dimensions where the framework is well-suited to BIDV&rsquo;s context.</p>
+    </section>
+
+    <!-- 9. Implementation Path -->
+    <section class="section" id="implementation-path">
+      <div class="section-header">
+        <div>
+          <div class="section-index">08 / Implementation Path</div>
+          <h2 class="section-title">Implementation Path</h2>
+        </div>
+      </div>
+      <div class="phase-grid">
+        <div class="subcard">
+          <h3>Immediate Next Step</h3>
+          <p><strong>GAP-03 — Sector Prioritization Module.</strong> Build an R script (<code>scripts/sector_prioritization.R</code>) that combines PACTA alignment gaps, TRISK stress-test scores, and portfolio exposure weights into a three-dimensional sector priority ranking. This is the next deliverable in the BIDV advisory sequence and the first time all three analytical outputs (alignment + stress + exposure) are synthesized into a single actionable output.</p>
+        </div>
+        <div class="subcard">
+          <h3>Short-Term (1–2 sprints)</h3>
+          <p><strong>GAP-04 — Report Generator.</strong> Build <code>scripts/generate_bidv_report.R</code> that reads the framework comparison, Decision&nbsp;263 mapping, sector prioritization results, and methodology docs, then renders a professional self-contained HTML report for delivery to BIDV.</p>
+          <p><strong>GAP-05 — Implementation Roadmap.</strong> Write the client-facing 5-phase adoption roadmap with timelines, resource requirements, and Decision&nbsp;263 milestone cross-references.</p>
+        </div>
+        <div class="subcard">
+          <h3>Medium-Term (2–3 sprints)</h3>
+          <p><strong>GAP-06 — BYOL Intake.</strong> Operationalize the bank intake pipeline with templates, validation script, and operator dashboard page (already drafted in <code>plans/2026-05-19-byol-pilot-intake-plan.md</code>).</p>
+          <p><strong>GAP-07 — Engagement Scoring.</strong> Build the borrower-level composite engagement priority scorer that merges PACTA alignment gaps with TRISK priority scores.</p>
+        </div>
+        <div class="subcard">
+          <h3>Long-Term Considerations</h3>
+          <p>Extend PACTA data coverage for Vietnamese ABCD. Develop Vietnam-specific carbon price curves for TRISK. Add physical risk assessment layer. Build automated pipeline refresh with reproducibility reporting (Idea&nbsp;2 from <code>research/future_planning_ideas.md</code>).</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10. Risks / Open Questions -->
+    <section class="section" id="risks-open-questions">
+      <div class="section-header">
+        <div>
+          <div class="section-index">09 / Risks / Open Questions</div>
+          <h2 class="section-title">Risks / Open Questions</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h4>Unresolved Risks</h4>
+          <ul>
+            <li><strong>Decision&nbsp;263 quota levels not independently verified.</strong> Exact numerical GHG quotas for thermal power, steel, and cement are published in MONRE implementing circulars (Vietnamese-language only). The mapping document&rsquo;s sector and compliance structure is valid regardless of specific quota numbers, but the credibility of findings would increase with verified quota data.</li>
+            <li><strong>MONRE guidance documents not accessible in English.</strong> The MRV methodology, facility size thresholds, and penalty frameworks are documented in Vietnamese-language materials that could not be independently verified. A Vietnamese regulatory review is recommended before final delivery to BIDV.</li>
+            <li><strong>Inherent PACTA+TRISK bias risk.</strong> The repo only implements PACTA and TRISK, which creates an unavoidable framing advantage. The evaluation mitigates this with explicit trade-off analysis and documented scenarios where peer frameworks outperform (Section&nbsp;6 in the comparison document), but an independent validator would strengthen credibility.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h4>Open Questions</h4>
+          <ul>
+            <li><strong>BIDV&rsquo;s actual portfolio composition.</strong> The recommendation is based on the synthetic MCB portfolio proxy and the assumption of 20+ Decision&nbsp;263 clients. If BIDV&rsquo;s actual sector exposure differs materially (e.g., significant oil &amp; gas or automotive lending), the framework recommendation weightings may shift.</li>
+            <li><strong>SBTi FI adoption cost-benefit.</strong> The recommendation marks SBTi FI as &ldquo;consider after PCAF data maturity,&rdquo; but the cost-benefit threshold for a Vietnamese state-owned bank is unknown. External advisory costing would be needed before a concrete SBTi FI recommendation can be made.</li>
+            <li><strong>Regulatory trajectory uncertainty.</strong> IFRS S2 adoption in Vietnam depends on the SSC&rsquo;s timeline for mandatory sustainability disclosure, which has not been finalized. The recommendations assume continuing regulatory momentum toward ISSB alignment.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11. Appendices / Evidence Notes -->
+    <section class="section" id="appendices-evidence">
+      <div class="section-header">
+        <div>
+          <div class="section-index">10 / Appendices / Evidence Notes</div>
+          <h2 class="section-title">Appendices / Evidence Notes</h2>
+        </div>
+      </div>
+      <div class="appendix-grid">
+        <div class="technical-frame">
+          <h4>Appendix A: Framework Strong Fit Counts</h4>
+          <p style="margin-bottom: 12px;">Number of &ldquo;Strong Fit&rdquo; scores per framework (max 10): <strong>PACTA 8</strong>, PCAF 7, TRISK 5, GFANZ 5, NGFS 5, IFRS S2 5, SBTi FI 1.</p>
+          <table>
+            <tr><th>Dimension</th><th>PACTA</th><th>TRISK</th><th>PCAF</th><th>SBTi</th><th>GFANZ</th><th>NGFS</th><th>IFRS S2</th></tr>
+            <tr><td>1. Data inputs</td><td><span class="tag tag-amber">Partial</span></td><td><span class="tag tag-amber">Partial</span></td><td><span class="tag tag-amber">Partial</span></td><td><span class="tag tag-red">Weak</span></td><td><span class="tag tag-amber">Partial</span></td><td><span class="tag tag-green">Strong</span></td><td><span class="tag tag-red">Weak</span></td></tr>
+            <tr><td>2. Sector coverage</td><td><span class="tag tag-green">Strong</span></td><td><span class="tag tag-green">Strong</span></td><td><span class="tag tag-green">Strong</span></td><td><span class="tag tag-green">Strong</span></td><td><span class="tag tag-green">Strong</span></td><td><span class="tag tag-green">Strong</span></td><td><span class="tag tag-green">Strong</span></td></tr>
+            <tr><td>3. Vietnam regulatory</td><td><span class="tag tag-green">Strong</span></td><td><span class="tag tag-amber">Partial</span></td><td><span class="tag tag-green">Strong</span></td><td><span class="tag tag-amber">Partial</span></td><td><span class="tag tag-green">Strong</span></td><td><span class="tag tag-amber">Partial</span></td><td><span class="tag tag-green">Strong</span></td></tr>
+            <tr><td>4. Output types</td><td><span class="tag tag-green">Strong</span></td><td><span class="tag tag-green">Strong</span></td><td><span class="tag tag-amber">Partial</span></td><td><span class="tag tag-amber">Partial</span></td><td><span class="tag tag-amber">Partial</span></td><td><span class="tag tag-amber">Partial</span></td><td><span class="tag tag-green">Strong</span></td></tr>
+            <tr><td>5. Implementation complexity</td><td><span class="tag tag-amber">Partial</span></td><td><span class="tag tag-red">Weak</span></td><td><span class="tag tag-amber">Partial</span></td><td><span class="tag tag-red">Weak</span></td><td><span class="tag tag-amber">Partial</span></td><td><span class="tag tag-red">Weak</span></td><td><span class="tag tag-amber">Partial</span></td></tr>
+            <tr><td>6. Cost</td><td><span class="tag tag-green">Strong</span></td><td><span class="tag tag-green">Strong</span></td><td><span class="tag tag-green">Strong</span></td><td><span class="tag tag-red">Weak</span></td><td><span class="tag tag-amber">Partial</span></td><td><span class="tag tag-green">Strong</span></td><td><span class="tag tag-amber">Partial</span></td></tr>
+            <tr><td>7. Open-source</td><td><span class="tag tag-green">Strong</span></td><td><span class="tag tag-green">Strong</span></td><td><span class="tag tag-green">Strong</span></td><td><span class="tag tag-amber">Partial</span></td><td><span class="tag tag-green">Strong</span></td><td><span class="tag tag-amber">Partial</span></td><td><span class="tag tag-amber">Partial</span></td></tr>
+            <tr><td>8. Time to first results</td><td><span class="tag tag-green">Strong</span></td><td><span class="tag tag-amber">Partial</span></td><td><span class="tag tag-green">Strong</span></td><td><span class="tag tag-red">Weak</span></td><td><span class="tag tag-amber">Partial</span></td><td><span class="tag tag-red">Weak</span></td><td><span class="tag tag-red">Weak</span></td></tr>
+            <tr><td>9. Complementarity w/ PCAF</td><td><span class="tag tag-green">Strong</span></td><td><span class="tag tag-green">Strong</span></td><td><span class="tag tag-green">Strong</span></td><td><span class="tag tag-green">Strong</span></td><td><span class="tag tag-green">Strong</span></td><td><span class="tag tag-green">Strong</span></td><td><span class="tag tag-green">Strong</span></td></tr>
+            <tr><td>10. Maturity &amp; ASEAN adoption</td><td><span class="tag tag-green">Strong</span></td><td><span class="tag tag-red">Weak</span></td><td><span class="tag tag-green">Strong</span></td><td><span class="tag tag-amber">Partial</span></td><td><span class="tag tag-green">Strong</span></td><td><span class="tag tag-green">Strong</span></td><td><span class="tag tag-green">Strong</span></td></tr>
+          </table>
+        </div>
+        <div class="technical-frame">
+          <h4>Appendix B: Source Notes</h4>
+          <table>
+            <tr><th>Framework</th><th>Primary Sources</th></tr>
+            <tr><td>PCAF</td><td><code>carbonaccountingfinancials.com</code> — Standard v3, Part A (2025)</td></tr>
+            <tr><td>SBTi FI</td><td><code>sciencebasedtargets.org</code> — FI Near-Term v2 (2024), Net-Zero Standard (2025)</td></tr>
+            <tr><td>GFANZ/NZBA</td><td><code>unepfi.org/net-zero-banking</code> — Sector papers for power, steel, cement</td></tr>
+            <tr><td>NGFS</td><td><code>ngfs.net/ngfs-scenarios-portal</code> — Phase V scenario data</td></tr>
+            <tr><td>TCFD/IFRS S2</td><td><code>ifrs.org/sustainability</code> — IFRS S2 (June 2023)</td></tr>
+            <tr><td>Decision&nbsp;263</td><td>Baker McKenzie (July 2024), DFDL (March 2024), GIZ Vietnam, IFC Vietnam Green Taxonomy Guide</td></tr>
+          </table>
+          <p style="margin-top: 12px;"><strong>Six items flagged as not independently verified</strong> (see <code>research/2026-05-22_decision263-vietnam-ghg.md</code> Section&nbsp;12).</p>
+        </div>
+        <div class="technical-frame">
+          <h4>Appendix C: Glossary</h4>
+          <table>
+            <tr><th>Term</th><th>Definition</th></tr>
+            <tr><td>ABCD</td><td>Asset-Based Company Data — production capacity, technology mix by company</td></tr>
+            <tr><td>Decision&nbsp;263</td><td>Quyết định 263/QĐ-TTg — Vietnam&rsquo;s pilot GHG emission quota regime (2025)</td></tr>
+            <tr><td>DCF</td><td>Discounted Cash Flow — financial model used in TRISK for NPV estimation</td></tr>
+            <tr><td>EPFI</td><td>Equator Principles Financial Institution</td></tr>
+            <tr><td>ISIC</td><td>International Standard Industrial Classification — used by PACTA for sector mapping</td></tr>
+            <tr><td>MONRE</td><td>Bộ Tài nguyên và Môi trường — Vietnam&rsquo;s Ministry of Environment</td></tr>
+            <tr><td>MRV</td><td>Measurement, Reporting, and Verification — under development for carbon market</td></tr>
+            <tr><td>NDC</td><td>Nationally Determined Contribution — Vietnam&rsquo;s climate commitment under Paris Agreement</td></tr>
+            <tr><td>NPV</td><td>Net Present Value — borrower financial metric in TRISK stress testing</td></tr>
+            <tr><td>PD</td><td>Probability of Default — borrower credit risk metric in TRISK</td></tr>
+            <tr><td>PDP8</td><td>Power Development Plan 8 — Vietnam&rsquo;s national energy plan (2023)</td></tr>
+            <tr><td>SASB</td><td>Sustainability Accounting Standards Board — now part of IFRS Foundation</td></tr>
+            <tr><td>SBV</td><td>State Bank of Vietnam — Vietnam&rsquo;s central bank</td></tr>
+            <tr><td>SDA</td><td>Sectoral Decarbonization Approach — emission intensity tracking method</td></tr>
+            <tr><td>VSIC</td><td>Vietnam Standard Industrial Classification — structurally ISIC Rev.4 with letter prefix</td></tr>
+          </table>
+        </div>
+        <div class="technical-frame">
+          <h4>Appendix D: Decision&nbsp;263 Timeline</h4>
+          <table>
+            <tr><th>Phase</th><th>Period</th><th>Key Events</th></tr>
+            <tr><td>Enabling legislation</td><td>2020–2022</td><td>Law on Environmental Protection 2020 (Art.&nbsp;91), Decree&nbsp;06/2022/ND-CP, Decree&nbsp;08/2022/ND-CP</td></tr>
+            <tr><td>GHG inventory mandate</td><td>2025+</td><td>Facilities ≥3,000 tCO2e/year must report to MONRE</td></tr>
+            <tr><td>Quota pilot</td><td>2025–2027</td><td>Decision&nbsp;263 quotas for thermal power, steel, cement — emission reduction plans required</td></tr>
+            <tr><td>Full carbon market</td><td>2028+</td><td>Carbon credit exchange operational — buying/selling credits for compliance</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="footer-note">designed for html first, printable without reconstruction</div>
+    </section>
+  </main>
+  <script>
+    (function() {
+      const chartCanvases = document.querySelectorAll('canvas');
+      chartCanvases.forEach((canvas) => {
+        canvas.classList.add('report-chart');
+        const parent = canvas.parentElement;
+        if (parent && parent.classList.contains('technical-frame') && !parent.classList.contains('chart-frame')) {
+          parent.classList.add('chart-frame');
+        }
+      });
+    })();
+
+    if (window.Chart) {
+      Chart.defaults.devicePixelRatio = 1;
+      Chart.defaults.animation = false;
+      Chart.defaults.resizeDelay = 150;
+      Chart.defaults.normalized = true;
+      Chart.defaults.maintainAspectRatio = false;
+      Chart.defaults.responsive = true;
+      window.__REPORT_CHART_DEFAULTS__ = {
+        animation: false,
+        resizeDelay: 150,
+        normalized: true,
+        maintainAspectRatio: false,
+        responsive: true
+      };
+
+      document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('strongFitChart');
+        if (!ctx) return;
+
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['PACTA', 'TRISK', 'PCAF', 'SBTi FI', 'GFANZ/NZBA', 'NGFS', 'IFRS S2'],
+            datasets: [{
+              label: 'Strong Fit scores (of 10)',
+              data: [8, 5, 7, 1, 5, 5, 5],
+              backgroundColor: [
+                'rgba(157, 107, 55, 0.75)',
+                'rgba(59, 111, 118, 0.75)',
+                'rgba(157, 107, 55, 0.55)',
+                'rgba(180, 80, 60, 0.55)',
+                'rgba(59, 111, 118, 0.55)',
+                'rgba(59, 111, 118, 0.55)',
+                'rgba(59, 111, 118, 0.55)'
+              ],
+              borderColor: [
+                'rgba(157, 107, 55, 1)',
+                'rgba(59, 111, 118, 1)',
+                'rgba(157, 107, 55, 1)',
+                'rgba(180, 80, 60, 1)',
+                'rgba(59, 111, 118, 1)',
+                'rgba(59, 111, 118, 1)',
+                'rgba(59, 111, 118, 1)'
+              ],
+              borderWidth: 2,
+              borderRadius: 6
+            }]
+          },
+          options: {
+            animation: false,
+            resizeDelay: 150,
+            normalized: true,
+            maintainAspectRatio: false,
+            responsive: true,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: '#1f1912',
+                titleColor: '#fbf7f1',
+                bodyColor: '#fbf7f1'
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                max: 10,
+                ticks: { stepSize: 2, color: '#5f564c' },
+                grid: { color: 'rgba(95, 86, 76, 0.1)' }
+              },
+              x: {
+                ticks: { color: '#5f564c', font: { size: 11 } },
+                grid: { display: false }
+              }
+            }
+          }
+        });
+      });
+    }
+  </script>
+</body>
+</html>
