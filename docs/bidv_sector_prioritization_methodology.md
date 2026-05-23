@@ -217,4 +217,28 @@ Horizontal stacked bar chart with:
 
 ---
 
+## 9. MCB Demonstration Results Appendix
+
+The script was executed against the MCB synthetic portfolio (43 loans, 19.3 billion VND Decision 263 exposure) with default weights (0.35/0.35/0.30). Results:
+
+| Sector | Alignment Score | Stress Score | Exposure Score | Composite | Band |
+|---|---|---|---|---|---|
+| Power | 1.000 | 1.000 | 1.000 | **1.000** | Critical |
+| Steel | 0.453 | 0.000 | 0.000 | **0.158** | Low |
+| Cement | 0.000 | 0.000 | 0.035 | **0.011** | Low |
+
+**Raw values:**
+
+| Sector | Alignment Gap | Stress (weighted mean) | Exposure (VND) | Exposure Share |
+|---|---|---|---|---|
+| Power | 13.37 pp | 493.39 | 15,770,000 | 81.8% |
+| Cement | 2.1% | 100.00 | 2,000,000 | 10.4% |
+| Steel | 7.2% | 100.00 | 1,500,000 | 7.8% |
+
+**Sensitivity check:** With weights 0.50/0.25/0.25 (alignment-heavy), steel's score increased from 0.158 to 0.226 (+43%). The ranking order (power > steel > cement) is stable across all tested weight combinations.
+
+**Caveats:** Steel match coverage ~4% in the MCB portfolio; power sector NA values at 2025 for some technologies; all results are synthetic, not real BIDV data.
+
+---
+
 *This methodology document serves as the specification for `scripts/sector_prioritization.R` (GAP-03). All formulas, weights, and normalization rules are implemented exactly as documented. The script accepts weight parameters so BIDV can adjust during implementation.*
