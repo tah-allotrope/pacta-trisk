@@ -1,7 +1,7 @@
 ---
 title: "BIDV Framework Recommendation Report Generator and Implementation Roadmap"
 date: "2026-05-22"
-status: "draft"
+status: "completed"
 request: "GAP-04 + GAP-05 from the BIDV gap analysis: build a report generator that assembles the framework comparison, Decision 263 mapping, sector prioritization, and implementation roadmap into a professional advisory HTML report for BIDV delivery. Additionally, write the client-facing implementation roadmap content that guides BIDV through data preparation, baseline establishment, risk assessment, action, and monitoring phases."
 plan_type: "multi-phase"
 research_inputs:

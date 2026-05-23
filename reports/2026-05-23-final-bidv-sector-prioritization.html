@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Final Report :: BIDV Sector Prioritization Module</title>
+  <meta name="color-scheme" content="dark light">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+    async function initMermaid() {
+      const blocks = document.querySelectorAll('.mermaid');
+      if (!blocks.length) {
+        return;
+      }
+
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'base',
+        securityLevel: 'loose',
+        themeVariables: {
+          primaryColor: '#f3ead9',
+          primaryTextColor: '#1f1912',
+          primaryBorderColor: '#9d6b37',
+          lineColor: '#3b6f76',
+          secondaryColor: '#efe4d0',
+          tertiaryColor: '#ffffff',
+          background: '#fbf7f1',
+          mainBkg: '#fbf7f1',
+          nodeBorder: '#9d6b37',
+          clusterBkg: '#f7efdf',
+          clusterBorder: '#3b6f76',
+          edgeLabelBackground: '#fbf7f1'
+        }
+      });
+
+      await mermaid.run({ nodes: blocks });
+    }
+
+    const run = () => initMermaid().catch((error) => console.error('Mermaid render failed', error));
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run, { once: true });
+    } else {
+      run();
+    }
+  </script>
+  <style>
+    :root {
+      --paper: #fbf7f1;
+      --paper-strong: #fffdf9;
+      --ink: #1f1912;
+      --ink-soft: #5f564c;
+      --line: #dccdb6;
+      --line-strong: #bfa37d;
+      --accent: #9d6b37;
+      --accent-soft: #efe4d0;
+      --accent-2: #3b6f76;
+      --shadow: 0 18px 40px rgba(49, 33, 16, 0.08);
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+      --page-width: 1040px;
+      --display-font: Georgia, "Times New Roman", serif;
+      --body-font: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --mono-font: "Cascadia Code", Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0; min-height: 100vh; overflow-x: hidden;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(157, 107, 55, 0.09), transparent 26%),
+        radial-gradient(circle at 88% 10%, rgba(59, 111, 118, 0.08), transparent 22%),
+        linear-gradient(180deg, #f7f1e7 0%, #fbf7f1 28%, #f6efe5 100%);
+      font-family: var(--body-font);
+      line-height: 1.65;
+      letter-spacing: 0.01em;
+    }
+
+    a { color: var(--accent-2); }
+
+    code, pre, .technical, .meta-chip, .section-index, .eyebrow, .stat-label, .stat-value, .mermaid {
+      font-family: var(--mono-font);
+    }
+
+    .page-shell {
+      width: min(var(--page-width), calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 28px 0 56px;
+    }
+
+    .hero {
+      padding: 34px;
+      border: 1px solid rgba(159, 123, 79, 0.28);
+      border-radius: 30px;
+      background:
+        linear-gradient(135deg, rgba(157, 107, 55, 0.1), transparent 34%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.86)),
+        var(--paper-strong);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.85fr);
+      gap: 24px;
+      align-items: end;
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .title {
+      margin: 0;
+      max-width: 12ch;
+      font-family: var(--display-font);
+      font-size: clamp(2.8rem, 5vw, 4.8rem);
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+      text-wrap: balance;
+    }
+
+    .lede {
+      margin: 18px 0 0;
+      max-width: 60ch;
+      color: var(--ink-soft);
+      font-size: 1rem;
+    }
+
+    .takeaway {
+      margin-top: 22px;
+      padding: 18px 20px;
+      border-left: 4px solid var(--accent-2);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      background: rgba(59, 111, 118, 0.08);
+      color: #20373a;
+      font-size: 1.02rem;
+    }
+
+    .meta-grid { display: grid; gap: 12px; }
+
+    .meta-card, .section, .subcard, .empty-state {
+      border: 1px solid rgba(95, 72, 46, 0.12);
+      background: rgba(255, 253, 249, 0.88);
+      box-shadow: var(--shadow);
+    }
+
+    .meta-card {
+      padding: 16px 18px;
+      border-radius: var(--radius-md);
+    }
+
+    .meta-label {
+      color: var(--ink-soft);
+      font-size: 0.76rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .meta-chip {
+      margin-top: 8px;
+      color: var(--accent);
+      font-size: 1rem;
+      font-weight: 700;
+      word-break: break-word;
+    }
+
+    .section {
+      margin-top: 22px;
+      padding: 24px;
+      border-radius: var(--radius-lg);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px 18px;
+      align-items: end;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-index {
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .section-title {
+      margin: 0;
+      font-family: var(--display-font);
+      font-size: clamp(1.45rem, 2vw, 2rem);
+      line-height: 1.05;
+    }
+
+    .summary-grid, .dual-grid, .phase-grid, .stat-grid, .appendix-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .summary-grid, .dual-grid, .phase-grid, .appendix-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .subcard {
+      padding: 18px;
+      border-radius: var(--radius-md);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .subcard h3, .subcard h4 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+      line-height: 1.2;
+    }
+
+    .subcard p:first-child, .subcard ul:first-child, .subcard ol:first-child { margin-top: 0; }
+
+    .stat-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin-top: 16px;
+    }
+
+    .stat {
+      padding: 14px 16px;
+      border: 1px solid rgba(59, 111, 118, 0.16);
+      border-radius: var(--radius-sm);
+      background: rgba(59, 111, 118, 0.06);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .stat-label {
+      color: var(--ink-soft);
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .stat-value {
+      margin-top: 8px;
+      color: var(--accent-2);
+      font-size: 1.18rem;
+      font-weight: 700;
+    }
+
+    .narrative, .chart-frame, .technical-frame, .diagram-frame, .viz-frame {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.54);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .diagram-frame {
+      overflow-x: auto;
+      overflow-y: auto;
+      overscroll-behavior-x: contain;
+      overscroll-behavior-y: contain;
+      max-height: min(70vh, 720px);
+    }
+
+    .chart-frame, .viz-frame { overflow: hidden; }
+
+    .mermaid {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      color: var(--ink);
+    }
+
+    .mermaid svg {
+      display: block;
+      width: auto !important;
+      min-width: 100%;
+      max-width: none !important;
+      height: auto !important;
+    }
+
+    .diagram-frame.compact-diagram {
+      padding: 12px;
+      max-height: min(62vh, 560px);
+    }
+
+    .diagram-frame.compact-diagram .mermaid { min-width: 900px; }
+
+    .chart-frame canvas, .technical-frame > canvas, .viz-frame canvas, canvas.report-chart {
+      display: block;
+      width: 100% !important;
+      max-width: 100%;
+      height: 300px !important;
+      min-height: 300px;
+      max-height: 300px;
+    }
+
+    .technical-frame table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+    }
+
+    .technical-frame th, .technical-frame td {
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      text-align: left;
+    }
+
+    .technical-frame th {
+      color: var(--accent);
+      font-size: 0.76rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .empty-state {
+      padding: 20px;
+      border-radius: var(--radius-md);
+      text-align: center;
+      color: var(--ink-soft);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .empty-state strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--accent);
+      font-size: 0.84rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    ul, ol { margin: 0; padding-left: 20px; }
+    li { margin-bottom: 8px; }
+    p:last-child, li:last-child { margin-bottom: 0; }
+
+    .footer-note {
+      margin-top: 18px;
+      color: rgba(95, 86, 76, 0.74);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      text-align: right;
+    }
+
+    @media (max-width: 920px) {
+      .hero-grid, .summary-grid, .dual-grid, .phase-grid, .stat-grid, .appendix-grid {
+        grid-template-columns: 1fr;
+      }
+      .title { max-width: none; }
+    }
+
+    @media (max-width: 640px) {
+      .page-shell {
+        width: min(100vw - 20px, var(--page-width));
+        padding-top: 16px;
+        padding-bottom: 36px;
+      }
+      .hero, .section { padding: 18px; border-radius: 20px; }
+      .title { font-size: clamp(2.1rem, 12vw, 3.2rem); }
+    }
+
+    @media print {
+      :root {
+        --paper: #ffffff; --paper-strong: #ffffff;
+        --ink: #111111; --ink-soft: #444444; --line: #d6d1c8;
+      }
+      @page { size: A4; margin: 14mm; }
+      body { background: #ffffff; }
+      .page-shell { width: 100%; max-width: none; padding: 0; }
+      .hero, .meta-card, .section, .subcard, .narrative, .chart-frame, .technical-frame,
+      .diagram-frame, .viz-frame, .empty-state, .stat { background: #ffffff; box-shadow: none; }
+      .hero, .section { margin-top: 0; margin-bottom: 10mm; }
+      .diagram-frame { overflow: visible; max-height: none; }
+      .diagram-frame.compact-diagram .mermaid { min-width: 0; }
+      .section-header, .takeaway { break-after: avoid; page-break-after: avoid; }
+      a { color: inherit; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero" id="title-hero">
+      <div class="hero-grid">
+        <div>
+          <p class="eyebrow">Final Report / Shareable Analysis Artifact</p>
+          <h1 class="title">BIDV Sector Prioritization Module</h1>
+          <p class="lede">
+            A reusable scoring module that ranks Decision 263 sectors (thermal power, cement, steel) by composite transition risk,
+            combining PACTA alignment gaps, TRISK stress-test scores, and portfolio exposure weights into an auditable priority list.
+          </p>
+          <div class="takeaway">Power is the unequivocal priority sector (composite score 1.000, Critical band), driven by its dominant alignment gap (13.37pp), heavy stress burden (exposure-weighted mean 493), and 81.8% share of Decision 263 exposure in the illustrative MCB portfolio.</div>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-card">
+            <div class="meta-label">Project</div>
+            <div class="meta-chip">PACTA-TRISK Vietnam</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Repository</div>
+            <div class="meta-chip">pacta-trisk</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Date</div>
+            <div class="meta-chip">2026-05-23</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="executive-summary">
+      <div class="section-header">
+        <div>
+          <div class="section-index">01 / Executive Summary</div>
+          <h2 class="section-title">Executive Summary</h2>
+        </div>
+      </div>
+      <div class="summary-grid">
+        <div class="subcard">
+          <h3>What Was Built</h3>
+          <p>A reusable R script (<code>scripts/sector_prioritization.R</code>) that synthesizes PACTA alignment gaps, TRISK stress-test priority scores, and portfolio exposure data into a ranked sector priority list. The module produces three outputs: a ranking CSV, a detail CSV with traceable score decomposition, and a horizontal stacked bar chart suitable for report embedding.</p>
+        </div>
+        <div class="subcard">
+          <h3>Key Result</h3>
+          <p>On the MCB synthetic portfolio, <strong>Power ranks first (1.000, Critical)</strong> across all three dimensions. Steel (0.158, Low) and Cement (0.011, Low) follow but fall well below the Critical threshold. Power's dominance is robust across tested weight variations — confirming that portfolio concentration is the dominant driver of sector priority in this illustrative portfolio.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="background-objective">
+      <div class="section-header">
+        <div>
+          <div class="section-index">02 / Background &amp; Objective</div>
+          <h2 class="section-title">Background &amp; Objective</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p><strong>Context.</strong> BIDV faces growing regulatory pressure under Decision 263 (Quyết định 263/QĐ-TTg, 2022), which mandates GHG emission quotas for thermal power, steel, and cement facilities. The repo already produces sector-level alignment gaps (via PACTA) and borrower-level stress-test priority scores (via TRISK), but no module existed to combine these independent outputs into a unified, actionable sector ranking.</p>
+        <p><strong>Objective.</strong> Build a transparent, reusable scoring module that answers: <em>"Which Decision 263 sector should BIDV prioritize for climate risk reduction and borrower engagement?"</em> The module must consume only existing pipeline outputs — no re-running of PACTA or TRISK — so it can run quickly as a post-processing step. It must be demonstrated on the synthetic MCB portfolio as an illustrative example, with explicit placeholders for substituting real BIDV data.</p>
+        <p><strong>Scope.</strong> Strictly the three Decision 263 sectors (thermal power, cement, steel). Automotive is excluded — it is not a Decision 263 sector. Borrower-level engagement scoring (GAP-07) is deferred; this module operates at the sector level.</p>
+      </div>
+    </section>
+
+    <section class="section" id="inputs-scope">
+      <div class="section-header">
+        <div>
+          <div class="section-index">03 / Inputs &amp; Scope</div>
+          <h2 class="section-title">Inputs &amp; Scope</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Data Inputs</h3>
+          <ul>
+            <li><strong>PACTA alignment gaps:</strong> <code>synthesis_output/vietnam/06_vn_ms_alignment_2030.csv</code> (power market-share gaps) and <code>synthesis_output/vietnam/06_vn_sda_alignment_2030.csv</code> (cement &amp; steel SDA gaps)</li>
+            <li><strong>TRISK stress scores:</strong> <code>dashboard/data/trisk/{power,cement,steel}/top_borrowers_alignment_trisk.csv</code> — borrower-level priority scores</li>
+            <li><strong>Portfolio exposure:</strong> <code>data/vietnam_loanbook.csv</code> — 43 loans, ~19.3 billion VND Decision 263 exposure</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Design Boundaries</h3>
+          <ul>
+            <li><strong>In scope:</strong> Power, cement, steel — the three Decision 263 sectors</li>
+            <li><strong>In scope:</strong> Default weights 0.35 alignment, 0.35 stress, 0.30 exposure (configurable via CLI)</li>
+            <li><strong>In scope:</strong> Min-max normalization across sectors</li>
+            <li><strong>Out of scope:</strong> Real BIDV data ingestion</li>
+            <li><strong>Out of scope:</strong> Borrower-level engagement scoring (GAP-07)</li>
+            <li><strong>Out of scope:</strong> Dashboard modifications</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="assumptions-constraints">
+      <div class="section-header">
+        <div>
+          <div class="section-index">04 / Assumptions &amp; Constraints</div>
+          <h2 class="section-title">Assumptions &amp; Constraints</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Key Assumptions</h3>
+          <ul>
+            <li><strong>ASM-01:</strong> Sector prioritization covers exactly the three Decision 263 sectors</li>
+            <li><strong>ASM-02:</strong> Default equal-ish weighting (0.35/0.35/0.30) reflects a balanced risk appetite</li>
+            <li><strong>ASM-03:</strong> TRISK stress aggregated via exposure-weighted mean at sector level</li>
+            <li><strong>ASM-04:</strong> Min-max normalization makes different units (pp vs %) comparable by relative severity</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Constraints</h3>
+          <ul>
+            <li><strong>CON-01:</strong> Script consumes only existing pipeline outputs — no PACTA/TRISK re-running</li>
+            <li><strong>CON-02:</strong> All scoring must be transparent and traceable to source rows</li>
+            <li><strong>CON-03:</strong> Demonstration uses MCB synthetic portfolio; all outputs include <code>data_source = "MCB_synthetic"</code></li>
+            <li><strong>CAVEAT:</strong> Steel match coverage ~4% — results less reliable; steel's true priority may be higher</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="methodology">
+      <div class="section-header">
+        <div>
+          <div class="section-index">05 / Methodology</div>
+          <h2 class="section-title">Methodology</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p><strong>Three scoring dimensions.</strong> Each Decision 263 sector is scored across three dimensions, each normalized to [0, 1] via min-max scaling across sectors:</p>
+        <ol>
+          <li><strong>Alignment gap severity:</strong> For power (market-share sector), use the maximum positive percentage-point gap above target across high-carbon technologies. For cement and steel (SDA sectors), use the emission intensity percentage gap vs. 2030 target.</li>
+          <li><strong>Transition stress severity:</strong> Aggregate TRISK borrower-level priority scores within each sector using exposure-weighted mean. Higher values = more stress concentrated in larger borrowers.</li>
+          <li><strong>Portfolio exposure concentration:</strong> Each sector's share of total Decision 263-relevant portfolio exposure (VND). Higher share = more concentrated = higher priority.</li>
+        </ol>
+        <p><strong>Composite score formula:</strong></p>
+        <p style="font-family: var(--mono-font); background: var(--accent-soft); padding: 12px; border-radius: 8px; text-align: center; font-size: 1.05rem;">
+          composite = 0.35 × alignment_score + 0.35 × stress_score + 0.30 × exposure_score
+        </p>
+        <p><strong>Priority bands:</strong> Critical (≥0.70), High (0.50–0.69), Medium (0.30–0.49), Low (&lt;0.30).</p>
+        <p><strong>Configurability:</strong> All three weights accept CLI overrides. The script also supports a standalone weight-sensitivity mode that tests alternative weight combinations and reports ranking stability.</p>
+      </div>
+      <div class="stat-grid">
+        <div class="stat">
+          <div class="stat-label">Sectors</div>
+          <div class="stat-value">3</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Dimensions</div>
+          <div class="stat-value">3</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Default Weights</div>
+          <div class="stat-value">35/35/30</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="phase-analysis">
+      <div class="section-header">
+        <div>
+          <div class="section-index">06 / Phase-by-Phase Analysis</div>
+          <h2 class="section-title">Phase-by-Phase Analysis</h2>
+        </div>
+      </div>
+      <div class="phase-grid">
+        <div class="subcard">
+          <h3>PHASE-01: Scoring Methodology</h3>
+          <p>Documented the three-dimensional scoring approach in <code>docs/bidv_sector_prioritization_methodology.md</code> (244 lines). Defined normalization rules (min-max across sectors), composite formula with configurable weights, and four priority bands. Specified data sources for each dimension and documented limitations.</p>
+        </div>
+        <div class="subcard">
+          <h3>PHASE-02: R Script</h3>
+          <p>Built <code>scripts/sector_prioritization.R</code> (364 lines) with 9 sections: configuration, alignment data loader, TRISK aggregator, exposure calculator, dimension scorer, normalizer, composite scorer, output writer, and chart generator. Accepts optional CLI weight overrides. Uses <code>getwd()</code> for path resolution (no <code>here</code> package available).</p>
+        </div>
+        <div class="subcard">
+          <h3>PHASE-03: Demonstration Run</h3>
+          <p>Executed against MCB synthetic portfolio (43 loans, 19.3B VND D263 exposure). Produced ranking CSV, detail CSV, chart, and interpretation notes. Sensitivity check confirmed ranking order (Power > Steel > Cement) is stable across alternative weight combinations — power's dominance is robust.</p>
+        </div>
+        <div class="subcard">
+          <h3>PHASE-04: Verification</h3>
+          <p>Cross-checked ranking CSV against detail CSV — composite scores match exactly. Verified chart embeddability via base64 encoding. Updated methodology document with MCB demonstration results appendix. Confirmed output directory is compatible with dashboard snapshot refresh scripts.</p>
+        </div>
+      </div>
+      <div class="diagram-frame compact-diagram">
+        <div class="mermaid">
+flowchart LR
+    A[PACTA Alignment CSVs] --> D[Alignment Gap Dimension]
+    B[TRISK Stress CSVs] --> E[Stress Severity Dimension]
+    C[Loanbook Exposure CSV] --> F[Exposure Concentration Dimension]
+    D --> G{Min-Max Normalize}
+    E --> G
+    F --> G
+    G --> H[Composite Score]
+    H --> I[Priority Band]
+    I --> J[Ranking CSV + Chart]
+    K[Weight Parameters<br/>0.35/0.35/0.30] -.-> H
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="findings-recommendation">
+      <div class="section-header">
+        <div>
+          <div class="section-index">07 / Findings &amp; Recommendation</div>
+          <h2 class="section-title">Findings &amp; Recommendation</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <h3>Ranking Results (MCB Synthetic Portfolio)</h3>
+        <div class="technical-frame">
+          <table>
+            <tr><th>Rank</th><th>Sector</th><th>Composite</th><th>Band</th><th>Alignment Gap</th><th>Stress Score</th><th>Exposure Share</th><th>Key Driver</th></tr>
+            <tr><td>1</td><td><strong>Power</strong></td><td><strong>1.000</strong></td><td><strong>Critical</strong></td><td>13.37 pp</td><td>493.4</td><td>81.8%</td><td>Dominates all three dimensions</td></tr>
+            <tr><td>2</td><td><strong>Steel</strong></td><td><strong>0.158</strong></td><td><strong>Low</strong></td><td>7.2%</td><td>100.0</td><td>7.8%</td><td>Moderate alignment gap</td></tr>
+            <tr><td>3</td><td><strong>Cement</strong></td><td><strong>0.011</strong></td><td><strong>Low</strong></td><td>2.1%</td><td>100.0</td><td>10.4%</td><td>Smallest gap, low exposure</td></tr>
+          </table>
+        </div>
+
+        <h3>Interpretation</h3>
+        <p><strong>Power is the unequivocal priority sector (1.000 Critical).</strong> Three converging factors drive this: (1) power's coal capacity is 13.4 percentage points above the PDP8 target — the largest misalignment across all sectors; (2) the power sector has 13 TRISK-stressed borrowers including three coal-heavy names with priority scores of 95–100; (3) power accounts for 81.8% of total Decision 263 exposure.</p>
+
+        <p><strong>Steel ranks second (0.158 Low)</strong> despite having only two borrowers — its SDA alignment gap (7.2% above 2030 target) is significantly higher than cement's (2.1%). However, stress and exposure scores are both near zero, limiting the composite.</p>
+
+        <p><strong>Cement ranks last (0.011 Low)</strong> with the smallest alignment gap (2.1%) and low exposure share (10.4%).</p>
+
+        <h3>Sensitivity</h3>
+        <p>When weights shift toward alignment (0.50) and away from stress/exposure (0.25 each), steel's score increases by 43% (0.158 → 0.226) — reflecting its moderate alignment gap. The ranking order is stable across all tested weight combinations, confirming power's dominance is robust to reasonable weight variations.</p>
+      </div>
+      <div class="viz-frame">
+        <canvas id="priorityChart"></canvas>
+      </div>
+    </section>
+
+    <section class="section" id="implementation-path">
+      <div class="section-header">
+        <div>
+          <div class="section-index">08 / Implementation Path</div>
+          <h2 class="section-title">Implementation Path</h2>
+        </div>
+      </div>
+      <div class="phase-grid">
+        <div class="subcard">
+          <h3>1. Run with Real BIDV Data</h3>
+          <p>Replace <code>data/vietnam_loanbook.csv</code> with BIDV's normalized loanbook. Re-run <code>scripts/sector_prioritization.R</code> to produce BIDV-specific ranking. The script accepts CLI flags for custom weights: <code>--w-alignment 0.40 --w-stress 0.40 --w-exposure 0.20</code>.</p>
+        </div>
+        <div class="subcard">
+          <h3>2. Embed in Report Generator</h3>
+          <p>The ranking CSV, detail CSV, and chart are already consumed by <code>scripts/generate_bidv_report.R</code> (GAP-04). Update the report by re-running the generator after a BIDV-specific prioritization run.</p>
+        </div>
+        <div class="subcard">
+          <h3>3. Calibrate Weights with BIDV Risk Team</h3>
+          <p>Use the weight-sensitivity mode to test how different weight preferences affect the ranking. BIDV's risk appetite (e.g., more weight on exposure vs. alignment) can be reflected through weight calibration, not code changes.</p>
+        </div>
+        <div class="subcard">
+          <h3>4. Defer to GAP-07 (Engagement Scoring)</h3>
+          <p>The sector-level prioritization feeds into borrower-level engagement scoring. The highest-priority sector (Power) should be the first target for borrower-level scoring and action planning.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="risks-open-questions">
+      <div class="section-header">
+        <div>
+          <div class="section-index">09 / Risks / Open Questions</div>
+          <h2 class="section-title">Risks / Open Questions</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Risks</h3>
+          <ul>
+            <li><strong>Steel match coverage ~4%:</strong> Low ABCD matching makes steel's alignment and stress results unreliable. Steel's true priority may be higher.</li>
+            <li><strong>TRISK floor values:</strong> Cement and steel both scored the floor stress value (100), limiting differentiation. This is a synthetic data artifact — real TRISK scores would vary more across sectors.</li>
+            <li><strong>Power dominates via exposure:</strong> Power's 81.8% exposure share drives its Critical score. A more balanced portfolio would produce a more nuanced ranking.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Open Questions</h3>
+          <ul>
+            <li><strong>Weight calibration:</strong> Should BIDV's risk appetite favor alignment gap (SBTi-style) or stress severity (credit-risk-style)?</li>
+            <li><strong>Automotive:</strong> If BIDV has material auto exposure, should the scope expand beyond Decision 263?</li>
+            <li><strong>TRISK for cement/steel:</strong> Current TRISK is sector-context only; borrower-level SDA implementation would improve stress differentiation.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="appendices-evidence">
+      <div class="section-header">
+        <div>
+          <div class="section-index">10 / Appendices / Evidence Notes</div>
+          <h2 class="section-title">Appendices / Evidence Notes</h2>
+        </div>
+      </div>
+      <div class="appendix-grid">
+        <div class="subcard">
+          <h3>Scoring Detail (Power)</h3>
+          <div class="technical-frame">
+            <table>
+              <tr><th>Dimension</th><th>Raw Value</th><th>Normalized</th><th>Weight</th><th>Contribution</th></tr>
+              <tr><td>Alignment</td><td>13.37 pp</td><td>1.000</td><td>0.35</td><td>0.350</td></tr>
+              <tr><td>Stress</td><td>493.4</td><td>1.000</td><td>0.35</td><td>0.350</td></tr>
+              <tr><td>Exposure</td><td>81.8%</td><td>1.000</td><td>0.30</td><td>0.300</td></tr>
+              <tr><td colspan="4"><strong>Composite</strong></td><td><strong>1.000</strong></td></tr>
+            </table>
+          </div>
+        </div>
+        <div class="subcard">
+          <h3>Output Artifacts</h3>
+          <ul>
+            <li><code>docs/bidv_sector_prioritization_methodology.md</code> — Methodology spec (244 lines)</li>
+            <li><code>scripts/sector_prioritization.R</code> — R implementation (364 lines)</li>
+            <li><code>synthesis_output/prioritization/sector_priority_ranking.csv</code> — Ranking data</li>
+            <li><code>synthesis_output/prioritization/sector_priority_detail.csv</code> — Traceable decomposition</li>
+            <li><code>synthesis_output/prioritization/sector_priority_chart.png</code> — Visualization</li>
+            <li><code>synthesis_output/prioritization/interpretation_notes.md</code> — Narrative</li>
+            <li><code>reports/2026-05-22-final-bidv-sector-prioritization.html</code> — This report</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Scale &amp; Scope</h3>
+          <ul>
+            <li>MCB synthetic portfolio: 43 loans, ~19.3B VND Decision 263 exposure</li>
+            <li>Power: 13 borrowers, 15.8B VND (81.8% share), 3 coal-heavy stress leaders</li>
+            <li>Cement: 2 borrowers, 2.0B VND (10.4% share), divergent stress scores (95 vs 5)</li>
+            <li>Steel: 2 borrowers, 1.5B VND (7.8% share), moderate alignment gap</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Glossary</h3>
+          <ul>
+            <li><strong>pp:</strong> Percentage points (used for market-share alignment gaps)</li>
+            <li><strong>SDA:</strong> Sectoral Decarbonization Approach (PACTA method for emission-intensity sectors)</li>
+            <li><strong>TRISK priority score:</strong> Composite borrower ranking combining NPV impact, PD impact, and exposure size (0–100 scale)</li>
+            <li><strong>Min-max normalization:</strong> <code>(x - min) / (max - min)</code> applied across the three sectors</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-note">designed for html first, printable without reconstruction</div>
+    </section>
+  </main>
+  <script>
+    (function() {
+      const chartCanvases = document.querySelectorAll('canvas');
+      chartCanvases.forEach((canvas) => {
+        canvas.classList.add('report-chart');
+        const parent = canvas.parentElement;
+        if (parent && parent.classList.contains('technical-frame') && !parent.classList.contains('chart-frame')) {
+          parent.classList.add('chart-frame');
+        }
+      });
+    })();
+
+    if (window.Chart) {
+      Chart.defaults.devicePixelRatio = 1;
+      Chart.defaults.animation = false;
+      Chart.defaults.resizeDelay = 150;
+      Chart.defaults.normalized = true;
+      Chart.defaults.maintainAspectRatio = false;
+      Chart.defaults.responsive = true;
+      window.__REPORT_CHART_DEFAULTS__ = {
+        animation: false, resizeDelay: 150, normalized: true,
+        maintainAspectRatio: false, responsive: true
+      };
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const ctx = document.getElementById('priorityChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Power', 'Steel', 'Cement'],
+          datasets: [
+            { label: 'Alignment (0.35)', data: [0.350, 0.158, 0.000],
+              backgroundColor: '#9d6b37', borderRadius: 3 },
+            { label: 'Stress (0.35)', data: [0.350, 0.000, 0.000],
+              backgroundColor: '#3b6f76', borderRadius: 3 },
+            { label: 'Exposure (0.30)', data: [0.300, 0.000, 0.011],
+              backgroundColor: '#bd8b4a', borderRadius: 3 }
+          ]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: false,
+          resizeDelay: 150,
+          normalized: true,
+          plugins: {
+            legend: { position: 'top' },
+            tooltip: {
+              callbacks: {
+                label: function(ctx) { return ctx.dataset.label + ': ' + ctx.parsed.x.toFixed(3); }
+              }
+            }
+          },
+          scales: {
+            x: {
+              stacked: true,
+              max: 1.1,
+              title: { display: true, text: 'Composite Score' }
+            },
+            y: {
+              stacked: true,
+              title: { display: true, text: 'Sector' }
+            }
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>

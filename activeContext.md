@@ -693,3 +693,34 @@ When filtering data to a subset of metrics but providing `scale_*_manual()` mapp
 - [x] Verified Phase 02 outputs via smoke runs and snapshot inspection
 - [x] Generated a new Phase 02 report artifact under `reports/`
 - [ ] Committed and pushed the merged Phase 01 + Phase 02 state to `main`
+
+---
+
+## BIDV Report Generator (GAP-04 + GAP-05) — 2026-05-23
+
+**Goal:** Build a report generator that assembles the framework comparison, Decision 263 mapping, sector prioritization, and implementation roadmap into a professional advisory HTML report for BIDV delivery. Additionally, write the client-facing implementation roadmap content.
+
+### Planned Work
+
+- [x] Write `docs/bidv_implementation_roadmap.md` — 5-phase, 24-week adoption pathway with resource table, integration guidance, fast-track variant, and customization fields
+- [x] Write `docs/bidv_report_template_spec.md` — 10-section structure, visual design spec, content sourcing map, markdown→HTML conversion rules
+- [x] Build `scripts/generate_bidv_report.R` — R script that reads all upstream content and renders a self-contained HTML report with base64-embedded images
+- [x] Render `reports/BIDV_Framework_Recommendation_Report.html` — 132.9 KB, all 10 sections populated, verified in browser
+- [x] Write `reports/BIDV_Framework_Recommendation_Report_README.md` — companion document explaining report content, data source, and re-run instructions
+
+### Review / Results
+
+- [x] `docs/bidv_implementation_roadmap.md` — 388 lines, 5 phases with timelines/activities/resources/deliverables, resource summary table, integration guidance (credit risk, SBV Circular 13, ESG governance, TCFD/ISSB), fast-track variant (16 weeks), customization fields for BIDV
+- [x] `docs/bidv_report_template_spec.md` — 268 lines, 10-section structure, Allotrope-branded CSS spec, content sourcing map for every section, pre-flight checks
+- [x] `scripts/generate_bidv_report.R` — ~500 lines, pre-flight validation, base64 image encoding, simple markdown→HTML converter, 10 section renderers, inline CSS, assembly and write
+- [x] `reports/BIDV_Framework_Recommendation_Report.html` — 132.9 KB (well under 2 MB target), all 10 sections present: Cover Page, Executive Summary (4 KPI cards), BIDV Context (sector exposure table), Framework Landscape (7×10 matrix), Framework Recommendation (3-tier stack), Sector Prioritization (ranking table + chart + interpretation), Decision 263 Mapping (sector + capability tables), Implementation Roadmap (5 phase cards + resource table), Risk Register (6 risks), Methodology Appendix (PACTA/TRISK summaries + 2 illustrative charts)
+- [x] Verified rendering in browser — all sections display correctly, tables are readable, charts embed properly, disclaimers are visible, footer confidentiality notice is present
+- [x] Updated plan status from "draft" to "completed"
+
+### Output Artifacts
+
+- `docs/bidv_implementation_roadmap.md` — New: 388-line implementation roadmap
+- `docs/bidv_report_template_spec.md` — New: 268-line template specification
+- `scripts/generate_bidv_report.R` — New: ~500-line report generator
+- `reports/BIDV_Framework_Recommendation_Report.html` — New: 132.9 KB final deliverable
+- `reports/BIDV_Framework_Recommendation_Report_README.md` — New: companion README
