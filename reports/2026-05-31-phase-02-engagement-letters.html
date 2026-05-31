@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phase Report :: Engagement Letter Generator</title>
+  <meta name="color-scheme" content="dark">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    async function initMermaid() {
+      const blocks = document.querySelectorAll('.mermaid');
+      if (!blocks.length) return;
+      mermaid.initialize({
+        startOnLoad: false, theme: 'dark', securityLevel: 'loose',
+        themeVariables: {
+          primaryColor: '#111111', primaryTextColor: '#e8f6ff', primaryBorderColor: '#00f5ff',
+          lineColor: '#39ff14', secondaryColor: '#121a1a', tertiaryColor: '#111111',
+          background: '#0d0d0d', mainBkg: '#0d0d0d', nodeBorder: '#00f5ff',
+          clusterBkg: '#111111', clusterBorder: '#39ff14', edgeLabelBackground: '#0d0d0d'
+        }
+      });
+      await mermaid.run({ nodes: blocks });
+    }
+    const run = () => initMermaid().catch((e) => console.error('Mermaid render failed', e));
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run, { once: true });
+    } else { run(); }
+  </script>
+  <style>
+    :root {
+      --bg: #0d0d0d; --panel: rgba(13,13,13,0.88); --panel-strong: rgba(19,19,19,0.96);
+      --line: rgba(0,245,255,0.26); --text: #e9f6ff; --muted: #8ea3ad;
+      --accent-blue: #00f5ff; --accent-green: #39ff14;
+      --glow-blue: 0 0 18px rgba(0,245,255,0.42); --glow-green: 0 0 18px rgba(57,255,20,0.28);
+      --shadow: 0 14px 40px rgba(0,0,0,0.32); --radius-lg: 22px; --radius-md: 16px; --radius-sm: 12px;
+      --narrative-font: "Segoe UI","Helvetica Neue",Helvetica,Arial,sans-serif;
+      --technical-font: "Cascadia Code","Fira Code",Consolas,"Liberation Mono",monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      position: relative; margin: 0; min-height: 100vh; overflow-x: hidden;
+      background:
+        radial-gradient(circle at top left, rgba(0,245,255,0.12), transparent 28%),
+        radial-gradient(circle at 85% 12%, rgba(57,255,20,0.08), transparent 24%),
+        linear-gradient(180deg,#050505 0%,#0d0d0d 36%,#090909 100%);
+      color: var(--text); font-family: var(--narrative-font); line-height: 1.6; letter-spacing: 0.01em;
+    }
+    body::before {
+      content: ""; position: absolute; inset: 0; pointer-events: none;
+      background-image: linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+      background-size: 32px 32px; opacity: 0.16;
+    }
+    a { color: var(--accent-blue); }
+    code, pre, .technical, .meta-chip, .section-kicker, .pill, .metric-label, .metric-value, .repo-tag, .mermaid { font-family: var(--technical-font); }
+    .page-shell { width: min(1180px, calc(100vw - 32px)); margin: 0 auto; padding: 32px 0 72px; position: relative; z-index: 1; }
+    .hero {
+      position: relative; padding: 28px; margin-bottom: 24px; border: 1px solid var(--line); border-radius: 28px;
+      background: linear-gradient(145deg, rgba(0,245,255,0.08), transparent 28%),
+        linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0)), var(--panel-strong);
+      box-shadow: var(--shadow), inset 0 0 0 1px rgba(255,255,255,0.02);
+    }
+    .hero-grid { display: grid; grid-template-columns: minmax(0,1.55fr) minmax(260px,0.85fr); gap: 22px; align-items: end; }
+    .section-kicker { margin: 0 0 12px; color: var(--accent-green); font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.22em; text-shadow: var(--glow-green); }
+    .phase-title { margin: 0; max-width: 16ch; font-size: clamp(2.2rem,4.4vw,4rem); line-height: 0.96; letter-spacing: -0.05em; color: #f5feff; text-transform: uppercase; text-wrap: balance; text-shadow: 0 0 24px rgba(0,245,255,0.2); }
+    .hero-summary { margin: 18px 0 0; max-width: 62ch; color: var(--muted); font-size: 0.98rem; }
+    .hero-meta { display: grid; gap: 12px; }
+    .meta-card { padding: 16px 18px; border: 1px solid rgba(57,255,20,0.2); border-radius: 18px; background: rgba(255,255,255,0.025); box-shadow: inset 0 0 0 1px rgba(0,0,0,0.24); }
+    .meta-label { margin-bottom: 6px; color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.16em; }
+    .meta-chip { color: var(--accent-blue); font-size: 1rem; font-weight: 700; letter-spacing: 0.02em; text-shadow: var(--glow-blue); word-break: break-word; }
+    .repo-tag { display: inline-flex; align-items: center; gap: 8px; margin-top: 10px; padding: 8px 12px; border: 1px solid rgba(0,245,255,0.24); border-radius: 999px; background: rgba(0,245,255,0.08); color: var(--accent-blue); font-size: 0.82rem; letter-spacing: 0.04em; }
+    .section { position: relative; margin-top: 22px; padding: 24px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--panel); box-shadow: var(--shadow); }
+    .section::before { content: ""; position: absolute; left: 24px; right: 24px; top: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(0,245,255,0.9), rgba(57,255,20,0.9), transparent); transform: translateY(-1px); }
+    .section-header { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 18px; align-items: end; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .section-title { margin: 0; font-size: clamp(1.2rem,2vw,1.7rem); line-height: 1.1; color: #f0feff; }
+    .section-index { display: inline-flex; align-items: center; gap: 10px; color: var(--accent-green); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; text-shadow: var(--glow-green); }
+    .section-index::after { content: ""; width: 44px; height: 1px; background: linear-gradient(90deg, rgba(57,255,20,0.9), transparent); }
+    .summary-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; }
+    .column-card, .diagram-frame, .technical-frame, .viz-frame, .question-frame, .empty-state {
+      border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-md);
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)), rgba(7,7,7,0.82);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.012);
+    }
+    .column-card { padding: 18px; min-height: 200px; }
+    .column-label { margin: 0 0 12px; color: var(--accent-blue); font-size: 0.83rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em; text-shadow: var(--glow-blue); }
+    .splitter { width: 100%; height: 1px; margin: 8px 0 16px; background: linear-gradient(90deg, rgba(0,245,255,0.4), transparent); }
+    .diagram-frame, .chart-frame, .technical-frame, .viz-frame, .question-frame { padding: 18px; }
+    .diagram-frame { overflow: auto; max-height: min(70vh, 720px); }
+    .mermaid { width: 100%; max-width: 100%; min-width: 0; color: var(--text); }
+    .mermaid svg { display: block; width: auto !important; min-width: 100%; max-width: none !important; height: auto !important; }
+    .chart-frame, .viz-frame { overflow: hidden; }
+    .technical-frame { color: #d6f6ff; }
+    .technical-frame table { width: 100%; border-collapse: collapse; }
+    .technical-frame th, .technical-frame td { padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
+    .technical-frame th { color: var(--accent-green); font-size: 0.76rem; text-align: left; letter-spacing: 0.12em; text-transform: uppercase; }
+    .viz-frame canvas, canvas.report-chart { display: block; width: 100% !important; max-width: 100%; height: 320px !important; min-height: 320px; max-height: 320px; }
+    .metric-strip { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; margin-top: 18px; }
+    .metric { padding: 14px 16px; border: 1px solid rgba(0,245,255,0.18); border-radius: var(--radius-sm); background: rgba(0,245,255,0.04); }
+    .metric-label { color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.16em; }
+    .metric-value { margin-top: 8px; color: var(--accent-green); font-size: 1.1rem; font-weight: 700; text-shadow: var(--glow-green); }
+    .pill-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    .pill { display: inline-flex; align-items: center; gap: 8px; padding: 8px 11px; border: 1px solid rgba(57,255,20,0.22); border-radius: 999px; background: rgba(57,255,20,0.06); color: #d9ffd0; font-size: 0.8rem; }
+    .question-frame ul, .technical-frame ul, .column-card ul { margin: 0; padding-left: 20px; }
+    .question-frame li, .technical-frame li, .column-card li { margin-bottom: 8px; }
+    .footer-note { margin-top: 18px; text-align: right; color: rgba(142,163,173,0.72); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    @media (max-width: 900px) { .hero-grid, .summary-grid, .metric-strip { grid-template-columns: 1fr; } .phase-title { max-width: none; } }
+    @media (max-width: 640px) { .page-shell { width: min(100vw - 20px, 1180px); } .hero, .section { padding: 18px; border-radius: 20px; } }
+    @media print { body { background:#fff; color:#111; } body::before { display:none; } .section,.hero { box-shadow:none; border-color:#ccc; break-inside: avoid; } a { color:#036; } }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero" id="phase-header">
+      <div class="hero-grid">
+        <div>
+          <p class="section-kicker">Phase Report / Engagement &amp; Disclosure Output Layer</p>
+          <h1 class="phase-title">Engagement Letter Generator</h1>
+          <p class="hero-summary">
+            PHASE-02 turns the PHASE-01 priority table into one self-contained, English-primary
+            (Vietnamese key terms inline) engagement letter per top-N borrower. Every gap and stress
+            figure is rendered from the borrower's data row; letter voice lives in an editable
+            template + per-sector prompt CSV so the bank can rebrand without touching code.
+          </p>
+          <div class="pill-row" aria-label="report metadata">
+            <span class="pill">phase :: 02 / 05</span>
+            <span class="pill">date :: 2026-05-31</span>
+            <span class="pill">status :: complete</span>
+          </div>
+          <div class="repo-tag">repo :: pacta-trisk</div>
+        </div>
+        <div class="hero-meta">
+          <div class="meta-card"><div class="meta-label">Letters produced</div><div class="meta-chip">10 (top-N, N=10)</div></div>
+          <div class="meta-card"><div class="meta-label">Editable surfaces</div><div class="meta-chip">letter_template.html + prompt CSV</div></div>
+          <div class="meta-card"><div class="meta-label">Residual tokens</div><div class="meta-chip">0 (guard enforced)</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section narrative" id="input-output-summary">
+      <div class="section-header"><div><div class="section-index">01 / Input -> Output</div><h2 class="section-title">Input -> Output Summary</h2></div></div>
+      <div class="summary-grid">
+        <div class="column-card">
+          <p class="column-label">Inputs</p><div class="splitter"></div>
+          <ul>
+            <li><code>output/engagement/engagement_priority.csv</code> — PHASE-01 priority table (figures source).</li>
+            <li><code>templates/engagement/letter_template.html</code> — token skeleton + inline CSS + watermark + print CSS.</li>
+            <li><code>templates/engagement/engagement_prompt_templates.csv</code> — one row per sector: <code>scenario_name</code>, <code>intro</code>, and 3 actions (data request / transition-plan ask / covenant trigger).</li>
+          </ul>
+        </div>
+        <div class="column-card">
+          <p class="column-label">Outputs (git-ignored in PHASE-05)</p><div class="splitter"></div>
+          <ul>
+            <li><code>output/engagement_letters/&lt;slug&gt;/letter.html</code> — 10 self-contained letters (~12 KB each).</li>
+            <li><code>output/engagement_letters/index.html</code> — linked table of all letters.</li>
+            <li><code>output/engagement_letters/manifest.csv</code> — rank, borrower, sector, composite_score, trisk_status, file, generated_at.</li>
+          </ul>
+          <div class="metric-strip">
+            <div class="metric"><div class="metric-label">Power letters</div><div class="metric-value">4</div></div>
+            <div class="metric"><div class="metric-label">Automotive</div><div class="metric-value">5</div></div>
+            <div class="metric"><div class="metric-label">Steel</div><div class="metric-value">1</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="logic-flow">
+      <div class="section-header"><div><div class="section-index">02 / Logic Flow</div><h2 class="section-title">Logic Flow</h2></div></div>
+      <div class="diagram-frame technical">
+        <div class="mermaid">
+flowchart LR
+  P[(engagement_priority.csv)] --> N[take top-N\nN=10]
+  T[letter_template.html] --> R
+  C[prompt CSV\nper sector] --> S[lookup sector row\nfail if missing]
+  N --> S
+  S --> M[build token map\nfrom data row]
+  M --> PS[pre-substitute prompt prose\nintro + 3 actions]
+  PS --> R[single-pass token substitution]
+  R --> G{residual\nbraces?}
+  G -->|yes| X[abort run\nname token + borrower]
+  G -->|no| W[write letter.html]
+  W --> I[index.html + manifest.csv]
+        </div>
+      </div>
+    </section>
+
+    <section class="section narrative" id="math-algorithm-used">
+      <div class="section-header"><div><div class="section-index">03 / Math / Algorithm Used</div><h2 class="section-title">Math / Algorithm Used</h2></div></div>
+      <div class="technical-frame">
+        <p>No statistical math in this phase — the algorithm is a <strong>safe render pipeline</strong>:</p>
+        <ul>
+          <li><strong>Token substitution:</strong> fixed-string (non-regex) replacement of <code>{{key}}</code> for every key in a complete map, so no value can accidentally be re-interpreted as a token.</li>
+          <li><strong>Nesting avoidance:</strong> prompt prose (which itself contains <code>{{borrower}}</code>, <code>{{alignment_gap}}</code>) is pre-substituted, then injected, so the final template pass never meets a nested token.</li>
+          <li><strong>Residual-token guard (RISK-02-01):</strong> after rendering, <code>regmatches(letter, gregexpr("\\{\\{[^{}]+\\}\\}", letter))</code> must return empty; any hit aborts the run naming the borrower and offending token.</li>
+          <li><strong>Figure formatting:</strong> NPV as <code>%+.1f%%</code> of baseline, PD as <code>%+.1f pp</code>, market-share gap as pp vs PDP8, SDA gap as <code>%</code> above pathway; <code>NA</code> TRISK fields render as an explicit "Not assessed" sentence rather than a blank.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" id="tools-formulas-methods">
+      <div class="section-header"><div><div class="section-index">04 / Tools / Formulas / Methods</div><h2 class="section-title">Tools / Formulas / Methods</h2></div></div>
+      <div class="technical-frame technical">
+        <table>
+          <thead><tr><th>Element</th><th>Choice</th><th>Rationale</th></tr></thead>
+          <tbody>
+            <tr><td>Output format</td><td>Self-contained HTML + print CSS</td><td>Q-001: HTML + browser print-to-PDF only; no new deps (CON-001).</td></tr>
+            <tr><td>Language posture</td><td>English-primary, VN key terms inline</td><td>Q-002: dropped full side-by-side bilingual blocks; kept regulatory/sector terms (Quy hoạch điện VIII, dư nợ, ...).</td></tr>
+            <tr><td>Recipient scope</td><td>Top-N, N=10, <code>--top_n</code> arg</td><td>Q-006: adjustable count.</td></tr>
+            <tr><td>Rebrand surface</td><td>External template + prompt CSV</td><td>Bank edits voice/wording without code (research Idea 3).</td></tr>
+            <tr><td>Idiom source</td><td><code>scripts/generate_bidv_report.R</code></td><td>Reused token-substitution + HTML-assembly + writeLines idioms.</td></tr>
+            <tr><td>Slug</td><td>iconv ASCII-translit + hyphenate</td><td>Safe per-borrower folder names (handles Vietnamese diacritics).</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="results-visualizations">
+      <div class="section-header"><div><div class="section-index">05 / Results &amp; Visualizations</div><h2 class="section-title">Results &amp; Visualizations</h2></div></div>
+      <div class="viz-frame"><canvas id="sectorChart"></canvas></div>
+      <div class="metric-strip">
+        <div class="metric"><div class="metric-label">Watermark coverage</div><div class="metric-value">10 / 10</div></div>
+        <div class="metric"><div class="metric-label">Disclaimer coverage</div><div class="metric-value">10 / 10</div></div>
+        <div class="metric"><div class="metric-label">Figure spot-checks</div><div class="metric-value">2 / 2 match CSV</div></div>
+      </div>
+    </section>
+
+    <section class="section narrative" id="limitations-second-best-alternative">
+      <div class="section-header"><div><div class="section-index">06 / Limitations / Second-Best Alternative</div><h2 class="section-title">Limitations / Second-Best Alternative</h2></div></div>
+      <div class="question-frame">
+        <ul>
+          <li><strong>English-primary, not fully bilingual:</strong> per Q-002, letters keep Vietnamese key terms inline but drop the full side-by-side Vietnamese block. A bank wanting a Vietnamese-first version would expand the template and prompt CSV — no code change needed.</li>
+          <li><strong>Covenant/engagement wording is illustrative:</strong> the three actions per sector are demo language; a real deployment needs legal review (the disclaimer says exactly this).</li>
+          <li><strong>Second-best alternative (rejected):</strong> native DOCX via the <code>officer</code> package (the original Idea 3 suggestion). Deferred for v1 to avoid a new dependency and Windows rendering risk (ALT-001); print-to-PDF from HTML matches the repo's existing deliverable pattern.</li>
+          <li><strong>Top-N only:</strong> default N=10; a bank wanting all borrowers or a hand-picked subset would extend the selection step (seeded for PHASE-04 controls).</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section narrative" id="errors-warnings-flags-encountered">
+      <div class="section-header"><div><div class="section-index">07 / Errors / Warnings / Flags</div><h2 class="section-title">Errors / Warnings / Flags Encountered</h2></div></div>
+      <div class="question-frame technical">
+        <ul>
+          <li><strong>Caught &amp; fixed:</strong> the first run aborted (exit 1) because the residual-token guard found a literal <code>&#123;&#123;tokens&#125;&#125;</code> inside the template's own CSS comment. Reworded the comment to brace-free documentation; re-run produced all 10 letters clean. This is the guard working as designed, not a defect.</li>
+          <li>No R warnings on the clean run. Pre-flight aborts non-zero if the priority CSV or a sector's prompt row is missing.</li>
+          <li>Verified the editable path: adding a marker to the power prompt row changed the rendered letter on re-run; reverting removed it.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section narrative" id="open-questions-next-phase-seeds">
+      <div class="section-header"><div><div class="section-index">08 / Open Questions / Next Phase Seeds</div><h2 class="section-title">Open Questions / Next Phase Seeds</h2></div></div>
+      <div class="question-frame">
+        <ul>
+          <li><strong>PHASE-03 (next):</strong> disclosure pack generator — TCFD four-pillar skeleton + ISSB IFRS S2 cross-refs + Decision 263 note, embedding the alignment-overview PNG and the top-10 borrower table from the same priority CSV, with an <code>anonymize</code> flag (off by default, Q-005).</li>
+          <li><strong>Reuse seed:</strong> the disclosure pack reuses this phase's token-substitution + residual-scan discipline and the same self-contained-HTML pattern.</li>
+          <li><strong>PHASE-04 seed:</strong> the operator page will expose the <code>top_n</code> control (no weight slider, per Q-004) and run this generator as a subprocess.</li>
+        </ul>
+      </div>
+      <div class="footer-note">artifact generated for reflection, not presentation theater</div>
+    </section>
+  </main>
+  <script>
+    (function() {
+      document.querySelectorAll('canvas').forEach((canvas) => {
+        canvas.classList.add('report-chart');
+        const parent = canvas.parentElement;
+        if (parent && parent.classList.contains('technical-frame') && !parent.classList.contains('chart-frame')) parent.classList.add('chart-frame');
+      });
+    })();
+    if (window.Chart) {
+      Chart.defaults.devicePixelRatio = 1;
+      Chart.defaults.animation = false;
+      Chart.defaults.resizeDelay = 150;
+      Chart.defaults.normalized = true;
+      Chart.defaults.maintainAspectRatio = false;
+      Chart.defaults.responsive = true;
+      new Chart(document.getElementById("sectorChart"), {
+        type: "bar",
+        data: {
+          labels: ["Power", "Automotive (partial)", "Steel"],
+          datasets: [{
+            label: "Letters generated",
+            data: [4, 5, 1],
+            backgroundColor: ["rgba(0,245,255,0.6)", "rgba(57,255,20,0.55)", "rgba(0,245,255,0.6)"],
+            borderColor: ["#00f5ff", "#39ff14", "#00f5ff"],
+            borderWidth: 1.5
+          }]
+        },
+        options: {
+          animation: false, resizeDelay: 150, normalized: true, maintainAspectRatio: false,
+          scales: {
+            y: { beginAtZero: true, ticks: { color: "#8ea3ad", stepSize: 1 }, grid: { color: "rgba(255,255,255,0.06)" } },
+            x: { ticks: { color: "#e9f6ff" }, grid: { display: false } }
+          },
+          plugins: {
+            legend: { display: false },
+            title: { display: true, text: "Top-10 engagement letters by sector (green = PACTA-only / partial)", color: "#e9f6ff", font: { size: 13 } }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>

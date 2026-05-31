@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Engagement Letter — {{borrower}}</title>
+  <style>
+    /* ------------------------------------------------------------------ *
+     * Engagement letter template (Engagement & Disclosure Output Layer).
+     * English-primary with Vietnamese key terms inline (Grill Me Q-002).
+     * Edit freely: bank letterhead, wording, and styling are all here;
+     * the generator substitutes the placeholders below and never hardcodes numbers.
+     * Placeholders (each wrapped in double braces in the body):
+     *   borrower, sector, date, rank, top_n, scenario_name, intro,
+     *   alignment_gap, npv_change, pd_change, exposure_vnd, trisk_status,
+     *   engagement_actions, generated_at
+     * ------------------------------------------------------------------ */
+    :root {
+      --ink: #1f2933;
+      --muted: #5a6b78;
+      --accent: #0a5ad6;
+      --line: #d7dee5;
+      --warn: #b42318;
+      --warn-bg: #fff4f2;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #eef1f4;
+      color: var(--ink);
+      font-family: "Georgia", "Times New Roman", serif;
+      line-height: 1.55;
+    }
+    .watermark {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-32deg);
+      font-family: "Segoe UI", Arial, sans-serif;
+      font-size: 4.4rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      color: rgba(180, 35, 24, 0.07);
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .sheet {
+      position: relative;
+      z-index: 1;
+      width: min(820px, calc(100vw - 24px));
+      margin: 22px auto;
+      padding: 40px 46px 30px;
+      background: #ffffff;
+      border: 1px solid var(--line);
+      box-shadow: 0 10px 34px rgba(31, 41, 51, 0.12);
+    }
+    .synthetic-band {
+      margin: -40px -46px 24px;
+      padding: 8px 46px;
+      background: var(--warn-bg);
+      border-bottom: 1px solid rgba(180, 35, 24, 0.25);
+      color: var(--warn);
+      font-family: "Segoe UI", Arial, sans-serif;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      text-align: center;
+    }
+    .letterhead { border-bottom: 2px solid var(--accent); padding-bottom: 10px; }
+    .bank {
+      font-family: "Segoe UI", Arial, sans-serif;
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: 0.01em;
+    }
+    .bank span { color: var(--muted); font-weight: 600; }
+    .dept {
+      font-family: "Segoe UI", Arial, sans-serif;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .meta {
+      display: flex;
+      justify-content: space-between;
+      font-family: "Segoe UI", Arial, sans-serif;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin: 16px 0 6px;
+    }
+    .recipient {
+      font-family: "Segoe UI", Arial, sans-serif;
+      font-size: 0.92rem;
+      margin: 8px 0 14px;
+    }
+    .subject {
+      font-size: 1.06rem;
+      color: var(--ink);
+      margin: 8px 0 14px;
+      border-left: 4px solid var(--accent);
+      padding-left: 12px;
+    }
+    .intro { margin: 0 0 18px; }
+    .snapshot {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f8fafc;
+      padding: 14px 16px;
+      margin: 0 0 20px;
+    }
+    .snapshot h2 {
+      font-family: "Segoe UI", Arial, sans-serif;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin: 0 0 8px;
+    }
+    .snapshot h2 span { color: var(--warn); font-weight: 600; }
+    .snapshot table { width: 100%; border-collapse: collapse; font-family: "Segoe UI", Arial, sans-serif; font-size: 0.9rem; }
+    .snapshot th {
+      text-align: left;
+      width: 42%;
+      padding: 6px 8px 6px 0;
+      color: var(--muted);
+      font-weight: 600;
+      vertical-align: top;
+      border-bottom: 1px solid #e7edf2;
+    }
+    .snapshot td { padding: 6px 0; border-bottom: 1px solid #e7edf2; color: var(--ink); }
+    .actions-title {
+      font-family: "Segoe UI", Arial, sans-serif;
+      font-size: 1rem;
+      color: var(--accent);
+      margin: 0 0 6px;
+    }
+    ol.actions { margin: 0 0 20px; padding-left: 22px; }
+    ol.actions li { margin-bottom: 9px; }
+    .closing { margin: 0 0 26px; }
+    .signoff { font-family: "Segoe UI", Arial, sans-serif; font-size: 0.92rem; margin-bottom: 26px; }
+    .signoff .name { font-weight: 700; margin-top: 28px; }
+    .disclaimer {
+      border-top: 1px solid var(--line);
+      padding-top: 12px;
+      font-family: "Segoe UI", Arial, sans-serif;
+      font-size: 0.74rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .disclaimer strong { color: var(--warn); }
+    @media print {
+      body { background: #fff; }
+      .sheet { box-shadow: none; border: none; margin: 0; width: auto; padding: 24px 30px; }
+      .watermark { color: rgba(180, 35, 24, 0.06); }
+      @page { margin: 14mm; }
+    }
+  </style>
+</head>
+<body>
+  <div class="watermark">SYNTHETIC · ILLUSTRATIVE</div>
+  <div class="sheet">
+    <div class="synthetic-band">
+      Synthetic data — illustrative only · Dữ liệu mô phỏng — không dùng cho mục đích thực · Requires human &amp; legal review before any external use
+    </div>
+
+    <header class="letterhead">
+      <div class="bank">Mekong Commercial Bank <span>· MCB</span></div>
+      <div class="dept">Sustainable Finance &amp; Climate Risk Office · Phòng Tài chính Bền vững &amp; Rủi ro Khí hậu</div>
+    </header>
+
+    <div class="meta">
+      <div>Date / Ngày: {{date}}</div>
+      <div>Ref: MCB-CR-{{rank}}</div>
+    </div>
+
+    <div class="recipient">
+      <strong>To / Kính gửi:</strong> {{borrower}}<br>
+      <strong>Sector / Ngành:</strong> {{sector}}
+    </div>
+
+    <h1 class="subject">Re: Climate transition alignment &amp; engagement (đánh giá chuyển dịch khí hậu) — {{scenario_name}}</h1>
+
+    <p class="intro">{{intro}}</p>
+
+    <div class="snapshot">
+      <h2>Assessment snapshot <span>(synthetic)</span></h2>
+      <table>
+        <tr><th>Alignment gap (khoảng cách định hướng)</th><td>{{alignment_gap}}</td></tr>
+        <tr><th>Benchmark scenario (kịch bản)</th><td>{{scenario_name}}</td></tr>
+        <tr><th>TRISK NPV change under stress</th><td>{{npv_change}}</td></tr>
+        <tr><th>TRISK PD change under stress (xác suất vỡ nợ)</th><td>{{pd_change}}</td></tr>
+        <tr><th>MCB exposure (dư nợ)</th><td>{{exposure_vnd}}</td></tr>
+        <tr><th>Engagement priority</th><td>#{{rank}} of top {{top_n}} · {{trisk_status}}</td></tr>
+      </table>
+    </div>
+
+    <h2 class="actions-title">Requested actions / Đề nghị</h2>
+    {{engagement_actions}}
+
+    <p class="closing">
+      We would value the opportunity to discuss this assessment and {{borrower}}'s transition plan
+      (kế hoạch chuyển dịch) with your team. Mekong Commercial Bank views this engagement as a
+      partnership to manage transition risk and to support a credible, financeable decarbonisation pathway.
+    </p>
+
+    <div class="signoff">
+      Yours sincerely / Trân trọng,
+      <div class="name">Head of Sustainable Finance &amp; Climate Risk</div>
+      <div>Mekong Commercial Bank (MCB)</div>
+    </div>
+
+    <footer class="disclaimer">
+      <strong>Illustrative — based on synthetic portfolio data.</strong>
+      This letter was generated automatically from the MCB demo engagement layer (PACTA alignment +
+      TRISK transition stress) on synthetic data. All figures are model outputs and do not constitute
+      financial advice, a credit decision, or a regulatory filing. <strong>Requires human and legal
+      review before any external use.</strong> Generated {{generated_at}}.
+    </footer>
+  </div>
+</body>
+</html>

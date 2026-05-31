@@ -740,7 +740,7 @@ When filtering data to a subset of metrics but providing `scale_*_manual()` mapp
 
 ### Phase Checklist
 - [x] PHASE-01 — `scripts/engagement_scoring.R` → `output/engagement/engagement_priority.csv` (+ phase report, commit, push) ✅ 2026-05-31
-- [ ] PHASE-02 — `scripts/generate_engagement_letters.R` + `templates/engagement/` (+ phase report, commit, push)
+- [x] PHASE-02 — `scripts/generate_engagement_letters.R` + `templates/engagement/` (+ phase report, commit, push) ✅ 2026-05-31
 - [ ] PHASE-03 — `scripts/generate_disclosure_pack.R` + `templates/disclosure/` (+ phase report, commit, push)
 - [ ] PHASE-04 — `dashboard/pages/7_Outputs.py` + `dashboard/lib/outputs.py` (no weight slider) (+ phase report, commit, push)
 - [ ] PHASE-05 — `.gitignore`, `docs/outputs_layer.md`, full-chain verification (+ phase report, commit, push)
@@ -751,3 +751,9 @@ When filtering data to a subset of metrics but providing `scale_*_manual()` mapp
 - Composite = renormalised 50/50 of min-max(alignment_gap) + min-max(trisk_priority_score); automotive (no TRISK) → alignment-only, `composite_partial=TRUE`.
 - Top 3 = coal-heavy power (Nghi Son 1.000, Vinacomin 0.998, Mong Duong 0.996); EVN highest exposure (5.77M VND).
 - All 23 borrowers matched loanbook exposure (no `unmatched_names.csv`). Phase report: `reports/2026-05-31-phase-01-engagement-scoring.html`.
+
+### PHASE-02 Result (2026-05-31)
+- `templates/engagement/letter_template.html` (English-primary + VN key terms, watermark band, print CSS) and `templates/engagement/engagement_prompt_templates.csv` (per-sector intro + 3 actions: data request / transition-plan / covenant trigger) are editable without code.
+- `scripts/generate_engagement_letters.R` (`--top_n`, default 10) renders 10 self-contained letters + `index.html` + `manifest.csv` under `output/engagement_letters/<slug>/`.
+- Verified: figures match the CSV (Nghi Son 25.8pp / −98.0% NPV / +21.9pp PD; Ford 22.0pp / "Not assessed" for TRISK); watermark 10/10; disclaimer 10/10; **0 residual `{{tokens}}`** (RISK-02-01 guard caught a literal in the template comment → fixed); prompt-CSV edit round-trip changes output on re-run.
+- Pre-flight fails non-zero if `engagement_priority.csv` or a sector's prompt row is missing.
