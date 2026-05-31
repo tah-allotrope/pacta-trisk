@@ -1,7 +1,7 @@
 ---
 title: "Engagement & Disclosure Output Layer"
 date: "2026-05-28"
-status: "draft"
+status: "in-progress"
 request: "Turn Idea 3 (Engagement & Disclosure Output Layer) from plans/2026-05-02-commercial-demo-expansion-ideas.md into a multi-phase implementation plan."
 plan_type: "multi-phase"
 research_inputs:
@@ -207,6 +207,15 @@ Prove the layer works end-to-end, document it, ensure artifacts stay out of git,
 - **ALT-002:** Embed engagement output directly in the existing TRISK page rather than a new page. Not chosen: the output layer is operator-gated and write-producing, which is a different trust boundary than the read-only public TRISK view.
 
 ## Grill Me
+
+> **Accepted answers (2026-05-31):**
+> - **Q-001 → default:** HTML + browser print-to-PDF only (no DOCX/`officer`).
+> - **Q-002 → English-primary:** Drop the full side-by-side Vietnamese blocks in letters; keep Vietnamese key terms (regulatory/sector terminology) inline. Disclosure pack stays English-with-Vietnamese-terms.
+> - **Q-003 → default:** TCFD four-pillar skeleton + ISSB IFRS S2 cross-refs + Decision 263 note.
+> - **Q-004 → fixed:** Fixed 50/50 alignment-vs-TRISK weighting. **Drop the PHASE-04 weight slider** (keep a documented script parameter only).
+> - **Q-005 → off:** Anonymization off by default (real names, internal board pack); operator toggle to anonymize.
+> - **Q-006 → default:** Top-N (N=10) by composite score, N adjustable on the dashboard.
+
 1. **Q-001:** Output formats for engagement letters — self-contained HTML (+ browser print-to-PDF) only, or also native DOCX/PDF via `officer`?
    - **Recommended default:** HTML + browser print-to-PDF only for v1 (no new deps, matches repo pattern). Defer DOCX to a follow-up.
    - **Why this matters:** DOCX/`officer` adds a dependency and Windows rendering risk, expanding PHASE-02 scope.

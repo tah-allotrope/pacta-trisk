@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phase Report :: Engagement Scoring Backbone</title>
+  <meta name="color-scheme" content="dark">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+    async function initMermaid() {
+      const blocks = document.querySelectorAll('.mermaid');
+      if (!blocks.length) {
+        return;
+      }
+
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'dark',
+        securityLevel: 'loose',
+        themeVariables: {
+          primaryColor: '#111111',
+          primaryTextColor: '#e8f6ff',
+          primaryBorderColor: '#00f5ff',
+          lineColor: '#39ff14',
+          secondaryColor: '#121a1a',
+          tertiaryColor: '#111111',
+          background: '#0d0d0d',
+          mainBkg: '#0d0d0d',
+          nodeBorder: '#00f5ff',
+          clusterBkg: '#111111',
+          clusterBorder: '#39ff14',
+          edgeLabelBackground: '#0d0d0d'
+        }
+      });
+
+      await mermaid.run({ nodes: blocks });
+    }
+
+    const run = () => initMermaid().catch((error) => console.error('Mermaid render failed', error));
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run, { once: true });
+    } else {
+      run();
+    }
+  </script>
+  <style>
+    :root {
+      --bg: #0d0d0d;
+      --bg-soft: #111111;
+      --panel: rgba(13, 13, 13, 0.88);
+      --panel-strong: rgba(19, 19, 19, 0.96);
+      --line: rgba(0, 245, 255, 0.26);
+      --line-strong: rgba(57, 255, 20, 0.38);
+      --text: #e9f6ff;
+      --muted: #8ea3ad;
+      --accent-blue: #00f5ff;
+      --accent-green: #39ff14;
+      --glow-blue: 0 0 18px rgba(0, 245, 255, 0.42);
+      --glow-green: 0 0 18px rgba(57, 255, 20, 0.28);
+      --shadow: 0 14px 40px rgba(0, 0, 0, 0.32);
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --narrative-font: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --technical-font: "Cascadia Code", "Fira Code", Consolas, "Liberation Mono", monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      position: relative;
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background:
+        radial-gradient(circle at top left, rgba(0, 245, 255, 0.12), transparent 28%),
+        radial-gradient(circle at 85% 12%, rgba(57, 255, 20, 0.08), transparent 24%),
+        linear-gradient(180deg, #050505 0%, #0d0d0d 36%, #090909 100%);
+      color: var(--text);
+      font-family: var(--narrative-font);
+      line-height: 1.6;
+      letter-spacing: 0.01em;
+    }
+
+    body::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+      background-size: 32px 32px;
+      opacity: 0.16;
+    }
+
+    a {
+      color: var(--accent-blue);
+    }
+
+    code,
+    pre,
+    .technical,
+    .meta-chip,
+    .section-kicker,
+    .pill,
+    .metric-label,
+    .metric-value,
+    .repo-tag,
+    .mermaid {
+      font-family: var(--technical-font);
+    }
+
+    .page-shell {
+      width: min(1180px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 32px 0 72px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero {
+      position: relative;
+      padding: 28px;
+      margin-bottom: 24px;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background:
+        linear-gradient(145deg, rgba(0, 245, 255, 0.08), transparent 28%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+        var(--panel-strong);
+      box-shadow: var(--shadow), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -10% -55% 42%;
+      height: 280px;
+      background: radial-gradient(circle, rgba(0, 245, 255, 0.18), transparent 64%);
+      filter: blur(12px);
+      pointer-events: none;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(260px, 0.85fr);
+      gap: 22px;
+      align-items: end;
+    }
+
+    .section-kicker {
+      margin: 0 0 12px;
+      color: var(--accent-green);
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      text-shadow: var(--glow-green);
+    }
+
+    .phase-title {
+      margin: 0;
+      max-width: 16ch;
+      font-size: clamp(2.2rem, 4.4vw, 4rem);
+      line-height: 0.96;
+      letter-spacing: -0.05em;
+      color: #f5feff;
+      text-transform: uppercase;
+      text-wrap: balance;
+      text-shadow: 0 0 24px rgba(0, 245, 255, 0.2);
+    }
+
+    .hero-summary {
+      margin: 18px 0 0;
+      max-width: 60ch;
+      color: var(--muted);
+      font-size: 0.98rem;
+    }
+
+    .hero-meta {
+      display: grid;
+      gap: 12px;
+    }
+
+    .meta-card {
+      padding: 16px 18px;
+      border: 1px solid rgba(57, 255, 20, 0.2);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.025);
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.24);
+    }
+
+    .meta-label {
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+
+    .meta-chip {
+      color: var(--accent-blue);
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-shadow: var(--glow-blue);
+      word-break: break-word;
+    }
+
+    .repo-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      padding: 8px 12px;
+      border: 1px solid rgba(0, 245, 255, 0.24);
+      border-radius: 999px;
+      background: rgba(0, 245, 255, 0.08);
+      color: var(--accent-blue);
+      font-size: 0.82rem;
+      letter-spacing: 0.04em;
+    }
+
+    .section {
+      position: relative;
+      margin-top: 22px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .section::before {
+      content: "";
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      top: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0, 245, 255, 0.9), rgba(57, 255, 20, 0.9), transparent);
+      transform: translateY(-1px);
+    }
+
+    .section-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 12px 18px;
+      align-items: end;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: clamp(1.2rem, 2vw, 1.7rem);
+      line-height: 1.1;
+      color: #f0feff;
+    }
+
+    .section-index {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--accent-green);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      text-shadow: var(--glow-green);
+    }
+
+    .section-index::after {
+      content: "";
+      width: 44px;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(57, 255, 20, 0.9), transparent);
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .column-card,
+    .diagram-frame,
+    .technical-frame,
+    .viz-frame,
+    .question-frame,
+    .empty-state {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-md);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01)),
+        rgba(7, 7, 7, 0.82);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.012);
+    }
+
+    .column-card {
+      padding: 18px;
+      min-height: 200px;
+    }
+
+    .column-label {
+      margin: 0 0 12px;
+      color: var(--accent-blue);
+      font-size: 0.83rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      text-shadow: var(--glow-blue);
+    }
+
+    .splitter {
+      width: 100%;
+      height: 1px;
+      margin: 8px 0 16px;
+      background: linear-gradient(90deg, rgba(0, 245, 255, 0.4), transparent);
+    }
+
+    .diagram-frame,
+    .chart-frame,
+    .technical-frame,
+    .viz-frame,
+    .question-frame {
+      padding: 18px;
+    }
+
+    .diagram-frame {
+      overflow-x: auto;
+      overflow-y: auto;
+      overscroll-behavior-x: contain;
+      overscroll-behavior-y: contain;
+      max-height: min(70vh, 720px);
+    }
+
+    .mermaid {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      color: var(--text);
+    }
+
+    .mermaid svg {
+      display: block;
+      width: auto !important;
+      min-width: 100%;
+      max-width: none !important;
+      height: auto !important;
+    }
+
+    .chart-frame,
+    .viz-frame {
+      overflow: hidden;
+    }
+
+    .technical-frame {
+      color: #d6f6ff;
+    }
+
+    .technical-frame table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .technical-frame th,
+    .technical-frame td {
+      padding: 12px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      vertical-align: top;
+    }
+
+    .technical-frame th {
+      color: var(--accent-green);
+      font-size: 0.76rem;
+      text-align: left;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .chart-frame canvas,
+    .technical-frame > canvas,
+    .viz-frame canvas,
+    canvas.report-chart {
+      display: block;
+      width: 100% !important;
+      max-width: 100%;
+      height: 360px !important;
+      min-height: 360px;
+      max-height: 360px;
+    }
+
+    .empty-state {
+      padding: 22px;
+      text-align: center;
+    }
+
+    .empty-state strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--accent-blue);
+      font-size: 0.9rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-shadow: var(--glow-blue);
+    }
+
+    .metric-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .metric {
+      padding: 14px 16px;
+      border: 1px solid rgba(0, 245, 255, 0.18);
+      border-radius: var(--radius-sm);
+      background: rgba(0, 245, 255, 0.04);
+    }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+
+    .metric-value {
+      margin-top: 8px;
+      color: var(--accent-green);
+      font-size: 1.2rem;
+      font-weight: 700;
+      text-shadow: var(--glow-green);
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 11px;
+      border: 1px solid rgba(57, 255, 20, 0.22);
+      border-radius: 999px;
+      background: rgba(57, 255, 20, 0.06);
+      color: #d9ffd0;
+      font-size: 0.8rem;
+    }
+
+    .question-frame ul,
+    .technical-frame ul,
+    .column-card ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .question-frame li,
+    .technical-frame li,
+    .column-card li {
+      margin-bottom: 8px;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      text-align: right;
+      color: rgba(142, 163, 173, 0.72);
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 900px) {
+      .hero-grid,
+      .summary-grid,
+      .metric-strip {
+        grid-template-columns: 1fr;
+      }
+
+      .phase-title {
+        max-width: none;
+      }
+
+    }
+
+    @media (max-width: 640px) {
+      .page-shell {
+        width: min(100vw - 20px, 1180px);
+        padding-top: 16px;
+        padding-bottom: 42px;
+      }
+
+      .hero,
+      .section {
+        padding: 18px;
+        border-radius: 20px;
+      }
+
+      .section::before {
+        left: 18px;
+        right: 18px;
+      }
+
+      .phase-title {
+        font-size: clamp(2rem, 12vw, 3rem);
+      }
+
+    }
+
+    @media print {
+      body { background: #fff; color: #111; }
+      body::before, .hero::after { display: none; }
+      .section, .hero { box-shadow: none; border-color: #ccc; break-inside: avoid; }
+      .accent-blue, a { color: #036; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero" id="phase-header">
+      <div class="hero-grid">
+        <div>
+          <p class="section-kicker">Phase Report / Engagement &amp; Disclosure Output Layer</p>
+          <h1 class="phase-title">Engagement Scoring Backbone</h1>
+          <p class="hero-summary">
+            PHASE-01 builds the single, data-driven borrower priority table that both downstream
+            generators (engagement letters, disclosure pack) will consume — so every borrower number
+            is computed once, from the committed PACTA + TRISK snapshot, and never hardcoded.
+          </p>
+          <div class="pill-row" aria-label="report metadata">
+            <span class="pill">phase :: 01 / 05</span>
+            <span class="pill">date :: 2026-05-31</span>
+            <span class="pill">status :: complete</span>
+          </div>
+          <div class="repo-tag">repo :: pacta-trisk</div>
+        </div>
+
+        <div class="hero-meta">
+          <div class="meta-card">
+            <div class="meta-label">Project</div>
+            <div class="meta-chip">PACTA + TRISK Vietnam Bank Demo</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Deliverable</div>
+            <div class="meta-chip">engagement_priority.csv</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Borrowers scored</div>
+            <div class="meta-chip">23 (17 TRISK + 6 PACTA-only)</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section narrative" id="input-output-summary">
+      <div class="section-header">
+        <div>
+          <div class="section-index">01 / Input -> Output</div>
+          <h2 class="section-title">Input -> Output Summary</h2>
+        </div>
+      </div>
+      <div class="summary-grid">
+        <div class="column-card">
+          <p class="column-label">Inputs (committed snapshot)</p>
+          <div class="splitter"></div>
+          <ul>
+            <li><code>dashboard/data/trisk/{power,cement,steel}/top_borrowers_alignment_trisk.csv</code> — borrower-level alignment gap (<code>mean_abs_alignment_gap_pp</code>), <code>npv_change</code>, <code>pd_change</code>, <code>stress_priority_score</code>, <code>alignment_context</code>.</li>
+            <li><code>synthesis_output/vietnam/04_vn_ms_company.csv</code> — long-format PACTA company market-share (automotive + power), used to derive the automotive borrower gap at 2030 under PDP8.</li>
+            <li><code>synthesis_output/vietnam/02_vn_matched_prioritized.csv</code> — matched loanbook → <code>exposure_vnd</code> per <code>name_abcd</code>.</li>
+          </ul>
+        </div>
+        <div class="column-card">
+          <p class="column-label">Output</p>
+          <div class="splitter"></div>
+          <ul>
+            <li><code>output/engagement/engagement_priority.csv</code> — 23 borrowers, sorted descending by <code>composite_score</code>.</li>
+            <li>Columns: <code>name_abcd, sector, exposure_vnd, alignment_gap, npv_change, pd_change, trisk_priority_score, trisk_status, composite_score, composite_partial</code> + transparency extras (<code>norm_alignment, norm_trisk_priority, alignment_basis, data_source</code>).</li>
+            <li>No <code>unmatched_names.csv</code> emitted — every scored borrower matched a loanbook exposure row.</li>
+          </ul>
+          <div class="metric-strip">
+            <div class="metric"><div class="metric-label">Power</div><div class="metric-value">13</div></div>
+            <div class="metric"><div class="metric-label">Auto (partial)</div><div class="metric-value">6</div></div>
+            <div class="metric"><div class="metric-label">Cement+Steel</div><div class="metric-value">4</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="logic-flow">
+      <div class="section-header">
+        <div>
+          <div class="section-index">02 / Logic Flow</div>
+          <h2 class="section-title">Logic Flow</h2>
+        </div>
+      </div>
+      <div class="diagram-frame technical">
+        <div class="mermaid">
+flowchart LR
+  A[TRISK borrower CSVs\npower / cement / steel] --> D[Unified borrower table]
+  B[PACTA company CSV\nautomotive 2030 PDP8] -->|mean abs share gap| D
+  C[Matched loanbook\nexposure_vnd] --> D
+  D --> E{TRISK score\npresent?}
+  E -->|yes| F[composite =\n0.5*normAlign + 0.5*normTRISK]
+  E -->|no| G[composite = normAlign\ncomposite_partial = TRUE]
+  F --> H[Sort desc by composite]
+  G --> H
+  H --> I[(engagement_priority.csv)]
+        </div>
+      </div>
+    </section>
+
+    <section class="section narrative" id="math-algorithm-used">
+      <div class="section-header">
+        <div>
+          <div class="section-index">03 / Math / Algorithm Used</div>
+          <h2 class="section-title">Math / Algorithm Used</h2>
+        </div>
+      </div>
+      <div class="technical-frame">
+        <p><strong>Min-max normalisation</strong> (with a zero-range guard returning 0.5, mirroring <code>sector_prioritization.R</code>):</p>
+        <p><code>norm(x) = (x - min(x)) / (max(x) - min(x))</code></p>
+        <p>applied independently to <code>alignment_gap</code> (across all 23 borrowers) and <code>trisk_priority_score</code> (across the 17 TRISK-covered borrowers).</p>
+        <p><strong>Composite score</strong> (fixed 50/50, Grill Me Q-004), renormalised by the weight actually available so partial rows are not artificially buried:</p>
+        <p><code>composite = (w_align·normAlign + w_trisk·normTRISK) / (w_align + w_trisk_present)</code></p>
+        <ul>
+          <li><strong>TRISK-covered row:</strong> <code>(0.5·normAlign + 0.5·normTRISK) / 1.0</code>.</li>
+          <li><strong>PACTA-only row (automotive):</strong> TRISK term absent → <code>(0.5·normAlign) / 0.5 = normAlign</code>, flagged <code>composite_partial = TRUE</code>.</li>
+        </ul>
+        <p><strong>Automotive borrower gap</strong> = mean of absolute per-technology share gaps at 2030 under PDP8: <code>mean(|projected_share − target_pdp8_ndc_share|) × 100</code> (pp), pivoted from the long-format company file.</p>
+      </div>
+    </section>
+
+    <section class="section" id="tools-formulas-methods">
+      <div class="section-header">
+        <div>
+          <div class="section-index">04 / Tools / Formulas / Methods</div>
+          <h2 class="section-title">Tools / Formulas / Methods</h2>
+        </div>
+      </div>
+      <div class="technical-frame technical">
+        <table>
+          <thead><tr><th>Element</th><th>Choice</th><th>Rationale</th></tr></thead>
+          <tbody>
+            <tr><td>Language / libs</td><td>R 4.5.2 — <code>dplyr</code>, <code>readr</code>, <code>tidyr</code></td><td>CON-001: no new dependencies; matches existing scripts.</td></tr>
+            <tr><td>Idiom source</td><td><code>scripts/sector_prioritization.R</code></td><td>Reused <code>parse_arg()</code>, min-max guard, console-summary, package-qualified calls.</td></tr>
+            <tr><td>Alignment source (covered)</td><td>TRISK <code>mean_abs_alignment_gap_pp</code></td><td>TRISK files already embed the borrower-level PACTA gap — no recompute.</td></tr>
+            <tr><td>Alignment source (automotive)</td><td>PACTA company file, PDP8 2030</td><td>Only sector with PACTA company alignment but no TRISK pilot.</td></tr>
+            <tr><td>Exposure</td><td>Σ <code>loan_size_outstanding</code> by <code>name_abcd</code></td><td>Join key confirmed; all 23 borrowers matched.</td></tr>
+            <tr><td>Parameters</td><td><code>--w_align 0.5 --w_trisk 0.5</code></td><td>Fixed default; exposed as CLI args for transparency.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="results-visualizations">
+      <div class="section-header">
+        <div>
+          <div class="section-index">05 / Results &amp; Visualizations</div>
+          <h2 class="section-title">Results &amp; Visualizations</h2>
+        </div>
+      </div>
+      <div class="viz-frame">
+        <canvas id="compositeChart"></canvas>
+      </div>
+      <div class="metric-strip">
+        <div class="metric"><div class="metric-label">Top borrower</div><div class="metric-value">Nghi Son Power (1.000)</div></div>
+        <div class="metric"><div class="metric-label">Highest exposure</div><div class="metric-value">EVN — 5.77M VND</div></div>
+        <div class="metric"><div class="metric-label">Partial (PACTA-only)</div><div class="metric-value">6 automotive</div></div>
+      </div>
+    </section>
+
+    <section class="section narrative" id="limitations-second-best-alternative">
+      <div class="section-header">
+        <div>
+          <div class="section-index">06 / Limitations / Second-Best Alternative</div>
+          <h2 class="section-title">Limitations / Second-Best Alternative</h2>
+        </div>
+      </div>
+      <div class="question-frame">
+        <ul>
+          <li><strong>Cross-sector comparability:</strong> power/automotive gaps are market-share percentage-points; cement/steel gaps are SDA emission-intensity <code>gap_pct</code>. After global min-max, cement/steel (2.1 / 7.2) compress near the floor. The composite is a demo prioritisation aid, not a calibrated risk number — documented in the script header and console.</li>
+          <li><strong>Partial-row asymmetry:</strong> renormalising automotive to the alignment component lets three automakers (gap 21.95 pp) outrank some TRISK-covered power names. This is intentional (do not penalise a borrower for the pilot's sector scope) and made explicit via <code>composite_partial</code>.</li>
+          <li><strong>Second-best alternative:</strong> per-sector normalisation would make magnitudes within-sector fair but loses the single cross-sector ranking the letters/disclosure need. Rejected for v1; revisitable if a bank wants sector-siloed lists.</li>
+          <li><strong>Dung Quat LNG</strong> carries a 0.0 alignment gap ("No alignment context available") — the known pre-commissioning zero-baseline edge case from the TRISK pilot, inherited not introduced.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section narrative" id="errors-warnings-flags-encountered">
+      <div class="section-header">
+        <div>
+          <div class="section-index">07 / Errors / Warnings / Flags</div>
+          <h2 class="section-title">Errors / Warnings / Flags Encountered</h2>
+        </div>
+      </div>
+      <div class="question-frame technical">
+        <ul>
+          <li>Run exited <strong>0</strong> on first execution; no R errors or warnings.</li>
+          <li>RISK-01-01 guard active: zero scored borrowers lacked a loanbook exposure match, so no <code>unmatched_names.csv</code> was produced (the path is exercised only when a join gap exists).</li>
+          <li>No silent drops — automotive borrowers are retained and flagged rather than excluded for missing TRISK coverage.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section narrative" id="open-questions-next-phase-seeds">
+      <div class="section-header">
+        <div>
+          <div class="section-index">08 / Open Questions / Next Phase Seeds</div>
+          <h2 class="section-title">Open Questions / Next Phase Seeds</h2>
+        </div>
+      </div>
+      <div class="question-frame">
+        <ul>
+          <li><strong>PHASE-02 (next):</strong> consume <code>engagement_priority.csv</code> to render one-page English-primary engagement letters for top-N (N=10) borrowers, with figures pulled from each data row and an editable CSV prompt template per sector.</li>
+          <li><strong>Token-safety seed:</strong> letters must scan for residual <code>&#123;&#123;token&#125;&#125;</code> before writing — a sector lacking a prompt row must fail the run, not ship a raw placeholder.</li>
+          <li><strong>Disclosure (PHASE-03):</strong> the same table feeds the top-10 transition-risk borrower section, with an <code>anonymize</code> path (off by default per Q-005).</li>
+          <li><strong>Open question:</strong> should exposure size eventually enter the composite (currently fixed 50/50 alignment vs TRISK only)? Deferred — would extend the PHASE-01 formula.</li>
+        </ul>
+      </div>
+      <div class="footer-note">artifact generated for reflection, not presentation theater</div>
+    </section>
+  </main>
+  <script>
+    (function() {
+      const chartCanvases = document.querySelectorAll('canvas');
+      chartCanvases.forEach((canvas) => {
+        canvas.classList.add('report-chart');
+        const parent = canvas.parentElement;
+        if (parent && parent.classList.contains('technical-frame') && !parent.classList.contains('chart-frame')) {
+          parent.classList.add('chart-frame');
+        }
+      });
+    })();
+
+    if (window.Chart) {
+      Chart.defaults.devicePixelRatio = 1;
+      Chart.defaults.animation = false;
+      Chart.defaults.resizeDelay = 150;
+      Chart.defaults.normalized = true;
+      Chart.defaults.maintainAspectRatio = false;
+      Chart.defaults.responsive = true;
+
+      const labels = [
+        "Nghi Son Power LLC", "Vinacomin Power JSC", "Intl Power Mong Duong",
+        "Ford Motor Company", "Hyundai Motor Company", "THACO Industries",
+        "Honda Motor Co Ltd", "Hoa Phat Group JSC", "Toyota Motor Corp", "EVN (Electricity of Vietnam)"
+      ];
+      const scores = [1.000, 0.998, 0.996, 0.850, 0.850, 0.850, 0.775, 0.613, 0.592, 0.531];
+      const partial = [false, false, false, true, true, true, true, false, true, false];
+      const colors = partial.map(p => p ? "rgba(57,255,20,0.55)" : "rgba(0,245,255,0.6)");
+      const borders = partial.map(p => p ? "#39ff14" : "#00f5ff");
+
+      new Chart(document.getElementById("compositeChart"), {
+        type: "bar",
+        data: {
+          labels: labels,
+          datasets: [{
+            label: "Composite score",
+            data: scores,
+            backgroundColor: colors,
+            borderColor: borders,
+            borderWidth: 1.5
+          }]
+        },
+        options: {
+          animation: false,
+          resizeDelay: 150,
+          normalized: true,
+          maintainAspectRatio: false,
+          indexAxis: "y",
+          scales: {
+            x: { min: 0, max: 1, ticks: { color: "#8ea3ad" }, grid: { color: "rgba(255,255,255,0.06)" } },
+            y: { ticks: { color: "#e9f6ff", font: { size: 11 } }, grid: { display: false } }
+          },
+          plugins: {
+            legend: { display: false },
+            title: {
+              display: true,
+              text: "Top 10 borrowers by composite engagement score (cyan = TRISK-covered, green = PACTA-only / partial)",
+              color: "#e9f6ff",
+              font: { size: 13 }
+            },
+            tooltip: {
+              callbacks: {
+                afterLabel: (ctx) => partial[ctx.dataIndex] ? "PACTA-only (composite_partial = TRUE)" : "TRISK-covered"
+              }
+            }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>

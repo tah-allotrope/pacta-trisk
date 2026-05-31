@@ -724,3 +724,30 @@ When filtering data to a subset of metrics but providing `scale_*_manual()` mapp
 - `scripts/generate_bidv_report.R` — New: ~500-line report generator
 - `reports/BIDV_Framework_Recommendation_Report.html` — New: 132.9 KB final deliverable
 - `reports/BIDV_Framework_Recommendation_Report_README.md` — New: companion README
+
+---
+
+## Engagement & Disclosure Output Layer (Idea 3) — 2026-05-31
+
+**Goal:** Implement `plans/2026-05-28-engagement-disclosure-output-layer-plan.md` — turn PACTA+TRISK outputs into client-facing deliverables (per-borrower engagement letters + TCFD/ISSB disclosure pack + operator-gated dashboard page).
+
+**Accepted Grill Me answers:** Q1 HTML-only · Q2 English-primary (VN key terms only) · Q3 TCFD+ISSB+Decision263 · Q4 fixed 50/50 (no slider) · Q5 anonymize off-by-default · Q6 top-N=10 adjustable.
+
+**Confirmed input schema (PHASE-01 TASK-01-01):**
+- Power/cement/steel borrowers: `dashboard/data/trisk/<sector>/top_borrowers_alignment_trisk.csv` already carries `company_name`, `mean_abs_alignment_gap_pp`, `npv_change`, `pd_change`, `stress_priority_score`, `alignment_context`.
+- Automotive borrowers: `synthesis_output/vietnam/04_vn_ms_company.csv` (sectors automotive+power; metrics projected / target_pdp8_ndc / target_nze_global / target_steps; years 2025–2030). Compute borrower gap = mean abs PDP8 share gap at 2030. No TRISK → `composite_partial = TRUE`.
+- Exposure (VND): sum `loan_size_outstanding` by `name_abcd` from `synthesis_output/vietnam/02_vn_matched_prioritized.csv` (col 21). All alignment/TRISK borrowers have loanbook exposure.
+
+### Phase Checklist
+- [x] PHASE-01 — `scripts/engagement_scoring.R` → `output/engagement/engagement_priority.csv` (+ phase report, commit, push) ✅ 2026-05-31
+- [ ] PHASE-02 — `scripts/generate_engagement_letters.R` + `templates/engagement/` (+ phase report, commit, push)
+- [ ] PHASE-03 — `scripts/generate_disclosure_pack.R` + `templates/disclosure/` (+ phase report, commit, push)
+- [ ] PHASE-04 — `dashboard/pages/7_Outputs.py` + `dashboard/lib/outputs.py` (no weight slider) (+ phase report, commit, push)
+- [ ] PHASE-05 — `.gitignore`, `docs/outputs_layer.md`, full-chain verification (+ phase report, commit, push)
+- [ ] FINAL — `/report final` synthesis once all phases complete
+
+### PHASE-01 Result (2026-05-31)
+- `scripts/engagement_scoring.R` runs clean (exit 0), writes `output/engagement/engagement_priority.csv` (23 borrowers: 13 power, 6 automotive-partial, 2 cement, 2 steel), sorted desc by `composite_score`.
+- Composite = renormalised 50/50 of min-max(alignment_gap) + min-max(trisk_priority_score); automotive (no TRISK) → alignment-only, `composite_partial=TRUE`.
+- Top 3 = coal-heavy power (Nghi Son 1.000, Vinacomin 0.998, Mong Duong 0.996); EVN highest exposure (5.77M VND).
+- All 23 borrowers matched loanbook exposure (no `unmatched_names.csv`). Phase report: `reports/2026-05-31-phase-01-engagement-scoring.html`.
