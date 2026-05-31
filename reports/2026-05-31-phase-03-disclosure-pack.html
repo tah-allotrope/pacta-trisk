@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phase Report :: Disclosure Pack Generator</title>
+  <meta name="color-scheme" content="dark">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    async function initMermaid() {
+      const blocks = document.querySelectorAll('.mermaid');
+      if (!blocks.length) return;
+      mermaid.initialize({
+        startOnLoad: false, theme: 'dark', securityLevel: 'loose',
+        themeVariables: {
+          primaryColor: '#111111', primaryTextColor: '#e8f6ff', primaryBorderColor: '#00f5ff',
+          lineColor: '#39ff14', secondaryColor: '#121a1a', tertiaryColor: '#111111',
+          background: '#0d0d0d', mainBkg: '#0d0d0d', nodeBorder: '#00f5ff',
+          clusterBkg: '#111111', clusterBorder: '#39ff14', edgeLabelBackground: '#0d0d0d'
+        }
+      });
+      await mermaid.run({ nodes: blocks });
+    }
+    const run = () => initMermaid().catch((e) => console.error('Mermaid render failed', e));
+    if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', run, { once: true }); } else { run(); }
+  </script>
+  <style>
+    :root {
+      --bg:#0d0d0d; --panel:rgba(13,13,13,0.88); --panel-strong:rgba(19,19,19,0.96);
+      --line:rgba(0,245,255,0.26); --text:#e9f6ff; --muted:#8ea3ad;
+      --accent-blue:#00f5ff; --accent-green:#39ff14;
+      --glow-blue:0 0 18px rgba(0,245,255,0.42); --glow-green:0 0 18px rgba(57,255,20,0.28);
+      --shadow:0 14px 40px rgba(0,0,0,0.32); --radius-lg:22px; --radius-md:16px; --radius-sm:12px;
+      --narrative-font:"Segoe UI","Helvetica Neue",Helvetica,Arial,sans-serif;
+      --technical-font:"Cascadia Code","Fira Code",Consolas,"Liberation Mono",monospace;
+    }
+    * { box-sizing:border-box; }
+    body { position:relative; margin:0; min-height:100vh; overflow-x:hidden;
+      background: radial-gradient(circle at top left, rgba(0,245,255,0.12), transparent 28%),
+        radial-gradient(circle at 85% 12%, rgba(57,255,20,0.08), transparent 24%),
+        linear-gradient(180deg,#050505 0%,#0d0d0d 36%,#090909 100%);
+      color:var(--text); font-family:var(--narrative-font); line-height:1.6; letter-spacing:0.01em; }
+    body::before { content:""; position:absolute; inset:0; pointer-events:none;
+      background-image: linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+      background-size:32px 32px; opacity:0.16; }
+    a { color:var(--accent-blue); }
+    code, pre, .meta-chip, .section-kicker, .pill, .metric-label, .metric-value, .repo-tag, .mermaid { font-family:var(--technical-font); }
+    .page-shell { width:min(1180px, calc(100vw - 32px)); margin:0 auto; padding:32px 0 72px; position:relative; z-index:1; }
+    .hero { position:relative; padding:28px; margin-bottom:24px; border:1px solid var(--line); border-radius:28px;
+      background: linear-gradient(145deg, rgba(0,245,255,0.08), transparent 28%),
+        linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0)), var(--panel-strong);
+      box-shadow: var(--shadow), inset 0 0 0 1px rgba(255,255,255,0.02); }
+    .hero-grid { display:grid; grid-template-columns:minmax(0,1.55fr) minmax(260px,0.85fr); gap:22px; align-items:end; }
+    .section-kicker { margin:0 0 12px; color:var(--accent-green); font-size:0.76rem; font-weight:700; text-transform:uppercase; letter-spacing:0.22em; text-shadow:var(--glow-green); }
+    .phase-title { margin:0; max-width:16ch; font-size:clamp(2.2rem,4.4vw,4rem); line-height:0.96; letter-spacing:-0.05em; color:#f5feff; text-transform:uppercase; text-wrap:balance; text-shadow:0 0 24px rgba(0,245,255,0.2); }
+    .hero-summary { margin:18px 0 0; max-width:62ch; color:var(--muted); font-size:0.98rem; }
+    .hero-meta { display:grid; gap:12px; }
+    .meta-card { padding:16px 18px; border:1px solid rgba(57,255,20,0.2); border-radius:18px; background:rgba(255,255,255,0.025); box-shadow:inset 0 0 0 1px rgba(0,0,0,0.24); }
+    .meta-label { margin-bottom:6px; color:var(--muted); font-size:0.75rem; text-transform:uppercase; letter-spacing:0.16em; }
+    .meta-chip { color:var(--accent-blue); font-size:1rem; font-weight:700; letter-spacing:0.02em; text-shadow:var(--glow-blue); word-break:break-word; }
+    .repo-tag { display:inline-flex; align-items:center; gap:8px; margin-top:10px; padding:8px 12px; border:1px solid rgba(0,245,255,0.24); border-radius:999px; background:rgba(0,245,255,0.08); color:var(--accent-blue); font-size:0.82rem; letter-spacing:0.04em; }
+    .section { position:relative; margin-top:22px; padding:24px; border:1px solid var(--line); border-radius:var(--radius-lg); background:var(--panel); box-shadow:var(--shadow); }
+    .section::before { content:""; position:absolute; left:24px; right:24px; top:0; height:1px; background:linear-gradient(90deg, transparent, rgba(0,245,255,0.9), rgba(57,255,20,0.9), transparent); transform:translateY(-1px); }
+    .section-header { display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px 18px; align-items:end; margin-bottom:18px; padding-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.08); }
+    .section-title { margin:0; font-size:clamp(1.2rem,2vw,1.7rem); line-height:1.1; color:#f0feff; }
+    .section-index { display:inline-flex; align-items:center; gap:10px; color:var(--accent-green); font-size:0.78rem; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; text-shadow:var(--glow-green); }
+    .section-index::after { content:""; width:44px; height:1px; background:linear-gradient(90deg, rgba(57,255,20,0.9), transparent); }
+    .summary-grid { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:16px; }
+    .column-card, .diagram-frame, .technical-frame, .viz-frame, .question-frame { border:1px solid rgba(255,255,255,0.08); border-radius:var(--radius-md); background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)), rgba(7,7,7,0.82); box-shadow:inset 0 0 0 1px rgba(255,255,255,0.012); }
+    .column-card { padding:18px; min-height:200px; }
+    .column-label { margin:0 0 12px; color:var(--accent-blue); font-size:0.83rem; font-weight:700; text-transform:uppercase; letter-spacing:0.16em; text-shadow:var(--glow-blue); }
+    .splitter { width:100%; height:1px; margin:8px 0 16px; background:linear-gradient(90deg, rgba(0,245,255,0.4), transparent); }
+    .diagram-frame, .chart-frame, .technical-frame, .viz-frame, .question-frame { padding:18px; }
+    .diagram-frame { overflow:auto; max-height:min(70vh, 720px); }
+    .mermaid { width:100%; max-width:100%; min-width:0; color:var(--text); }
+    .mermaid svg { display:block; width:auto !important; min-width:100%; max-width:none !important; height:auto !important; }
+    .chart-frame, .viz-frame { overflow:hidden; }
+    .technical-frame { color:#d6f6ff; }
+    .technical-frame table { width:100%; border-collapse:collapse; }
+    .technical-frame th, .technical-frame td { padding:12px 10px; border-bottom:1px solid rgba(255,255,255,0.08); vertical-align:top; }
+    .technical-frame th { color:var(--accent-green); font-size:0.76rem; text-align:left; letter-spacing:0.12em; text-transform:uppercase; }
+    .viz-frame canvas, canvas.report-chart { display:block; width:100% !important; max-width:100%; height:320px !important; min-height:320px; max-height:320px; }
+    .metric-strip { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:12px; margin-top:18px; }
+    .metric { padding:14px 16px; border:1px solid rgba(0,245,255,0.18); border-radius:var(--radius-sm); background:rgba(0,245,255,0.04); }
+    .metric-label { color:var(--muted); font-size:0.72rem; text-transform:uppercase; letter-spacing:0.16em; }
+    .metric-value { margin-top:8px; color:var(--accent-green); font-size:1.05rem; font-weight:700; text-shadow:var(--glow-green); }
+    .pill-row { display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
+    .pill { display:inline-flex; align-items:center; gap:8px; padding:8px 11px; border:1px solid rgba(57,255,20,0.22); border-radius:999px; background:rgba(57,255,20,0.06); color:#d9ffd0; font-size:0.8rem; }
+    .question-frame ul, .technical-frame ul, .column-card ul { margin:0; padding-left:20px; }
+    .question-frame li, .technical-frame li, .column-card li { margin-bottom:8px; }
+    .footer-note { margin-top:18px; text-align:right; color:rgba(142,163,173,0.72); font-size:0.78rem; letter-spacing:0.08em; text-transform:uppercase; }
+    @media (max-width:900px) { .hero-grid, .summary-grid, .metric-strip { grid-template-columns:1fr; } .phase-title { max-width:none; } }
+    @media (max-width:640px) { .page-shell { width:min(100vw - 20px, 1180px); } .hero, .section { padding:18px; border-radius:20px; } }
+    @media print { body { background:#fff; color:#111; } body::before { display:none; } .section,.hero { box-shadow:none; border-color:#ccc; break-inside:avoid; } a { color:#036; } }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero" id="phase-header">
+      <div class="hero-grid">
+        <div>
+          <p class="section-kicker">Phase Report / Engagement &amp; Disclosure Output Layer</p>
+          <h1 class="phase-title">Disclosure Pack Generator</h1>
+          <p class="hero-summary">
+            PHASE-03 assembles a single self-contained board/regulator disclosure pack on the four TCFD
+            pillars, cross-referenced to ISSB IFRS S2 and Vietnam's Decision 263/QĐ-TTg. It embeds the
+            alignment overview and coal stranded-risk charts, the top-N counterparty table, and a
+            condensed methodology appendix — with an anonymisation switch for external sharing.
+          </p>
+          <div class="pill-row" aria-label="report metadata">
+            <span class="pill">phase :: 03 / 05</span>
+            <span class="pill">date :: 2026-05-31</span>
+            <span class="pill">status :: complete</span>
+          </div>
+          <div class="repo-tag">repo :: pacta-trisk</div>
+        </div>
+        <div class="hero-meta">
+          <div class="meta-card"><div class="meta-label">Output</div><div class="meta-chip">disclosure_pack.html · 80.4 KB</div></div>
+          <div class="meta-card"><div class="meta-label">TCFD pillars</div><div class="meta-chip">4 / 4 present</div></div>
+          <div class="meta-card"><div class="meta-label">Anonymise mode</div><div class="meta-chip">0 real names leak</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section narrative" id="input-output-summary">
+      <div class="section-header"><div><div class="section-index">01 / Input -> Output</div><h2 class="section-title">Input -> Output Summary</h2></div></div>
+      <div class="summary-grid">
+        <div class="column-card">
+          <p class="column-label">Inputs</p><div class="splitter"></div>
+          <ul>
+            <li><code>output/engagement/engagement_priority.csv</code> — counterparty table + exec figures.</li>
+            <li><code>06_vn_ms_alignment_2030.csv</code> + <code>06_vn_sda_alignment_2030.csv</code> — sector gap table.</li>
+            <li><code>12_vn_alignment_overview.png</code>, <code>13_vn_coal_stranded_risk.png</code> — embedded base64.</li>
+            <li><code>templates/disclosure/disclosure_sections.md</code> — editable TCFD narrative.</li>
+            <li><code>PACTA_Beginner_Guide.md</code>, <code>TRISK_Demo_Assumptions.md</code>, <code>bidv_decision263_mapping.md</code> — appendix extracts.</li>
+          </ul>
+        </div>
+        <div class="column-card">
+          <p class="column-label">Output (git-ignored in PHASE-05)</p><div class="splitter"></div>
+          <ul>
+            <li><code>output/disclosure/disclosure_pack.html</code> — one self-contained file, 80.4 KB (&lt; 2 MB target).</li>
+            <li>5 sections: Executive Summary · Alignment vs PDP8/NDC/NZE · Top counterparties · TCFD disclosures · Methodology.</li>
+            <li>Two modes from one script: named internal board pack (default) and <code>--anonymize</code> external version.</li>
+          </ul>
+          <div class="metric-strip">
+            <div class="metric"><div class="metric-label">ISSB cross-refs</div><div class="metric-value">6</div></div>
+            <div class="metric"><div class="metric-label">Decision 263 refs</div><div class="metric-value">11</div></div>
+            <div class="metric"><div class="metric-label">Synthetic notes</div><div class="metric-value">3 sections</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="logic-flow">
+      <div class="section-header"><div><div class="section-index">02 / Logic Flow</div><h2 class="section-title">Logic Flow</h2></div></div>
+      <div class="diagram-frame technical">
+        <div class="mermaid">
+flowchart LR
+  PR[(engagement_priority.csv)] --> EX[exec summary + KPIs]
+  AL[alignment CSVs + PNGs] --> ALH[alignment section]
+  PR --> BT[top-N counterparty table]
+  MD[disclosure_sections.md] --> TC[TCFD pillars\nISSB + Decision 263]
+  DOCS[PACTA / TRISK / D263 docs] --> AP[methodology appendix\nextract_section]
+  EX --> ASM[assemble HTML + inline CSS]
+  ALH --> ASM
+  BT --> ASM
+  TC --> ASM
+  AP --> ASM
+  ASM --> AN{anonymize?}
+  AN -->|yes| RP[whole-string replace\nlongest-first -> Borrower A..]
+  AN -->|no| W
+  RP --> W[write disclosure_pack.html]
+  W --> SZ[size check < 2 MB]
+        </div>
+      </div>
+    </section>
+
+    <section class="section narrative" id="math-algorithm-used">
+      <div class="section-header"><div><div class="section-index">03 / Math / Algorithm Used</div><h2 class="section-title">Math / Algorithm Used</h2></div></div>
+      <div class="technical-frame">
+        <p>Assembly logic rather than statistics:</p>
+        <ul>
+          <li><strong>Self-contained md→HTML:</strong> a small converter handles headers, lists, blockquotes, rules, and inline bold/code/links; an HTML-comment stripper drops the template's editor notes so they never reach the page.</li>
+          <li><strong>Section extraction:</strong> <code>extract_section(md, header, next_header)</code> pulls bounded appendix excerpts (PACTA "What is PACTA", TRISK "Purpose" + "Interpretation Guardrails", Decision 263 "Overview") so the appendix stays condensed and the file stays small.</li>
+          <li><strong>Anonymisation (RISK-03-01):</strong> one borrower-name list, applied <em>longest-name-first</em> with fixed-string replacement across the fully-assembled HTML, so a short name (e.g. "EVN") can never partially match inside a longer one. A grep over the output confirms zero real names remain.</li>
+          <li><strong>Graceful degradation:</strong> any missing input becomes a "[section pending]" callout instead of crashing the run (pre-flight pattern from <code>generate_bidv_report.R</code>).</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" id="tools-formulas-methods">
+      <div class="section-header"><div><div class="section-index">04 / Tools / Formulas / Methods</div><h2 class="section-title">Tools / Formulas / Methods</h2></div></div>
+      <div class="technical-frame technical">
+        <table>
+          <thead><tr><th>Element</th><th>Choice</th><th>Rationale</th></tr></thead>
+          <tbody>
+            <tr><td>Framing</td><td>TCFD pillars + ISSB IFRS S2 cross-refs + Decision 263 note</td><td>Grill Me Q-003.</td></tr>
+            <tr><td>Output</td><td>One self-contained HTML, print CSS</td><td>Q-001: browser print-to-PDF; base64 PNGs; no new deps.</td></tr>
+            <tr><td>Anonymise default</td><td>Off (named board pack); <code>--anonymize</code> opt-in</td><td>Q-005: internal board use by default, shareable on demand.</td></tr>
+            <tr><td>Reuse</td><td><code>generate_bidv_report.R</code> CSS + md helpers</td><td>Consistent look; DEC-001 (no Quarto/RMarkdown).</td></tr>
+            <tr><td>Appendix</td><td><code>extract_section</code> bounded excerpts</td><td>Condensed methodology; keeps file &lt; 2 MB.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="results-visualizations">
+      <div class="section-header"><div><div class="section-index">05 / Results &amp; Visualizations</div><h2 class="section-title">Results &amp; Visualizations</h2></div></div>
+      <div class="viz-frame"><canvas id="checkChart"></canvas></div>
+      <div class="metric-strip">
+        <div class="metric"><div class="metric-label">File size</div><div class="metric-value">80.4 KB / 2 MB</div></div>
+        <div class="metric"><div class="metric-label">Markdown leakage</div><div class="metric-value">0 stray tokens</div></div>
+        <div class="metric"><div class="metric-label">Anonymise leak</div><div class="metric-value">0 real names</div></div>
+      </div>
+    </section>
+
+    <section class="section narrative" id="limitations-second-best-alternative">
+      <div class="section-header"><div><div class="section-index">06 / Limitations / Second-Best Alternative</div><h2 class="section-title">Limitations / Second-Best Alternative</h2></div></div>
+      <div class="question-frame">
+        <ul>
+          <li><strong>Demo regulatory wording:</strong> TCFD/ISSB/Decision 263 narrative is illustrative; a domain reviewer must confirm the regulatory phrasing before any filing (the disclaimer says so).</li>
+          <li><strong>English-with-Vietnamese-terms (Q-002):</strong> the pack is English-primary with Vietnamese key terms, not a full bilingual document — matching the BIDV report convention.</li>
+          <li><strong>Anonymisation is name-list based:</strong> it removes the known borrower names robustly (verified by grep), but a free-text addition that named a borrower in a new way would need the name added to the priority table to be caught. Mitigated by sourcing every name from the same priority CSV.</li>
+          <li><strong>Second-best alternative (rejected):</strong> a native PDF/DOCX renderer (ALT-001). Deferred for v1; print-to-PDF from self-contained HTML matches the repo pattern and adds no dependency.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section narrative" id="errors-warnings-flags-encountered">
+      <div class="section-header"><div><div class="section-index">07 / Errors / Warnings / Flags</div><h2 class="section-title">Errors / Warnings / Flags Encountered</h2></div></div>
+      <div class="question-frame technical">
+        <ul>
+          <li>Both runs (named + anonymised) exited <strong>0</strong>; no R warnings.</li>
+          <li>A verification grep initially mis-reported "Decision 263" as absent; direct inspection showed 11 occurrences (the earlier grep flag combination tripped near non-ASCII text). Content confirmed present — no defect in the artifact.</li>
+          <li>Markdown-leakage scan: 0 stray <code>##</code> headers, 0 stray <code>**</code> bold, 0 unclosed comment blocks.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section narrative" id="open-questions-next-phase-seeds">
+      <div class="section-header"><div><div class="section-index">08 / Open Questions / Next Phase Seeds</div><h2 class="section-title">Open Questions / Next Phase Seeds</h2></div></div>
+      <div class="question-frame">
+        <ul>
+          <li><strong>PHASE-04 (next):</strong> operator-gated dashboard page (<code>dashboard/pages/7_Outputs.py</code> + <code>dashboard/lib/outputs.py</code>) running both R generators as subprocesses behind an <code>OUTPUTS_LAYER</code> env flag and a confirmation checkbox; exposes <code>top_n</code> and the <code>anonymize</code> toggle (no weight slider, Q-004).</li>
+          <li><strong>PHASE-05 seed:</strong> <code>.gitignore</code> must list <code>output/engagement_letters/</code> and <code>output/disclosure/</code> before any committed run, plus <code>docs/outputs_layer.md</code> and full-chain verification.</li>
+        </ul>
+      </div>
+      <div class="footer-note">artifact generated for reflection, not presentation theater</div>
+    </section>
+  </main>
+  <script>
+    (function() {
+      document.querySelectorAll('canvas').forEach((canvas) => {
+        canvas.classList.add('report-chart');
+        const parent = canvas.parentElement;
+        if (parent && parent.classList.contains('technical-frame') && !parent.classList.contains('chart-frame')) parent.classList.add('chart-frame');
+      });
+    })();
+    if (window.Chart) {
+      Chart.defaults.devicePixelRatio = 1;
+      Chart.defaults.animation = false;
+      Chart.defaults.resizeDelay = 150;
+      Chart.defaults.normalized = true;
+      Chart.defaults.maintainAspectRatio = false;
+      Chart.defaults.responsive = true;
+      new Chart(document.getElementById("checkChart"), {
+        type: "bar",
+        data: {
+          labels: ["TCFD pillars", "ISSB cross-refs", "Decision 263 refs", "Synthetic-note sections", "Real names (anon)"],
+          datasets: [{
+            label: "Verification count",
+            data: [4, 6, 11, 3, 0],
+            backgroundColor: ["rgba(57,255,20,0.55)", "rgba(0,245,255,0.6)", "rgba(0,245,255,0.6)", "rgba(57,255,20,0.55)", "rgba(248,81,73,0.5)"],
+            borderColor: ["#39ff14", "#00f5ff", "#00f5ff", "#39ff14", "#f85149"],
+            borderWidth: 1.5
+          }]
+        },
+        options: {
+          animation: false, resizeDelay: 150, normalized: true, maintainAspectRatio: false,
+          scales: {
+            y: { beginAtZero: true, ticks: { color: "#8ea3ad" }, grid: { color: "rgba(255,255,255,0.06)" } },
+            x: { ticks: { color: "#e9f6ff", font: { size: 10 } }, grid: { display: false } }
+          },
+          plugins: {
+            legend: { display: false },
+            title: { display: true, text: "PHASE-03 verification checks (real names under --anonymize = 0)", color: "#e9f6ff", font: { size: 13 } }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>

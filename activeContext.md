@@ -741,7 +741,7 @@ When filtering data to a subset of metrics but providing `scale_*_manual()` mapp
 ### Phase Checklist
 - [x] PHASE-01 — `scripts/engagement_scoring.R` → `output/engagement/engagement_priority.csv` (+ phase report, commit, push) ✅ 2026-05-31
 - [x] PHASE-02 — `scripts/generate_engagement_letters.R` + `templates/engagement/` (+ phase report, commit, push) ✅ 2026-05-31
-- [ ] PHASE-03 — `scripts/generate_disclosure_pack.R` + `templates/disclosure/` (+ phase report, commit, push)
+- [x] PHASE-03 — `scripts/generate_disclosure_pack.R` + `templates/disclosure/` (+ phase report, commit, push) ✅ 2026-05-31
 - [ ] PHASE-04 — `dashboard/pages/7_Outputs.py` + `dashboard/lib/outputs.py` (no weight slider) (+ phase report, commit, push)
 - [ ] PHASE-05 — `.gitignore`, `docs/outputs_layer.md`, full-chain verification (+ phase report, commit, push)
 - [ ] FINAL — `/report final` synthesis once all phases complete
@@ -757,3 +757,8 @@ When filtering data to a subset of metrics but providing `scale_*_manual()` mapp
 - `scripts/generate_engagement_letters.R` (`--top_n`, default 10) renders 10 self-contained letters + `index.html` + `manifest.csv` under `output/engagement_letters/<slug>/`.
 - Verified: figures match the CSV (Nghi Son 25.8pp / −98.0% NPV / +21.9pp PD; Ford 22.0pp / "Not assessed" for TRISK); watermark 10/10; disclaimer 10/10; **0 residual `{{tokens}}`** (RISK-02-01 guard caught a literal in the template comment → fixed); prompt-CSV edit round-trip changes output on re-run.
 - Pre-flight fails non-zero if `engagement_priority.csv` or a sector's prompt row is missing.
+
+### PHASE-03 Result (2026-05-31)
+- `templates/disclosure/disclosure_sections.md` (editable TCFD four-pillar narrative; each pillar annotated with ISSB IFRS S2 cross-ref + Decision 263/QĐ-TTg link) and `scripts/generate_disclosure_pack.R` (`--top_n`, `--anonymize`).
+- Output `output/disclosure/disclosure_pack.html` (80.4 KB, well under 2 MB): exec summary (KPIs) + alignment vs PDP8/NDC/NZE (embedded `12_vn_alignment_overview.png` + `13_vn_coal_stranded_risk.png` + gap table) + top-10 counterparty table + TCFD pillars + methodology appendix (condensed PACTA/TRISK/Decision263 extracts).
+- Verified: 4/4 TCFD pillars; ISSB ×6; Decision 263 ×11; synthetic-data disclaimer in all 3 data-driven sections; named build keeps real names; **`--anonymize` → 0 real names** (Borrower A–J pseudonyms, longest-first whole-string replacement, RISK-03-01); no raw markdown leakage; print CSS with page-break rules. Default = named/internal board pack (Q-005).
