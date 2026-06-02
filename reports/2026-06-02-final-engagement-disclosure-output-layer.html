@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Final Report :: Engagement &amp; Disclosure Output Layer</title>
+  <meta name="color-scheme" content="dark light">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    async function initMermaid() {
+      const blocks = document.querySelectorAll('.mermaid');
+      if (!blocks.length) return;
+      mermaid.initialize({
+        startOnLoad: false, theme: 'base', securityLevel: 'loose',
+        themeVariables: {
+          primaryColor: '#f3ead9', primaryTextColor: '#1f1912', primaryBorderColor: '#9d6b37',
+          lineColor: '#3b6f76', secondaryColor: '#efe4d0', tertiaryColor: '#ffffff',
+          background: '#fbf7f1', mainBkg: '#fbf7f1', nodeBorder: '#9d6b37',
+          clusterBkg: '#f7efdf', clusterBorder: '#3b6f76', edgeLabelBackground: '#fbf7f1'
+        }
+      });
+      await mermaid.run({ nodes: blocks });
+    }
+    const run = () => initMermaid().catch((e) => console.error('Mermaid render failed', e));
+    if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', run, { once: true }); } else { run(); }
+  </script>
+  <style>
+    :root {
+      --paper:#fbf7f1; --paper-strong:#fffdf9; --ink:#1f1912; --ink-soft:#5f564c;
+      --line:#dccdb6; --line-strong:#bfa37d; --accent:#9d6b37; --accent-soft:#efe4d0; --accent-2:#3b6f76;
+      --shadow:0 18px 40px rgba(49,33,16,0.08); --radius-lg:24px; --radius-md:18px; --radius-sm:12px;
+      --page-width:1040px; --display-font:Georgia,"Times New Roman",serif;
+      --body-font:"Segoe UI","Helvetica Neue",Helvetica,Arial,sans-serif; --mono-font:"Cascadia Code",Consolas,monospace;
+    }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; overflow-x:hidden; color:var(--ink);
+      background: radial-gradient(circle at top left, rgba(157,107,55,0.09), transparent 26%),
+        radial-gradient(circle at 88% 10%, rgba(59,111,118,0.08), transparent 22%),
+        linear-gradient(180deg,#f7f1e7 0%,#fbf7f1 28%,#f6efe5 100%);
+      font-family:var(--body-font); line-height:1.65; letter-spacing:0.01em; }
+    a { color:var(--accent-2); }
+    code, pre, .technical, .meta-chip, .section-index, .eyebrow, .stat-label, .stat-value, .mermaid { font-family:var(--mono-font); }
+    .page-shell { width:min(var(--page-width), calc(100vw - 32px)); margin:0 auto; padding:28px 0 56px; }
+    .hero { padding:34px; border:1px solid rgba(159,123,79,0.28); border-radius:30px;
+      background: linear-gradient(135deg, rgba(157,107,55,0.1), transparent 34%),
+        linear-gradient(180deg, rgba(255,255,255,0.58), rgba(255,255,255,0.86)), var(--paper-strong);
+      box-shadow:var(--shadow); }
+    .hero-grid { display:grid; grid-template-columns:minmax(0,1.45fr) minmax(260px,0.85fr); gap:24px; align-items:end; }
+    .eyebrow { margin:0 0 12px; color:var(--accent); font-size:0.78rem; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; }
+    .title { margin:0; max-width:16ch; font-family:var(--display-font); font-size:clamp(2.4rem,4.6vw,4.2rem); line-height:0.96; letter-spacing:-0.04em; text-wrap:balance; }
+    .lede { margin:18px 0 0; max-width:60ch; color:var(--ink-soft); font-size:1rem; }
+    .takeaway { margin-top:22px; padding:18px 20px; border-left:4px solid var(--accent-2); border-radius:0 var(--radius-sm) var(--radius-sm) 0; background:rgba(59,111,118,0.08); color:#20373a; font-size:1.02rem; }
+    .meta-grid { display:grid; gap:12px; }
+    .meta-card, .section, .subcard, .empty-state { border:1px solid rgba(95,72,46,0.12); background:rgba(255,253,249,0.88); box-shadow:var(--shadow); }
+    .meta-card { padding:16px 18px; border-radius:var(--radius-md); }
+    .meta-label { color:var(--ink-soft); font-size:0.76rem; letter-spacing:0.14em; text-transform:uppercase; }
+    .meta-chip { margin-top:8px; color:var(--accent); font-size:1rem; font-weight:700; word-break:break-word; }
+    .section { margin-top:22px; padding:24px; border-radius:var(--radius-lg); break-inside:avoid; page-break-inside:avoid; }
+    .section-header { display:flex; justify-content:space-between; gap:12px 18px; align-items:end; margin-bottom:18px; padding-bottom:12px; border-bottom:1px solid var(--line); }
+    .section-index { color:var(--accent); font-size:0.78rem; font-weight:700; letter-spacing:0.16em; text-transform:uppercase; }
+    .section-title { margin:0; font-family:var(--display-font); font-size:clamp(1.45rem,2vw,2rem); line-height:1.05; }
+    .summary-grid, .dual-grid, .phase-grid, .stat-grid, .appendix-grid { display:grid; gap:16px; }
+    .summary-grid, .dual-grid, .phase-grid, .appendix-grid { grid-template-columns:repeat(2, minmax(0,1fr)); }
+    .subcard { padding:18px; border-radius:var(--radius-md); break-inside:avoid; page-break-inside:avoid; }
+    .subcard h3, .subcard h4 { margin:0 0 10px; font-size:1rem; line-height:1.2; }
+    .subcard h3 { color:var(--accent-2); }
+    .stat-grid { grid-template-columns:repeat(3, minmax(0,1fr)); margin-top:16px; }
+    .stat { padding:14px 16px; border:1px solid rgba(59,111,118,0.16); border-radius:var(--radius-sm); background:rgba(59,111,118,0.06); break-inside:avoid; page-break-inside:avoid; }
+    .stat-label { color:var(--ink-soft); font-size:0.72rem; letter-spacing:0.14em; text-transform:uppercase; }
+    .stat-value { margin-top:8px; color:var(--accent-2); font-size:1.18rem; font-weight:700; }
+    .narrative, .chart-frame, .technical-frame, .diagram-frame, .viz-frame { padding:18px; border:1px solid var(--line); border-radius:var(--radius-md); background:rgba(255,255,255,0.54); break-inside:avoid; page-break-inside:avoid; }
+    .diagram-frame { overflow:auto; max-height:min(70vh, 720px); }
+    .chart-frame, .viz-frame { overflow:hidden; }
+    .mermaid { width:100%; max-width:100%; min-width:0; color:var(--ink); }
+    .mermaid svg { display:block; width:auto !important; min-width:100%; max-width:none !important; height:auto !important; }
+    .chart-frame canvas, .viz-frame canvas, canvas.report-chart { display:block; width:100% !important; max-width:100%; height:320px !important; min-height:320px; max-height:320px; }
+    .technical-frame table { width:100%; border-collapse:collapse; font-size:0.95rem; }
+    .technical-frame th, .technical-frame td { padding:12px 10px; border-bottom:1px solid var(--line); vertical-align:top; text-align:left; }
+    .technical-frame th { color:var(--accent); font-size:0.76rem; letter-spacing:0.1em; text-transform:uppercase; }
+    ul, ol { margin:0; padding-left:20px; } li { margin-bottom:8px; }
+    p:last-child, li:last-child { margin-bottom:0; }
+    .footer-note { margin-top:18px; color:rgba(95,86,76,0.74); font-size:0.78rem; text-transform:uppercase; letter-spacing:0.08em; text-align:right; }
+    .tag { display:inline-block; padding:0.12rem 0.5rem; border-radius:999px; background:var(--accent-soft); color:var(--accent); font-size:0.72rem; font-weight:700; }
+    @media (max-width:920px) { .hero-grid, .summary-grid, .dual-grid, .phase-grid, .stat-grid, .appendix-grid { grid-template-columns:1fr; } .title { max-width:none; } }
+    @media (max-width:640px) { .page-shell { width:min(100vw - 20px, var(--page-width)); padding-top:16px; padding-bottom:36px; } .hero, .section { padding:18px; border-radius:20px; } .title { font-size:clamp(2.1rem,12vw,3.2rem); } }
+    @media print {
+      :root { --paper:#fff; --paper-strong:#fff; --ink:#111; --ink-soft:#444; --line:#d6d1c8; }
+      @page { size:A4; margin:14mm; }
+      body { background:#fff; }
+      .page-shell { width:100%; max-width:none; padding:0; }
+      .hero, .meta-card, .section, .subcard, .narrative, .chart-frame, .technical-frame, .diagram-frame, .viz-frame, .empty-state, .stat { background:#fff; box-shadow:none; }
+      .hero, .section { margin-top:0; margin-bottom:10mm; }
+      .diagram-frame { overflow:visible; max-height:none; }
+      a { color:inherit; text-decoration:none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero" id="title-hero">
+      <div class="hero-grid">
+        <div>
+          <p class="eyebrow">Final Report / Shareable Analysis Artifact</p>
+          <h1 class="title">Engagement &amp; Disclosure Output Layer</h1>
+          <p class="lede">
+            How a PACTA + TRISK climate-analytics demo for a Vietnamese bank was extended from
+            "interesting analysis" into the two artifacts a bank actually acts on: per-borrower
+            engagement letters and a board/regulator disclosure pack.
+          </p>
+          <div class="takeaway">
+            <strong>Bottom line:</strong> a five-phase build now turns the existing committed
+            PACTA + TRISK snapshot into client-ready letters and a TCFD/ISSB/Decision-263 disclosure
+            pack — every number computed once from data, never hardcoded, every artifact watermarked
+            synthetic and gated behind an operator flag. All five phases shipped, verified, and pushed.
+          </div>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-card"><div class="meta-label">Project</div><div class="meta-chip">PACTA + TRISK Vietnam Bank Demo</div></div>
+          <div class="meta-card"><div class="meta-label">Repository</div><div class="meta-chip">pacta-trisk</div></div>
+          <div class="meta-card"><div class="meta-label">Date</div><div class="meta-chip">2026-06-02</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 01 EXEC SUMMARY -->
+    <section class="section" id="executive-summary">
+      <div class="section-header"><div><div class="section-index">01 / Executive Summary</div><h2 class="section-title">Executive Summary</h2></div></div>
+      <div class="summary-grid">
+        <div class="subcard">
+          <h3>What was built</h3>
+          <p>A new "output layer" that converts analytical results into deliverables a relationship manager and a board can use:</p>
+          <ul>
+            <li><strong>A scoring backbone</strong> ranking 23 financed counterparties by a composite transition-risk priority.</li>
+            <li><strong>10 engagement letters</strong> — one per top borrower, English-primary with Vietnamese key terms.</li>
+            <li><strong>A disclosure pack</strong> — TCFD four pillars, ISSB IFRS S2 cross-references, Decision 263 mapping.</li>
+            <li><strong>An operator-only dashboard page</strong> to generate, preview, and download them on demand.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Why it matters</h3>
+          <p>The pipeline previously ended at analytics. This layer answers the two questions a bank actually has — <em>"what do I do Monday morning?"</em> (engagement letters) and <em>"what do I file with SBV?"</em> (disclosure pack) — turning a one-off demo into a recurring deliverable.</p>
+          <div class="stat-grid">
+            <div class="stat"><div class="stat-label">Borrowers scored</div><div class="stat-value">23</div></div>
+            <div class="stat"><div class="stat-label">Letters</div><div class="stat-value">10</div></div>
+            <div class="stat"><div class="stat-label">Phases shipped</div><div class="stat-value">5 / 5</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 BACKGROUND -->
+    <section class="section" id="background-objective">
+      <div class="section-header"><div><div class="section-index">02 / Background &amp; Objective</div><h2 class="section-title">Background &amp; Objective</h2></div></div>
+      <div class="narrative">
+        <p>The <code>pacta-trisk</code> repository is a synthetic demonstration of climate analytics for a fictional "Mekong Commercial Bank (MCB)" in Vietnam. Two methods sit at its core: <strong>PACTA</strong> measures whether a bank's financed production (power capacity, vehicle mix, cement/steel intensity) is aligned with Paris-consistent pathways such as Vietnam's Power Development Plan VIII (PDP8); <strong>TRISK</strong> stress-tests each borrower by re-pricing its assets and probability of default under a late-and-sudden policy shock.</p>
+        <p>Those analytics already existed in the repo as committed result files and a public Streamlit dashboard. What was missing — flagged as "Idea 3" in the commercial-demo triage — was the <strong>last mile</strong>: the layer that takes the analytics and produces something a banker hands to a borrower or files with the regulator. The objective of this multi-phase effort was to build exactly that, with a strict rule that it only <em>synthesises existing outputs</em> and runs no new model.</p>
+      </div>
+    </section>
+
+    <!-- 03 INPUTS & SCOPE -->
+    <section class="section" id="inputs-scope">
+      <div class="section-header"><div><div class="section-index">03 / Inputs &amp; Scope</div><h2 class="section-title">Inputs &amp; Scope</h2></div></div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Inputs used (all pre-existing)</h3>
+          <ul>
+            <li>TRISK borrower results for power, cement, steel (<code>top_borrowers_alignment_trisk.csv</code>) — already carry the alignment gap, NPV/PD change, and a 0–100 stress-priority score.</li>
+            <li>PACTA company alignment (<code>04_vn_ms_company.csv</code>) for automotive — no TRISK pilot for that sector.</li>
+            <li>The matched, prioritised loanbook for VND exposure per borrower.</li>
+            <li>Alignment-overview and coal stranded-risk charts; PACTA, TRISK, and Decision 263 documentation for the appendix.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Scope boundary</h3>
+          <p><span class="tag">In</span> Composite scoring; letter + disclosure generators with editable templates; an operator-gated dashboard page; documentation; verification.</p>
+          <p><span class="tag">Out</span> New PACTA/TRISK model runs; real bank-data ingestion; full Vietnamese translation of methodology prose; native DOCX/PDF rendering; exposing the operator page on the public deployment.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 04 ASSUMPTIONS -->
+    <section class="section" id="assumptions-constraints">
+      <div class="section-header"><div><div class="section-index">04 / Assumptions &amp; Constraints</div><h2 class="section-title">Assumptions &amp; Constraints</h2></div></div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Key decisions (from the six "Grill Me" questions)</h3>
+          <ul>
+            <li><strong>Format:</strong> self-contained HTML + browser print-to-PDF only (no new dependencies).</li>
+            <li><strong>Language:</strong> English-primary with Vietnamese key terms inline (not full side-by-side bilingual).</li>
+            <li><strong>Disclosure framing:</strong> TCFD pillars + ISSB IFRS S2 + Decision 263 note.</li>
+            <li><strong>Weighting:</strong> fixed 50/50 alignment vs TRISK — no operator slider.</li>
+            <li><strong>Anonymisation:</strong> off by default (named board pack); operator toggle to anonymise.</li>
+            <li><strong>Recipients:</strong> top-N borrowers, N=10, adjustable.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Constraints &amp; caveats</h3>
+          <ul>
+            <li>Everything runs on <strong>synthetic data</strong>; every artifact carries a synthetic-data watermark and a "requires human and legal review" disclaimer.</li>
+            <li>Generated letters and packs are <strong>never committed to git</strong> (privacy posture); only the aggregate scoring table is tracked.</li>
+            <li>Cross-sector gap magnitudes are not strictly comparable (market-share percentage-points vs SDA emission-intensity percent) — the composite is a demo prioritisation aid, not a calibrated risk number.</li>
+            <li>Automotive borrowers lack a TRISK score and are scored on alignment only, flagged as partial rather than dropped.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 METHODOLOGY -->
+    <section class="section" id="methodology">
+      <div class="section-header"><div><div class="section-index">05 / Methodology</div><h2 class="section-title">Methodology</h2></div></div>
+      <div class="narrative">
+        <p>The work followed the five planned phases, each ending with verification, a phase report, and a pushed commit. The design discipline throughout was <strong>"compute once, render everywhere"</strong>: a single scoring table is the only source of borrower numbers, and both generators render figures from it rather than hardcoding anything.</p>
+        <p>The composite engagement score normalises each borrower's alignment gap and TRISK stress-priority to a 0–1 range and blends them 50/50, re-normalising to whichever components are available so a borrower in a sector without a TRISK pilot is neither dropped nor unfairly buried. Letters use safe token substitution with a guard that aborts the run if any placeholder is left unfilled; the disclosure pack converts an editable markdown narrative to HTML and can anonymise every borrower name in a single verified pass. The dashboard page reuses the repository's proven operator-gating pattern so the generators never reach the public site.</p>
+      </div>
+      <div class="stat-grid">
+        <div class="stat"><div class="stat-label">Orientation</div><div class="stat-value">5-phase build</div></div>
+        <div class="stat"><div class="stat-label">Evidence rule</div><div class="stat-value">figures from data</div></div>
+        <div class="stat"><div class="stat-label">Dashboard tests</div><div class="stat-value">48 passing</div></div>
+      </div>
+    </section>
+
+    <!-- 06 PHASE ANALYSIS -->
+    <section class="section" id="phase-analysis">
+      <div class="section-header"><div><div class="section-index">06 / Phase-by-Phase Analysis</div><h2 class="section-title">Phase-by-Phase Analysis</h2></div></div>
+      <div class="phase-grid">
+        <div class="subcard">
+          <h3>P1 · Scoring backbone</h3>
+          <p>Built <code>engagement_scoring.R</code> → a 23-borrower priority table (13 power, 6 automotive-partial, 2 cement, 2 steel), sorted by composite score. The coal-heavy power names lead. Every borrower matched a loanbook exposure row.</p>
+        </div>
+        <div class="subcard">
+          <h3>P2 · Engagement letters</h3>
+          <p>An editable HTML template + per-sector prompt CSV drive 10 one-page letters. A residual-token guard caught a stray placeholder on the first run (working as designed) and the figures were spot-checked against the data row.</p>
+        </div>
+        <div class="subcard">
+          <h3>P3 · Disclosure pack</h3>
+          <p>One self-contained HTML pack (84 KB): exec summary, alignment vs PDP8/NDC/NZE with embedded charts, top-counterparty table, TCFD pillars with ISSB + Decision 263 notes, and a methodology appendix. An <code>--anonymize</code> mode removes every real name.</p>
+        </div>
+        <div class="subcard">
+          <h3>P4 · Operator page</h3>
+          <p>A dashboard page gated behind an environment flag <em>and</em> a confirmation checkbox runs both generators as subprocesses, surfaces errors, and offers downloads + an inline preview. Ten new tests; full suite green.</p>
+        </div>
+        <div class="subcard">
+          <h3>P5 · Verification &amp; packaging</h3>
+          <p>Locked generated artifacts out of git, proved the whole chain runs clean from an empty output directory, and wrote operator + bank documentation so a newcomer can run the layer without this conversation.</p>
+        </div>
+        <div class="subcard" style="background:rgba(59,111,118,0.06);">
+          <h3>The through-line</h3>
+          <p>Each phase fed the next from one table: scoring → letters and disclosure → operator surface → packaging. No phase re-derived numbers; they all read the same priority CSV, which is why the artifacts are internally consistent.</p>
+        </div>
+      </div>
+      <div class="diagram-frame" style="margin-top:16px;">
+        <div class="mermaid">
+flowchart LR
+  SNAP[(committed PACTA + TRISK snapshot)] --> P1[P1 scoring backbone\nengagement_priority.csv]
+  P1 --> P2[P2 engagement letters]
+  P1 --> P3[P3 disclosure pack]
+  P2 --> P4[P4 operator-gated page]
+  P3 --> P4
+  P4 --> P5[P5 verify · docs · gitignore]
+        </div>
+      </div>
+    </section>
+
+    <!-- 07 FINDINGS -->
+    <section class="section" id="findings-recommendation">
+      <div class="section-header"><div><div class="section-index">07 / Findings &amp; Recommendation</div><h2 class="section-title">Findings &amp; Recommendation</h2></div></div>
+      <div class="narrative">
+        <p>The layer works end to end and is internally consistent. The composite ranking puts <strong>coal-heavy power borrowers at the top</strong> — Nghi Son Power, Vinacomin Power, and International Power Mong Duong all score at or near 1.0 — which is the intuitively correct transition-risk priority for a Vietnamese power book. Automotive names (Ford, Hyundai, THACO) rank next on alignment alone, flagged as partial because the TRISK pilot does not yet cover that sector. The chart below shows the top-10 by composite score; cyan bars are TRISK-covered borrowers, gold bars are alignment-only (partial).</p>
+        <p><strong>Recommendation:</strong> use this as the standing template for productionising the demo. The editable template + prompt CSV mean the bank can re-voice every deliverable without touching code; the operator gate and synthetic watermarks keep it safe to demo publicly while real generation stays private. The clear next investments are TRISK coverage for automotive (to remove the partial flag) and a domain/legal review of the disclosure wording before any real filing.</p>
+      </div>
+      <div class="viz-frame" style="margin-top:16px;">
+        <canvas id="compositeChart"></canvas>
+      </div>
+    </section>
+
+    <!-- 08 IMPLEMENTATION PATH -->
+    <section class="section" id="implementation-path">
+      <div class="section-header"><div><div class="section-index">08 / Implementation Path</div><h2 class="section-title">Implementation Path</h2></div></div>
+      <div class="phase-grid">
+        <div class="subcard">
+          <h3>Run it (command line)</h3>
+          <p>From the repo root, in order:</p>
+          <ol>
+            <li><code>Rscript scripts/engagement_scoring.R</code></li>
+            <li><code>Rscript scripts/generate_engagement_letters.R --top_n 10</code></li>
+            <li><code>Rscript scripts/generate_disclosure_pack.R</code> (add <code>--anonymize</code> to share externally)</li>
+          </ol>
+          <p>Open any output in a browser; print-to-PDF for a hand-off copy.</p>
+        </div>
+        <div class="subcard">
+          <h3>Run it (dashboard, operator-only)</h3>
+          <p>Set <code>OUTPUTS_LAYER=1</code> (and <code>R_RSCRIPT</code> if needed), start the dashboard, open <strong>Engagement &amp; Disclosure Outputs</strong>, tick the confirmation box, choose top-N / anonymise, and generate. Without the flag the page stays hidden.</p>
+        </div>
+        <div class="subcard">
+          <h3>Re-brand without code</h3>
+          <p>Edit <code>templates/engagement/letter_template.html</code> (layout), <code>engagement_prompt_templates.csv</code> (per-sector wording), or <code>templates/disclosure/disclosure_sections.md</code> (TCFD narrative). Re-run the relevant script — figures are always re-pulled from data.</p>
+        </div>
+        <div class="subcard">
+          <h3>Suggested next steps</h3>
+          <ul>
+            <li>Extend the TRISK pilot to automotive to remove the partial-coverage flag.</li>
+            <li>Domain + legal review of the disclosure wording before any external use.</li>
+            <li>Optional: native DOCX/PDF rendering; fuller Vietnamese translation.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 09 RISKS -->
+    <section class="section" id="risks-open-questions">
+      <div class="section-header"><div><div class="section-index">09 / Risks / Open Questions</div><h2 class="section-title">Risks / Open Questions</h2></div></div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Risks &amp; mitigations</h3>
+          <ul>
+            <li><strong>Wrong figures in a client letter</strong> → every number renders from the data row; an automated guard aborts on any unfilled placeholder.</li>
+            <li><strong>Operator surface leaking to the public site</strong> → env-flag gate (reused from the proven intake page) + confirmation checkbox.</li>
+            <li><strong>A real name leaking from an "anonymised" pack</strong> → single name-list replacement across the whole document, verified by search (zero real names remain).</li>
+            <li><strong>Accidental commit of a generated artifact</strong> → ignore rules added before any generation run.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Open questions</h3>
+          <ul>
+            <li>Should exposure size become a third factor in the composite (currently alignment + TRISK only)?</li>
+            <li>When should automotive get a TRISK pilot so it is no longer partial?</li>
+            <li>Is browser print-to-PDF sufficient long-term, or is native DOCX worth the added dependency?</li>
+            <li>How much of the disclosure prose should be fully translated to Vietnamese for a real filing?</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 APPENDICES -->
+    <section class="section" id="appendices-evidence">
+      <div class="section-header"><div><div class="section-index">10 / Appendices / Evidence Notes</div><h2 class="section-title">Appendices / Evidence Notes</h2></div></div>
+      <div class="appendix-grid">
+        <div class="subcard technical-frame">
+          <h3>Verification evidence</h3>
+          <table>
+            <thead><tr><th>Check</th><th>Result</th></tr></thead>
+            <tbody>
+              <tr><td>Full chain from clean slate</td><td>3/3 scripts exit 0</td></tr>
+              <tr><td>Letter figures vs CSV</td><td>match (power + steel spot-checks)</td></tr>
+              <tr><td>Watermark / disclaimer</td><td>10 / 10 letters</td></tr>
+              <tr><td>Residual tokens in letters</td><td>0</td></tr>
+              <tr><td>Disclosure TCFD pillars</td><td>4 / 4 present</td></tr>
+              <tr><td>Anonymise → real names</td><td>0</td></tr>
+              <tr><td>Dashboard test suite</td><td>48 passing</td></tr>
+              <tr><td>Generated artifacts in git</td><td>none (ignored)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="subcard">
+          <h3>Glossary &amp; commits</h3>
+          <p><strong>PACTA</strong> — alignment of financed production with Paris pathways. <strong>TRISK</strong> — transition-risk stress test (NPV + PD under a policy shock). <strong>SDA</strong> — Sectoral Decarbonisation Approach (emission-intensity benchmark for cement/steel). <strong>TCFD / ISSB IFRS S2</strong> — climate-disclosure frameworks. <strong>Decision 263</strong> — Vietnam's GHG / green-growth obligation.</p>
+          <p>One commit per phase, all pushed to <code>main</code>: P1 <code>0e41b89</code>, P2 <code>cfc75d1</code>, P3 <code>cee02f8</code>, P4 <code>5773ecd</code>, P5 <code>37efedb</code>.</p>
+          <p>Per-phase reports and the source plan live under <code>reports/</code> and <code>plans/</code>; operator documentation is in <code>docs/outputs_layer.md</code>.</p>
+        </div>
+      </div>
+      <div class="footer-note">synthetic demonstration · illustrative only · requires human and legal review before any external use</div>
+    </section>
+  </main>
+  <script>
+    (function() {
+      document.querySelectorAll('canvas').forEach((canvas) => {
+        canvas.classList.add('report-chart');
+        const parent = canvas.parentElement;
+        if (parent && parent.classList.contains('technical-frame') && !parent.classList.contains('chart-frame')) parent.classList.add('chart-frame');
+      });
+      if (window.Chart) {
+        Chart.defaults.devicePixelRatio = 1;
+        Chart.defaults.animation = false;
+        Chart.defaults.resizeDelay = 150;
+        Chart.defaults.normalized = true;
+        Chart.defaults.maintainAspectRatio = false;
+        Chart.defaults.responsive = true;
+
+        const labels = [
+          "Nghi Son Power", "Vinacomin Power", "Intl Power Mong Duong",
+          "Ford Motor", "Hyundai Motor", "THACO Industries",
+          "Honda Motor", "Hoa Phat (steel)", "Toyota Motor", "EVN"
+        ];
+        const scores = [1.000, 0.998, 0.996, 0.850, 0.850, 0.850, 0.775, 0.613, 0.592, 0.531];
+        const partial = [false, false, false, true, true, true, true, false, true, false];
+        new Chart(document.getElementById("compositeChart"), {
+          type: "bar",
+          data: {
+            labels: labels,
+            datasets: [{
+              label: "Composite score",
+              data: scores,
+              backgroundColor: partial.map(p => p ? "rgba(157,107,55,0.55)" : "rgba(59,111,118,0.55)"),
+              borderColor: partial.map(p => p ? "#9d6b37" : "#3b6f76"),
+              borderWidth: 1.5
+            }]
+          },
+          options: {
+            animation: false, resizeDelay: 150, normalized: true, maintainAspectRatio: false,
+            indexAxis: "y",
+            scales: {
+              x: { min: 0, max: 1, ticks: { color: "#5f564c" }, grid: { color: "rgba(95,72,46,0.12)" } },
+              y: { ticks: { color: "#1f1912", font: { size: 11 } }, grid: { display: false } }
+            },
+            plugins: {
+              legend: { display: false },
+              title: { display: true, text: "Top 10 borrowers by composite engagement score (teal = TRISK-covered, gold = alignment-only / partial)", color: "#1f1912", font: { size: 12 } },
+              tooltip: { callbacks: { afterLabel: (ctx) => partial[ctx.dataIndex] ? "PACTA-only (partial)" : "TRISK-covered" } }
+            }
+          }
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
