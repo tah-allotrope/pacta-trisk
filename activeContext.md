@@ -744,7 +744,7 @@ When filtering data to a subset of metrics but providing `scale_*_manual()` mapp
 - [x] PHASE-03 — `scripts/generate_disclosure_pack.R` + `templates/disclosure/` (+ phase report, commit, push) ✅ 2026-05-31
 - [x] PHASE-04 — `dashboard/pages/7_Outputs.py` + `dashboard/lib/outputs.py` (no weight slider) (+ phase report, commit, push) ✅ 2026-06-02
 - [x] PHASE-05 — `.gitignore`, `docs/outputs_layer.md`, full-chain verification (+ phase report, commit, push) ✅ 2026-06-02
-- [ ] FINAL — `/report final` synthesis once all phases complete
+- [x] FINAL — `/report final` synthesis once all phases complete ✅ 2026-06-02 → `reports/2026-06-02-final-engagement-disclosure-output-layer.html` (commit `58f6408`)
 
 ### PHASE-01 Result (2026-05-31)
 - `scripts/engagement_scoring.R` runs clean (exit 0), writes `output/engagement/engagement_priority.csv` (23 borrowers: 13 power, 6 automotive-partial, 2 cement, 2 steel), sorted desc by `composite_score`.
