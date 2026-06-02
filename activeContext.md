@@ -742,7 +742,7 @@ When filtering data to a subset of metrics but providing `scale_*_manual()` mapp
 - [x] PHASE-01 — `scripts/engagement_scoring.R` → `output/engagement/engagement_priority.csv` (+ phase report, commit, push) ✅ 2026-05-31
 - [x] PHASE-02 — `scripts/generate_engagement_letters.R` + `templates/engagement/` (+ phase report, commit, push) ✅ 2026-05-31
 - [x] PHASE-03 — `scripts/generate_disclosure_pack.R` + `templates/disclosure/` (+ phase report, commit, push) ✅ 2026-05-31
-- [ ] PHASE-04 — `dashboard/pages/7_Outputs.py` + `dashboard/lib/outputs.py` (no weight slider) (+ phase report, commit, push)
+- [x] PHASE-04 — `dashboard/pages/7_Outputs.py` + `dashboard/lib/outputs.py` (no weight slider) (+ phase report, commit, push) ✅ 2026-06-02
 - [ ] PHASE-05 — `.gitignore`, `docs/outputs_layer.md`, full-chain verification (+ phase report, commit, push)
 - [ ] FINAL — `/report final` synthesis once all phases complete
 
@@ -762,3 +762,9 @@ When filtering data to a subset of metrics but providing `scale_*_manual()` mapp
 - `templates/disclosure/disclosure_sections.md` (editable TCFD four-pillar narrative; each pillar annotated with ISSB IFRS S2 cross-ref + Decision 263/QĐ-TTg link) and `scripts/generate_disclosure_pack.R` (`--top_n`, `--anonymize`).
 - Output `output/disclosure/disclosure_pack.html` (80.4 KB, well under 2 MB): exec summary (KPIs) + alignment vs PDP8/NDC/NZE (embedded `12_vn_alignment_overview.png` + `13_vn_coal_stranded_risk.png` + gap table) + top-10 counterparty table + TCFD pillars + methodology appendix (condensed PACTA/TRISK/Decision263 extracts).
 - Verified: 4/4 TCFD pillars; ISSB ×6; Decision 263 ×11; synthetic-data disclaimer in all 3 data-driven sections; named build keeps real names; **`--anonymize` → 0 real names** (Borrower A–J pseudonyms, longest-first whole-string replacement, RISK-03-01); no raw markdown leakage; print CSS with page-break rules. Default = named/internal board pack (Q-005).
+
+### PHASE-04 Result (2026-06-02)
+- `dashboard/lib/outputs.py` mirrors `intake.py`: `ENV_FLAG="OUTPUTS_LAYER"`, `is_outputs_enabled()`, and `_run_r()` (Rscript resolved via `R_RSCRIPT`; runs generators with `cwd=REPO_ROOT`; surfaces stderr on non-zero — RISK-04-01). Wrappers `generate_engagement_letters(top_n)` and `generate_disclosure_pack(top_n, anonymize)` call `ensure_scoring()` first.
+- `dashboard/pages/7_Outputs.py`: gates on the flag (else `st.info`+`st.stop`); operator banner + synthetic pill; **mandatory confirmation checkbox** disables both generate buttons until ticked; controls = `top_n` number input + `anonymize` checkbox (**no weight slider**, Q-004); download buttons per letter + disclosure pack with inline preview; `footer_note()`.
+- Tests `dashboard/tests/test_outputs.py` (10): flag gating, script presence, disabled-state guards, page-disabled-without-flag (info shown, 0 buttons), page-enabled (2 buttons both disabled pre-confirm). Full suite **48 passed** (one transient TRISK timeout flake on a loaded run, passes in isolation/in-group/on re-run).
+- End-to-end subprocess verified: lib generated 3 letters + an anonymized pack (0 real-name leak) with `OUTPUTS_LAYER=1`.
