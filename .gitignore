@@ -1,1 +1,10 @@
 nul
+
+# Engagement & Disclosure Output Layer — generated client-facing artifacts.
+# Privacy posture (CON-003): never commit generated letters/disclosure packs.
+# The scoring backbone (output/engagement/engagement_priority.csv) IS tracked;
+# only the per-borrower letters and the disclosure pack are ignored.
+output/engagement_letters/*
+!output/engagement_letters/.gitkeep
+output/disclosure/*
+!output/disclosure/.gitkeep

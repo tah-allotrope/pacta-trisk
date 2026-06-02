@@ -743,7 +743,7 @@ When filtering data to a subset of metrics but providing `scale_*_manual()` mapp
 - [x] PHASE-02 — `scripts/generate_engagement_letters.R` + `templates/engagement/` (+ phase report, commit, push) ✅ 2026-05-31
 - [x] PHASE-03 — `scripts/generate_disclosure_pack.R` + `templates/disclosure/` (+ phase report, commit, push) ✅ 2026-05-31
 - [x] PHASE-04 — `dashboard/pages/7_Outputs.py` + `dashboard/lib/outputs.py` (no weight slider) (+ phase report, commit, push) ✅ 2026-06-02
-- [ ] PHASE-05 — `.gitignore`, `docs/outputs_layer.md`, full-chain verification (+ phase report, commit, push)
+- [x] PHASE-05 — `.gitignore`, `docs/outputs_layer.md`, full-chain verification (+ phase report, commit, push) ✅ 2026-06-02
 - [ ] FINAL — `/report final` synthesis once all phases complete
 
 ### PHASE-01 Result (2026-05-31)
@@ -768,3 +768,11 @@ When filtering data to a subset of metrics but providing `scale_*_manual()` mapp
 - `dashboard/pages/7_Outputs.py`: gates on the flag (else `st.info`+`st.stop`); operator banner + synthetic pill; **mandatory confirmation checkbox** disables both generate buttons until ticked; controls = `top_n` number input + `anonymize` checkbox (**no weight slider**, Q-004); download buttons per letter + disclosure pack with inline preview; `footer_note()`.
 - Tests `dashboard/tests/test_outputs.py` (10): flag gating, script presence, disabled-state guards, page-disabled-without-flag (info shown, 0 buttons), page-enabled (2 buttons both disabled pre-confirm). Full suite **48 passed** (one transient TRISK timeout flake on a loaded run, passes in isolation/in-group/on re-run).
 - End-to-end subprocess verified: lib generated 3 letters + an anonymized pack (0 real-name leak) with `OUTPUTS_LAYER=1`.
+
+### PHASE-05 Result (2026-06-02)
+- `.gitignore`: ignores `output/engagement_letters/*` and `output/disclosure/*` (with `.gitkeep` kept); scoring CSV `output/engagement/engagement_priority.csv` stays tracked. `git check-ignore` confirms generated `letter.html`/`disclosure_pack.html` are ignored.
+- **Full chain from a clean slate** (wiped artifacts + priority CSV, then ran all 3 scripts): all exit 0; regenerated priority CSV + 10 letters + index + manifest + disclosure pack.
+- `docs/outputs_layer.md`: operator + bank-facing guide (CLI + dashboard run, env flags, privacy posture, no-code template editing, tokens, coverage caveats, verification commands).
+- Re-verified on clean artifacts: letters watermark 10/10, disclaimer 10/10, 0 residual tokens; Hoa Phat steel figures match CSV (7.2% SDA / −55.3% NPV / +11.7pp PD / 900,000 VND); disclosure 4/4 pillars, 84 KB; `--anonymize` → 0 real names.
+
+**STATUS: ALL 5 PHASES COMPLETE.** Plan `plans/2026-05-28-engagement-disclosure-output-layer-plan.md` marked `completed`. Commits: PHASE-01 `0e41b89`, PHASE-02 `cfc75d1`, PHASE-03 `cee02f8`, PHASE-04 `5773ecd`, PHASE-05 (pending), all pushed to `origin/main`.
