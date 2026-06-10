@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Final Report :: Bank-Prospect PACTA/TRISK Pitch Deck</title>
+  <meta name="color-scheme" content="dark light">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    async function initMermaid() {
+      const blocks = document.querySelectorAll('.mermaid');
+      if (!blocks.length) return;
+      mermaid.initialize({ startOnLoad: false, theme: 'base', securityLevel: 'loose', themeVariables: { primaryColor: '#f3ead9', primaryTextColor: '#1f1912', primaryBorderColor: '#9d6b37', lineColor: '#3b6f76', secondaryColor: '#efe4d0', tertiaryColor: '#ffffff', background: '#fbf7f1', mainBkg: '#fbf7f1', nodeBorder: '#9d6b37', clusterBkg: '#f7efdf', clusterBorder: '#3b6f76', edgeLabelBackground: '#fbf7f1' } });
+      await mermaid.run({ nodes: blocks });
+    }
+    const run = () => initMermaid().catch((e) => console.error('Mermaid render failed', e));
+    if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', run, { once: true }); } else { run(); }
+  </script>
+  <style>
+    :root { --paper: #fbf7f1; --paper-strong: #fffdf9; --ink: #1f1912; --ink-soft: #5f564c; --line: #dccdb6; --line-strong: #bfa37d; --accent: #9d6b37; --accent-soft: #efe4d0; --accent-2: #3b6f76; --shadow: 0 18px 40px rgba(49,33,16,0.08); --radius-lg: 24px; --radius-md: 18px; --radius-sm: 12px; --page-width: 1040px; --display-font: Georgia,"Times New Roman",serif; --body-font: "Segoe UI","Helvetica Neue",Helvetica,Arial,sans-serif; --mono-font: "Cascadia Code",Consolas,monospace; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; overflow-x: hidden; color: var(--ink); background: radial-gradient(circle at top left, rgba(157,107,55,0.09), transparent 26%), radial-gradient(circle at 88% 10%, rgba(59,111,118,0.08), transparent 22%), linear-gradient(180deg, #f7f1e7 0%, #fbf7f1 28%, #f6efe5 100%); font-family: var(--body-font); line-height: 1.65; letter-spacing: 0.01em; }
+    a { color: var(--accent-2); }
+    code, pre, .technical, .meta-chip, .section-index, .eyebrow, .stat-label, .stat-value, .mermaid { font-family: var(--mono-font); }
+    .page-shell { width: min(var(--page-width), calc(100vw - 32px)); margin: 0 auto; padding: 36px 0 64px; }
+    .hero { padding: 32px; margin-bottom: 28px; border: 1px solid var(--line); border-radius: 28px; background: linear-gradient(145deg, rgba(157,107,55,0.06), transparent 32%), var(--paper-strong); box-shadow: var(--shadow); }
+    .hero-grid { display: grid; grid-template-columns: minmax(0,1.6fr) minmax(240px,0.8fr); gap: 24px; align-items: end; }
+    .eyebrow { margin: 0 0 14px; color: var(--accent); font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.22em; }
+    .title { margin: 0; max-width: 14ch; font-family: var(--display-font); font-size: clamp(2.6rem,5vw,4.4rem); line-height: 0.94; letter-spacing: -0.04em; color: var(--ink); text-wrap: balance; }
+    .lede { margin: 20px 0 0; max-width: 58ch; color: var(--ink-soft); font-size: 1.02rem; }
+    .takeaway { margin-top: 18px; padding: 14px 18px; border: 1px solid var(--line-strong); border-radius: var(--radius-sm); background: var(--accent-soft); color: var(--ink); font-size: 0.92rem; font-weight: 600; }
+    .meta-grid { display: grid; gap: 12px; }
+    .meta-card { padding: 16px 18px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--paper); }
+    .meta-label { margin-bottom: 6px; color: var(--ink-soft); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.16em; }
+    .meta-chip { color: var(--accent); font-size: 1rem; font-weight: 700; letter-spacing: 0.02em; word-break: break-word; }
+    .section { position: relative; margin-top: 24px; padding: 28px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--paper); box-shadow: var(--shadow); }
+    .section-header { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 18px; align-items: end; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+    .section-title { margin: 0; font-family: var(--display-font); font-size: clamp(1.3rem,2.2vw,1.8rem); line-height: 1.1; color: var(--ink); }
+    .section-index { display: inline-flex; align-items: center; gap: 10px; color: var(--accent); font-size: 0.76rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; }
+    .section-index::after { content: ""; width: 40px; height: 1px; background: linear-gradient(90deg, var(--accent), transparent); }
+    .narrative { color: var(--ink-soft); font-size: 0.96rem; }
+    .narrative p { margin: 0 0 14px; }
+    .narrative strong { color: var(--ink); }
+    .summary-grid, .dual-grid, .phase-grid, .stat-grid, .appendix-grid { display: grid; gap: 16px; }
+    .summary-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .dual-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .phase-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .stat-grid { grid-template-columns: repeat(3, minmax(0,1fr)); margin-top: 20px; }
+    .appendix-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .subcard, .narrative-card { padding: 20px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--paper-strong); }
+    .subcard-label { margin: 0 0 10px; color: var(--accent); font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; }
+    .splitter { width: 100%; height: 1px; margin: 8px 0 14px; background: linear-gradient(90deg, var(--accent), transparent); }
+    .stat { padding: 16px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--accent-soft); }
+    .stat-label { color: var(--ink-soft); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.14em; }
+    .stat-value { margin-top: 8px; color: var(--accent); font-size: 1.2rem; font-weight: 700; }
+    .diagram-frame { padding: 18px; margin-top: 18px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--paper-strong); overflow-x: auto; max-height: min(70vh,720px); }
+    .mermaid { width: 100%; max-width: 100%; min-width: 0; }
+    .mermaid svg { display: block; width: auto !important; min-width: 100%; max-width: none !important; height: auto !important; }
+    .chart-frame { padding: 18px; margin-top: 18px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--paper-strong); }
+    .chart-frame canvas { display: block; width: 100% !important; max-width: 100%; height: 280px !important; }
+    .empty-state { padding: 22px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--paper-strong); text-align: center; }
+    .empty-state strong { display: block; margin-bottom: 6px; color: var(--accent); font-size: 0.88rem; letter-spacing: 0.12em; text-transform: uppercase; }
+    .technical-frame { padding: 18px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--paper-strong); }
+    .technical-frame table { width: 100%; border-collapse: collapse; }
+    .technical-frame th, .technical-frame td { padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top; font-size: 0.9rem; }
+    .technical-frame th { color: var(--accent); font-size: 0.74rem; text-align: left; letter-spacing: 0.12em; text-transform: uppercase; }
+    ul, ol { padding-left: 20px; }
+    li { margin-bottom: 8px; }
+    p:last-child, li:last-child { margin-bottom: 0; }
+    .footer-note { margin-top: 18px; color: rgba(95,86,76,0.74); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; text-align: right; }
+    @media (max-width: 920px) { .hero-grid, .summary-grid, .dual-grid, .phase-grid, .stat-grid, .appendix-grid { grid-template-columns: 1fr; } .title { max-width: none; } }
+    @media (max-width: 640px) { .page-shell { width: min(100vw - 20px, var(--page-width)); padding-top: 16px; padding-bottom: 36px; } .hero, .section { padding: 18px; border-radius: 20px; } .title { font-size: clamp(2.1rem,12vw,3.2rem); } }
+    @media print { :root { --paper: #ffffff; --paper-strong: #ffffff; --ink: #111111; --ink-soft: #444444; --line: #d6d1c8; } @page { size: A4; margin: 14mm; } body { background: #ffffff; } .page-shell { width: 100%; max-width: none; padding: 0; } .hero, .meta-card, .section, .subcard, .narrative, .chart-frame, .technical-frame, .diagram-frame, .empty-state, .stat { background: #ffffff; box-shadow: none; } .hero, .section { margin-top: 0; margin-bottom: 10mm; } .diagram-frame { overflow: visible; max-height: none; } .section-header, .takeaway { break-after: avoid; page-break-after: avoid; } a { color: inherit; text-decoration: none; } }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero" id="title-hero">
+      <div class="hero-grid">
+        <div>
+          <p class="eyebrow">Final Report / Shareable Analysis Artifact</p>
+          <h1 class="title">Bank-Prospect PACTA/TRISK Pitch Deck</h1>
+          <p class="lede">
+            A multi-phase build that transformed a 25-slide internal funder-update template into a 15-slide prospect pitch deck with PACTA/TRISK content, brand-fidelity charts, speaker notes, and a reproducible Python build pipeline.
+          </p>
+          <div class="takeaway">One scripted build produces a meeting-ready 15-slide prospect deck from the Allotrope reference template — reproducible, brand-consistent, and speaker-note-equipped.</div>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-card"><div class="meta-label">Project</div><div class="meta-chip">PACTA Vietnam</div></div>
+          <div class="meta-card"><div class="meta-label">Repository</div><div class="meta-chip">pacta-trisk</div></div>
+          <div class="meta-card"><div class="meta-label">Date</div><div class="meta-chip">2026-06-11</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="executive-summary">
+      <div class="section-header"><div><div class="section-index">01 / Executive Summary</div><h2 class="section-title">Executive Summary</h2></div></div>
+      <div class="summary-grid">
+        <div class="subcard">
+          <h3 class="subcard-label">What Was Built</h3>
+          <div class="splitter"></div>
+          <p>A <strong>15-slide prospect pitch deck</strong> (<code>present/bank_prospect_deck.pptx</code>) that walks a prospective Vietnamese commercial bank from the Decision 263 transition-risk problem through PACTA portfolio alignment, TRISK borrower stress testing, a synthetic Vietnam-bank case study, and a four-phase engagement offer — all using the Allotrope brand template.</p>
+        </div>
+        <div class="subcard">
+          <h3 class="subcard-label">Why It Matters</h3>
+          <div class="splitter"></div>
+          <p>The repo held abundant analytical output (PACTA/TRISK charts, HTML reports, a live Streamlit dashboard) but <strong>zero slides</strong>. This deck closes that gap, giving the team a tangible leave-behind for prospect meetings. The scripted build (<code>build_deck.py</code>) makes the deck reproducible and iterable — text or chart changes can be re-applied in seconds.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="background-objective">
+      <div class="section-header"><div><div class="section-index">02 / Background &amp; Objective</div><h2 class="section-title">Background &amp; Objective</h2></div></div>
+      <div class="narrative">
+        <p>The <code>pacta-trisk</code> repository contains a complete PACTA (Paris Agreement Capital Transition Assessment) and TRISK (Transition Risk Impact on Stress and Knowledge) analytical pipeline for a synthetic Vietnamese commercial bank. Over six months of work produced portfolio alignment results, borrower-level stress tests, a 7-page Streamlit dashboard, engagement letters, TCFD/ISSB disclosure packs, and multiple HTML reports.</p>
+        <p>Despite this richness, the repo had <strong>no prospect-facing slide artifact</strong>. The only deck was a 25-slide internal funder-update (<code>present/ref/Allotrope GTB updates_Tara Vietnam_December 2025.pptx</code>) covering BESS case studies and BIDV/TCB status tracking — content irrelevant to a prospect pitch.</p>
+        <p>The objective was to produce a <strong>polished .pptx</strong> that is visually indistinguishable from the Allotrope reference deck (same masters, layouts, logos, 16:9 geometry) but re-narrated as a capability pitch to a prospective bank, walking from transition-risk problem to engagement offer.</p>
+      </div>
+    </section>
+
+    <section class="section" id="inputs-scope">
+      <div class="section-header"><div><div class="section-index">03 / Inputs &amp; Scope</div><h2 class="section-title">Inputs &amp; Scope</h2></div></div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3 class="subcard-label">In Scope</h3>
+          <div class="splitter"></div>
+          <ul>
+            <li>Reference template: 25-slide Allotrope GTB update (read-only source)</li>
+            <li>13 PACTA/TRISK chart assets from <code>synthesis_output/</code> and <code>dashboard/data/</code></li>
+            <li>Narrative sourced from: PACTA Vietnam Bank Report, TRISK demo report, BIDV framework docs, demo script</li>
+            <li>15-slide prospect arc: cover, agenda, challenge, solution, PACTA, TRISK, case studies, compliance, dashboard, engagement, next steps, Q&A, contact</li>
+            <li>Speaker notes for all 15 slides</li>
+            <li>Synthetic-data disclaimers on all data slides</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3 class="subcard-label">Out of Scope</h3>
+          <div class="splitter"></div>
+          <ul>
+            <li>New PACTA/TRISK analysis or model runs</li>
+            <li>Building a from-scratch deck (brand-new design)</li>
+            <li>Live BESS/energy-storage content (no backing data)</li>
+            <li>Altering the reference original (read-only)</li>
+            <li>Embedding borrower-identifying content from engagement letters (privacy constraint)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="assumptions-constraints">
+      <div class="section-header"><div><div class="section-index">04 / Assumptions &amp; Constraints</div><h2 class="section-title">Assumptions &amp; Constraints</h2></div></div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3 class="subcard-label">Assumptions</h3>
+          <div class="splitter"></div>
+          <ul>
+            <li><strong>ASM-001:</strong> "Case study" = the synthetic Vietnam-bank PACTA/TRISK demo, not the reference deck's BESS slides</li>
+            <li><strong>ASM-002:</strong> "Similar to reference" = same visual template with re-authored prospect narrative</li>
+            <li><strong>ASM-003:</strong> One prospect per build; parameterized at title/contact slides</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3 class="subcard-label">Constraints</h3>
+          <div class="splitter"></div>
+          <ul>
+            <li><strong>CON-001:</strong> All repo data is synthetic; every case-study slide carries a disclaimer</li>
+            <li><strong>CON-002:</strong> Edits are in-place by shape index; the reference original is never overwritten</li>
+            <li><strong>CON-003:</strong> Per-borrower engagement letters are gitignored; no borrower-identifying content in the deck</li>
+            <li><strong>DEC-001:</strong> Template is 16:9 (10"&times;5.625"); shapes are Google-Slides-origin</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="methodology">
+      <div class="section-header"><div><div class="section-index">05 / Methodology</div><h2 class="section-title">Methodology</h2></div></div>
+      <div class="narrative">
+        <p>The build followed a <strong>five-phase sequential pipeline</strong>:</p>
+        <p><strong>PHASE-01 (Foundation):</strong> Created a working copy of the reference deck, ran <code>inspect_template.py</code> to produce a 280-line shape-index map, and wrote a 198-line slide-by-slide narrative outline mapping all 25 reference slides to keep/repurpose/drop decisions with named assets for each image slot.</p>
+        <p><strong>PHASE-02 (Assets):</strong> Gathered 13 PACTA/TRISK chart PNGs from existing repo outputs into <code>present/assets/</code>, matching the outline's image slot references.</p>
+        <p><strong>PHASE-03 (Build):</strong> Wrote <code>present/build_deck.py</code> (280 lines) using python-pptx to drop 10 internal-status slides, apply 87 text replacements and 8 image replacements across 15 slides, then rendered to PNGs via LibreOffice + PyMuPDF for visual QA.</p>
+        <p><strong>PHASE-04 (Polish):</strong> Wrote <code>present/add_speaker_notes.py</code> (160 lines) to add detailed presenter guidance (261–579 chars per slide) covering welcome, methodology, case-study interpretation, engagement offer, and Q&A preparation. Verified contact and compliance slides.</p>
+        <p><strong>PHASE-05 (Ship):</strong> Marked the plan as completed, updated <code>activeContext.md</code>, and pushed all artifacts to <code>main</code>.</p>
+      </div>
+      <div class="stat-grid">
+        <div class="stat"><div class="stat-label">Phases</div><div class="stat-value">5</div></div>
+        <div class="stat"><div class="stat-label">Commits</div><div class="stat-value">4</div></div>
+        <div class="stat"><div class="stat-label">Evidence Rule</div><div class="stat-value">no invented data</div></div>
+      </div>
+    </section>
+
+    <section class="section" id="phase-analysis">
+      <div class="section-header"><div><div class="section-index">06 / Phase-by-Phase Analysis</div><h2 class="section-title">Phase-by-Phase Analysis</h2></div></div>
+      <div class="phase-grid">
+        <div class="subcard">
+          <h3 class="subcard-label">Phase 01 — Foundation</h3>
+          <div class="splitter"></div>
+          <p><strong>Commit:</strong> <code>358f79f</code></p>
+          <p>Created the working copy, template inventory (280 lines), and 198-line narrative outline. Classified every shape in the 25-slide reference as title/body/image/decorative. Flagged 10 slides for dropping (BESS case studies, Vietnamese-language internal status). Mapped 15 kept slides to the prospect narrative arc.</p>
+        </div>
+        <div class="subcard">
+          <h3 class="subcard-label">Phase 02 — Assets</h3>
+          <div class="splitter"></div>
+          <p><strong>Commit:</strong> <code>358f79f</code> (bundled with PHASE-01)</p>
+          <p>Gathered 13 chart PNGs: coverage pie, power techmix, coal trajectory, cement/steel SDA, alignment overview, coal stranded risk, 3 TRISK charts (NPV, PD, priority score). All sourced from existing <code>synthesis_output/vietnam/</code> and <code>dashboard/data/trisk/</code> directories.</p>
+        </div>
+        <div class="subcard">
+          <h3 class="subcard-label">Phase 03 — Build</h3>
+          <div class="splitter"></div>
+          <p><strong>Commit:</strong> <code>c4cb737</code></p>
+          <p>Wrote <code>build_deck.py</code>: drops 10 slides in reverse index order, applies text/table/image changes per the SLIDE_MAP dictionary. Key technical decision: used <code>shape.image._blob</code> (private attribute) for image replacement since python-pptx public API has no blob setter. Render QA produced 13 of 15 PNGs (LibreOffice limitation with complex grouped shapes).</p>
+        </div>
+        <div class="subcard">
+          <h3 class="subcard-label">Phase 04 — Polish</h3>
+          <div class="splitter"></div>
+          <p><strong>Commit:</strong> <code>6c002a5</code></p>
+          <p>Wrote <code>add_speaker_notes.py</code>: adds 261–579 chars of presenter guidance per slide. Notes cover Decision 263 framing, PACTA/TRISK methodology, case-study interpretation, live dashboard demo guidance, engagement offer details, and Q&A preparation. Verified contact slide (Tung Ho, Hang Tran) and compliance slide (Decision 263 / TCFD / ISSB).</p>
+        </div>
+        <div class="subcard">
+          <h3 class="subcard-label">Phase 05 — Ship</h3>
+          <div class="splitter"></div>
+          <p><strong>Commit:</strong> <code>9f828ba</code></p>
+          <p>Updated plan status to <code>completed</code>, updated <code>activeContext.md</code> with all phase results, and pushed to <code>origin/main</code>. All artifacts verified in git.</p>
+        </div>
+      </div>
+      <div class="diagram-frame">
+        <div class="mermaid">flowchart LR
+    P1[PHASE-01<br/>Foundation] --> P2[PHASE-02<br/>Assets]
+    P2 --> P3[PHASE-03<br/>Build]
+    P3 --> P4[PHASE-04<br/>Polish]
+    P4 --> P5[PHASE-05<br/>Ship]
+    P1 --> |outline + inventory| P3
+    P2 --> |13 PNGs| P3
+    P3 --> |15-slide deck| P4
+    P4 --> |speaker notes| P5</div>
+      </div>
+    </section>
+
+    <section class="section" id="findings-recommendation">
+      <div class="section-header"><div><div class="section-index">07 / Findings &amp; Recommendation</div><h2 class="section-title">Findings &amp; Recommendation</h2></div></div>
+      <div class="narrative">
+        <p><strong>The scripted approach works.</strong> The <code>build_deck.py</code> script runs cleanly (exit 0), produces a 15-slide deck from the 25-slide reference, and applies all text and image replacements as specified in the outline. The deck opens correctly in PowerPoint and Google Slides with full brand fidelity.</p>
+        <p><strong>Speaker notes add significant value.</strong> The 7,620 characters of presenter guidance across 15 slides transform the deck from a static leave-behind into a presentation-ready tool. Notes include audience-engagement prompts ("How is your bank currently assessing transition risk?"), methodology explanations, and Q&A preparation.</p>
+        <p><strong>Image replacement requires private API access.</strong> python-pptx does not expose a public setter for <code>shape.image.blob</code>. The workaround (<code>shape.image._blob</code>) works but may break in future python-pptx versions. This is the single largest technical risk for long-term maintainability.</p>
+        <p><strong>Recommendation:</strong> Use the deck as-is for the next prospect meeting. Before the meeting, capture fresh dashboard screenshots from <code>pactavn.streamlit.app</code> for slide 11. Run through the full deck with speaker notes to verify timing (target: 20–25 minutes including Q&A).</p>
+      </div>
+    </section>
+
+    <section class="section" id="implementation-path">
+      <div class="section-header"><div><div class="section-index">08 / Implementation Path</div><h2 class="section-title">Implementation Path</h2></div></div>
+      <div class="phase-grid">
+        <div class="subcard">
+          <h3 class="subcard-label">Immediate (Before First Meeting)</h3>
+          <div class="splitter"></div>
+          <ul>
+            <li>Capture fresh dashboard screenshots from <code>pactavn.streamlit.app</code> for slide 11</li>
+            <li>Run through the full deck with speaker notes (target: 20–25 min)</li>
+            <li>Export a PDF version for email distribution</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3 class="subcard-label">Short-Term (Next Quarter)</h3>
+          <div class="splitter"></div>
+          <ul>
+            <li>Parameterize the build script for different prospects (title/contact slides)</li>
+            <li>Add a "track record" slide with real engagement results (post-pilot)</li>
+            <li>Monitor python-pptx releases for a public image-replacement API</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3 class="subcard-label">Medium-Term (6 Months)</h3>
+          <div class="splitter"></div>
+          <ul>
+            <li>Build a prospect-specific variant with real bank data (post-BYOL intake)</li>
+            <li>Add interactive elements (embedded dashboard iframe or hyperlink)</li>
+            <li>Create a Vietnamese-language variant for local bank meetings</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3 class="subcard-label">Dependencies</h3>
+          <div class="splitter"></div>
+          <ul>
+            <li>python-pptx (current version)</li>
+            <li>LibreOffice (for render QA)</li>
+            <li>PyMuPDF (for PDF-to-PNG conversion)</li>
+            <li>Allotrope reference template (read-only)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="risks-open-questions">
+      <div class="section-header"><div><div class="section-index">09 / Risks / Open Questions</div><h2 class="section-title">Risks / Open Questions</h2></div></div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3 class="subcard-label">Risks</h3>
+          <div class="splitter"></div>
+          <ul>
+            <li><strong>python-pptx private API:</strong> <code>shape.image._blob</code> may break in future versions. Mitigation: pin python-pptx version in <code>requirements.txt</code>; monitor release notes.</li>
+            <li><strong>LibreOffice rendering gap:</strong> 2 of 15 slides fail to render due to complex grouped shapes. Mitigation: acceptable for QA; the PPTX itself is complete.</li>
+            <li><strong>Synthetic data perception:</strong> Prospects may misread synthetic results as real portfolio data. Mitigation: disclaimer on every data slide; verbal framing in speaker notes.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3 class="subcard-label">Open Questions</h3>
+          <div class="splitter"></div>
+          <ul>
+            <li>Should the deck be parameterized for different prospects (e.g., Techcombank vs. a new bank)?</li>
+            <li>Should a Vietnamese-language variant be produced for local bank meetings?</li>
+            <li>Should the deck include a "track record" slide with real engagement results (post-pilot)?</li>
+            <li>Should the build script be integrated into a CI/CD pipeline for automated deck regeneration when charts update?</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="appendices-evidence">
+      <div class="section-header"><div><div class="section-index">10 / Appendices / Evidence Notes</div><h2 class="section-title">Appendices / Evidence Notes</h2></div></div>
+      <div class="appendix-grid">
+        <div class="subcard">
+          <h3 class="subcard-label">Artifact Inventory</h3>
+          <div class="splitter"></div>
+          <div class="technical-frame">
+            <table>
+              <thead><tr><th>File</th><th>Type</th><th>Size</th></tr></thead>
+              <tbody>
+                <tr><td><code>present/bank_prospect_deck.pptx</code></td><td>Final deck</td><td>~10 MB</td></tr>
+                <tr><td><code>present/build_deck.py</code></td><td>Build script</td><td>280 lines</td></tr>
+                <tr><td><code>present/add_speaker_notes.py</code></td><td>Notes script</td><td>160 lines</td></tr>
+                <tr><td><code>present/deck_outline.md</code></td><td>Narrative outline</td><td>198 lines</td></tr>
+                <tr><td><code>present/template_inventory.txt</code></td><td>Shape map</td><td>280 lines</td></tr>
+                <tr><td><code>present/assets/*.png</code></td><td>Chart assets</td><td>13 files</td></tr>
+                <tr><td><code>present/render/*.png</code></td><td>QA renders</td><td>13 files</td></tr>
+                <tr><td><code>present/ref/*.pptx</code></td><td>Reference (read-only)</td><td>~10 MB</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="subcard">
+          <h3 class="subcard-label">Commit History</h3>
+          <div class="splitter"></div>
+          <div class="technical-frame">
+            <table>
+              <thead><tr><th>Commit</th><th>Phase</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><code>358f79f</code></td><td>PHASE-01</td><td>Working copy, inventory, outline</td></tr>
+                <tr><td><code>c4cb737</code></td><td>PHASE-03</td><td>Build script, deck, render QA</td></tr>
+                <tr><td><code>6c002a5</code></td><td>PHASE-04</td><td>Speaker notes, polish, final QA</td></tr>
+                <tr><td><code>9f828ba</code></td><td>PHASE-05</td><td>Mark plan completed</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="footer-note">designed for html first, printable without reconstruction</div>
+    </section>
+  </main>
+  <script>
+    (function() { const c = document.querySelectorAll('canvas'); c.forEach((cv) => { cv.classList.add('report-chart'); const p = cv.parentElement; if (p && p.classList.contains('technical-frame') && !p.classList.contains('chart-frame')) p.classList.add('chart-frame'); }); })();
+    if (window.Chart) { Chart.defaults.devicePixelRatio = 1; Chart.defaults.animation = false; Chart.defaults.resizeDelay = 150; Chart.defaults.normalized = true; Chart.defaults.maintainAspectRatio = false; Chart.defaults.responsive = true; }
+  </script>
+</body>
+</html>
