@@ -1,7 +1,7 @@
 ---
 title: "Bank-Prospect PACTA/TRISK Pitch Deck"
 date: "2026-06-09"
-status: "draft"
+status: "in_progress"
 request: "Build the bank-prospect PACTA/TRISK pitch deck described in reports/2026-06-09-bank-prospect-deck-gap-analysis.md, covering gaps GAP-01..GAP-09, using the present skill to edit a copy of the reference deck at present/ref/, then git commit and push to main."
 plan_type: "multi-phase"
 research_inputs:
