@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Đặc tả Dữ liệu Danh mục Cho vay</title>
+<style>
+  :root {
+    --primary: #1a365d; --accent: #2b6cb0; --bg: #f7fafc;
+    --card-bg: #ffffff; --border: #e2e8f0; --text: #2d3748; --text-light: #718096;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.7;
+    max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem;
+  }
+  h1 { color: var(--primary); border-bottom: 3px solid var(--accent); padding-bottom: 0.5rem; }
+  h2 { color: var(--primary); margin-top: 2rem; }
+  h3 { color: var(--accent); }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; background: var(--card-bg); }
+  th, td { border: 1px solid var(--border); padding: 0.5rem 0.75rem; text-align: left; font-size: 0.92rem; }
+  th { background: #edf2f7; }
+  blockquote {
+    border-left: 4px solid var(--accent); margin: 1rem 0; padding: 0.5rem 1rem;
+    background: var(--card-bg); color: var(--text-light); font-style: italic;
+  }
+  code { background: #edf2f7; padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.9em; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+</style>
+</head>
+<body>
+<h1>Đặc tả Dữ liệu Danh mục Cho vay</h1>
+<blockquote>
+<p><strong>Bản dịch tham khảo — bản tiếng Anh là bản chính.</strong> Xem
+<code>pilot/loanbook_data_spec.md</code> để có phiên bản chính thức.</p>
+</blockquote>
+<p><em>Dành cho các ngân hàng đối tác tiềm năng đang xem xét giai đoạn dữ liệu
+thực PACTA + TRISK.</em></p>
+<blockquote>
+<p><strong>Đây là bản đặc tả, không phải yêu cầu cung cấp dữ liệu.</strong> Trong giai
+đoạn thí điểm, không có dữ liệu danh mục cho vay thực nào được thu thập.
+Tài liệu này mô tả chính xác những gì một giai đoạn dữ liệu thực trong
+tương lai sẽ cần, để đội ngũ của quý ngân hàng có thể đánh giá tính khả
+thi và yêu cầu ẩn danh hóa trước khi cam kết.</p>
+</blockquote>
+<h2>Dữ liệu này phục vụ mục đích gì</h2>
+<p>Danh mục cho vay của quý ngân hàng sẽ đi qua đúng quy trình đã tạo ra bản
+demo mà quý vị đã xem: phân loại ngành → mức độ phù hợp danh mục PACTA (so
+với PDP8 / NDC 2022 / IEA NZE) → kiểm tra sức chịu đựng rủi ro chuyển đổi
+TRISK → bộ tài liệu tiếp cận khách hàng và công bố thông tin (phù hợp với
+Quyết định 263 / TCFD).</p>
+<h2>Các cột bắt buộc</h2>
+<table>
+<thead>
+<tr>
+<th>Cột</th>
+<th>Kiểu dữ liệu</th>
+<th>Mô tả</th>
+<th>Phục vụ cho</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>counterparty_name</code></td>
+<td>văn bản</td>
+<td>Tên bên vay</td>
+<td>Ghi nhãn báo cáo, bộ tài liệu công bố</td>
+</tr>
+<tr>
+<td><code>exposure_vnd</code></td>
+<td>số, ≥ 0</td>
+<td>Dư nợ (VND)</td>
+<td>Trọng số danh mục, mức độ kiểm tra sức chịu đựng NPV</td>
+</tr>
+<tr>
+<td><code>sector_code</code></td>
+<td>văn bản</td>
+<td>Mã ngành kinh tế</td>
+<td>Ánh xạ ngành (xem bên dưới)</td>
+</tr>
+<tr>
+<td><code>sector_code_system</code></td>
+<td><code>VSIC</code> hoặc <code>ISIC</code></td>
+<td>Hệ thống mã của <code>sector_code</code></td>
+<td>Ánh xạ ngành</td>
+</tr>
+<tr>
+<td><code>credit_limit_vnd</code></td>
+<td>số, ≥ 0</td>
+<td>Hạn mức tín dụng (VND)</td>
+<td>Bối cảnh dư nợ tại thời điểm vỡ nợ</td>
+</tr>
+</tbody>
+</table>
+<h2>Các cột không bắt buộc (khuyến nghị)</h2>
+<table>
+<thead>
+<tr>
+<th>Cột</th>
+<th>Kiểu dữ liệu</th>
+<th>Mô tả</th>
+<th>Phục vụ cho</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>lei</code></td>
+<td>văn bản</td>
+<td>Mã định danh pháp nhân</td>
+<td>Đối chiếu ABCD với độ tin cậy cao hơn</td>
+</tr>
+<tr>
+<td><code>tax_id</code></td>
+<td>văn bản</td>
+<td>Mã số thuế</td>
+<td>Gán ID bên vay, loại trùng lặp</td>
+</tr>
+<tr>
+<td><code>parent_name</code></td>
+<td>văn bản</td>
+<td>Tên công ty mẹ</td>
+<td>Tổng hợp theo tập đoàn (VD: EVN, THACO, VICEM)</td>
+</tr>
+<tr>
+<td><code>parent_id</code></td>
+<td>văn bản</td>
+<td>Mã định danh công ty mẹ</td>
+<td>Tổng hợp theo tập đoàn</td>
+</tr>
+<tr>
+<td><code>currency</code></td>
+<td>văn bản</td>
+<td>Mã tiền tệ (mặc định <code>VND</code>)</td>
+<td>Chuẩn hóa tiền tệ</td>
+</tr>
+</tbody>
+</table>
+<h2>Các ngành PACTA hiện đang được hỗ trợ</h2>
+<table>
+<thead>
+<tr>
+<th>Mã ISIC</th>
+<th>Ngành</th>
+<th>Mức độ hỗ trợ PACTA/TRISK</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3511</td>
+<td>Điện lực</td>
+<td>TRISK thị phần cấp độ bên vay đầy đủ</td>
+</tr>
+<tr>
+<td>2394</td>
+<td>Xi măng</td>
+<td>TRISK SDA cấp độ ngành</td>
+</tr>
+<tr>
+<td>2410</td>
+<td>Thép</td>
+<td>TRISK SDA cấp độ ngành (tỷ lệ đối chiếu ~4% trong bản demo — danh mục thực có LEI/mã số thuế sẽ cải thiện đáng kể)</td>
+</tr>
+<tr>
+<td>2910</td>
+<td>Ô tô</td>
+<td>Chỉ mức độ phù hợp PACTA (chưa có kiểm tra TRISK)</td>
+</tr>
+<tr>
+<td>0510</td>
+<td>Khai thác than</td>
+<td>Một phần (không nằm trong kiểm tra TRISK)</td>
+</tr>
+<tr>
+<td>0610</td>
+<td>Dầu khí</td>
+<td>Một phần (không nằm trong kiểm tra TRISK)</td>
+</tr>
+</tbody>
+</table>
+<h2>Định dạng và gửi dữ liệu</h2>
+<ul>
+<li><strong>Định dạng file:</strong> CSV (UTF-8 hoặc Latin-1), mỗi dòng là một khoản vay.</li>
+<li><strong>File mẫu:</strong> xem <code>intake/templates/loanbook_template.csv</code> và hướng dẫn
+  tiếng Việt <code>intake/templates/README_vi.md</code>.</li>
+<li><strong>Ẩn danh hóa:</strong> <code>counterparty_name</code> có thể được thay bằng mã số (VD:
+  <code>"Ben_vay_0042"</code>) miễn là nhất quán trong nội bộ — quy trình không yêu
+  cầu tên pháp nhân thực để chạy PACTA/TRISK, chỉ cần cho bước hiển thị bộ
+  tài liệu công bố cuối cùng. Mã số thuế / LEI có thể bỏ trống hoặc mã hóa
+  nếu sự hiện diện của chúng gây nhạy cảm — việc bỏ trống chỉ làm giảm chất
+  lượng tỷ lệ đối chiếu, không cản trở phân tích.</li>
+<li><strong>Kiểm định:</strong> mọi file gửi lên đều được kiểm định tự động qua cùng một
+  công cụ dùng trong bản demo (<code>scripts/intake_validate_and_map.R</code>), tạo ra
+  báo cáo kiểm định (<code>validation_summary.txt</code>) trước khi bất kỳ phân tích
+  nào chạy — đội ngũ của quý ngân hàng sẽ thấy chính xác điều gì đã qua,
+  điều gì không, và lý do, trước khi có kết quả.</li>
+</ul>
+<h2>Quý ngân hàng sẽ nhận được gì</h2>
+<ol>
+<li>Danh mục cho vay đã chuẩn hóa và đối chiếu (ánh xạ ngành, loại trùng lặp
+   theo tập đoàn).</li>
+<li>Kết quả mức độ phù hợp danh mục PACTA so với PDP8 / NDC 2022 / IEA NZE.</li>
+<li>Kết quả kiểm tra sức chịu đựng rủi ro chuyển đổi TRISK (biến động NPV và
+   PD) cho các ngành được hỗ trợ.</li>
+<li>Bộ tài liệu tiếp cận khách hàng và công bố thông tin (chấm điểm ưu tiên,
+   thư tiếp cận khách hàng, bộ tài liệu công bố phù hợp Quyết định 263).</li>
+</ol>
+<hr />
+<p><em>Mọi con số do quy trình này tạo ra chỉ mang tính minh họa cho mục đích sàng
+lọc rủi ro chuyển đổi danh mục, không phải kết quả rủi ro tín dụng sản xuất
+hoặc vốn quy định.</em></p>
+</body>
+</html>

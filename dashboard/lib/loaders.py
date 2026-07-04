@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Iterable
 
@@ -13,6 +14,17 @@ PACTA_DIR = DATA_DIR / "pacta"
 TRISK_DIR = DATA_DIR / "trisk"
 REPORTS_DIR = DATA_DIR / "reports"
 TRISK_MANIFEST = TRISK_DIR / "manifest.csv"
+PIPELINE_MANIFEST = DATA_DIR / "pipeline_manifest.json"
+
+
+def load_pipeline_manifest() -> dict | None:
+    """Read the pipeline refresh manifest, or None if it hasn't been generated yet."""
+    if not PIPELINE_MANIFEST.exists():
+        return None
+    try:
+        return json.loads(PIPELINE_MANIFEST.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return None
 
 
 @st.cache_data(show_spinner=False)

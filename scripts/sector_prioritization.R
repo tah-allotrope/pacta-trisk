@@ -24,8 +24,7 @@ w_alignment  <- parse_arg(args, "w_alignment",  0.35)
 w_stress     <- parse_arg(args, "w_stress",     0.35)
 w_exposure   <- parse_arg(args, "w_exposure",   0.30)
 
-base_dir <- normalizePath(here::here(), mustWork = FALSE)
-if (base_dir == "") base_dir <- getwd()
+base_dir <- getwd()
 
 alignment_file_ms <- file.path(base_dir, "synthesis_output", "vietnam", "06_vn_ms_alignment_2030.csv")
 alignment_file_sda <- file.path(base_dir, "synthesis_output", "vietnam", "06_vn_sda_alignment_2030.csv")

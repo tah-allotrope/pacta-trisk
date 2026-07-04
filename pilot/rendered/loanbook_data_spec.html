@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loanbook Data Specification</title>
+<style>
+  :root {
+    --primary: #1a365d; --accent: #2b6cb0; --bg: #f7fafc;
+    --card-bg: #ffffff; --border: #e2e8f0; --text: #2d3748; --text-light: #718096;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.7;
+    max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem;
+  }
+  h1 { color: var(--primary); border-bottom: 3px solid var(--accent); padding-bottom: 0.5rem; }
+  h2 { color: var(--primary); margin-top: 2rem; }
+  h3 { color: var(--accent); }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; background: var(--card-bg); }
+  th, td { border: 1px solid var(--border); padding: 0.5rem 0.75rem; text-align: left; font-size: 0.92rem; }
+  th { background: #edf2f7; }
+  blockquote {
+    border-left: 4px solid var(--accent); margin: 1rem 0; padding: 0.5rem 1rem;
+    background: var(--card-bg); color: var(--text-light); font-style: italic;
+  }
+  code { background: #edf2f7; padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.9em; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+</style>
+</head>
+<body>
+<h1>Loanbook Data Specification</h1>
+<p><em>For prospective bank partners considering a real-data PACTA + TRISK phase.</em></p>
+<blockquote>
+<p><strong>This is a specification, not a data request.</strong> No real loanbook data is
+collected during the pilot. This sheet describes exactly what a future
+real-data phase would need, so your team can assess feasibility and
+anonymization requirements before committing.</p>
+</blockquote>
+<h2>What this feeds</h2>
+<p>Your loanbook maps 1:1 onto the same pipeline that produces the demo you've
+seen: sector classification → PACTA portfolio alignment (vs. PDP8 / NDC 2022
+/ IEA NZE) → TRISK transition-risk stress test → engagement and disclosure
+outputs (Decision 263 / TCFD-aligned). The column list below is the minimum
+the pipeline's intake validator (<code>scripts/intake_validate_and_map.R</code>)
+requires; everything maps directly to the fields used in the demo dashboard.</p>
+<h2>Required columns</h2>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+<th>Feeds</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>counterparty_name</code></td>
+<td>text</td>
+<td>Borrower/company name</td>
+<td>Report labeling, disclosure pack</td>
+</tr>
+<tr>
+<td><code>exposure_vnd</code></td>
+<td>numeric, ≥ 0</td>
+<td>Outstanding loan exposure (VND)</td>
+<td>Portfolio weighting, NPV stress magnitude</td>
+</tr>
+<tr>
+<td><code>sector_code</code></td>
+<td>text</td>
+<td>Industry classification code</td>
+<td>Sector mapping (see below)</td>
+</tr>
+<tr>
+<td><code>sector_code_system</code></td>
+<td><code>VSIC</code> or <code>ISIC</code></td>
+<td>Which classification system <code>sector_code</code> uses</td>
+<td>Sector mapping</td>
+</tr>
+<tr>
+<td><code>credit_limit_vnd</code></td>
+<td>numeric, ≥ 0</td>
+<td>Approved credit limit (VND)</td>
+<td>Exposure-at-default context</td>
+</tr>
+</tbody>
+</table>
+<h2>Optional columns (recommended)</h2>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+<th>Feeds</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>lei</code></td>
+<td>text</td>
+<td>Legal Entity Identifier</td>
+<td>Higher-confidence ABCD matching</td>
+</tr>
+<tr>
+<td><code>tax_id</code></td>
+<td>text</td>
+<td>Tax/business registration ID</td>
+<td>Borrower ID assignment, deduplication</td>
+</tr>
+<tr>
+<td><code>parent_name</code></td>
+<td>text</td>
+<td>Ultimate parent company name</td>
+<td>Group-level roll-up (e.g., EVN, THACO, VICEM subsidiaries)</td>
+</tr>
+<tr>
+<td><code>parent_id</code></td>
+<td>text</td>
+<td>Parent company identifier</td>
+<td>Group-level roll-up</td>
+</tr>
+<tr>
+<td><code>currency</code></td>
+<td>text</td>
+<td>Currency code (defaults to <code>VND</code>)</td>
+<td>Currency normalization</td>
+</tr>
+</tbody>
+</table>
+<h2>Currently in-scope PACTA sectors</h2>
+<table>
+<thead>
+<tr>
+<th>ISIC code</th>
+<th>Sector</th>
+<th>PACTA/TRISK coverage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3511</td>
+<td>Power generation</td>
+<td>Full borrower-level market-share TRISK</td>
+</tr>
+<tr>
+<td>2394</td>
+<td>Cement</td>
+<td>Sector-level SDA TRISK</td>
+</tr>
+<tr>
+<td>2410</td>
+<td>Steel</td>
+<td>Sector-level SDA TRISK (match coverage ~4% in the demo — a real loanbook with LEI/tax ID improves this materially)</td>
+</tr>
+<tr>
+<td>2910</td>
+<td>Automotive</td>
+<td>PACTA alignment only (no TRISK stress in this build)</td>
+</tr>
+<tr>
+<td>0510</td>
+<td>Coal mining</td>
+<td>Partial (excluded from TRISK stress)</td>
+</tr>
+<tr>
+<td>0610</td>
+<td>Oil &amp; gas</td>
+<td>Partial (excluded from TRISK stress)</td>
+</tr>
+</tbody>
+</table>
+<p>Any other sector code is marked "not in scope" and excluded from PACTA/TRISK
+analysis but still counted in overall portfolio composition.</p>
+<h2>Format and delivery</h2>
+<ul>
+<li><strong>File format:</strong> CSV (UTF-8 or Latin-1), one row per loan facility.</li>
+<li><strong>Template:</strong> see <code>intake/templates/loanbook_template.csv</code> and the Vietnamese
+  guide <code>intake/templates/README_vi.md</code>.</li>
+<li><strong>Anonymization:</strong> <code>counterparty_name</code> may be pseudonymized (e.g.,
+  <code>"Borrower_0042"</code>) as long as it stays internally consistent — the pipeline
+  does not require real legal names to run PACTA/TRISK, only for the final
+  disclosure pack rendering. Tax ID / LEI can be omitted or hashed if their
+  presence alone is sensitive; omitting them only reduces match-rate quality,
+  it does not block the analysis.</li>
+<li><strong>Validation:</strong> every submitted file is run through the same automated
+  validator used in the demo (<code>scripts/intake_validate_and_map.R</code>), producing
+  a validation report (<code>validation_summary.txt</code>) before any analysis runs —
+  your team sees exactly what passed, what failed, and why, before results
+  are generated.</li>
+</ul>
+<h2>What you get back</h2>
+<ol>
+<li>A normalized, matched loanbook (sector-mapped, deduplicated to parent
+   groups).</li>
+<li>PACTA portfolio alignment results against PDP8 / NDC 2022 / IEA NZE.</li>
+<li>TRISK transition-risk stress results (NPV and PD deltas) for covered
+   sectors.</li>
+<li>Engagement and disclosure outputs (priority scoring, engagement letters,
+   Decision 263-aligned disclosure pack).</li>
+</ol>
+<hr />
+<p><em>All figures produced by this pipeline are illustrative transition-risk
+indicators for portfolio screening, not production credit-risk or regulatory
+capital outputs.</em></p>
+</body>
+</html>

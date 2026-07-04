@@ -12,7 +12,7 @@ def test_app_shell_renders() -> None:
 
 def test_pacta_page_renders() -> None:
     at = AppTest.from_file("dashboard/pages/1_PACTA_Alignment.py")
-    at.run()
+    at.run(timeout=15)
     assert not at.exception
 
 

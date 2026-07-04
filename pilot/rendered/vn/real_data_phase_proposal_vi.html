@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Đề xuất Giai đoạn Dữ liệu Thực</title>
+<style>
+  :root {
+    --primary: #1a365d; --accent: #2b6cb0; --bg: #f7fafc;
+    --card-bg: #ffffff; --border: #e2e8f0; --text: #2d3748; --text-light: #718096;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.7;
+    max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem;
+  }
+  h1 { color: var(--primary); border-bottom: 3px solid var(--accent); padding-bottom: 0.5rem; }
+  h2 { color: var(--primary); margin-top: 2rem; }
+  h3 { color: var(--accent); }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; background: var(--card-bg); }
+  th, td { border: 1px solid var(--border); padding: 0.5rem 0.75rem; text-align: left; font-size: 0.92rem; }
+  th { background: #edf2f7; }
+  blockquote {
+    border-left: 4px solid var(--accent); margin: 1rem 0; padding: 0.5rem 1rem;
+    background: var(--card-bg); color: var(--text-light); font-style: italic;
+  }
+  code { background: #edf2f7; padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.9em; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+</style>
+</head>
+<body>
+<h1>Đề xuất Giai đoạn Dữ liệu Thực</h1>
+<blockquote>
+<p><strong>Bản dịch tham khảo — bản tiếng Anh là bản chính.</strong> Xem
+<code>pilot/real_data_phase_proposal.md</code> để có phiên bản chính thức. Các mục
+<code>{{...}}</code> giữ nguyên không dịch — điền theo hướng dẫn tại
+<code>pilot/tailoring_checklist.md</code>.</p>
+</blockquote>
+<p><strong>Chuẩn bị cho:</strong> {{BANK_NAME}}
+<strong>Chuẩn bị bởi:</strong> Allotrope VC
+<strong>Ngày:</strong> {{DATE}}
+<strong>Liên hệ:</strong> {{CONTACT_NAME}} · {{CONTACT_EMAIL}}</p>
+<h2>1. Bối cảnh</h2>
+<p>{{BANK_NAME}} đã đánh giá nền tảng PACTA + TRISK Việt Nam bằng một trường
+hợp ngân hàng tổng hợp (Ngân hàng Thương mại Mekong). Đề xuất này xác định
+phạm vi giai đoạn tiếp theo: chạy cùng quy trình mức độ phù hợp PACTA và
+kiểm tra sức chịu đựng rủi ro chuyển đổi TRISK trên danh mục cho vay thực
+của {{BANK_NAME}}.</p>
+<h2>2. Phạm vi</h2>
+<ul>
+<li><strong>Tiếp nhận dữ liệu:</strong> {{BANK_NAME}} cung cấp trích xuất danh mục cho vay
+  theo <code>loanbook_data_spec.md</code>. Phương pháp ẩn danh hóa:
+  {{ANONYMIZATION_APPROACH}}.</li>
+<li><strong>Kiểm định:</strong> kiểm định lược đồ tự động và ánh xạ ngành, với báo cáo kiểm
+  định gửi lại {{BANK_NAME}} trước khi phân tích được tiến hành.</li>
+<li><strong>Mức độ phù hợp PACTA:</strong> mức độ phù hợp danh mục so với lộ trình PDP8,
+  NDC 2022, và IEA NZE, bao gồm các ngành: {{SECTOR_LIST}}.</li>
+<li><strong>Kiểm tra sức chịu đựng TRISK:</strong> kiểm tra sức chịu đựng NPV và xác suất
+  vỡ nợ cấp độ bên vay/ngành dưới {{SCENARIO_SELECTION}} (mặc định: năm xảy
+  ra cú sốc 2030, giả định cơ bản về tỷ lệ chiết khấu/lãi suất phi rủi
+  ro/truyền dẫn thị trường — có thể điều chỉnh qua Scenario Builder).</li>
+<li><strong>Kết quả đầu ra:</strong> chấm điểm ưu tiên tiếp cận, bản thảo thư tiếp cận
+  khách hàng, và bộ tài liệu công bố thông tin phù hợp với Quyết định 263 /
+  TCFD.</li>
+<li><strong>Bàn giao:</strong> phiên bản dashboard riêng tư dành cho dữ liệu của
+  {{BANK_NAME}}, cùng báo cáo kết quả ({{REPORT_LANGUAGE}}).</li>
+</ul>
+<h2>3. Ngoài phạm vi của giai đoạn này</h2>
+<ul>
+<li>Các ngành mới ngoài {{SECTOR_LIST}}.</li>
+<li>Thay đổi phương pháp luận (VD: SDA cấp độ bên vay cho xi măng/thép).</li>
+<li>Tích hợp với hệ thống nội bộ của {{BANK_NAME}} (bàn giao dựa trên file).</li>
+</ul>
+<h2>4. Lộ trình thời gian</h2>
+<table>
+<thead>
+<tr>
+<th>Mốc thời gian</th>
+<th>Ngày mục tiêu</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Nhận danh mục cho vay</td>
+<td>{{DATE_1}}</td>
+</tr>
+<tr>
+<td>Trả báo cáo kiểm định</td>
+<td>{{DATE_2}}</td>
+</tr>
+<tr>
+<td>Bàn giao kết quả PACTA + TRISK</td>
+<td>{{DATE_3}}</td>
+</tr>
+<tr>
+<td>Buổi trình bày kết quả</td>
+<td>{{DATE_4}}</td>
+</tr>
+</tbody>
+</table>
+<h2>5. Xử lý dữ liệu &amp; Bảo mật</h2>
+<ul>
+<li>Dữ liệu danh mục cho vay của {{BANK_NAME}} chỉ được sử dụng cho phân tích
+  của giai đoạn này và không được lưu giữ quá {{DATA_RETENTION_PERIOD}} nếu
+  không có thỏa thuận bằng văn bản.</li>
+<li>Kết quả được bàn giao tới phiên bản dashboard riêng tư, có kiểm soát truy
+  cập (không phải bản demo công khai).</li>
+<li>{{ADDITIONAL_CONFIDENTIALITY_TERMS}}</li>
+</ul>
+<h2>6. Điều khoản thương mại</h2>
+<p>{{PRICING_AND_TERMS_PLACEHOLDER}}</p>
+<h2>7. Bước tiếp theo</h2>
+<p>Ký xác nhận đề xuất này, sau đó cùng đội ngũ rủi ro/ESG của {{BANK_NAME}}
+rà soát đặc tả dữ liệu danh mục cho vay để thống nhất phương pháp ẩn danh
+hóa và ánh xạ ngành trước khi chuyển giao dữ liệu.</p>
+<hr />
+<p><em>Đề xuất này được đưa ra sau một giai đoạn thí điểm hoàn toàn trên dữ liệu
+tổng hợp; chưa có dữ liệu thực nào của {{BANK_NAME}} được xử lý, xem, hoặc
+lưu trữ trước khi có thỏa thuận này.</em></p>
+</body>
+</html>

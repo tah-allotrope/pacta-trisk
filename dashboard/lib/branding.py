@@ -1,10 +1,17 @@
 from __future__ import annotations
 
+import re
+
 import streamlit as st
+
+from dashboard.lib.analytics import track_page_view
+from dashboard.lib.loaders import load_pipeline_manifest
 
 
 def apply_page_frame(title: str, subtitle: str | None = None) -> None:
     st.set_page_config(page_title=title, page_icon=":bar_chart:", layout="wide")
+    page_slug = re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-")
+    track_page_view(page_slug)
     st.markdown(
         """
         <style>
@@ -59,6 +66,19 @@ def public_demo_banner() -> None:
         """,
         unsafe_allow_html=True,
     )
+
+
+def data_freshness_badge() -> None:
+    """Render a 'Data as of' badge from the pipeline refresh manifest, or a fallback note if absent."""
+    manifest = load_pipeline_manifest()
+    if manifest is None:
+        st.caption("Data as of: unknown (no pipeline_manifest.json found — run scripts/pipeline_refresh.R).")
+        return
+    generated_at = manifest.get("generated_at", "unknown")
+    status = manifest.get("status", "unknown")
+    sha = manifest.get("git_sha") or "unknown"
+    status_note = "" if status == "ok" else " — **last refresh failed, showing prior snapshot**"
+    st.caption(f"Data as of: {generated_at} (pipeline `{sha[:7] if sha != 'unknown' else sha}`){status_note}")
 
 
 def footer_note() -> None:

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Real-Data Phase Proposal</title>
+<style>
+  :root {
+    --primary: #1a365d; --accent: #2b6cb0; --bg: #f7fafc;
+    --card-bg: #ffffff; --border: #e2e8f0; --text: #2d3748; --text-light: #718096;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.7;
+    max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem;
+  }
+  h1 { color: var(--primary); border-bottom: 3px solid var(--accent); padding-bottom: 0.5rem; }
+  h2 { color: var(--primary); margin-top: 2rem; }
+  h3 { color: var(--accent); }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; background: var(--card-bg); }
+  th, td { border: 1px solid var(--border); padding: 0.5rem 0.75rem; text-align: left; font-size: 0.92rem; }
+  th { background: #edf2f7; }
+  blockquote {
+    border-left: 4px solid var(--accent); margin: 1rem 0; padding: 0.5rem 1rem;
+    background: var(--card-bg); color: var(--text-light); font-style: italic;
+  }
+  code { background: #edf2f7; padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.9em; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+</style>
+</head>
+<body>
+<h1>Real-Data Phase Proposal</h1>
+<p><strong>Prepared for:</strong> {{BANK_NAME}}
+<strong>Prepared by:</strong> Allotrope VC
+<strong>Date:</strong> {{DATE}}
+<strong>Contact:</strong> {{CONTACT_NAME}} · {{CONTACT_EMAIL}}</p>
+<h2>1. Context</h2>
+<p>{{BANK_NAME}} has evaluated the PACTA + TRISK Vietnam platform using a
+synthetic bank case (Mekong Commercial Bank). This proposal scopes the next
+phase: running the same PACTA alignment and TRISK transition-risk stress
+test against {{BANK_NAME}}'s own loanbook.</p>
+<h2>2. Scope</h2>
+<ul>
+<li><strong>Intake:</strong> {{BANK_NAME}} provides a loanbook extract per
+  <code>loanbook_data_spec.md</code>. Anonymization approach: {{ANONYMIZATION_APPROACH}}.</li>
+<li><strong>Validation:</strong> automated schema validation and sector mapping, with a
+  validation report returned to {{BANK_NAME}} before analysis proceeds.</li>
+<li><strong>PACTA alignment:</strong> portfolio alignment against PDP8, NDC 2022, and IEA
+  NZE pathways, covering sectors: {{SECTOR_LIST}}.</li>
+<li><strong>TRISK stress test:</strong> borrower/sector-level NPV and probability-of-default
+  stress under {{SCENARIO_SELECTION}} (default: shock year 2030, base
+  discount/risk-free/passthrough assumptions — adjustable via the Scenario
+  Builder).</li>
+<li><strong>Outputs:</strong> engagement priority scoring, engagement letter drafts, and a
+  Decision 263 / TCFD-aligned disclosure pack.</li>
+<li><strong>Delivery:</strong> private dashboard instance scoped to {{BANK_NAME}}'s data,
+  plus a findings report ({{REPORT_LANGUAGE}}).</li>
+</ul>
+<h2>3. Out of scope for this phase</h2>
+<ul>
+<li>New sectors beyond {{SECTOR_LIST}}.</li>
+<li>Methodology changes (e.g., borrower-level SDA for cement/steel).</li>
+<li>Integration with {{BANK_NAME}}'s internal systems (delivery is file-based).</li>
+</ul>
+<h2>4. Timeline</h2>
+<table>
+<thead>
+<tr>
+<th>Milestone</th>
+<th>Target date</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Loanbook received</td>
+<td>{{DATE_1}}</td>
+</tr>
+<tr>
+<td>Validation report returned</td>
+<td>{{DATE_2}}</td>
+</tr>
+<tr>
+<td>PACTA + TRISK results delivered</td>
+<td>{{DATE_3}}</td>
+</tr>
+<tr>
+<td>Findings walkthrough session</td>
+<td>{{DATE_4}}</td>
+</tr>
+</tbody>
+</table>
+<h2>5. Data handling &amp; confidentiality</h2>
+<ul>
+<li>{{BANK_NAME}}'s loanbook data is used only for this engagement's analysis
+  and is not retained beyond {{DATA_RETENTION_PERIOD}} without written
+  agreement.</li>
+<li>Results are delivered to a private, access-controlled dashboard instance
+  (not the public demo).</li>
+<li>{{ADDITIONAL_CONFIDENTIALITY_TERMS}}</li>
+</ul>
+<h2>6. Commercial terms</h2>
+<p>{{PRICING_AND_TERMS_PLACEHOLDER}}</p>
+<h2>7. Next step</h2>
+<p>Sign-off on this proposal, followed by the loanbook data spec walkthrough
+with {{BANK_NAME}}'s risk/ESG team to confirm the anonymization approach and
+sector mapping before data transfer.</p>
+<hr />
+<p><em>This proposal follows a pilot conducted entirely on synthetic data; no real
+{{BANK_NAME}} data has been processed, viewed, or stored prior to this
+agreement.</em></p>
+</body>
+</html>

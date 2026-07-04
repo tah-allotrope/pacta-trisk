@@ -1,4 +1,13 @@
 nul
+Rplots.pdf
+localhostrun-tunnel*.log
+.playwright-mcp/
+.claude/worktrees/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.opencode/package-lock.json
 
 # Engagement & Disclosure Output Layer — generated client-facing artifacts.
 # Privacy posture (CON-003): never commit generated letters/disclosure packs.
