@@ -8,12 +8,13 @@
 cran_packages <- c(
   "arrow", "base64enc", "dplyr", "fs", "ggplot2", "ggrepel", "glue",
   "jsonlite", "magrittr", "pacta.loanbook", "purrr", "r2dii.analysis",
-  "r2dii.data", "r2dii.match", "r2dii.plot", "readr", "remotes", "rlang",
+  "r2dii.data", "r2dii.match", "r2dii.plot", "readr", "rlang",
   "scales", "stringi", "tibble", "tidyr", "uuid", "xfun", "zoo"
 )
 
-# trisk.model 2.6.1 — pinned commit on Theia-Finance-Labs/trisk.model@main.
-trisk_model_ref <- "Theia-Finance-Labs/trisk.model@cf720666a10d5517135ca17b7b158ad0ca64824b"
+# trisk.model 2.6.1 — pinned commit tarball (avoids the GitHub API and its
+# rate limits; the archive URL needs no authentication).
+trisk_model_tarball <- "https://github.com/Theia-Finance-Labs/trisk.model/archive/cf720666a10d5517135ca17b7b158ad0ca64824b.tar.gz"
 
 # Prefer the repos configured by the environment (e.g. r-lib/actions
 # setup-r with use-public-rspm installs fast Linux binaries from Posit
@@ -29,7 +30,9 @@ if (length(missing) > 0) {
 }
 
 if (!"trisk.model" %in% rownames(installed.packages())) {
-  remotes::install_github(trisk_model_ref, repos = repos, upgrade = "never")
+  tarball <- file.path(tempdir(), "trisk.model.tar.gz")
+  download.file(trisk_model_tarball, tarball, mode = "wb", quiet = TRUE)
+  install.packages(tarball, repos = NULL, type = "source")
 }
 
 still_missing <- setdiff(c(cran_packages, "trisk.model"), rownames(installed.packages()))
