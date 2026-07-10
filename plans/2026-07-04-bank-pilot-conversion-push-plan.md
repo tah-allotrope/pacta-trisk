@@ -1,7 +1,7 @@
 ---
 title: "Bank Pilot Conversion Push"
 date: "2026-07-04"
-status: "draft"
+status: "completed"
 request: "bank-pilot-conversion-push"
 plan_type: "multi-phase"
 research_inputs:

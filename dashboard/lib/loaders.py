@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Iterable
 
 import pandas as pd
 import streamlit as st
@@ -143,7 +142,3 @@ def report_catalog() -> list[dict[str, str | Path]]:
         if meta:
             rows.append({"path": path, **meta})
     return rows
-
-
-def image_catalog(names: Iterable[str], base_dir: Path) -> list[dict[str, str | Path]]:
-    return [{"name": name, "path": base_dir / name} for name in names]

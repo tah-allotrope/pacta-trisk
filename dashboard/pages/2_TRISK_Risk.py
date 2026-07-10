@@ -29,12 +29,21 @@ def _build_sector_zip(sector: str) -> bytes:
     return buffer.read()
 
 
-def _build_full_zip() -> bytes:
+def _build_full_zip(sectors: list[str]) -> bytes:
+    # Bounded to the manifest-listed sector folders (flat files) plus the
+    # manifest itself — never a recursive walk of the whole snapshot tree.
     buffer = BytesIO()
     with ZipFile(buffer, mode="w", compression=ZIP_DEFLATED) as zf:
-        for path in sorted(TRISK_DIR.rglob("*")):
-            if path.is_file():
-                zf.write(path, arcname=str(path.relative_to(TRISK_DIR)))
+        manifest_path = TRISK_DIR / "manifest.csv"
+        if manifest_path.is_file():
+            zf.write(manifest_path, arcname="manifest.csv")
+        for sector in sectors:
+            sector_dir = TRISK_DIR / sector
+            if not sector_dir.is_dir():
+                continue
+            for path in sorted(sector_dir.iterdir()):
+                if path.is_file():
+                    zf.write(path, arcname=f"{sector}/{path.name}")
     buffer.seek(0)
     return buffer.read()
 
@@ -213,7 +222,7 @@ with download_left:
 with download_right:
     st.download_button(
         "Download full TRISK multisector snapshot (zip)",
-        _build_full_zip(),
+        _build_full_zip(sector_options),
         file_name="trisk_multisector_results_bundle.zip",
         mime="application/zip",
     )

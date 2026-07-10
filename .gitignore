@@ -17,3 +17,11 @@ output/engagement_letters/*
 !output/engagement_letters/.gitkeep
 output/disclosure/*
 !output/disclosure/.gitkeep
+
+# Raw per-run TRISK scenario-grid CSVs (~2,900 files per tree). The dashboard
+# reads only the consolidated grid artifacts (scenarios.csv,
+# borrower_results.parquet, grid_meta.json); raw runs stay local-only.
+# CRITICAL: refresh.yml auto-commits with `git add dashboard/data
+# synthesis_output` — these entries are what keep CI from re-adding them.
+dashboard/data/trisk/grid/*/runs/
+synthesis_output/trisk/grid/*/runs/

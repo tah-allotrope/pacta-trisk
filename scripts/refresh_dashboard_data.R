@@ -56,24 +56,6 @@ copy_png_group <- function(src_dir, dest_dir, required = TRUE) {
   }
 }
 
-copy_dir_contents <- function(src_dir, dest_dir) {
-  if (!dir.exists(src_dir)) {
-    message(sprintf("  [MISS] %s not found", src_dir))
-    return(FALSE)
-  }
-
-  if (!dir.exists(dest_dir)) dir.create(dest_dir, recursive = TRUE, showWarnings = FALSE)
-  files <- list.files(src_dir, full.names = TRUE, all.files = TRUE, no.. = TRUE)
-  if (length(files) == 0) {
-    message(sprintf("  [MISS] %s is empty", src_dir))
-    return(FALSE)
-  }
-
-  file.copy(files, dest_dir, recursive = TRUE, overwrite = TRUE)
-  message(sprintf("  [OK] %s -> %s", src_dir, dest_dir))
-  TRUE
-}
-
 pacta_files <- c(
   "synthesis_output/vietnam/02_vn_matched_prioritized.csv",
   "synthesis_output/vietnam/04_vn_ms_company.csv",
@@ -154,14 +136,17 @@ for (i in seq_len(nrow(trisk_manifest))) {
 
   copy_png_group(file.path(src_root, "figures"), dest_root)
 
+  # The app reads only the consolidated grid artifacts; raw per-run CSVs under
+  # runs/ stay in synthesis_output and are never published to the snapshot.
   grid_src_root <- file.path("synthesis_output", "trisk", "grid", sector)
   grid_dest_root <- file.path(grid_root, sector)
-  grid_present <- copy_dir_contents(grid_src_root, grid_dest_root)
-  grid_files <- file.path(grid_dest_root, c("scenarios.csv", "borrower_results.parquet", "grid_meta.json"))
-  trisk_manifest$grid_available[[i]] <- isTRUE(grid_present) && all(file.exists(grid_files))
-  if (!trisk_manifest$grid_available[[i]]) {
-    for (gf in grid_files[!file.exists(grid_files)]) record_miss(gf, required = TRUE)
+  grid_file_names <- c("scenarios.csv", "borrower_results.parquet", "grid_meta.json")
+  if (!dir.exists(grid_dest_root)) dir.create(grid_dest_root, recursive = TRUE, showWarnings = FALSE)
+  for (name in grid_file_names) {
+    copy_file(file.path(grid_src_root, name), grid_dest_root)
   }
+  grid_files <- file.path(grid_dest_root, grid_file_names)
+  trisk_manifest$grid_available[[i]] <- all(file.exists(grid_files))
 }
 
 write_csv(trisk_manifest, file.path("dashboard", "data", "trisk", "manifest.csv"))

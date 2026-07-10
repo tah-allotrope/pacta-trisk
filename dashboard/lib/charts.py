@@ -4,7 +4,7 @@ import pandas as pd
 import plotly.express as px
 
 
-ALLotrope_COLORS = ["#00E5FF", "#39FF14", "#7CFFB2", "#2F81F7", "#FFB000", "#F85149"]
+ALLOTROPE_COLORS = ["#00E5FF", "#39FF14", "#7CFFB2", "#2F81F7", "#FFB000", "#F85149"]
 
 
 def _base_layout(fig, title: str | None = None):
@@ -13,7 +13,7 @@ def _base_layout(fig, title: str | None = None):
         template="plotly_dark",
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        colorway=ALLotrope_COLORS,
+        colorway=ALLOTROPE_COLORS,
         margin=dict(l=16, r=16, t=52, b=16),
         legend_title_text="",
         height=360,
@@ -40,10 +40,4 @@ def npv_var_scatter(df: pd.DataFrame, x: str, y: str, color: str, hover_name: st
 
 def ranked_bar(df: pd.DataFrame, x: str, y: str, color: str, title: str):
     fig = px.bar(df, x=x, y=y, color=color, orientation="h")
-    return _base_layout(fig, title)
-
-
-def pd_change_heatmap(df: pd.DataFrame, x: str, y: str, z: str, title: str):
-    pivot = df.pivot(index=y, columns=x, values=z)
-    fig = px.imshow(pivot, text_auto=True, aspect="auto", color_continuous_scale="Tealgrn")
     return _base_layout(fig, title)

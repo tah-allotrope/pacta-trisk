@@ -1,7 +1,7 @@
 ---
 title: "Bring-Your-Own-Loanbook (BYOL) Pilot Intake"
 date: "2026-05-19"
-status: "draft"
+status: "completed"
 request: "Build an intake contract, Excel/CSV template, validation/mapping wizard script, and operator-gated dashboard upload page so a real Vietnamese bank can plug in their own loanbook and get normalized PACTA+TRISK-ready output."
 plan_type: "multi-phase"
 research_inputs:

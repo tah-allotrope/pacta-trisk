@@ -1,7 +1,7 @@
 ---
 title: "Interactive Scenario & Stress Builder"
 date: "2026-05-02"
-status: "draft"
+status: "completed"
 request: "Build a Scenario Builder page on the PACTA-TRISK Streamlit dashboard letting a banker drive shock_year, discount_rate, risk_free_rate, market_passthrough, and carbon-price scenario family live, with a precomputed grid path that works on Streamlit Cloud and an operator-only live-rerun path that calls scripts/trisk_sector_demo.R. Include side-by-side baseline vs scenario comparison, top movers in NPV/PD change, save-scenario feature, and exportable artifacts."
 plan_type: "multi-phase"
 research_inputs:

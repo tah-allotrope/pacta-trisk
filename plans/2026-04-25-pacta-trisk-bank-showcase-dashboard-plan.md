@@ -1,7 +1,7 @@
 ---
 title: "PACTA + TRISK Bank Showcase Dashboard"
 date: "2026-04-25"
-status: "draft"
+status: "completed"
 request: "PACTA + TRISK dashboard/webapp for showcase with bank clients, deployed on a free tier of the best option among Firebase, Supabase, Oracle Cloud Free Tier, Streamlit Community Cloud, etc. Compare hosting options and pick a recommended stack. Use existing PACTA + TRISK outputs in this repo (reports/, research/) and synthetic Vietnam bank data."
 plan_type: "multi-phase"
 research_inputs:

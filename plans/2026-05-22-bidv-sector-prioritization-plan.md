@@ -1,7 +1,7 @@
 ---
 title: "BIDV Sector Prioritization Module"
 date: "2026-05-22"
-status: "draft"
+status: "completed"
 request: "GAP-03 from the BIDV gap analysis: build a sector prioritization scoring script that combines PACTA alignment gaps, TRISK stress-test priority scores, and portfolio exposure weights into a ranked sector priority list, demonstrated with the synthetic MCB portfolio as an illustrative BIDV example."
 plan_type: "multi-phase"
 research_inputs:

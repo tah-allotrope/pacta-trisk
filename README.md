@@ -1,0 +1,105 @@
+# PACTA + TRISK Vietnam — Bank Climate Alignment & Transition-Risk Platform
+
+An end-to-end demonstration platform that shows how a Vietnamese bank can
+measure loanbook climate alignment (**PACTA** — Paris Agreement Capital
+Transition Assessment) and stress-test transition risk at borrower level
+(**TRISK**), then turn the results into engagement and disclosure
+deliverables aligned with Decision 263/QĐ-TTg, TCFD, and ISSB.
+
+> **All data is synthetic.** Every number comes from the fictional
+> "Mekong Commercial Bank (MCB)" case — synthetic loanbook, synthetic
+> asset-based company data, and adapted PDP8 / NDC / IEA NZE scenario
+> pathways. Nothing here is a real assessment of any institution.
+
+**Live demo:** https://pactavn.streamlit.app
+
+## Architecture
+
+```
+data/generate_vietnam_data.R          synthetic inputs (loanbook, ABCD, scenarios)
+        │
+        ▼
+scripts/pacta_vietnam_scenario.R      PACTA alignment vs PDP8 / NDC / NZE
+        │                             → synthesis_output/vietnam/
+        ▼
+scripts/trisk_prepare_inputs.R        TRISK input packages per sector
+scripts/trisk_sector_demo.R           TRISK stress runs (power / cement / steel)
+scripts/trisk_scenario_grid.R         243-scenario sensitivity grid per sector
+        │                             → synthesis_output/trisk/
+        ▼
+scripts/sector_prioritization.R       sector ranking (alignment × stress × exposure)
+scripts/refresh_dashboard_data.R      publish frozen snapshot → dashboard/data/
+        │                             (orchestrated by scripts/pipeline_refresh.R,
+        ▼                              run weekly by .github/workflows/refresh.yml)
+dashboard/                            Streamlit app (7 pages; 3 operator-gated)
+        │
+        ▼
+scripts/engagement_scoring.R          borrower engagement priority
+scripts/generate_engagement_letters.R per-borrower letters
+scripts/generate_disclosure_pack.R    TCFD / ISSB / Decision 263 pack
+```
+
+## Quick start
+
+Prerequisites: R 4.5+ (Windows path assumed below) and Python 3.11+.
+
+```powershell
+# Python deps (dashboard)
+python -m pip install -r dashboard/requirements.txt
+
+# R deps (pipeline)
+& "C:\Program Files\R\R-4.5.2\bin\Rscript.exe" scripts/ci/install_deps.R
+
+# Rebuild the TRISK chain + dashboard snapshot (writes pipeline_manifest.json)
+$env:Path += ";C:\Program Files\R\R-4.5.2\bin"
+Rscript scripts/pipeline_refresh.R
+
+# Tests
+python -m pytest dashboard/tests
+
+# Run the app
+python -m streamlit run dashboard/app.py
+```
+
+On Linux/macOS use plain `Rscript` on PATH. Always run from the repo root —
+all R scripts resolve paths relative to the working directory.
+
+## Repository map
+
+| Path | Contents |
+|---|---|
+| `scripts/` | R pipeline stages, report generators, `pipeline_refresh.R` orchestrator |
+| `data/` | Synthetic Vietnam inputs + generator (`generate_vietnam_data.R`) |
+| `synthesis_output/` | Pipeline outputs (PACTA, TRISK, scenario grid) |
+| `dashboard/` | Streamlit app: `app.py`, `pages/`, `lib/`, `tests/`, frozen snapshot `data/` |
+| `intake/` | "Bring Your Own Loanbook" schema contract + templates |
+| `pilot/` | Bank-agnostic pilot conversion pack (`{{BANK_NAME}}` tailoring slots) |
+| `docs/` | Methodology guides, deployment notes, assumption registers |
+| `reports/` | Rendered self-contained HTML reports |
+| `plans/`, `research/` | Implementation plans and research briefs |
+
+## Operator features (env-gated, off by default)
+
+| Flag | Feature |
+|---|---|
+| `BYOL_INTAKE=1` | Intake Wizard (page 6): validate + map a client loanbook |
+| `OUTPUTS_LAYER=1` | Outputs (page 7): engagement letters + disclosure pack |
+| `TRISK_LIVE_RERUN=1` | Live TRISK rerun in the Scenario Builder (**never on Cloud** — no R runtime) |
+| `PILOT_ANALYTICS_ENDPOINT` | Anonymous page-view counter (see `docs/streamlit-deploy.md`) |
+| `R_RSCRIPT` | Path to `Rscript` for the R-calling features above |
+
+## Methodology & caveats
+
+- PACTA: `r2dii.data` / `r2dii.match` / `r2dii.analysis` (RMI); TRISK:
+  `trisk.model` (Theia Finance Labs), after Baer et al. (2022).
+- TRISK NPV/PD figures are **illustrative stress indicators**, not
+  production credit-model outputs.
+- Cement and steel use sector-level SDA context (not borrower-specific
+  alignment); steel match coverage in the synthetic book is low.
+- See `docs/TRISK_Demo_Assumptions.md`, `docs/trisk_multisector_contract.md`,
+  and `dashboard/data/README.md` for the full assumption registers.
+
+## License
+
+Proprietary — see `NOTICE.md`. Upstream R packages retain their own
+open-source licenses.

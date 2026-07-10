@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PHASE-02 Report — Snapshot &amp; Repo Diet, Front Door, Housekeeping</title>
+<style>
+  :root { --ink:#1c2733; --sub:#5a6b7a; --line:#dde5ec; --ok:#1a7f4e; --warn:#9a6700; --bg:#f7fafc; --card:#ffffff; --accent:#0b5d8a; }
+  body { font-family: "Segoe UI", system-ui, sans-serif; color: var(--ink); background: var(--bg); margin: 0; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+  header { border-bottom: 3px solid var(--accent); padding-bottom: 1rem; margin-bottom: 1.5rem; }
+  h1 { margin: 0 0 .25rem; font-size: 1.6rem; }
+  .meta { color: var(--sub); font-size: .92rem; }
+  h2 { color: var(--accent); font-size: 1.15rem; margin-top: 2rem; border-bottom: 1px solid var(--line); padding-bottom: .3rem; }
+  table { border-collapse: collapse; width: 100%; font-size: .9rem; margin: .75rem 0; background: var(--card); }
+  th, td { border: 1px solid var(--line); padding: .45rem .6rem; text-align: left; vertical-align: top; }
+  th { background: #eef4f8; }
+  code { background: #eef2f5; padding: .1rem .3rem; border-radius: 4px; font-size: .86em; }
+  .ok { color: var(--ok); font-weight: 600; }
+  .warn { color: var(--warn); font-weight: 600; }
+  .kpis { display: flex; gap: .8rem; flex-wrap: wrap; margin: 1rem 0; }
+  .kpi { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: .7rem 1rem; min-width: 150px; }
+  .kpi .v { font-size: 1.25rem; font-weight: 700; color: var(--accent); }
+  .kpi .l { font-size: .8rem; color: var(--sub); }
+  .note { background: #fff8e8; border: 1px solid #eadfb8; border-radius: 8px; padding: .7rem 1rem; font-size: .9rem; }
+  footer { margin-top: 3rem; color: var(--sub); font-size: .82rem; border-top: 1px solid var(--line); padding-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>PHASE-02 — Snapshot &amp; Repo Diet, Front Door, Housekeeping</h1>
+  <div class="meta">Plan: <code>plans/2026-07-10-real-data-readiness-hardening-plan.md</code> · Executed: 2026-07-10 · Branch: <code>cc-nightly/20260710-083004</code></div>
+</header>
+
+<p>Goal: cut <code>dashboard/data/</code> from ~108&nbsp;MB to &lt;&nbsp;15&nbsp;MB by dropping never-read grid artifacts, bound the ZIP export, add the missing root README and proprietary notice, and clear small hygiene debts. This phase also carried the PHASE-01 exit criterion "one green Actions run" over the line — the first three CI attempts failed and were diagnosed and fixed in three fixup commits.</p>
+
+<div class="kpis">
+  <div class="kpi"><div class="v">108 → 4 MB</div><div class="l">dashboard/data size</div></div>
+  <div class="kpi"><div class="v">5,844</div><div class="l">dead files untracked</div></div>
+  <div class="kpi"><div class="v">81 → 42 MB</div><div class="l">git objects (gc pack)</div></div>
+  <div class="kpi"><div class="v">54</div><div class="l">tests passed</div></div>
+  <div class="kpi"><div class="v ok">green</div><div class="l">CI refresh run</div></div>
+</div>
+
+<h2>Tasks completed</h2>
+<table>
+  <tr><th>Task</th><th>Change</th><th>Result</th></tr>
+  <tr><td>TASK-02-01</td><td><code>scripts/refresh_dashboard_data.R</code>: grid copy narrowed from a full directory copy to exactly <code>scenarios.csv</code>, <code>borrower_results.parquet</code>, <code>grid_meta.json</code> per sector; unused <code>copy_dir_contents()</code> helper removed.</td><td class="ok">Re-run verified: each grid dir contains exactly 3 files; <code>grid_available</code> = TRUE ×3.</td></tr>
+  <tr><td>TASK-02-02</td><td>Untracked 5,832 raw per-run grid CSVs (2,916 each under <code>dashboard/data/trisk/grid/*/runs/</code> and <code>synthesis_output/trisk/grid/*/runs/</code>) plus 12 snapshot grid <code>input/</code> files; added <code>.gitignore</code> patterns for both <code>runs/</code> trees so the auto-committing CI can never re-add them.</td><td class="ok">Done. <code>git status</code> shows no <code>runs/</code> paths; CI bot commit after the change added no runs files.</td></tr>
+  <tr><td>TASK-02-03</td><td><code>dashboard/pages/2_TRISK_Risk.py</code>: <code>_build_full_zip()</code> rewritten to iterate manifest-listed sector folders (flat) + <code>manifest.csv</code> instead of <code>TRISK_DIR.rglob("*")</code>.</td><td class="ok">ZIP verified: 52 entries, 212 KB, zero <code>grid/</code> paths.</td></tr>
+  <tr><td>TASK-02-04</td><td>Created root <code>README.md</code>: platform summary, synthetic-data posture, ASCII pipeline diagram, quick start, repo map, env-flag table, methodology caveats, live-app link.</td><td class="ok">Done.</td></tr>
+  <tr><td>TASK-02-05</td><td>Created <code>NOTICE.md</code> (proprietary, © Allotrope VC; upstream OSS licenses acknowledged).</td><td class="ok">Done.</td></tr>
+  <tr><td>TASK-02-06</td><td>Housekeeping: deleted <code>scripts/debug_ms.R</code> (committed scratch code); removed unused <code>pd_change_heatmap()</code> from <code>charts.py</code> and unused <code>image_catalog()</code> + <code>Iterable</code> import from <code>loaders.py</code>; renamed <code>ALLotrope_COLORS</code> → <code>ALLOTROPE_COLORS</code>.</td><td class="ok">Zero call sites confirmed by grep before removal; syntax + full suite green.</td></tr>
+  <tr><td>TASK-02-07</td><td>Flipped <code>status: "draft"</code> → <code>"completed"</code> in 5 implemented plan files (conversion push, scenario builder, BYOL intake, sector prioritization, showcase dashboard).</td><td class="ok">Done.</td></tr>
+  <tr><td>TASK-02-08</td><td><code>git gc</code>: 5,600 loose objects (81.1 MiB) packed to a 41.7 MiB packfile.</td><td class="ok">Done.</td></tr>
+</table>
+
+<h2>Carried over from PHASE-01: getting CI green</h2>
+<p>The PHASE-01 exit criterion "one green Actions run" required three iterations, each a small fixup commit on this branch:</p>
+<table>
+  <tr><th>Run</th><th>Failure</th><th>Fix (commit)</th></tr>
+  <tr><td>29063435563</td><td><code>fs</code> 2.1.0 failed to compile from source — libuv headers missing on the runner.</td><td><code>0c5c5e5</code>: <code>use-public-rspm: true</code> on setup-r (Posit PM Linux binaries, no compilation) + <code>libuv1-dev</code> in the apt line; <code>install_deps.R</code> honors configured repos instead of hardcoding the CRAN source repo.</td></tr>
+  <tr><td>29063992707</td><td><code>trisk.model</code> "not available for this version of R" — the package has been <strong>archived from CRAN</strong> (no CRAN archive dir either).</td><td><code>3f324b3</code>: install from Theia-Finance-Labs GitHub, pinned to commit <code>cf72066</code> (Version 2.6.1, matching the verified local install).</td></tr>
+  <tr><td>29064192240</td><td><code>remotes::install_github</code> hit the GitHub API rate limit (bundled PAT).</td><td><code>2b3351c</code>: install from the pinned commit <em>archive tarball</em> — no API, no auth. Verified locally in a temp library before pushing. <code>install_deps.R</code> now also fails fast if any package is missing post-install.</td></tr>
+  <tr><td>29064332153</td><td class="ok">SUCCESS — full pipeline green on ubuntu-latest / R 4.5; bot committed the CI-verified snapshot (<code>9255692</code>, manifest sha <code>2b3351c</code>, all 7 steps ok, ~21 s pipeline).</td><td>—</td></tr>
+</table>
+
+<h2>Verification evidence</h2>
+<table>
+  <tr><th>Check</th><th>Result</th></tr>
+  <tr><td><code>Rscript scripts/refresh_dashboard_data.R</code> after narrowing</td><td class="ok">exit 0; grid dirs = exactly 3 files; manifest <code>grid_available</code> TRUE ×3</td></tr>
+  <tr><td><code>dashboard/data</code> total size</td><td class="ok">4 MB (was ~108 MB) — target &lt; 15 MB met</td></tr>
+  <tr><td>Full-zip contents</td><td class="ok">52 entries, 212 KB, no <code>grid/</code> paths</td></tr>
+  <tr><td><code>python -m pytest dashboard/tests</code> (post-rebase on CI-verified snapshot)</td><td class="ok">54 passed</td></tr>
+  <tr><td><code>git count-objects -vH</code> after gc</td><td class="ok">size-pack 41.69 MiB, 0 loose</td></tr>
+  <tr><td>CI refresh workflow</td><td class="ok">run 29064332153 success; bot snapshot commit <code>9255692</code> contains no <code>runs/</code> files</td></tr>
+</table>
+
+<h2>Notes &amp; deviations</h2>
+<div class="note">
+<ul>
+  <li><strong>Phase attribution slip:</strong> the grid <code>runs/</code>/<code>input/</code> untracking (staged during PHASE-02 work) was accidentally swept into the PHASE-01 fixup commit <code>0c5c5e5</code> (which was intended to touch only two CI files). All content is planned work and history was not rewritten; this report is the record of where it landed.</li>
+  <li>The CI bot's snapshot commit <code>9255692</code> briefly re-added the 12 grid <code>input/</code> files because it ran the pre-narrowing script version; they are removed again in this phase's commit, and with the narrowed script + <code>.gitignore</code> now on the branch they cannot return.</li>
+  <li><code>trisk.model</code> being archived from CRAN is a new supply-chain fact discovered here — relevant to PHASE-03's renv work: the lockfile must record the GitHub source (RemoteType/RemoteSha), not CRAN.</li>
+  <li>Per plan ASM-003 no history rewrite was performed; the ~7 MB deck binaries remain in history. Clone weight improved via gc pack + forward-looking untracking.</li>
+</ul>
+</div>
+
+<footer>Allotrope VC — PACTA + TRISK Vietnam platform. Synthetic demo data only. Phase report generated as part of plan execution on branch <code>cc-nightly/20260710-083004</code>.</footer>
+</div>
+</body>
+</html>
