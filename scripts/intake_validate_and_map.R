@@ -33,9 +33,10 @@ get_arg <- function(flag, default = NULL) {
 
 input_file  <- get_arg("--input")
 output_dir  <- get_arg("--output-dir", file.path(getwd(), "intake", "output"))
+anonymize   <- "--anonymize" %in% args
 
 if (is.null(input_file)) {
-  stop("Usage: Rscript scripts/intake_validate_and_map.R --input <file> [--output-dir <dir>]")
+  stop("Usage: Rscript scripts/intake_validate_and_map.R --input <file> [--output-dir <dir>] [--anonymize]")
 }
 
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
@@ -119,10 +120,44 @@ for (i in seq_len(n_total)) {
   sc <- trimws(as.character(row$sector_code))
   if (is.na(sc) || sc == "") {
     add_error(i, "sector_code", "sector_code is missing or empty")
+  } else if (scs == "VSIC" && !grepl("^[A-Za-z]*\\d+$", sc)) {
+    add_error(i, "sector_code", sprintf("sector_code '%s' is not a valid VSIC code", sc))
+  }
+
+  # currency check - output requires VND
+  cur <- trimws(as.character(row$currency))
+  if (!is.na(cur) && cur != "" && cur != "VND") {
+    add_error(i, "currency", sprintf("currency '%s' must be VND for PACTA processing", cur))
   }
 }
 
+# Check for unmappable sector codes (normalize but don't map to PACTA sectors)
+known_isic <- c("3511", "2910", "2394", "2410", "0510", "0610")
+for (i in seq_len(n_total)) {
+  sc <- trimws(as.character(input_data$sector_code[i]))
+  scs <- trimws(as.character(input_data$sector_code_system[i]))
+  if (!is.na(sc) && sc != "" && scs == "VSIC") {
+    norm_code <- gsub("^[A-Za-z]+", "", sc)
+    if (grepl("^\\d+$", norm_code)) {
+      norm_code <- stringi::stri_pad_left(norm_code, 4, "0")
+      if (!norm_code %in% known_isic) {
+        add_error(i, "sector_code", sprintf("sector_code '%s' (ISIC %s) is not in PACTA scope", sc, norm_code))
+      }
+    }
+  }
+}
+
+# Check for duplicate rows
+dupes <- which(duplicated(input_data))
+for (i in dupes) {
+  add_error(i, "duplicate", sprintf("Row %d is a duplicate of an earlier row", i))
+}
+
 errors_df <- if (length(errors) > 0) bind_rows(errors) else tibble(row = integer(), column = character(), error = character())
+
+# Rows with errors are excluded from the normalized output
+error_rows <- unique(errors_df$row)
+valid_mask <- !seq_len(n_total) %in% error_rows
 
 # ---- VSIC -> ISIC normalization ----
 normalize_sector_code <- function(code, code_system) {
@@ -226,6 +261,39 @@ output_loanbook <- tibble(
   isin_direct_loantaker = "NA"
 )
 
+# Filter to only valid rows
+output_loanbook <- output_loanbook[valid_mask, ]
+
+if (anonymize) {
+  pseudonymize_names <- function(names_vec, map) {
+    unique_names <- unique(names_vec[!is.na(names_vec)])
+    new_pseudos <- setdiff(unique_names, map$original_name)
+    if (length(new_pseudos) > 0) {
+      new_rows <- tibble(
+        original_name = new_pseudos,
+        pseudonym = sprintf("Counterparty %03d", seq(nrow(map) + 1, length.out = length(new_pseudos)))
+      )
+      map <- bind_rows(map, new_rows)
+    }
+    lookup <- setNames(map$pseudonym, map$original_name)
+    pseudonymized <- ifelse(is.na(names_vec), NA_character_, lookup[names_vec])
+    list(names = pseudonymized, map = map)
+  }
+
+  pseudo_map <- tibble(original_name = character(), pseudonym = character())
+  dl_result <- pseudonymize_names(output_loanbook$name_direct_loantaker, pseudo_map)
+  output_loanbook$name_direct_loantaker <- dl_result$names
+  pseudo_map <- dl_result$map
+
+  up_result <- pseudonymize_names(output_loanbook$name_ultimate_parent, pseudo_map)
+  output_loanbook$name_ultimate_parent <- up_result$names
+  pseudo_map <- up_result$map
+
+  map_path <- file.path(output_dir, "pseudonym_map.csv")
+  write_csv(pseudo_map, map_path)
+  cat(sprintf("  Written: %s\n", map_path))
+}
+
 # ---- Write normalized loanbook ----
 normalized_path <- file.path(output_dir, "normalized_loanbook.csv")
 write_csv(output_loanbook, normalized_path)
@@ -287,6 +355,15 @@ if (file.exists(abcd_file)) {
             best_abcd_match = name_abcd
           ) %>%
           arrange(input_counterparty, desc(score))
+
+        if (anonymize && nrow(pseudo_map) > 0) {
+          lookup <- setNames(pseudo_map$pseudonym, pseudo_map$original_name)
+          match_preview$input_counterparty <- ifelse(
+            is.na(match_preview$input_counterparty),
+            NA_character_,
+            lookup[match_preview$input_counterparty]
+          )
+        }
 
         cat(sprintf("  Matches found: %d\n", nrow(match_preview)))
       } else {

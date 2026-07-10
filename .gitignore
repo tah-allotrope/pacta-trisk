@@ -25,3 +25,10 @@ output/disclosure/*
 # synthesis_output` — these entries are what keep CI from re-adding them.
 dashboard/data/trisk/grid/*/runs/
 synthesis_output/trisk/grid/*/runs/
+
+# Pseudonym mapping from --anonymize intake runs. Operator-held, never committed.
+intake/output*/pseudonym_map.csv
+
+# Rehearsal intake outputs (generated during dress rehearsal, not tracked).
+intake/output_rehearsal/
+intake/output_rehearsal_named/

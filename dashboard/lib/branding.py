@@ -5,11 +5,13 @@ import re
 import streamlit as st
 
 from dashboard.lib.analytics import track_page_view
+from dashboard.lib.auth import require_password
 from dashboard.lib.loaders import load_pipeline_manifest
 
 
 def apply_page_frame(title: str, subtitle: str | None = None) -> None:
     st.set_page_config(page_title=title, page_icon=":bar_chart:", layout="wide")
+    require_password()
     page_slug = re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-")
     track_page_view(page_slug)
     st.markdown(

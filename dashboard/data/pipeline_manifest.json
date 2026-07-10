@@ -1,41 +1,46 @@
 {
-  "generated_at": "2026-07-10T02:20:04+0000",
-  "git_sha": "2b3351c9aa5f63c2c1cb83b93bee33127ec310ff",
+  "generated_at": "2026-07-10T17:59:28+0700",
+  "git_sha": "608e7669960d1522dfcf8416e8cbc20825a4a096",
   "steps": [
     {
       "name": "trisk_prepare_inputs",
       "status": "ok",
-      "seconds": 1.1
+      "seconds": 2.1
     },
     {
       "name": "trisk_power_demo",
       "status": "ok",
-      "seconds": 0.9
+      "seconds": 1.8
     },
     {
       "name": "trisk_sector_demo_cement",
       "status": "ok",
-      "seconds": 7.4
+      "seconds": 27.9
     },
     {
       "name": "trisk_sector_demo_steel",
       "status": "ok",
-      "seconds": 6.7
+      "seconds": 35.5
     },
     {
       "name": "trisk_scenario_grid",
       "status": "ok",
-      "seconds": 2
+      "seconds": 3.6
     },
     {
       "name": "sector_prioritization",
       "status": "ok",
-      "seconds": 2
+      "seconds": 3.3
     },
     {
       "name": "refresh_dashboard_data",
       "status": "ok",
-      "seconds": 0.8
+      "seconds": 1.6
+    },
+    {
+      "name": "refresh_audit",
+      "status": "ok",
+      "seconds": 1.4
     }
   ],
   "status": "ok",

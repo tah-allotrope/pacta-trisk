@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pipeline Refresh Audit</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 900px; margin: 2rem auto; padding: 0 1rem; color: #2d3748; }
+  h1 { color: #1a365d; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; }
+  h2 { color: #2b6cb0; margin-top: 2rem; }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+  th { background: #1a365d; color: white; padding: 0.5rem; text-align: left; }
+  td { padding: 0.5rem; border-bottom: 1px solid #e2e8f0; }
+  tr:nth-child(even) { background: #f7fafc; }
+  code { background: #edf2f7; padding: 0.1rem 0.3rem; border-radius: 3px; font-size: 0.85rem; }
+  .meta { color: #718096; font-size: 0.85rem; }
+</style>
+</head>
+<body>
+
+<h1>Pipeline Refresh Audit</h1>
+<p class="meta">Generated: 2026-07-10T17:42:50+0700 &middot; Commit: <code>608e766</code></p>
+
+<h2>Step Timings</h2>
+<table>
+<tr><th>Step</th><th>Status</th><th>Duration</th></tr>
+<tr><td>trisk_prepare_inputs</td><td>ok</td><td>4.6s</td></tr>
+<tr><td>trisk_power_demo</td><td>ok</td><td>2.5s</td></tr>
+<tr><td>trisk_sector_demo_cement</td><td>ok</td><td>15.8s</td></tr>
+<tr><td>trisk_sector_demo_steel</td><td>ok</td><td>16.3s</td></tr>
+<tr><td>trisk_scenario_grid</td><td>ok</td><td>7.7s</td></tr>
+<tr><td>sector_prioritization</td><td>ok</td><td>4.7s</td></tr>
+<tr><td>refresh_dashboard_data</td><td>ok</td><td>3.0s</td></tr>
+
+</table>
+
+<h2>Input Checksums (MD5)</h2>
+<table>
+<tr><th>File</th><th>Checksum</th></tr>
+<tr><td><code>data/vietnam_loanbook.csv</code></td><td><code>ee3cc91cff6313d450683a6125c5606f</code></td></tr>
+<tr><td><code>data/vietnam_abcd.csv</code></td><td><code>9da390a7c9ffe7538b251fed0b7e78a4</code></td></tr>
+
+</table>
+
+<h2>PACTA Match Coverage by Sector</h2>
+<table>
+<tr><th>Sector</th><th>Matched Rows</th></tr>
+<tr><td>automotive</td><td>7</td></tr>
+<tr><td>cement</td><td>3</td></tr>
+<tr><td>coal</td><td>2</td></tr>
+<tr><td>power</td><td>29</td></tr>
+<tr><td>steel</td><td>2</td></tr>
+
+</table>
+
+<h2>Top 5 TRISK Borrowers (Power — Stress Priority)</h2>
+<table>
+<tr><th>Company</th><th>Score</th></tr>
+<tr><td>Nghi Son Power LLC</td><td>100.00</td></tr>
+<tr><td>Vinacomin Power JSC</td><td>99.66</td></tr>
+<tr><td>International Power Mong Duong</td><td>99.22</td></tr>
+<tr><td>EVN (Electricity of Vietnam)</td><td>63.94</td></tr>
+<tr><td>PVN Power Corporation</td><td>45.53</td></tr>
+
+</table>
+
+<h2>Top 5 Engagement Priority</h2>
+<table>
+<tr><th>Company</th><th>Composite Score</th></tr>
+<tr><td>Nghi Son Power LLC</td><td>1.0000</td></tr>
+<tr><td>Vinacomin Power JSC</td><td>0.9982</td></tr>
+<tr><td>International Power Mong Duong</td><td>0.9959</td></tr>
+<tr><td>Ford Motor Company</td><td>0.8501</td></tr>
+<tr><td>Hyundai Motor Company</td><td>0.8501</td></tr>
+
+</table>
+
+<h2>Changes Since Last Run</h2>
+<table>
+<tr><th>Metric</th><th>Previous</th><th>Current</th><th>Status</th></tr>
+<tr><td>n_pacta_matched</td><td>43</td><td>43</td><td></td></tr>
+<tr><td>n_engagement</td><td>23</td><td>23</td><td></td></tr>
+<tr><td>top_trisk_borrower</td><td>Nghi Son Power LLC</td><td>Nghi Son Power LLC</td><td></td></tr>
+<tr><td>top_engagement</td><td>Nghi Son Power LLC</td><td>Nghi Son Power LLC</td><td></td></tr>
+
+</table>
+
+</body>
+</html>

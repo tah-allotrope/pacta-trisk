@@ -35,3 +35,20 @@ See `docs/intake_privacy.md` for the full privacy posture. Key rules:
 - No raw counterparty names appear on the public dashboard
 - The intake wizard runs behind `BYOL_INTAKE=1` env flag only
 - Aggregated views only in dashboard output
+
+## Anonymization
+
+The `--anonymize` flag replaces counterparty names with stable pseudonyms
+(`Counterparty 001`, `Counterparty 002`, ...) in the normalized loanbook and
+match preview. A mapping file (`pseudonym_map.csv`) is written to the output
+directory for operator reference but is gitignored and never committed.
+
+```bash
+Rscript scripts/intake_validate_and_map.R \
+  --input data/fixtures/unseen_bank_loanbook.csv \
+  --output-dir intake/output_rehearsal \
+  --anonymize
+```
+
+**Note:** Pseudonym numbering is per-run. The map must be regenerated and
+re-held per delivery; never reuse across extracts.

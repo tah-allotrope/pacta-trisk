@@ -4,7 +4,10 @@
 # the dashboard data snapshot, writing a manifest so the dashboard can show
 # a "Data as of" badge instead of the copy being a silent hand-edit.
 #
-# Usage: Rscript scripts/pipeline_refresh.R
+# Usage: Rscript scripts/pipeline_refresh.R [--full]
+#
+# Default (no flag): runs the 7-step TRISK refresh chain.
+# With --full: prepends data generation + PACTA, appends engagement scoring (10 steps).
 #
 # Fails fast: if any step errors, later steps do not run and the manifest
 # records which step failed.
@@ -12,6 +15,9 @@
 suppressPackageStartupMessages({
   library(jsonlite)
 })
+
+args <- commandArgs(trailingOnly = TRUE)
+full_mode <- "--full" %in% args
 
 steps <- list(
   list(name = "trisk_prepare_inputs", script = "scripts/trisk_prepare_inputs.R", args = character()),
@@ -22,6 +28,27 @@ steps <- list(
   list(name = "sector_prioritization", script = "scripts/sector_prioritization.R", args = character()),
   list(name = "refresh_dashboard_data", script = "scripts/refresh_dashboard_data.R", args = character())
 )
+
+if (full_mode) {
+  steps <- c(
+    list(
+      list(name = "generate_vietnam_data", script = "data/generate_vietnam_data.R", args = character()),
+      list(name = "pacta_vietnam_scenario", script = "scripts/pacta_vietnam_scenario.R", args = character())
+    ),
+    steps,
+    list(
+      list(name = "engagement_scoring", script = "scripts/engagement_scoring.R", args = character()),
+      list(name = "refresh_audit", script = "scripts/generate_refresh_audit.R", args = character())
+    )
+  )
+} else {
+  steps <- c(
+    steps,
+    list(
+      list(name = "refresh_audit", script = "scripts/generate_refresh_audit.R", args = character())
+    )
+  )
+}
 
 git_sha <- tryCatch(
   trimws(system("git rev-parse HEAD", intern = TRUE)),

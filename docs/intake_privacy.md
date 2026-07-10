@@ -8,7 +8,7 @@
 
 3. **The intake wizard runs behind `BYOL_INTAKE=1` env flag only.** Follows the same gating pattern as `TRISK_LIVE_RERUN` in `dashboard/lib/live_rerun.py`. Without this flag, the Intake Wizard page is invisible and unreachable.
 
-4. **Optional pre-anonymization.** Banks may anonymize borrower names before sending. The template README documents this option. No automated hash-based anonymization is performed.
+4. **Optional pre-anonymization.** Banks may anonymize borrower names before sending. The template README documents this option. The intake script also supports `--anonymize` to replace counterparty names with stable pseudonyms (`Counterparty 001`, ...) in the normalized output. This is the default `{{ANONYMIZATION_APPROACH}}` for the real-data phase.
 
 5. **Aggregated views only in dashboard output.** The dashboard shows sector-level alignment and risk metrics. No individual loan rows or counterparty names appear in the public dashboard.
 

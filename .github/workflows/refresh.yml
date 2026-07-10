@@ -22,30 +22,27 @@ jobs:
           r-version: "4.5"
           use-public-rspm: true
 
-      - name: Cache R library
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.R_LIBS_USER }}
-          key: r-library-${{ runner.os }}-${{ hashFiles('scripts/ci/install_deps.R') }}
-          restore-keys: |
-            r-library-${{ runner.os }}-
-
       - name: Install system dependencies for R packages
         run: |
           sudo apt-get update
           sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libgdal-dev libudunits2-dev libuv1-dev
 
-      - name: Install R dependencies
-        run: Rscript scripts/ci/install_deps.R
+      - name: Restore R dependencies via renv
+        uses: r-lib/actions/setup-renv@v2
+        with:
+          cache-version: 1
 
       - name: Run pipeline refresh
         run: Rscript scripts/pipeline_refresh.R
+
+      - name: Regression-test refreshed outputs
+        run: Rscript -e "testthat::test_dir('tests/testthat')"
 
       - name: Commit refreshed snapshot
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add dashboard/data synthesis_output
+          git add dashboard/data synthesis_output reports/pipeline_refresh_audit.html reports/refresh_audit_metrics.json
           if git diff --cached --quiet; then
             echo "No data changes to commit."
           else
