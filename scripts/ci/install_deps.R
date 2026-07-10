@@ -12,9 +12,17 @@ cran_packages <- c(
   "trisk.model", "xfun"
 )
 
+# Prefer the repos configured by the environment (e.g. r-lib/actions
+# setup-r with use-public-rspm installs fast Linux binaries from Posit
+# Package Manager); fall back to CRAN cloud when nothing is configured.
+repos <- getOption("repos")
+if (is.null(repos) || length(repos) == 0 || identical(unname(repos["CRAN"]), "@CRAN@")) {
+  repos <- c(CRAN = "https://cloud.r-project.org")
+}
+
 missing <- setdiff(cran_packages, rownames(installed.packages()))
 if (length(missing) > 0) {
-  install.packages(missing, repos = "https://cloud.r-project.org")
+  install.packages(missing, repos = repos)
 }
 
 cat("All pipeline R dependencies installed.\n")
