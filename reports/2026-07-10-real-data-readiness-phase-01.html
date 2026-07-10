@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PHASE-01 Report — Activate &amp; Verify Refresh Automation</title>
+<style>
+  :root { --ink:#1c2733; --sub:#5a6b7a; --line:#dde5ec; --ok:#1a7f4e; --bg:#f7fafc; --card:#ffffff; --accent:#0b5d8a; }
+  body { font-family: "Segoe UI", system-ui, sans-serif; color: var(--ink); background: var(--bg); margin: 0; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+  header { border-bottom: 3px solid var(--accent); padding-bottom: 1rem; margin-bottom: 1.5rem; }
+  h1 { margin: 0 0 .25rem; font-size: 1.6rem; }
+  .meta { color: var(--sub); font-size: .92rem; }
+  h2 { color: var(--accent); font-size: 1.15rem; margin-top: 2rem; border-bottom: 1px solid var(--line); padding-bottom: .3rem; }
+  table { border-collapse: collapse; width: 100%; font-size: .9rem; margin: .75rem 0; background: var(--card); }
+  th, td { border: 1px solid var(--line); padding: .45rem .6rem; text-align: left; vertical-align: top; }
+  th { background: #eef4f8; }
+  code { background: #eef2f5; padding: .1rem .3rem; border-radius: 4px; font-size: .86em; }
+  .ok { color: var(--ok); font-weight: 600; }
+  .kpis { display: flex; gap: .8rem; flex-wrap: wrap; margin: 1rem 0; }
+  .kpi { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: .7rem 1rem; min-width: 150px; }
+  .kpi .v { font-size: 1.25rem; font-weight: 700; color: var(--accent); }
+  .kpi .l { font-size: .8rem; color: var(--sub); }
+  .note { background: #fff8e8; border: 1px solid #eadfb8; border-radius: 8px; padding: .7rem 1rem; font-size: .9rem; }
+  footer { margin-top: 3rem; color: var(--sub); font-size: .82rem; border-top: 1px solid var(--line); padding-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>PHASE-01 — Activate &amp; Verify Refresh Automation</h1>
+  <div class="meta">Plan: <code>plans/2026-07-10-real-data-readiness-hardening-plan.md</code> · Executed: 2026-07-10 · Branch: <code>cc-nightly/20260710-083004</code></div>
+</header>
+
+<p>Goal: prove the July-4 pipeline automation actually works — run <code>pipeline_refresh.R</code> locally to green, make the snapshot copy fail loudly on missing artifacts, commit a real manifest so the public app's freshness badge shows a date, and prepare the GitHub Actions workflow for a verified run.</p>
+
+<div class="kpis">
+  <div class="kpi"><div class="v">7 / 7</div><div class="l">pipeline steps OK</div></div>
+  <div class="kpi"><div class="v">~50 s</div><div class="l">local pipeline runtime</div></div>
+  <div class="kpi"><div class="v">54</div><div class="l">dashboard tests passed</div></div>
+  <div class="kpi"><div class="v ok">live</div><div class="l">"Data as of" badge</div></div>
+</div>
+
+<h2>Tasks completed</h2>
+<table>
+  <tr><th>Task</th><th>Change</th><th>Result</th></tr>
+  <tr><td>TASK-01-01</td><td>Removed the fragile <code>R_LIBS_USER</code> library-load hack in <code>scripts/trisk_sector_demo.R</code>; now a plain <code>library(trisk.model)</code>.</td><td class="ok">Done — all TRISK steps ran clean with the standard library path.</td></tr>
+  <tr><td>TASK-01-02</td><td>Hardened <code>scripts/refresh_dashboard_data.R</code>: a <code>misses_required</code> accumulator collects every missing required artifact (PACTA CSVs, all 14 TRISK files per sector, PNG groups, 3 grid files per sector); reports remain warn-only; script exits 1 listing misses under a <code>MISSING REQUIRED</code> header.</td><td class="ok">Verified: renaming <code>synthesis_output/trisk/power_demo/company_summary.csv</code> → exit 1 naming that exact path; restore → exit 0.</td></tr>
+  <tr><td>TASK-01-03</td><td>Ran the full orchestrator locally: <code>Rscript scripts/pipeline_refresh.R</code> (first-ever execution).</td><td class="ok">Exit 0. All 7 steps <code>ok</code> (prepare 2.2 s, power 2.7 s, cement 12.3 s, steel 11.2 s, grid 4.4 s — cache-skip, prioritization 3.3 s, snapshot 13.8 s).</td></tr>
+  <tr><td>TASK-01-04</td><td>Committed the generated <code>dashboard/data/pipeline_manifest.json</code> (status <code>ok</code>, git sha <code>e14cd84</code>, per-step timings, 6 row counts).</td><td class="ok">Done in this phase's commit.</td></tr>
+  <tr><td>TASK-01-05</td><td>Badge verification via Streamlit AppTest on <code>dashboard/app.py</code>.</td><td class="ok">Renders <code>Data as of: 2026-07-10T08:49:10+0700 (pipeline `e14cd84`)</code> — the "unknown" fallback is gone.</td></tr>
+  <tr><td>TASK-01-06</td><td>Bumped <code>.github/workflows/refresh.yml</code> R version <code>4.4 → 4.5</code> to match local R 4.5.2.</td><td class="ok">Workflow dispatch to be triggered on this branch after push (bot commits land on the branch, not main).</td></tr>
+  <tr><td>TASK-01-07</td><td>Added "Enabling pilot analytics" to <code>docs/streamlit-deploy.md</code>: GoatCounter registration + <code>PILOT_ANALYTICS_ENDPOINT</code> secret, PII posture, opt-out.</td><td class="ok">Documented (no code change needed — <code>dashboard/lib/analytics.py</code> already honors the variable).</td></tr>
+</table>
+
+<h2>Pipeline manifest (first verified run)</h2>
+<table>
+  <tr><th>Step</th><th>Status</th><th>Seconds</th></tr>
+  <tr><td>trisk_prepare_inputs</td><td class="ok">ok</td><td>2.2</td></tr>
+  <tr><td>trisk_power_demo</td><td class="ok">ok</td><td>2.7</td></tr>
+  <tr><td>trisk_sector_demo_cement</td><td class="ok">ok</td><td>12.3</td></tr>
+  <tr><td>trisk_sector_demo_steel</td><td class="ok">ok</td><td>11.2</td></tr>
+  <tr><td>trisk_scenario_grid</td><td class="ok">ok</td><td>4.4</td></tr>
+  <tr><td>sector_prioritization</td><td class="ok">ok</td><td>3.3</td></tr>
+  <tr><td>refresh_dashboard_data</td><td class="ok">ok</td><td>13.8</td></tr>
+</table>
+<p class="meta">Row counts: power trajectories 672 · cement 84 · steel 84 · power NPV 79 · cement NPV 10 · steel NPV 10. Generated at <code>2026-07-10T08:49:10+0700</code>.</p>
+
+<h2>Verification evidence</h2>
+<table>
+  <tr><th>Check</th><th>Command</th><th>Result</th></tr>
+  <tr><td>Fail-loud negative test</td><td>rename required CSV → <code>Rscript scripts/refresh_dashboard_data.R</code></td><td class="ok">exit 1, path listed under MISSING REQUIRED</td></tr>
+  <tr><td>Optional-report tolerance</td><td>reports copy uses <code>required = FALSE</code></td><td class="ok">warn-only by construction</td></tr>
+  <tr><td>Full pipeline</td><td><code>Rscript scripts/pipeline_refresh.R</code></td><td class="ok">exit 0, manifest status <code>ok</code>, 7 steps</td></tr>
+  <tr><td>Dashboard suite</td><td><code>python -m pytest dashboard/tests</code></td><td class="ok">54 passed in 24.75 s</td></tr>
+  <tr><td>Freshness badge</td><td>AppTest render of landing page</td><td class="ok">real timestamp, no "unknown"</td></tr>
+</table>
+
+<h2>Notes &amp; deviations</h2>
+<div class="note">
+<ul>
+  <li>The local Python environment lacked <code>streamlit</code> (fresh interpreter); installed <code>streamlit 1.59.1</code> per <code>dashboard/requirements.txt</code> range. Installed <code>plotly 6.8.0</code>/<code>pandas 2.3.3</code> already present were left as-is (requirements pin plotly &lt;6 for Cloud; all 54 tests pass with 6.8 locally).</li>
+  <li>The pipeline regenerated snapshot CSVs; per plan RISK-01-02 these are committed as the new verified baseline.</li>
+  <li>The green GitHub Actions run (PHASE-01 exit criterion) is triggered on the working branch after push — the workflow's auto-commit lands on that branch, never <code>main</code>. Result recorded in the PHASE-02 report if still running at commit time.</li>
+</ul>
+</div>
+
+<footer>Allotrope VC — PACTA + TRISK Vietnam platform. Synthetic demo data only. Phase report generated as part of plan execution on branch <code>cc-nightly/20260710-083004</code>.</footer>
+</div>
+</body>
+</html>

@@ -19,8 +19,7 @@ suppressPackageStartupMessages({
   library(tidyr)
 })
 
-lib <- Sys.getenv("R_LIBS_USER")
-library(trisk.model, lib.loc = lib)
+suppressPackageStartupMessages(library(trisk.model))
 
 trisk_supported_sectors <- c("power", "cement", "steel")
 

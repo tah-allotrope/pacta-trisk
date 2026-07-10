@@ -49,6 +49,31 @@ python -m pytest dashboard/tests
 python -m streamlit run dashboard/app.py --server.headless true
 ```
 
+## Enabling pilot analytics
+
+The dashboard ships with an anonymous, PII-free page-view counter
+(`dashboard/lib/analytics.py`). It is a no-op until the
+`PILOT_ANALYTICS_ENDPOINT` environment variable is set, so the public app
+sends nothing by default.
+
+To activate it for a pilot window:
+
+1. Register a free [GoatCounter](https://www.goatcounter.com/) account with
+   site code `pacta-trisk` (any available code works; it becomes the
+   subdomain).
+2. In Streamlit Community Cloud, open the app's **Settings → Secrets** and
+   add:
+
+   ```toml
+   PILOT_ANALYTICS_ENDPOINT = "https://pacta-trisk.goatcounter.com/count"
+   ```
+
+3. Reboot the app. Each page view now fires a background ping carrying only
+   the page slug (e.g. `/pacta-alignment`) — no user identity, no cookies,
+   no query data. IP handling is done by the counter service, not the app.
+4. View engagement numbers in the GoatCounter dashboard before the closing
+   conversation; unset the secret to stop collection at any time.
+
 ## Live-rerun operator setup (PHASE-04)
 
 The Scenario Builder page supports an optional operator-only live-rerun mode that bypasses the precomputed grid and calls the R TRISK model directly.

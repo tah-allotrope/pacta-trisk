@@ -1,0 +1,50 @@
+{
+  "generated_at": "2026-07-10T08:49:10+0700",
+  "git_sha": "e14cd841038b77ea8133e77c90d915cb51fff805",
+  "steps": [
+    {
+      "name": "trisk_prepare_inputs",
+      "status": "ok",
+      "seconds": 2.2
+    },
+    {
+      "name": "trisk_power_demo",
+      "status": "ok",
+      "seconds": 2.7
+    },
+    {
+      "name": "trisk_sector_demo_cement",
+      "status": "ok",
+      "seconds": 12.3
+    },
+    {
+      "name": "trisk_sector_demo_steel",
+      "status": "ok",
+      "seconds": 11.2
+    },
+    {
+      "name": "trisk_scenario_grid",
+      "status": "ok",
+      "seconds": 4.4
+    },
+    {
+      "name": "sector_prioritization",
+      "status": "ok",
+      "seconds": 3.3
+    },
+    {
+      "name": "refresh_dashboard_data",
+      "status": "ok",
+      "seconds": 13.8
+    }
+  ],
+  "status": "ok",
+  "row_counts": {
+    "dashboard/data/trisk/power/company_trajectories_latest.csv": 672,
+    "dashboard/data/trisk/cement/company_trajectories_latest.csv": 84,
+    "dashboard/data/trisk/steel/company_trajectories_latest.csv": 84,
+    "dashboard/data/trisk/power/npv_results_latest.csv": 79,
+    "dashboard/data/trisk/cement/npv_results_latest.csv": 10,
+    "dashboard/data/trisk/steel/npv_results_latest.csv": 10
+  }
+}
