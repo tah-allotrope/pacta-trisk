@@ -1,0 +1,9 @@
+model,scenario,scenario_geography,variable,unit,year,carbon_tax
+synthetic_vietnam_demo,steel_intensity_transition,Vietnam,Price|Carbon,USD/t CO2,2025,10
+synthetic_vietnam_demo,steel_intensity_transition,Vietnam,Price|Carbon,USD/t CO2,2026,16
+synthetic_vietnam_demo,steel_intensity_transition,Vietnam,Price|Carbon,USD/t CO2,2027,24
+synthetic_vietnam_demo,steel_intensity_transition,Vietnam,Price|Carbon,USD/t CO2,2028,33
+synthetic_vietnam_demo,steel_intensity_transition,Vietnam,Price|Carbon,USD/t CO2,2029,42
+synthetic_vietnam_demo,steel_intensity_transition,Vietnam,Price|Carbon,USD/t CO2,2030,52
+synthetic_vietnam_demo,steel_intensity_transition,Vietnam,Price|Carbon,USD/t CO2,2031,62
+synthetic_vietnam_demo,steel_intensity_transition,Vietnam,Price|Carbon,USD/t CO2,2032,72

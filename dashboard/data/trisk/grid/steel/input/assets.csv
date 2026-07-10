@@ -1,0 +1,13 @@
+company_id,company_name,asset_id,asset_name,country_iso2,production_year,sector,technology,capacity,capacity_factor,emission_factor,production_unit,technology_type
+VN_ABCD_022,Hoa Phat Group JSC,VN_ABCD_022_OpenHearth_2025,Hoa Phat Group JSC :: OpenHearth :: 2025,VN,2025,Steel,OpenHearth,7500000,1,1.85,tonnes,carbontech
+VN_ABCD_022,Hoa Phat Group JSC,VN_ABCD_022_OpenHearth_2026,Hoa Phat Group JSC :: OpenHearth :: 2026,VN,2026,Steel,OpenHearth,7700000,1,1.84,tonnes,carbontech
+VN_ABCD_022,Hoa Phat Group JSC,VN_ABCD_022_OpenHearth_2027,Hoa Phat Group JSC :: OpenHearth :: 2027,VN,2027,Steel,OpenHearth,7900000,1,1.83,tonnes,carbontech
+VN_ABCD_022,Hoa Phat Group JSC,VN_ABCD_022_OpenHearth_2028,Hoa Phat Group JSC :: OpenHearth :: 2028,VN,2028,Steel,OpenHearth,8100000,1,1.82,tonnes,carbontech
+VN_ABCD_022,Hoa Phat Group JSC,VN_ABCD_022_OpenHearth_2029,Hoa Phat Group JSC :: OpenHearth :: 2029,VN,2029,Steel,OpenHearth,8300000,1,1.81,tonnes,carbontech
+VN_ABCD_022,Hoa Phat Group JSC,VN_ABCD_022_OpenHearth_2030,Hoa Phat Group JSC :: OpenHearth :: 2030,VN,2030,Steel,OpenHearth,8500000,1,1.8,tonnes,carbontech
+VN_ABCD_023,Pomina Group,VN_ABCD_023_ElectricArc_2025,Pomina Group :: ElectricArc :: 2025,VN,2025,Steel,ElectricArc,1200000,1,0.58,tonnes,greentech
+VN_ABCD_023,Pomina Group,VN_ABCD_023_ElectricArc_2026,Pomina Group :: ElectricArc :: 2026,VN,2026,Steel,ElectricArc,1260000,1,0.566,tonnes,greentech
+VN_ABCD_023,Pomina Group,VN_ABCD_023_ElectricArc_2027,Pomina Group :: ElectricArc :: 2027,VN,2027,Steel,ElectricArc,1320000,1,0.554,tonnes,greentech
+VN_ABCD_023,Pomina Group,VN_ABCD_023_ElectricArc_2028,Pomina Group :: ElectricArc :: 2028,VN,2028,Steel,ElectricArc,1380000,1,0.541,tonnes,greentech
+VN_ABCD_023,Pomina Group,VN_ABCD_023_ElectricArc_2029,Pomina Group :: ElectricArc :: 2029,VN,2029,Steel,ElectricArc,1440000,1,0.529,tonnes,greentech
+VN_ABCD_023,Pomina Group,VN_ABCD_023_ElectricArc_2030,Pomina Group :: ElectricArc :: 2030,VN,2030,Steel,ElectricArc,1500000,1,0.517,tonnes,greentech
