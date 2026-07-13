@@ -20,6 +20,8 @@ library(readr)
 library(stringi)
 library(tibble)
 
+source("R/matching_helpers.R")
+
 # ---- Command-line argument parsing ----
 args <- commandArgs(trailingOnly = TRUE)
 
@@ -217,11 +219,11 @@ sector_mapping <- tibble(
   mutate(sector = ifelse(is.na(sector), "not in scope", sector))
 
 # Diacritic normalization
-names_norm <- stringi::stri_trans_general(counterparty_names, "Latin-ASCII")
+names_norm <- normalize_vn_name(counterparty_names)
 parent_names <- ifelse(
   is.na(input_data$parent_name) | trimws(as.character(input_data$parent_name)) == "",
   names_norm,
-  stringi::stri_trans_general(as.character(input_data$parent_name), "Latin-ASCII")
+  normalize_vn_name(as.character(input_data$parent_name))
 )
 
 # Build output loanbook
@@ -322,7 +324,7 @@ if (file.exists(abcd_file)) {
 
       # Normalize names
       abcd_norm <- abcd %>%
-        mutate(name_company = stri_trans_general(name_company, "Latin-ASCII"))
+        mutate(name_company = normalize_vn_name(name_company))
 
       # Extend sector classifications with the custom VSIC/ISIC mapping
       sector_classifications <- r2dii.data::sector_classifications

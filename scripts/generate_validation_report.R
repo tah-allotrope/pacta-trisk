@@ -13,6 +13,8 @@ suppressPackageStartupMessages({
   library(readr)
 })
 
+source("R/report_toolkit.R")
+
 args <- commandArgs(trailingOnly = TRUE)
 
 get_arg <- function(flag, default = NULL) {
@@ -295,7 +297,6 @@ html <- paste0('<!DOCTYPE html>
 </body>
 </html>')
 
-dir.create(dirname(output_path), showWarnings = FALSE, recursive = TRUE)
-writeLines(html, output_path, useBytes = TRUE)
+write_html_report(html, output_path)
 cat(sprintf("Report saved to: %s\n", normalizePath(output_path)))
 cat(sprintf("File size: %.1f KB\n", file.info(output_path)$size / 1024))

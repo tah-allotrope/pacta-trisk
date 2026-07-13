@@ -1,6 +1,8 @@
 # ==============================================================================
 # pacta_vietnam_scenario.R
-# Vietnam-specific PACTA pipeline for Mekong Commercial Bank (MCB)
+# Vietnam-specific PACTA pipeline. Defaults to the synthetic Mekong
+# Commercial Bank (MCB) demo; pass --config <path> to run against any
+# engagement config (see R/engagement_config.R).
 #
 # Demonstrates climate alignment of a synthetic Vietnamese commercial bank
 # loanbook against Vietnam's Power Development Plan 8 (PDP8), NDC targets,
@@ -10,6 +12,7 @@
 #
 # Run from project root:
 #   "C:\Program Files\R\R-4.5.2\bin\Rscript.exe" scripts/pacta_vietnam_scenario.R
+#   "C:\Program Files\R\R-4.5.2\bin\Rscript.exe" scripts/pacta_vietnam_scenario.R --config engagements/<slug>/engagement_config.json
 # ==============================================================================
 
 library(pacta.loanbook)
@@ -26,22 +29,24 @@ library(base64enc)
 library(readr)
 library(stringi)
 
+source("R/engagement_config.R")
+source("R/sector_registry.R")
+source("R/report_toolkit.R")
+source("R/matching_helpers.R")
+
+cfg <- load_engagement_config(get_config_arg())
+bank_name  <- cfg$bank_name
+bank_short <- if (identical(bank_name, "Mekong Commercial Bank")) "MCB" else bank_name
+
 cat("========================================\n")
-cat("PACTA VIETNAM: Mekong Commercial Bank\n")
+cat(sprintf("PACTA VIETNAM: %s\n", bank_name))
 cat("========================================\n\n")
 
 # --- Output directories ---
-vn_output  <- file.path(getwd(), "synthesis_output", "vietnam")
-report_dir <- file.path(getwd(), "reports")
+vn_output  <- file.path(getwd(), cfg$paths$pacta_output_dir)
+report_dir <- file.path(getwd(), cfg$paths$reports_dir)
 dir.create(vn_output,  showWarnings = FALSE, recursive = TRUE)
 dir.create(report_dir, showWarnings = FALSE, recursive = TRUE)
-
-# --- Helper: base64 encode a PNG ---
-img_to_base64 <- function(path) {
-  raw <- readBin(path, "raw", file.info(path)$size)
-  b64 <- base64enc::base64encode(raw)
-  paste0("data:image/png;base64,", b64)
-}
 
 # ==============================================================================
 # SECTION 1: LOAD VIETNAM DATA
@@ -49,14 +54,10 @@ img_to_base64 <- function(path) {
 
 cat("--- Section 1: Loading Vietnam data ---\n\n")
 
-# Check that generated CSVs exist
-required_files <- c(
-  "data/vietnam_loanbook.csv",
-  "data/vietnam_abcd.csv",
-  "data/vietnam_scenario_ms.csv",
-  "data/vietnam_scenario_co2.csv",
-  "data/vietnam_region_isos.csv"
-)
+# Check that the engagement's input CSVs exist (load_engagement_config()
+# already validated this, but keep the explicit check + message for anyone
+# running the analysis logic standalone with a hand-built cfg list).
+required_files <- unlist(cfg$inputs, use.names = FALSE)
 
 missing <- required_files[!file.exists(required_files)]
 if (length(missing) > 0) {
@@ -66,11 +67,11 @@ if (length(missing) > 0) {
   ))
 }
 
-loanbook <- read_csv("data/vietnam_loanbook.csv", show_col_types = FALSE)
-abcd     <- read_csv("data/vietnam_abcd.csv",     show_col_types = FALSE)
-scenario <- read_csv("data/vietnam_scenario_ms.csv",  show_col_types = FALSE)
-co2      <- read_csv("data/vietnam_scenario_co2.csv", show_col_types = FALSE)
-region   <- read_csv("data/vietnam_region_isos.csv",  show_col_types = FALSE)
+loanbook <- read_csv(cfg$inputs$loanbook_csv, show_col_types = FALSE)
+abcd     <- read_csv(cfg$inputs$abcd_csv,     show_col_types = FALSE)
+scenario <- read_csv(cfg$inputs$scenario_ms_csv,  show_col_types = FALSE)
+co2      <- read_csv(cfg$inputs$scenario_co2_csv, show_col_types = FALSE)
+region   <- read_csv(cfg$inputs$region_isos_csv,  show_col_types = FALSE)
 
 cat(sprintf("  Loanbook: %d rows, %d cols\n", nrow(loanbook), ncol(loanbook)))
 cat(sprintf("  ABCD: %d rows | Sectors: %s\n",
@@ -165,13 +166,13 @@ cat("--- Section 3: Fuzzy matching ---\n\n")
 # columns and will abort if any _orig columns already exist in the input.
 loanbook_norm <- loanbook_classified %>%
   mutate(
-    name_direct_loantaker = stri_trans_general(name_direct_loantaker, "Latin-ASCII"),
-    name_ultimate_parent  = stri_trans_general(name_ultimate_parent,  "Latin-ASCII")
+    name_direct_loantaker = normalize_vn_name(name_direct_loantaker),
+    name_ultimate_parent  = normalize_vn_name(name_ultimate_parent)
   )
 
 abcd_norm <- abcd %>%
   mutate(
-    name_company = stri_trans_general(name_company, "Latin-ASCII")
+    name_company = normalize_vn_name(name_company)
   )
 
 # Match loanbook against ABCD by sector
@@ -294,9 +295,9 @@ p_pie <- ggplot(df_pie, aes(x = "", y = amount, fill = status)) +
     "Not in Scope"           = "#9E9E9E"
   )) +
   labs(
-    title    = "MCB Portfolio: PACTA Coverage",
+    title    = sprintf("%s Portfolio: PACTA Coverage", bank_short),
     subtitle = paste0("Total: ", format(round(outstanding_total / 1000), big.mark = ","),
-                      " bn VND | Mekong Commercial Bank 2025"),
+                      " bn VND | ", bank_name, " 2025"),
     fill     = NULL
   ) +
   theme_void() +
@@ -370,7 +371,7 @@ if (nrow(power_techmix_data) > 0) {
   p_power_techmix <- qplot_techmix(power_techmix_data) +
     labs(
       title    = "Power Sector: Technology Mix",
-      subtitle = "MCB Portfolio vs Market vs PDP8/NDC Target (Vietnam, 2025-2030)"
+      subtitle = sprintf("%s Portfolio vs Market vs PDP8/NDC Target (Vietnam, 2025-2030)", bank_short)
     ) +
     theme(text = element_text(family = "sans"))
 
@@ -395,7 +396,7 @@ if (nrow(coal_traj_data) > 0) {
     ) +
     labs(
       title    = "Power: Coal Capacity Trajectory",
-      subtitle = paste0("MCB portfolio coal exposure vs PDP8 ceiling & NZE phase-down",
+      subtitle = paste0(bank_short, " portfolio coal exposure vs PDP8 ceiling & NZE phase-down",
                         "\n(BOT plants locked to contracts; legal constraint noted)"),
       caption  = "PDP8: no new coal post-2030; JETP: peak emissions by 2030"
     ) +
@@ -422,7 +423,7 @@ if (nrow(renew_traj_data) > 0) {
     ) +
     labs(
       title    = "Power: Renewables Capacity Buildout",
-      subtitle = "MCB solar+wind loans vs PDP8 target (74.8 GW by 2030) & NZE global"
+      subtitle = sprintf("%s solar+wind loans vs PDP8 target (74.8 GW by 2030) & NZE global", bank_short)
     ) +
     theme(text = element_text(family = "sans"))
 
@@ -440,7 +441,7 @@ if (nrow(auto_techmix_data) > 0) {
   p_auto_techmix <- qplot_techmix(auto_techmix_data) +
     labs(
       title    = "Automotive Sector: Technology Mix",
-      subtitle = "MCB auto loans (THACO/Toyota ICE vs VinFast EV) vs NDC Target 2030"
+      subtitle = sprintf("%s auto loans (THACO/Toyota ICE vs VinFast EV) vs NDC Target 2030", bank_short)
     ) +
     theme(text = element_text(family = "sans"))
 
@@ -545,7 +546,7 @@ if (nrow(cement_sda) > 0) {
       title    = "Cement: Emission Intensity Trajectory",
       subtitle = paste0("tCO2/tonne | VICEM + Holcim Vietnam | PDP8/NDC conditional target:",
                         " 0.71 by 2030\n(IEA NZE target 0.54 requires CCS - not yet available in Vietnam)"),
-      caption  = "Data: Synthetic MCB portfolio, PDP8 2023, IEA NZE Asia-Pacific"
+      caption  = sprintf("Data: Synthetic %s portfolio, PDP8 2023, IEA NZE Asia-Pacific", bank_short)
     ) +
     theme(text = element_text(family = "sans"))
 
@@ -657,7 +658,7 @@ if (nrow(align_plot_data) > 0) {
     coord_flip() +
     geom_hline(yintercept = 0, linetype = "dashed", color = "grey40") +
     labs(
-      title    = "MCB Portfolio: Alignment Gap at 2030 vs PDP8/NDC",
+      title    = sprintf("%s Portfolio: Alignment Gap at 2030 vs PDP8/NDC", bank_short),
       subtitle = "Technology share gap: Projected minus Target (percentage points)\nPositive = above target (good for low-carbon); Negative = below target",
       x = NULL, y = "Share Gap (pp)", fill = "Alignment"
     ) +
@@ -862,7 +863,7 @@ html <- paste0('<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PACTA Vietnam - Mekong Commercial Bank 2025</title>
+<title>PACTA Vietnam - ', bank_name, ' 2025</title>
 <style>
   :root {
     --primary: #1a365d;
@@ -964,7 +965,7 @@ html <- paste0('<!DOCTYPE html>
 <div class="hero">
   <h1>PACTA Portfolio Alignment Report</h1>
   <div class="subtitle">Paris Agreement Capital Transition Assessment</div>
-  <div class="bank-name">Mekong Commercial Bank (MCB) &mdash; Vietnam</div>
+  <div class="bank-name">', bank_name, ' (', bank_short, ') &mdash; Vietnam</div>
   <div class="badge-vn">Scenario: PDP8 2023 / Vietnam NDC / IEA NZE Global</div>
   <div class="meta">Generated: ', today_str, ' &nbsp;|&nbsp;
     Framework: r2dii / pacta.loanbook &nbsp;|&nbsp;
@@ -979,7 +980,7 @@ html <- paste0('<!DOCTYPE html>
   <ol>
     <li><a href="#exec">Tóm tắt điều hành (Executive Summary)</a></li>
     <li><a href="#methodology">Phương pháp PACTA (Methodology)</a></li>
-    <li><a href="#portfolio">Danh mục cho vay MCB (MCB Loanbook)</a></li>
+    <li><a href="#portfolio">Danh mục cho vay ', bank_short, ' (', bank_short, ' Loanbook)</a></li>
     <li><a href="#power">Ngành điện (Power Sector)</a></li>
     <li><a href="#automotive">Ngành ô tô (Automotive)</a></li>
     <li><a href="#cement">Xi măng (Cement)</a></li>
@@ -995,7 +996,7 @@ html <- paste0('<!DOCTYPE html>
   <h2>1. Tóm tắt điều hành (Executive Summary)</h2>
   <p>
     Phân tích PACTA này đánh giá danh mục cho vay ', format(total_portfolio_bn, big.mark = ","), ' tỷ VND
-    (~$', round(total_portfolio_bn / 25000, 1), ' tỷ USD) của Mekong Commercial Bank đối với
+    (~$', round(total_portfolio_bn / 25000, 1), ' tỷ USD) của ', bank_name, ' đối với
     <strong>Quy hoạch Điện 8 (PDP8)</strong>, cam kết NDC 2022 của Việt Nam, và kịch bản
     Net Zero 2050 toàn cầu của IEA.
   </p>
@@ -1027,7 +1028,7 @@ html <- paste0('<!DOCTYPE html>
   </div>
   <div class="callout callout-danger">
     <strong>Phát hiện chính (Key Finding):</strong>
-    Danh mục MCB <strong>không đồng thuận với Paris</strong> theo kịch bản IEA NZE.
+    Danh mục ', bank_short, ' <strong>không đồng thuận với Paris</strong> theo kịch bản IEA NZE.
     Rủi ro cao nhất: khoản vay điện than (~', format(round(coal_power_bn), big.mark = ","), ' tỷ VND)
     đối mặt với rủi ro tài sản mắc kẹt trong 10&ndash;15 năm do lộ trình JETP và PDP8
     cắt giảm than. Cơ hội tích cực: danh mục năng lượng tái tạo và VinFast đang đi đúng hướng.
@@ -1078,9 +1079,9 @@ html <- paste0('<!DOCTYPE html>
 
 <!-- PORTFOLIO -->
 <div class="section" id="portfolio">
-  <h2>3. Danh mục cho vay MCB (MCB Loanbook Overview)</h2>
+  <h2>3. Danh mục cho vay ', bank_short, ' (', bank_short, ' Loanbook Overview)</h2>
   <p>
-    Mekong Commercial Bank (MCB) là ngân hàng thương mại cỡ vừa-lớn của Việt Nam
+    ', bank_name, ' (', bank_short, ') là ngân hàng thương mại cỡ vừa-lớn của Việt Nam
     (tổng tài sản ~500.000 tỷ VND, tương đương MB Bank hoặc Techcombank).
     Danh mục phân tích PACTA gồm <strong>', n_loans, ' khoản vay</strong> trong
     các lĩnh vực kinh tế thực có liên quan đến khí hậu.
@@ -1127,7 +1128,7 @@ html <- paste0('<!DOCTYPE html>
 <div class="section" id="power">
   <h2>4. Phân tích ngành điện (Power Sector)</h2>
   <p>
-    Ngành điện chiếm <strong>63% danh mục MCB</strong> (15,750 tỷ VND).
+    Ngành điện chiếm <strong>63% danh mục ', bank_short, '</strong> (15,750 tỷ VND).
     Đây là lĩnh vực quan trọng nhất trong phân tích vì Việt Nam đang trong quá trình
     chuyển đổi năng lượng sâu sắc theo PDP8 và cam kết JETP.
   </p>
@@ -1137,20 +1138,20 @@ html <- paste0('<!DOCTYPE html>
     JETP cam kết đỉnh phát thải điện năm 2030 và than dưới 30%.
   </div>
   <h3>Cơ cấu công nghệ điện</h3>
-  ', chart_html("power_techmix", "Cơ cấu công nghệ điện: MCB vs PDP8 target (2025-2030)"), '
+  ', chart_html("power_techmix", sprintf("Cơ cấu công nghệ điện: %s vs PDP8 target (2025-2030)", bank_short)), '
   <h3>Lộ trình điện than</h3>
-  ', chart_html("coal_traj", "Lộ trình công suất điện than: MCB portfolio vs PDP8 và NZE"), '
+  ', chart_html("coal_traj", sprintf("Lộ trình công suất điện than: %s portfolio vs PDP8 và NZE", bank_short)), '
   <div class="callout callout-danger">
-    <strong>Rủi ro than:</strong> MCB có ', format(round(coal_power_bn), big.mark = ","), ' tỷ VND
+    <strong>Rủi ro than:</strong> ', bank_short, ' có ', format(round(coal_power_bn), big.mark = ","), ' tỷ VND
     cho vay điện than. Các nhà máy BOT (Nghi Son 2, Mong Duong 2) bị khóa bởi hợp đồng PPA đến ~2035,
     khiến việc nghỉ hưu sớm phụ thuộc vào gói mua lại chính phủ trong JETP.
     Rủi ro NPL ước tính: nếu 20% danh mục than bị suy giảm &rarr; ~1,400 tỷ VND tổn thất tiềm năng.
   </div>
   <h3>Lộ trình năng lượng tái tạo</h3>
-  ', chart_html("renew_traj", "Năng lượng tái tạo: MCB portfolio (Trung Nam, BIM, TTC, Xuan Thien, T&T) vs PDP8"), '
+  ', chart_html("renew_traj", sprintf("Năng lượng tái tạo: %s portfolio (Trung Nam, BIM, TTC, Xuan Thien, T&T) vs PDP8", bank_short)), '
   <div class="callout callout-success">
     <strong>Cơ hội tích cực:</strong> ', format(round(renew_bn), big.mark = ","), ' tỷ VND
-    cho vay tái tạo của MCB (mặt trời + gió) đang phù hợp với PDP8.
+    cho vay tái tạo của ', bank_short, ' (mặt trời + gió) đang phù hợp với PDP8.
     Đây là tài sản chất lượng tốt trong danh mục khí hậu.
   </div>
 </div>
@@ -1159,7 +1160,7 @@ html <- paste0('<!DOCTYPE html>
 <div class="section" id="automotive">
   <h2>5. Phân tích ngành ô tô (Automotive Sector)</h2>
   <p>
-    MCB có ', format(4500, big.mark = ","), ' tỷ VND cho vay ô tô (4,500 tỷ VND),
+    ', bank_short, ' có ', format(4500, big.mark = ","), ' tỷ VND cho vay ô tô (4,500 tỷ VND),
     trong đó THACO chiếm tỷ trọng lớn nhất (1,200 tỷ VND, 100% ICE).
     VinFast (EV 100%) chỉ chiếm 4% danh mục nhưng đại diện cho hướng tăng trưởng tương lai.
   </p>
@@ -1169,11 +1170,11 @@ html <- paste0('<!DOCTYPE html>
     Thị trường hiện tại: ~2% EV (toàn bộ là VinFast).
   </div>
   <div class="two-charts">
-    ', chart_html("auto_techmix", "Cơ cấu công nghệ ô tô: MCB vs NDC target"), '
+    ', chart_html("auto_techmix", sprintf("Cơ cấu công nghệ ô tô: %s vs NDC target", bank_short)), '
     ', chart_html("ev_traj", "Lộ trình xe điện EV: VinFast-driven vs NDC target"), '
   </div>
   <div class="callout callout-danger">
-    <strong>Khoảng cách căn chỉnh EV:</strong> MCB dự kiến đạt ~10% EV theo trọng số vốn vay vào 2030,
+    <strong>Khoảng cách căn chỉnh EV:</strong> ', bank_short, ' dự kiến đạt ~10% EV theo trọng số vốn vay vào 2030,
     so với mục tiêu NDC 28%. Khoảng cách ~18 điểm phần trăm là rủi ro cao.
     THACO (1,200 tỷ VND, 100% ICE) là đối tác cần ưu tiên tiếp cận về chiến lược điện hóa.
   </div>
@@ -1184,12 +1185,12 @@ html <- paste0('<!DOCTYPE html>
   <h2>6. Phân tích xi măng (Cement Sector)</h2>
   <p>
     Việt Nam là nước xuất khẩu xi măng lớn thứ 3 thế giới.
-    MCB có ', 2000, ' tỷ VND cho vay xi măng (VICEM 1,200 tỷ + Holcim 800 tỷ).
+    ', bank_short, ' có ', 2000, ' tỷ VND cho vay xi măng (VICEM 1,200 tỷ + Holcim 800 tỷ).
     Cường độ phát thải trung bình: 0.82 tCO₂/tấn xi măng (cao hơn mức trung bình toàn cầu 0.60).
   </p>
   ', chart_html("cement_sda", "Xi măng: Lộ trình cường độ phát thải CO₂ (SDA Method)"), '
   <div class="callout callout-warning">
-    <strong>Phân tích SDA:</strong> Danh mục xi măng MCB dự kiến đạt ~0.74 tCO₂/tấn vào 2030,
+    <strong>Phân tích SDA:</strong> Danh mục xi măng ', bank_short, ' dự kiến đạt ~0.74 tCO₂/tấn vào 2030,
     so với mục tiêu NDC conditional 0.71 (khoảng cách nhỏ ~0.03).
     Mục tiêu NZE toàn cầu 0.54 đòi hỏi CCS và nhiên liệu thay thế, chưa có sẵn ở Việt Nam.
     Mức độ căn chỉnh: <span class="badge badge-amber">Biên giới (Borderline)</span>.
@@ -1200,7 +1201,7 @@ html <- paste0('<!DOCTYPE html>
 <div class="section" id="steel">
   <h2>7. Phân tích thép (Steel Sector)</h2>
   <p>
-    MCB có 1,500 tỷ VND cho vay thép gồm hai doanh nghiệp với công nghệ rất khác nhau:
+    ', bank_short, ' có 1,500 tỷ VND cho vay thép gồm hai doanh nghiệp với công nghệ rất khác nhau:
     <strong>Hoa Phát</strong> (lò cao/BOF, cường độ cao) và
     <strong>Pomina</strong> (lò điện hồ quang EAF, cường độ thấp).
     Phân tích này cho thấy sự khác biệt về rủi ro trong cùng một lĩnh vực.
@@ -1222,7 +1223,7 @@ html <- paste0('<!DOCTYPE html>
 <div class="section" id="alignment">
   <h2>8. Tổng quan căn chỉnh (Alignment Summary)</h2>
   <p>
-    Bảng tổng hợp kết quả căn chỉnh danh mục MCB đối với kịch bản PDP8/NDC Việt Nam tại năm 2030.
+    Bảng tổng hợp kết quả căn chỉnh danh mục ', bank_short, ' đối với kịch bản PDP8/NDC Việt Nam tại năm 2030.
     Phân tích dựa trên <strong>phương pháp thị phần</strong> (ngành điện, ô tô) và
     <strong>phương pháp SDA</strong> (xi măng, thép).
   </p>
@@ -1267,7 +1268,7 @@ html <- paste0('<!DOCTYPE html>
 <div class="section" id="risk">
   <h2>9. Rủi ro tài sản mắc kẹt (Stranded Asset Risk)</h2>
   <p>
-    JETP và lộ trình PDP8 tạo ra rủi ro tài sản mắc kẹt đáng kể đối với danh mục than của MCB.
+    JETP và lộ trình PDP8 tạo ra rủi ro tài sản mắc kẹt đáng kể đối với danh mục than của ', bank_short, '.
     Cơ chế nghỉ hưu than (Coal Retirement Mechanism) nhắm vào 5&ndash;8 GW than
     đóng cửa sớm vào năm 2035.
   </p>
@@ -1332,7 +1333,7 @@ html <- paste0('<!DOCTYPE html>
 <!-- FOOTER -->
 <div class="footer">
   <p>
-    <strong>PACTA Vietnam Report &mdash; Mekong Commercial Bank (Synthetic / Illustrative)</strong><br>
+    <strong>PACTA Vietnam Report &mdash; ', bank_name, ' (Synthetic / Illustrative)</strong><br>
     Framework: r2dii.analysis / r2dii.match / r2dii.plot / pacta.loanbook &nbsp;|&nbsp;
     Scenario: PDP8 Decision 500/Q\u0110-TTg (2023), Vietnam NDC 2022, IEA NZE 2050<br>
     Generated: ', today_str, ' &nbsp;|&nbsp;

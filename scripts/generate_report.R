@@ -7,12 +7,9 @@
 
 output_dir <- "output"
 
-# --- Helper: encode a PNG file as base64 data URI ---
-img_to_base64 <- function(path) {
-  raw <- readBin(path, "raw", file.info(path)$size)
-  b64 <- base64enc::base64encode(raw)
-  paste0("data:image/png;base64,", b64)
-}
+# --- Helper: encode a PNG file as base64 data URI (shared with other report
+# generators; see R/report_toolkit.R) ---
+source("R/report_toolkit.R")
 
 # Check if base64enc is available; if not, use a pure-R fallback
 if (!requireNamespace("base64enc", quietly = TRUE)) {

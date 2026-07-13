@@ -69,6 +69,8 @@ all R scripts resolve paths relative to the working directory.
 | Path | Contents |
 |---|---|
 | `scripts/` | R pipeline stages, report generators, `pipeline_refresh.R` orchestrator |
+| `R/` | Shared R modules sourced by `scripts/*.R`: engagement config loader, sector registry, report toolkit, matching helpers |
+| `engagements/` | Per-engagement config (`engagement_config.json`); `mcb-demo/` documents the built-in defaults |
 | `data/` | Synthetic Vietnam inputs + generator (`generate_vietnam_data.R`) |
 | `synthesis_output/` | Pipeline outputs (PACTA, TRISK, scenario grid) |
 | `dashboard/` | Streamlit app: `app.py`, `pages/`, `lib/`, `tests/`, frozen snapshot `data/` |
@@ -77,6 +79,7 @@ all R scripts resolve paths relative to the working directory.
 | `docs/` | Methodology guides, deployment notes, assumption registers |
 | `reports/` | Rendered self-contained HTML reports |
 | `plans/`, `research/` | Implementation plans and research briefs |
+| `attic/` | Superseded methodology-reference scripts, kept for historical context only |
 
 ## Operator features (env-gated, off by default)
 
