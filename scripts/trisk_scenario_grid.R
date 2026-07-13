@@ -290,7 +290,7 @@ apply_base_deltas <- function(borrower_results, sector) {
 
 run_sector_grid <- function(sector) {
   assert_supported_sector(sector)
-  meta <- trisk_sector_meta[[sector]]
+  meta <- sector_meta(sector)
   paths <- resolve_trisk_paths(sector)
   input_dir <- paths$input_dir
 

@@ -1,0 +1,24 @@
+{
+  "bank_name": "Mekong Commercial Bank",
+  "bank_slug": "mcb-demo",
+  "inputs": {
+    "loanbook_csv": "data/vietnam_loanbook.csv",
+    "abcd_csv": "data/vietnam_abcd.csv",
+    "scenario_ms_csv": "data/vietnam_scenario_ms.csv",
+    "scenario_co2_csv": "data/vietnam_scenario_co2.csv",
+    "region_isos_csv": "data/vietnam_region_isos.csv"
+  },
+  "trisk_sectors": ["power", "cement", "steel"],
+  "run_grid": true,
+  "paths": {
+    "pacta_output_dir": "synthesis_output/vietnam",
+    "trisk_output_root": "synthesis_output/trisk",
+    "trisk_input_root": "output/trisk_inputs",
+    "snapshot_dir": "dashboard/data",
+    "reports_dir": "reports",
+    "engagement_output_dir": "output/engagement",
+    "letters_output_dir": "output/engagement_letters",
+    "disclosure_output_dir": "output/disclosure"
+  },
+  "anonymize": false
+}

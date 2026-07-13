@@ -32,3 +32,13 @@ intake/output*/pseudonym_map.csv
 # Rehearsal intake outputs (generated during dress rehearsal, not tracked).
 intake/output_rehearsal/
 intake/output_rehearsal_named/
+
+# Per-engagement generated artifacts (charts, HTML, letters, disclosure,
+# private snapshots). Only engagement_config.json and the small
+# regression-test artifacts named explicitly in each engagement's plan are
+# committed; everything bulky/regeneratable stays local-only.
+engagements/*/snapshot/
+engagements/*/reports/
+engagements/*/output/**/figures/
+engagements/*/output/engagement_letters/
+engagements/*/output/disclosure/

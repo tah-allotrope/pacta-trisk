@@ -78,7 +78,7 @@ if (is.na(carbon_price_model)) {
   quit(status = 1)
 }
 
-meta <- trisk_sector_meta[[sector]]
+meta <- sector_meta(sector)
 meta$carbon_price_model <- carbon_price_model
 
 paths <- resolve_trisk_paths(sector)

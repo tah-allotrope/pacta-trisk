@@ -21,53 +21,9 @@ suppressPackageStartupMessages({
 
 suppressPackageStartupMessages(library(trisk.model))
 
+source("R/sector_registry.R")
+
 trisk_supported_sectors <- c("power", "cement", "steel")
-
-trisk_sector_meta <- list(
-  power = list(
-    label = "power",
-    title = "Power",
-    subtitle = "Firm-level transition-stress view for the Vietnam synthetic power book.",
-    scenario_geography = "Vietnam",
-    carbon_price_model = "increasing_carbon_tax_50",
-    baseline_scenario = "VN_PDP8_BASELINE",
-    target_scenario = "VN_NZE_STRESS",
-    alignment_mode = "company_ms",
-    company_aliases = c("PVN Power Corporation" = "PVN Power Corporation")
-  ),
-  cement = list(
-    label = "cement",
-    title = "Cement",
-    subtitle = "Borrower stress view for Vietnam cement producers with sector-level SDA context.",
-    scenario_geography = "Vietnam",
-    carbon_price_model = "cement_intensity_transition",
-    baseline_scenario = "VN_PDP8_BASELINE",
-    target_scenario = "VN_NZE_STRESS",
-    alignment_mode = "sector_sda",
-    company_aliases = c("Holcim Group" = "Holcim Group", "VICEM" = "VICEM")
-  ),
-  steel = list(
-    label = "steel",
-    title = "Steel",
-    subtitle = "Borrower stress view for Vietnam steel producers with sector-level SDA context.",
-    scenario_geography = "Vietnam",
-    carbon_price_model = "steel_intensity_transition",
-    baseline_scenario = "VN_PDP8_BASELINE",
-    target_scenario = "VN_NZE_STRESS",
-    alignment_mode = "sector_sda",
-    company_aliases = c("Hoa Phat Group JSC" = "Hoa Phat Group JSC", "Pomina Group" = "Pomina Group")
-  )
-)
-
-trisk_base_params <- list(
-  shock_year = 2028,
-  discount_rate = 0.08,
-  risk_free_rate = 0.03,
-  growth_rate = 0.02,
-  div_netprofit_prop_coef = 1,
-  market_passthrough = 0.25,
-  show_params_cols = TRUE
-)
 
 trisk_sensitivity_specs <- tribble(
   ~run_label,                  ~parameter_name,       ~parameter_value, ~shock_year, ~discount_rate, ~risk_free_rate, ~market_passthrough,
@@ -196,7 +152,7 @@ build_run_params <- function(meta, input_dir, output_path, overrides = list()) {
         scenario_geography = meta$scenario_geography,
         carbon_price_model = meta$carbon_price_model
       ),
-      trisk_base_params
+      trisk_base_params()
     ),
     overrides
   )
@@ -262,7 +218,7 @@ summarize_trisk_run <- function(npv_results, pd_results, alignment_company) {
 execute_trisk_run <- function(sector, run_label, output_path, overrides = list(), meta = NULL, input_dir = NULL, alignment_company = NULL) {
   assert_supported_sector(sector)
   if (is.null(meta)) {
-    meta <- trisk_sector_meta[[sector]]
+    meta <- sector_meta(sector)
   }
 
   paths <- resolve_trisk_paths(sector, output_root = dirname(output_path))
@@ -469,7 +425,7 @@ run_sector_demo <- function(sector = "power") {
   sector <- tolower(sector)
   assert_supported_sector(sector)
 
-  meta <- trisk_sector_meta[[sector]]
+  meta <- sector_meta(sector)
 
   cat("========================================\n")
   cat(sprintf("Running Vietnam TRISK %s demo\n", meta$title))

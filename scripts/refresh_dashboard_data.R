@@ -9,6 +9,8 @@ suppressPackageStartupMessages({
   library(tibble)
 })
 
+source("R/sector_registry.R")
+
 clear_dir <- function(path) {
   if (dir.exists(path)) {
     unlink(list.files(path, full.names = TRUE, all.files = TRUE, no.. = TRUE), recursive = TRUE, force = TRUE)
@@ -93,12 +95,8 @@ trisk_sector_files <- c(
   "top_borrowers_alignment_trisk.csv"
 )
 
-trisk_manifest <- tribble(
-  ~sector,  ~label,  ~folder,       ~price_unit,            ~pathway_unit, ~alignment_mode, ~grid_available, ~disclaimer,
-  "power",  "Power",  "power",     "USD/MWh-equivalent", "MW",         "borrower_ms",  FALSE,            "Borrower-level PACTA market-share gaps are available for power.",
-  "cement", "Cement", "cement",    "USD/unit-equivalent", "tonnes",     "sector_sda",   FALSE,            "Cement currently uses sector-level SDA context, not borrower-specific alignment.",
-  "steel",  "Steel",  "steel",     "USD/unit-equivalent", "tonnes",     "sector_sda",   FALSE,            "Steel currently uses sector-level SDA context, not borrower-specific alignment."
-)
+trisk_manifest <- sector_registry() %>%
+  select(sector, label, folder, price_unit, pathway_unit, alignment_mode, grid_available, disclaimer)
 
 for (f in pacta_files) {
   copy_file(f, "dashboard/data/pacta")
