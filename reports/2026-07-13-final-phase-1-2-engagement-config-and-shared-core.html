@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Final Report :: Client Engagement Runway — Phases 1–2</title>
+  <meta name="color-scheme" content="dark light">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+    async function initMermaid() {
+      const blocks = document.querySelectorAll('.mermaid');
+      if (!blocks.length) {
+        return;
+      }
+
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'base',
+        securityLevel: 'loose',
+        themeVariables: {
+          primaryColor: '#f3ead9',
+          primaryTextColor: '#1f1912',
+          primaryBorderColor: '#9d6b37',
+          lineColor: '#3b6f76',
+          secondaryColor: '#efe4d0',
+          tertiaryColor: '#ffffff',
+          background: '#fbf7f1',
+          mainBkg: '#fbf7f1',
+          nodeBorder: '#9d6b37',
+          clusterBkg: '#f7efdf',
+          clusterBorder: '#3b6f76',
+          edgeLabelBackground: '#fbf7f1'
+        }
+      });
+
+      await mermaid.run({ nodes: blocks });
+    }
+
+    const run = () => initMermaid().catch((error) => console.error('Mermaid render failed', error));
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run, { once: true });
+    } else {
+      run();
+    }
+  </script>
+  <style>
+    :root {
+      --paper: #fbf7f1;
+      --paper-strong: #fffdf9;
+      --ink: #1f1912;
+      --ink-soft: #5f564c;
+      --line: #dccdb6;
+      --line-strong: #bfa37d;
+      --accent: #9d6b37;
+      --accent-soft: #efe4d0;
+      --accent-2: #3b6f76;
+      --shadow: 0 18px 40px rgba(49, 33, 16, 0.08);
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+      --page-width: 1040px;
+      --display-font: Georgia, "Times New Roman", serif;
+      --body-font: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --mono-font: "Cascadia Code", Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(157, 107, 55, 0.09), transparent 26%),
+        radial-gradient(circle at 88% 10%, rgba(59, 111, 118, 0.08), transparent 22%),
+        linear-gradient(180deg, #f7f1e7 0%, #fbf7f1 28%, #f6efe5 100%);
+      font-family: var(--body-font);
+      line-height: 1.65;
+      letter-spacing: 0.01em;
+    }
+
+    a {
+      color: var(--accent-2);
+    }
+
+    code,
+    pre,
+    .technical,
+    .meta-chip,
+    .section-index,
+    .eyebrow,
+    .stat-label,
+    .stat-value,
+    .mermaid {
+      font-family: var(--mono-font);
+    }
+
+    .page-shell {
+      width: min(var(--page-width), calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 28px 0 56px;
+    }
+
+    .hero {
+      padding: 34px;
+      border: 1px solid rgba(159, 123, 79, 0.28);
+      border-radius: 30px;
+      background:
+        linear-gradient(135deg, rgba(157, 107, 55, 0.1), transparent 34%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.86)),
+        var(--paper-strong);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.85fr);
+      gap: 24px;
+      align-items: end;
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .title {
+      margin: 0;
+      max-width: 16ch;
+      font-family: var(--display-font);
+      font-size: clamp(2.4rem, 4.4vw, 4rem);
+      line-height: 0.98;
+      letter-spacing: -0.03em;
+      text-wrap: balance;
+    }
+
+    .lede {
+      margin: 18px 0 0;
+      max-width: 60ch;
+      color: var(--ink-soft);
+      font-size: 1rem;
+    }
+
+    .takeaway {
+      margin-top: 22px;
+      padding: 18px 20px;
+      border-left: 4px solid var(--accent-2);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      background: rgba(59, 111, 118, 0.08);
+      color: #20373a;
+      font-size: 1.02rem;
+    }
+
+    .meta-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .meta-card,
+    .section,
+    .subcard,
+    .empty-state {
+      border: 1px solid rgba(95, 72, 46, 0.12);
+      background: rgba(255, 253, 249, 0.88);
+      box-shadow: var(--shadow);
+    }
+
+    .meta-card {
+      padding: 16px 18px;
+      border-radius: var(--radius-md);
+    }
+
+    .meta-label {
+      color: var(--ink-soft);
+      font-size: 0.76rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .meta-chip {
+      margin-top: 8px;
+      color: var(--accent);
+      font-size: 1rem;
+      font-weight: 700;
+      word-break: break-word;
+    }
+
+    .section {
+      margin-top: 22px;
+      padding: 24px;
+      border-radius: var(--radius-lg);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px 18px;
+      align-items: end;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-index {
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .section-title {
+      margin: 0;
+      font-family: var(--display-font);
+      font-size: clamp(1.45rem, 2vw, 2rem);
+      line-height: 1.05;
+    }
+
+    .summary-grid,
+    .dual-grid,
+    .phase-grid,
+    .stat-grid,
+    .appendix-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .summary-grid,
+    .dual-grid,
+    .phase-grid,
+    .appendix-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .subcard {
+      padding: 18px;
+      border-radius: var(--radius-md);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .subcard h3,
+    .subcard h4 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+      line-height: 1.2;
+    }
+
+    .subcard p:first-child,
+    .subcard ul:first-child,
+    .subcard ol:first-child {
+      margin-top: 0;
+    }
+
+    .stat-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin-top: 16px;
+    }
+
+    .stat {
+      padding: 14px 16px;
+      border: 1px solid rgba(59, 111, 118, 0.16);
+      border-radius: var(--radius-sm);
+      background: rgba(59, 111, 118, 0.06);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .stat-label {
+      color: var(--ink-soft);
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .stat-value {
+      margin-top: 8px;
+      color: var(--accent-2);
+      font-size: 1.18rem;
+      font-weight: 700;
+    }
+
+    .narrative,
+    .chart-frame,
+    .technical-frame,
+    .diagram-frame,
+    .viz-frame {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.54);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .diagram-frame {
+      overflow-x: auto;
+      overflow-y: auto;
+      overscroll-behavior-x: contain;
+      overscroll-behavior-y: contain;
+      max-height: min(70vh, 720px);
+    }
+
+    .chart-frame,
+    .viz-frame {
+      overflow: hidden;
+    }
+
+    .mermaid {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      color: var(--ink);
+    }
+
+    .mermaid svg {
+      display: block;
+      width: auto !important;
+      min-width: 100%;
+      max-width: none !important;
+      height: auto !important;
+    }
+
+    .diagram-frame.compact-diagram {
+      padding: 12px;
+      max-height: min(62vh, 560px);
+    }
+
+    .diagram-frame.compact-diagram .mermaid {
+      min-width: 900px;
+    }
+
+    .chart-frame canvas,
+    .technical-frame > canvas,
+    .viz-frame canvas,
+    canvas.report-chart {
+      display: block;
+      width: 100% !important;
+      max-width: 100%;
+      height: 300px !important;
+      min-height: 300px;
+      max-height: 300px;
+    }
+
+    .technical-frame table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+    }
+
+    .technical-frame th,
+    .technical-frame td {
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      text-align: left;
+    }
+
+    .technical-frame th {
+      color: var(--accent);
+      font-size: 0.76rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .badge-done {
+      background: rgba(59, 111, 118, 0.14);
+      color: var(--accent-2);
+    }
+
+    .badge-pending {
+      background: rgba(157, 107, 55, 0.14);
+      color: var(--accent);
+    }
+
+    .empty-state {
+      padding: 20px;
+      border-radius: var(--radius-md);
+      text-align: center;
+      color: var(--ink-soft);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .empty-state strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--accent);
+      font-size: 0.84rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    ul,
+    ol {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    p:last-child,
+    li:last-child {
+      margin-bottom: 0;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      color: rgba(95, 86, 76, 0.74);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      text-align: right;
+    }
+
+    @media (max-width: 920px) {
+      .hero-grid,
+      .summary-grid,
+      .dual-grid,
+      .phase-grid,
+      .stat-grid,
+      .appendix-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .title {
+        max-width: none;
+      }
+
+    }
+
+    @media (max-width: 640px) {
+      .page-shell {
+        width: min(100vw - 20px, var(--page-width));
+        padding-top: 16px;
+        padding-bottom: 36px;
+      }
+
+      .hero,
+      .section {
+        padding: 18px;
+        border-radius: 20px;
+      }
+
+      .title {
+        font-size: clamp(2.1rem, 12vw, 3.2rem);
+      }
+
+    }
+
+    @media print {
+      :root {
+        --paper: #ffffff;
+        --paper-strong: #ffffff;
+        --ink: #111111;
+        --ink-soft: #444444;
+        --line: #d6d1c8;
+      }
+
+      @page {
+        size: A4;
+        margin: 14mm;
+      }
+
+      body {
+        background: #ffffff;
+      }
+
+      .page-shell {
+        width: 100%;
+        max-width: none;
+        padding: 0;
+      }
+
+      .hero,
+      .meta-card,
+      .section,
+      .subcard,
+      .narrative,
+      .chart-frame,
+      .technical-frame,
+      .diagram-frame,
+      .viz-frame,
+      .empty-state,
+      .stat {
+        background: #ffffff;
+        box-shadow: none;
+      }
+
+      .hero,
+      .section {
+        margin-top: 0;
+        margin-bottom: 10mm;
+      }
+
+      .diagram-frame {
+        overflow: visible;
+        max-height: none;
+      }
+
+      .diagram-frame.compact-diagram .mermaid {
+        min-width: 0;
+      }
+
+      .section-header,
+      .takeaway {
+        break-after: avoid;
+        page-break-after: avoid;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero" id="title-hero">
+      <div class="hero-grid">
+        <div>
+          <p class="eyebrow">Final Report / Shareable Analysis Artifact</p>
+          <h1 class="title">Client Engagement Runway — Phases 1–2</h1>
+          <p class="lede">
+            Config-driven pipeline foundation for the PACTA + TRISK Vietnam platform: the first two phases
+            of a six-phase plan to turn a single-bank demo into a repeatable client-engagement runway.
+          </p>
+          <div class="takeaway">
+            The pipeline's bank identity and input paths are now a config value, not a hardcoded string —
+            and the synthetic Mekong Commercial Bank (MCB) demo output is proven byte-identical before and
+            after the change. Four phases remain before a second bank's loanbook can flow through the
+            platform end-to-end.
+          </div>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-card">
+            <div class="meta-label">Project</div>
+            <div class="meta-chip">PACTA + TRISK Vietnam Platform</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Repository</div>
+            <div class="meta-chip">pacta-trisk</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Date</div>
+            <div class="meta-chip">2026-07-13</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="executive-summary">
+      <div class="section-header">
+        <div>
+          <div class="section-index">01 / Executive Summary</div>
+          <h2 class="section-title">Executive Summary</h2>
+        </div>
+      </div>
+      <div class="summary-grid">
+        <div class="subcard">
+          <h3>What was done</h3>
+          <p>
+            Of the six-phase <em>Client Engagement Runway</em> plan, the first two phases are complete and
+            committed to <code>main</code>. Phase 1 built a JSON engagement-configuration layer
+            (<code>R/engagement_config.R</code>) and consolidated TRISK sector metadata that had been
+            hand-duplicated across two — and, once verified, four — separate scripts into one registry
+            (<code>R/sector_registry.R</code>). Phase 2 extracted the shared HTML-report and
+            Vietnamese-name-matching helpers into reusable modules and parameterized the 1,385-line PACTA
+            analysis script so its bank name, input files, and output directories all come from the
+            engagement config instead of being hardcoded to "Mekong Commercial Bank."
+          </p>
+        </div>
+        <div class="subcard">
+          <h3>Why it matters</h3>
+          <p>
+            The platform's pilot sales pack promises a bank "here is the file we need from you; we will
+            return your alignment and transition-risk analysis" — but until now, the analysis code had
+            never run against anything except the hand-built synthetic MCB CSVs. Every path and every
+            "MCB" mention in the code was a literal string. This work is the prerequisite refactor that
+            makes a second bank's engagement possible without duplicating the pipeline's ~3,100 lines of
+            PACTA logic a second time.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="background-objective">
+      <div class="section-header">
+        <div>
+          <div class="section-index">02 / Background &amp; Objective</div>
+          <h2 class="section-title">Background &amp; Objective</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p>
+          The pacta-trisk platform is a demo-complete PACTA (climate-alignment) and TRISK (transition-risk)
+          analysis pipeline for a fictional Vietnamese bank, Mekong Commercial Bank (MCB), published as a
+          public Streamlit dashboard. A prior hardening effort (completed 2026-07-10) proved the automated
+          refresh pipeline, cut the published snapshot from ~108&nbsp;MB to 3&nbsp;MB, added a pinned R
+          environment and a golden-number regression test suite, and ran a dress rehearsal of the intake
+          layer against a deliberately dirty 40-row fixture loanbook for a second, fictional bank ("Saigon
+          Delta Bank").
+        </p>
+        <p>
+          That rehearsal's own closing verdict named the one promise still undemonstrated: running the
+          full PACTA and TRISK analysis — not just intake validation — on a loanbook other than MCB's. The
+          root cause is that <code>scripts/pacta_vietnam_scenario.R</code> has no command-line arguments
+          and hardcodes every input path, output directory, and instance of the bank's name. The
+          <strong>Client Engagement Runway</strong> plan (<code>plans/2026-07-13-client-engagement-runway-plan.md</code>)
+          lays out six phases to close that gap: an engagement-config layer, a shared R core, a TRISK-chain
+          parameterization pass, a one-command orchestrator, a second-bank end-to-end run, and a set of
+          data-dependency and methodology fixes. This report covers the first two.
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="inputs-scope">
+      <div class="section-header">
+        <div>
+          <div class="section-index">03 / Inputs &amp; Scope</div>
+          <h2 class="section-title">Inputs &amp; Scope</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Plan &amp; research inputs</h3>
+          <ul>
+            <li><code>plans/2026-07-13-client-engagement-runway-plan.md</code> — the six-phase implementation plan this session executed against.</li>
+            <li><code>research/2026-07-13-client-engagement-runway-brainstorm.md</code> — the brainstorm that identified the gap and shaped the plan's sequencing.</li>
+            <li><code>research/2026-07-10-real-data-readiness-and-hardening-brainstorm.md</code> — prior-phase findings on duplicated report/matching logic and scattered run configuration.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Scope executed this session</h3>
+          <ul>
+            <li><span class="badge badge-done">Done</span> Phase 1 — engagement config layer + sector registry</li>
+            <li><span class="badge badge-done">Done</span> Phase 2 — shared R core + PACTA parameterization</li>
+            <li><span class="badge badge-pending">Not started</span> Phase 3 — parameterize TRISK chain + downstream generators</li>
+            <li><span class="badge badge-pending">Not started</span> Phase 4 — <code>run_engagement.R</code> orchestrator</li>
+            <li><span class="badge badge-pending">Not started</span> Phase 5 — second-bank (SDB) end-to-end run + golden fixture</li>
+            <li><span class="badge badge-pending">Not started</span> Phase 6 — ABCD sourcing brief, scenario versioning, NA bug fixes</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="assumptions-constraints">
+      <div class="section-header">
+        <div>
+          <div class="section-index">04 / Assumptions &amp; Constraints</div>
+          <h2 class="section-title">Assumptions &amp; Constraints</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Binding constraint honored throughout</h3>
+          <p>
+            With no <code>--config</code> flag, every script's observable output — file paths, CSV bytes,
+            and the pipeline manifest shape — had to remain identical to the pre-refactor behavior, since
+            the weekly auto-committing CI, the golden-number test suite, and the public dashboard all
+            depend on it. Both phases were verified against this bar before committing (see Methodology).
+          </p>
+        </div>
+        <div class="subcard">
+          <h3>Scope decisions made this session</h3>
+          <ul>
+            <li>Engagement configuration is JSON via <code>jsonlite</code>, not YAML — the YAML package is not pinned in <code>renv.lock</code>, and adding a new dependency for this was judged unnecessary.</li>
+            <li>The bank-name substitution reaches the full HTML report body, including the Vietnamese narrative prose — but the narrative's <em>hardcoded factual figures</em> (e.g. "2,000 tỷ VND cho vay xi măng") remain MCB-specific literals; rewriting the narrative to compute those figures from data is out of scope for this refactor and is a known limitation carried forward.</li>
+            <li>Two superseded PACTA scripts (<code>pacta_demo.R</code>, <code>pacta_synthesis.R</code>) were retired to <code>attic/</code> rather than parameterized, after confirming via repo-wide search that nothing in <code>scripts/</code>, <code>dashboard/</code>, or CI referenced them.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="methodology">
+      <div class="section-header">
+        <div>
+          <div class="section-index">05 / Methodology</div>
+          <h2 class="section-title">Methodology</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p>
+          Each phase followed the same discipline: capture a pre-change baseline, make the code change,
+          then prove the default (no-config) behavior is unaffected before committing.
+        </p>
+        <ul>
+          <li><strong>Baseline capture:</strong> before any edit, the full R test suite and Python test suite were run to confirm a green starting point (89 R tests / 58 Python tests passing).</li>
+          <li><strong>Byte-identity proof for Phase 1:</strong> the TRISK sector manifest (<code>dashboard/data/trisk/manifest.csv</code>) generated from the new shared registry was diffed against the pre-refactor version and found byte-for-byte identical; a full <code>pipeline_refresh.R</code> run reproduced the same 8-step "ok" manifest as before the change.</li>
+          <li><strong>Byte-identity proof for Phase 2:</strong> all 7 <code>synthesis_output/vietnam/*.csv</code> outputs were MD5-hashed before and after parameterizing <code>pacta_vietnam_scenario.R</code> and found identical. The generated HTML report was diffed with embedded base64 PNG data stripped out (PNG re-encoding is not byte-stable across ggplot runs, a known, already-documented platform trait) — the remaining text content showed <strong>zero differences</strong>, confirming all ~30 "MCB" / "Mekong Commercial Bank" substitutions render identically under default config.</li>
+          <li><strong>Full-chain regression:</strong> <code>Rscript scripts/pipeline_refresh.R --full</code> was run after each phase, exercising data generation, PACTA, the full TRISK chain, the 243-cell scenario grid, prioritization, and engagement scoring in sequence — reproducing the platform's known golden borrower ranking as an independent correctness signal.</li>
+          <li><strong>Discovery during verification:</strong> running the full pipeline after Phase 1 surfaced two additional, previously un-grepped consumers of the old inline sector-metadata structure (<code>trisk_scenario_grid.R</code> and <code>trisk_run_adhoc.R</code>, the latter powering the dashboard's live-rerun feature) that the plan's file list had not anticipated. Both were fixed and verified in the same phase rather than deferred, since leaving them broken would have silently regressed the scenario grid and live-rerun features.</li>
+          <li><strong>Scratch-data hygiene:</strong> full pipeline verification runs regenerate non-deterministic TRISK sensitivity-run folders (new UUIDs/timestamps every run) and re-render PNGs. These verification byproducts were reverted before each commit so the two phase commits contain only the intended code changes, not incidental data churn.</li>
+        </ul>
+      </div>
+      <div class="stat-grid">
+        <div class="stat">
+          <div class="stat-label">R tests passing (final)</div>
+          <div class="stat-value">126 / 126</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Python tests passing (final)</div>
+          <div class="stat-value">58 / 58</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">MCB CSV byte-identity</div>
+          <div class="stat-value">7 / 7 files</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="phase-analysis">
+      <div class="section-header">
+        <div>
+          <div class="section-index">06 / Phase-by-Phase Analysis</div>
+          <h2 class="section-title">Phase-by-Phase Analysis</h2>
+        </div>
+      </div>
+      <div class="phase-grid">
+        <div class="subcard">
+          <h3>Phase 1 — Engagement Config Layer &amp; Sector Registry <span class="badge badge-done">Done</span></h3>
+          <p>
+            Introduced <code>R/engagement_config.R</code>: a JSON config loader whose built-in defaults
+            reproduce today's MCB paths exactly, with validation that checks bank-name/slug well-formedness
+            and confirms every input file exists before analysis begins. Introduced
+            <code>R/sector_registry.R</code>, merging TRISK sector metadata (labels, units, alignment
+            modes, scenario names, base run parameters) that had previously been maintained by hand in two
+            separate places — a duplication that was one accidental edit away from silently drifting out
+            of sync. Created <code>engagements/mcb-demo/engagement_config.json</code> as a documented
+            example of the defaults.
+          </p>
+        </div>
+        <div class="subcard">
+          <h3>Phase 2 — Shared R Core &amp; PACTA Parameterization <span class="badge badge-done">Done</span></h3>
+          <p>
+            Extracted the duplicated base64-image-encoding and HTML-writing helpers into
+            <code>R/report_toolkit.R</code>, and the duplicated Vietnamese diacritic-normalization call
+            into <code>R/matching_helpers.R</code>, wiring both into the four scripts that previously
+            carried their own copies. Parameterized <code>pacta_vietnam_scenario.R</code>'s input paths,
+            output directories, and every occurrence of the bank's name — the single largest piece of this
+            phase, since "MCB" text appeared far more densely (in Vietnamese narrative prose, chart titles,
+            and the HTML report shell) than the plan's initial estimate suggested. Retired the two
+            superseded demo scripts to <code>attic/</code>.
+          </p>
+        </div>
+        <div class="subcard">
+          <h3>Phase 3 — TRISK Chain + Downstream Generators <span class="badge badge-pending">Not started</span></h3>
+          <p>
+            Planned next: give the remaining nine pipeline scripts (TRISK input prep, power/cement/steel
+            demo runners, the scenario grid, prioritization, the dashboard snapshot copier, engagement
+            scoring, and the letter/disclosure generators) the same <code>--config</code> support so an
+            engagement can run its analysis entirely outside the MCB directory tree.
+          </p>
+        </div>
+        <div class="subcard">
+          <h3>Phases 4–6 — Orchestrator, Second-Bank Run, Data Fixes <span class="badge badge-pending">Not started</span></h3>
+          <p>
+            Planned: a <code>run_engagement.R</code> one-command orchestrator; running the previously
+            rehearsed "Saigon Delta Bank" fixture through the full analysis chain for the first time, with a
+            second golden-number test set frozen from its output; and closing two external dependencies
+            (a real asset-data sourcing decision, an asset-data intake contract) plus two known
+            data-quality bugs.
+          </p>
+        </div>
+      </div>
+      <div class="diagram-frame compact-diagram">
+        <div class="mermaid">
+flowchart LR
+  A["Brainstorm:\nplatform runs\nonly MCB's book"] --> B["Plan: 6 phases"]
+  B --> P1["Phase 1\nEngagement config +\nsector registry"]
+  P1 --> P2["Phase 2\nShared R core +\nPACTA parameterized"]
+  P2 -.this session ends here.-> P3["Phase 3\nTRISK chain +\ndownstream configged"]
+  P3 --> P4["Phase 4\nrun_engagement.R\norchestrator"]
+  P4 --> P5["Phase 5\nSecond-bank (SDB)\nend-to-end run"]
+  P5 --> P6["Phase 6\nData deps +\nbug fixes"]
+  classDef done fill:#e4f0ee,stroke:#3b6f76,color:#20373a;
+  classDef pending fill:#f7efdf,stroke:#9d6b37,color:#5f564c,stroke-dasharray: 4 3;
+  class A,B,P1,P2 done;
+  class P3,P4,P5,P6 pending;
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="findings-recommendation">
+      <div class="section-header">
+        <div>
+          <div class="section-index">07 / Findings &amp; Recommendation</div>
+          <h2 class="section-title">Findings &amp; Recommendation</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p>
+          <strong>Finding 1 — the duplication was worse than documented.</strong> The plan's research
+          inputs described TRISK sector metadata as duplicated in two places. Verification runs surfaced a
+          third and fourth undocumented consumer of the same inline structure (the scenario-grid builder
+          and the dashboard's live-rerun adapter). Both were silently broken by the Phase 1 refactor until
+          caught by running the full pipeline rather than relying on the unit test suite alone — a signal
+          that end-to-end verification, not just targeted tests, is doing real work in this codebase.
+        </p>
+        <p>
+          <strong>Finding 2 — the bank-name parameterization was a bigger surface than estimated.</strong>
+          The plan's Phase 2 task description estimated "8 occurrences" of the bank name to replace; the
+          actual count across chart titles, cat() banners, and the bilingual HTML report body was
+          approximately 30. All were located and substituted, and the byte-identity proof (CSV hashes
+          unchanged, HTML text-diff zero) gives confidence that none were missed or handled inconsistently.
+        </p>
+        <p>
+          <strong>Finding 3 — a known, carried-forward limitation.</strong> The Vietnamese narrative prose
+          in the PACTA report contains hardcoded factual claims specific to MCB's actual loanbook (specific
+          VND amounts, specific sector percentages) that are not computed from the input data. Swapping the
+          bank's <em>name</em> in that prose was in scope and completed; making those specific claims
+          <em>data-driven</em> for an arbitrary engagement was not, and remains true only for MCB today.
+          This should be flagged explicitly if a future engagement's report is reviewed for accuracy.
+        </p>
+        <p>
+          <strong>Recommendation:</strong> proceed directly to Phase 3. The config-loading pattern and the
+          verification discipline (baseline → change → byte-identity proof → full-pipeline regression) that
+          worked for Phases 1–2 should be repeated for the nine remaining scripts, since Phase 3 is the
+          direct prerequisite for the orchestrator (Phase 4) and the second-bank run (Phase 5) that
+          demonstrate the platform's core commercial promise.
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="implementation-path">
+      <div class="section-header">
+        <div>
+          <div class="section-index">08 / Implementation Path</div>
+          <h2 class="section-title">Implementation Path</h2>
+        </div>
+      </div>
+      <div class="phase-grid">
+        <div class="subcard">
+          <h3>Immediate next step</h3>
+          <p>
+            Execute Phase 3 of <code>plans/2026-07-13-client-engagement-runway-plan.md</code>: add
+            <code>--config</code> support to <code>trisk_prepare_inputs.R</code>,
+            <code>trisk_power_demo.R</code>, <code>trisk_sector_demo.R</code>,
+            <code>trisk_scenario_grid.R</code>, <code>sector_prioritization.R</code>,
+            <code>refresh_dashboard_data.R</code>, <code>engagement_scoring.R</code>,
+            <code>generate_engagement_letters.R</code>, and <code>generate_disclosure_pack.R</code>, each
+            gated so default (no-flag) behavior is provably unchanged.
+          </p>
+        </div>
+        <div class="subcard">
+          <h3>Sequencing after that</h3>
+          <ol>
+            <li>Phase 4 — build <code>run_engagement.R</code> and the shared step-runner extracted from <code>pipeline_refresh.R</code>.</li>
+            <li>Phase 5 — run the Saigon Delta Bank fixture through the full chain for the first time; freeze a second golden-number fixture.</li>
+            <li>Phase 6 — write the ABCD sourcing decision brief, add scenario versioning, and fix the two known NA-producing data bugs.</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="risks-open-questions">
+      <div class="section-header">
+        <div>
+          <div class="section-index">09 / Risks / Open Questions</div>
+          <h2 class="section-title">Risks / Open Questions</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Risks carried into Phase 3</h3>
+          <ul>
+            <li>The same "hidden consumer" risk that surfaced in Phase 1 (undocumented callers of shared logic) likely recurs across nine more scripts; each should be grepped for cross-references, not just edited in isolation.</li>
+            <li>Phase 5's second-bank run is expected to hit zero-match or empty-sector edge cases (the Saigon Delta Bank fixture was deliberately built with unmatchable rows) that Phases 1–2 have not exercised at all — those failure modes remain unverified until Phase 5 runs.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Open items</h3>
+          <ul>
+            <li>The Vietnamese narrative's hardcoded factual figures (noted in Finding 3) are an accepted, documented limitation rather than a resolved one — a future engagement's report should not be treated as fully data-driven without this caveat.</li>
+            <li>Phases 3–6 are unstarted; this report should not be read as evidence that the "one command, any bank" capability exists yet — only that its foundation is now in place and proven not to have regressed the existing MCB demo.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="appendices-evidence">
+      <div class="section-header">
+        <div>
+          <div class="section-index">10 / Appendices / Evidence Notes</div>
+          <h2 class="section-title">Appendices / Evidence Notes</h2>
+        </div>
+      </div>
+      <div class="appendix-grid">
+        <div class="subcard">
+          <h3>Commits</h3>
+          <div class="technical-frame">
+            <table>
+              <thead><tr><th>Commit</th><th>Summary</th></tr></thead>
+              <tbody>
+                <tr><td><code>d4c637b</code></td><td>phase-1: engagement config layer + sector registry</td></tr>
+                <tr><td><code>a03df4c</code></td><td>phase-2: shared R core + PACTA parameterization (byte-identical MCB)</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="subcard">
+          <h3>New / modified files</h3>
+          <ul>
+            <li><code>R/engagement_config.R</code>, <code>R/sector_registry.R</code>, <code>R/report_toolkit.R</code>, <code>R/matching_helpers.R</code> (new)</li>
+            <li><code>engagements/mcb-demo/engagement_config.json</code> (new)</li>
+            <li><code>attic/pacta_demo.R</code>, <code>attic/pacta_synthesis.R</code>, <code>attic/README.md</code> (moved / new)</li>
+            <li><code>tests/testthat/test_engagement_config.R</code>, <code>tests/testthat/test_matching_helpers.R</code> (new, 15 test cases combined)</li>
+            <li><code>scripts/pacta_vietnam_scenario.R</code>, <code>scripts/trisk_sector_demo.R</code>, <code>scripts/refresh_dashboard_data.R</code>, <code>scripts/trisk_scenario_grid.R</code>, <code>scripts/trisk_run_adhoc.R</code>, <code>scripts/intake_validate_and_map.R</code>, <code>scripts/generate_report.R</code>, <code>scripts/generate_validation_report.R</code> (modified)</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Verification commands run</h3>
+          <ul>
+            <li><code>Rscript -e "testthat::test_dir('tests/testthat')"</code> — 126 passed, 0 failed (final state)</li>
+            <li><code>python -m pytest dashboard/tests</code> — 58 passed (final state)</li>
+            <li><code>Rscript scripts/pipeline_refresh.R --full</code> — 11-step manifest, status <code>ok</code>, reproduced golden borrower ranking</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Golden borrower ranking reproduced</h3>
+          <div class="technical-frame">
+            <table>
+              <thead><tr><th>Rank</th><th>Borrower</th><th>Composite score</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td>Nghi Son Power LLC</td><td>1.000</td></tr>
+                <tr><td>2</td><td>Vinacomin Power JSC</td><td>0.998</td></tr>
+                <tr><td>3</td><td>International Power Mong Duong</td><td>0.996</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="footer-note">designed for html first, printable without reconstruction</div>
+    </section>
+  </main>
+  <script>
+    (function() {
+      const chartCanvases = document.querySelectorAll('canvas');
+      chartCanvases.forEach((canvas) => {
+        canvas.classList.add('report-chart');
+        const parent = canvas.parentElement;
+        if (parent && parent.classList.contains('technical-frame') && !parent.classList.contains('chart-frame')) {
+          parent.classList.add('chart-frame');
+        }
+      });
+    })();
+
+    if (window.Chart) {
+      Chart.defaults.devicePixelRatio = 1;
+      Chart.defaults.animation = false;
+      Chart.defaults.resizeDelay = 150;
+      Chart.defaults.normalized = true;
+      Chart.defaults.maintainAspectRatio = false;
+      Chart.defaults.responsive = true;
+      window.__REPORT_CHART_DEFAULTS__ = {
+        animation: false,
+        resizeDelay: 150,
+        normalized: true,
+        maintainAspectRatio: false,
+        responsive: true
+      };
+    }
+  </script>
+</body>
+</html>
