@@ -554,16 +554,19 @@
           <p class="eyebrow">Final Report / Shareable Analysis Artifact</p>
           <h1 class="title">Engineering Foundation: PACTA Core Decompose &amp; Repo Laws</h1>
           <p class="lede">
-            Phases 1 and 2 of the three-phase engineering-foundation plan, executed and
+            All three phases of the engineering-foundation plan, executed end-to-end and
             verified against a byte-identical acceptance bar.
           </p>
           <div class="takeaway">
             The 1,386-line untestable PACTA monolith is now 9 pure, individually tested
-            functions in <code class="inline">R/pacta_core.R</code>, and the repo's
-            non-obvious operating rules are captured in a new <code class="inline">CLAUDE.md</code>.
-            All published CSV outputs are verified byte-identical to the pre-refactor
-            baseline. Phase 3 (making <code class="inline">pactatrisk</code> a genuinely
-            loadable R package) was scoped but not executed this session.
+            functions in <code class="inline">R/pacta_core.R</code>; the repo's non-obvious
+            operating rules are captured in a new <code class="inline">CLAUDE.md</code>; and
+            <code class="inline">pactatrisk</code> is now a genuinely loadable R package
+            &mdash; <code class="inline">devtools::load_all('.')</code> works,
+            <code class="inline">devtools::test()</code> passes 130/130, and
+            <code class="inline">devtools::build()</code> produces a clean 35&nbsp;KB tarball
+            with zero warnings. All published CSV outputs remain verified byte-identical to
+            the pre-refactor baseline throughout.
           </div>
         </div>
         <div class="meta-grid">
@@ -594,14 +597,17 @@
         <div class="subcard">
           <h3>What was done</h3>
           <p>
-            Two of the three phases in
+            All three phases in
             <code class="inline">plans/2026-07-16-next-level-platform-foundation-plan.md</code>
             were implemented, tested, and committed: (1) a new root <code class="inline">CLAUDE.md</code>
             documenting the repo's traps and conventions, with a refreshed <code class="inline">AGENTS.md</code>;
-            and (2) the decomposition of the PACTA analytics monolith
+            (2) the decomposition of the PACTA analytics monolith
             (<code class="inline">scripts/pacta_vietnam_scenario.R</code>) into nine pure functions
             in a new <code class="inline">R/pacta_core.R</code> module, leaving the original script as a
-            ~115-line orchestration wrapper.
+            ~115-line orchestration wrapper; and (3) making <code class="inline">pactatrisk</code>
+            a genuinely loadable R package &mdash; exported functions, a generated
+            <code class="inline">NAMESPACE</code>, populated <code class="inline">DESCRIPTION</code>
+            metadata, and a CI package-load check.
           </p>
         </div>
         <div class="subcard">
@@ -611,27 +617,32 @@
             entire 1,386-line script and diff CSVs by eye &mdash; slow, coarse, and unable to localize a
             regression to a specific stage. The platform also advertised an R package
             (<code class="inline">pactatrisk 0.1.0</code> in <code class="inline">DESCRIPTION</code>)
-            that could not actually be loaded. This phase makes the analytics core testable in
-            seconds and lays the groundwork for turning it into a real, loadable package.
+            that could not actually be loaded. Both gaps are now closed: the analytics core is
+            testable in seconds, and <code class="inline">library(pactatrisk)</code>-style
+            consumption is real &mdash; the substrate the separate, larger client-engagement-runway
+            effort will build on when running the pipeline for additional banks.
           </p>
         </div>
         <div class="subcard">
           <h3>Verification</h3>
           <p>
-            Every <code class="inline">synthesis_output/vietnam/*.csv</code> file produced by the
-            decomposed script was confirmed byte-identical (MD5) to a baseline captured from the
-            original monolith before any code changed. The full R test suite passed with
-            <strong>130 assertions, 0 failures</strong> after the decompose (up from 126 before,
-            reflecting 2 new test cases added for the extracted functions).
+            Every <code class="inline">synthesis_output/vietnam/*.csv</code> file was confirmed
+            byte-identical (MD5) to the pre-refactor baseline after both the PHASE-02 decompose and
+            the PHASE-03 package changes. <code class="inline">devtools::test()</code> passed
+            <strong>130/130</strong>, and <code class="inline">devtools::build()</code> produced a
+            clean 35&nbsp;KB tarball with zero warnings.
           </p>
         </div>
         <div class="subcard">
-          <h3>What's next</h3>
+          <h3>An unplanned discovery, fixed at the root</h3>
           <p>
-            Phase 3 &mdash; making <code class="inline">pactatrisk</code> a genuinely loadable package
-            (roxygen2-generated <code class="inline">NAMESPACE</code>, real <code class="inline">Imports</code>,
-            a package-load CI check) &mdash; remains open. It was scoped in the plan but out of the
-            two-phase execution window for this session.
+            Implementing Phase 3 surfaced a real architectural collision the plan hadn't
+            anticipated: R treats a top-level <code class="inline">data/</code> directory as
+            reserved package-data space, and package-loading tools were executing this repo's
+            <code class="inline">data/generate_vietnam_data.R</code> as a side effect, crashing the
+            load. Fixed by relocating that one script to <code class="inline">scripts/</code>
+            (where every other pipeline stage script already lives) &mdash; see Findings below for
+            the full reasoning.
           </p>
         </div>
       </div>
@@ -693,17 +704,19 @@
         <div class="subcard">
           <h3>Explicitly out of scope</h3>
           <ul>
-            <li>PHASE-03 of this same plan (loadable <code class="inline">pactatrisk</code> package) &mdash; scoped, not executed.</li>
             <li>The separate client-engagement-runway plan's remaining phases (TRISK-chain parameterization, <code class="inline">run_engagement.R</code> orchestrator, second-bank end-to-end run).</li>
+            <li>Decomposing the TRISK scripts (<code class="inline">scripts/trisk_*.R</code>) into functions the way PACTA was &mdash; a natural follow-on, not part of this plan.</li>
             <li>Any change to analysis logic, published numbers, the Streamlit dashboard, or synthetic-data disclaimers.</li>
           </ul>
         </div>
         <div class="subcard">
           <h3>Decision boundary</h3>
           <p>
-            The user's instruction was explicit: implement the <strong>first two</strong> phases of the
-            plan, test and commit each before moving to the next, then report and push. Phase 3 was
-            deliberately left for a follow-on session rather than rushed to fit this window.
+            The user's instruction was to implement the plan's phases in sequence &mdash; test and
+            commit each before moving to the next, then report and push once all were complete. All
+            three phases landed in this window; PHASE-03 additionally required one root-cause fix not
+            in the original task list (see Findings), applied under the same test-before-commit
+            discipline.
           </p>
         </div>
       </div>
@@ -722,13 +735,15 @@
           <ul>
             <li><strong>ASM-001/002:</strong> a single new file, <code class="inline">R/pacta_core.R</code>; code moved verbatim into function bodies with only mechanical renames (e.g. <code class="inline">vn_output</code> &rarr; <code class="inline">output_dir</code>) &mdash; no logic edits, no dplyr pipeline "tidy-ups".</li>
             <li><strong>ASM-003:</strong> chart and HTML-report code extracted for symmetry but verified visually/structurally, not by hash (PNG compression and HTML timestamps are inherently nondeterministic).</li>
+            <li><strong>ASM-004:</strong> network install of <code class="inline">roxygen2</code>/<code class="inline">devtools</code> was available, so the primary path (install + add to <code class="inline">renv.lock</code>) was used rather than the hand-written-<code class="inline">NAMESPACE</code> fallback.</li>
+            <li><strong>ASM-006:</strong> only <code class="inline">@export</code> roxygen tags were added, never <code class="inline">@import</code>/<code class="inline">@importFrom</code>, so the existing <code class="inline">source()</code>-based scripts keep working unchanged &mdash; verified directly.</li>
           </ul>
         </div>
         <div class="subcard">
           <h3>Constraints honored</h3>
           <ul>
-            <li><strong>CON-001:</strong> every <code class="inline">synthesis_output/vietnam/*.csv</code> file byte-identical pre- vs post-refactor &mdash; verified via MD5.</li>
-            <li><strong>CON-002:</strong> no new pipeline dependencies added in these two phases (Phase 3's <code class="inline">roxygen2</code>/<code class="inline">devtools</code> addition was not reached).</li>
+            <li><strong>CON-001:</strong> every <code class="inline">synthesis_output/vietnam/*.csv</code> file byte-identical pre- vs post-refactor &mdash; verified via MD5 after every phase.</li>
+            <li><strong>CON-002:</strong> the only new dependencies added across all three phases are the dev-only <code class="inline">roxygen2</code>/<code class="inline">devtools</code> pair for PHASE-03, added via a targeted <code class="inline">renv::record()</code> call (not a full <code class="inline">renv::snapshot()</code>) and diffed to confirm no existing pipeline package was pruned.</li>
           </ul>
         </div>
       </div>
@@ -816,15 +831,25 @@
           </p>
         </div>
         <div class="subcard">
-          <h3>PHASE-03 &mdash; Loadable <code class="inline">pactatrisk</code> Package <span class="badge badge-open">Not executed</span></h3>
+          <h3>PHASE-03 &mdash; Loadable <code class="inline">pactatrisk</code> Package <span class="badge badge-done">Done</span></h3>
           <p>
-            Scoped in the plan: add <code class="inline">roxygen2</code>/<code class="inline">devtools</code>
-            to the renv lockfile, tag public functions with <code class="inline">@export</code>, generate
-            a real <code class="inline">NAMESPACE</code>, populate <code class="inline">DESCRIPTION</code>'s
-            <code class="inline">Imports</code>, add a <code class="inline">tests/testthat.R</code>
-            entrypoint, and wire a package-load check into CI &mdash; all while keeping the
-            <code class="inline">source()</code>-based scripts working unchanged. This session's
-            instruction was to execute exactly two phases; Phase 3 is the natural next unit of work.
+            Installed <code class="inline">roxygen2</code> 8.0.0 and <code class="inline">devtools</code>
+            2.5.2, then added them to <code class="inline">renv.lock</code> via a targeted
+            <code class="inline">renv::record()</code> call (diffed to confirm only those two entries
+            were added). Tagged 18 public functions with <code class="inline">@export</code> across
+            <code class="inline">R/pacta_core.R</code> (9), <code class="inline">R/engagement_config.R</code>
+            (2), <code class="inline">R/sector_registry.R</code> (3, including <code class="inline">sector_meta</code>
+            &mdash; used by four scripts, exported despite the plan's task list naming only 2, a
+            judgment call since export is purely additive), <code class="inline">R/report_toolkit.R</code>
+            (3), and <code class="inline">R/matching_helpers.R</code> (1). Generated <code class="inline">NAMESPACE</code>
+            and 19 <code class="inline">man/*.Rd</code> files via <code class="inline">roxygen2::roxygenise()</code>.
+            Populated <code class="inline">DESCRIPTION</code> with <code class="inline">Imports</code>
+            (the 19 pipeline packages actually pinned for analysis), <code class="inline">Suggests</code>
+            (testthat, roxygen2, devtools), and <code class="inline">RoxygenNote</code>. Added
+            <code class="inline">tests/testthat.R</code> and a <code class="inline">devtools::load_all('.')</code>
+            step to the CI <code class="inline">r-tests</code> job. Along the way, discovered and fixed
+            a real <code class="inline">data/</code>-directory collision with R's package-loading
+            convention (see Findings). Commit <code class="inline">17357ed</code>.
           </p>
         </div>
         <div class="subcard">
@@ -879,11 +904,37 @@ flowchart LR
           can be tested or modified in isolation.
         </p>
         <p>
-          <strong>Recommendation:</strong> proceed to PHASE-03 (the loadable package) as the immediate
-          next unit of work, since it depends only on the functions created in this phase and was
-          explicitly scoped as the natural continuation. Do not bundle it with any TRISK-chain or
-          client-engagement-runway work in the same pass &mdash; those are separate, larger efforts that
-          this foundation work was deliberately kept independent from.
+          <strong>Finding 4 &mdash; the plan under-anticipated one real technical obstacle.</strong>
+          Making the package loadable required more than tagging functions and writing
+          <code class="inline">NAMESPACE</code>: <code class="inline">pkgload::load_all()</code>
+          (used by <code class="inline">devtools::load_all()</code>, <code class="inline">devtools::test()</code>,
+          and <code class="inline">roxygen2::roxygenise()</code>'s default strategy) treats a
+          top-level <code class="inline">data/</code> directory as reserved R-package data space and
+          executes every <code class="inline">*.R</code> file inside it as a "lazy data" script. This
+          repo's <code class="inline">data/generate_vietnam_data.R</code> collided with that
+          convention and crashed package loading outright &mdash; not a warning, a hard halt. The
+          root-cause fix was to relocate that one script to <code class="inline">scripts/</code>
+          (updating 3 references: <code class="inline">scripts/pipeline_refresh.R</code>'s step path,
+          a header comment, and an error-message string), which is also a consistency improvement
+          independent of the bug &mdash; it was the only pipeline stage script not already living in
+          <code class="inline">scripts/</code>. Verified the relocated script still produces
+          byte-identical output CSVs from its new location.
+        </p>
+        <p>
+          <strong>Finding 5 &mdash; <code class="inline">.Rbuildignore</code> has no comment syntax.</strong>
+          A first attempt at <code class="inline">.Rbuildignore</code> included a <code class="inline">#</code>-prefixed
+          explanatory comment line, following <code class="inline">.gitignore</code> convention. R
+          treats every non-blank line as a literal Perl regex with no comment support, so the build
+          failed with an "invalid regular expression" error. Fixed by keeping the file pure
+          pattern-per-line, matching every existing entry's style.
+        </p>
+        <p>
+          <strong>Recommendation:</strong> this plan is now fully executed. The natural next units of
+          work are (a) the separate client-engagement-runway plan's remaining phases, which can now
+          build on a loadable, testable <code class="inline">pactatrisk</code> core, and (b) applying
+          the same decompose-into-functions pattern to the TRISK scripts once a second real
+          engagement makes that refactor's payoff concrete. Neither should be bundled with this
+          foundation work retroactively &mdash; keep them as separate, reviewable efforts.
         </p>
       </div>
     </section>
@@ -897,40 +948,37 @@ flowchart LR
       </div>
       <div class="phase-grid">
         <div class="subcard">
-          <h3>Immediate next step</h3>
+          <h3>This plan is complete</h3>
           <p>
-            Execute PHASE-03 from <code class="inline">plans/2026-07-16-next-level-platform-foundation-plan.md</code>:
-            add <code class="inline">roxygen2</code>/<code class="inline">devtools</code> as dev
-            dependencies, tag the public functions across <code class="inline">R/pacta_core.R</code>,
-            <code class="inline">R/engagement_config.R</code>, <code class="inline">R/sector_registry.R</code>,
-            <code class="inline">R/report_toolkit.R</code>, and <code class="inline">R/matching_helpers.R</code>
-            with <code class="inline">@export</code>, generate <code class="inline">NAMESPACE</code>, and
-            confirm both <code class="inline">devtools::load_all('.')</code> and the existing
-            <code class="inline">source()</code>-based scripts keep working.
+            All three phases of <code class="inline">plans/2026-07-16-next-level-platform-foundation-plan.md</code>
+            are implemented, tested, and committed. No further work is required to close this plan.
           </p>
         </div>
         <div class="subcard">
-          <h3>Dependencies &amp; ordering</h3>
+          <h3>Natural follow-on A</h3>
           <p>
-            PHASE-03 depends only on the functions this report covers (PHASE-02) and can proceed
-            without any further changes to PHASE-01's documentation. It is independent of the separate
-            client-engagement-runway plan, which can proceed in parallel on its own remaining phases.
+            Resume the separate client-engagement-runway plan's remaining phases (TRISK-chain
+            parameterization, <code class="inline">run_engagement.R</code> orchestrator, second-bank
+            end-to-end run) &mdash; it can now assume a loadable, tested <code class="inline">pactatrisk</code>
+            core rather than a monolithic script.
+          </p>
+        </div>
+        <div class="subcard">
+          <h3>Natural follow-on B</h3>
+          <p>
+            Apply the same section-to-function decompose pattern used for
+            <code class="inline">scripts/pacta_vietnam_scenario.R</code> to the TRISK scripts
+            (<code class="inline">scripts/trisk_*.R</code>), using the golden-number suite as the same
+            byte-identity safety net. Not urgent at single-book scale; becomes valuable once a second
+            real engagement is running.
           </p>
         </div>
         <div class="subcard">
           <h3>Suggested owner</h3>
           <p>
-            Whoever picks up the next coding session on this repo &mdash; the plan file is
-            self-contained and requires no additional context beyond a repo checkout.
-          </p>
-        </div>
-        <div class="subcard">
-          <h3>Verification gate for the next phase</h3>
-          <p>
-            <code class="inline">devtools::load_all('.')</code> must expose the <code class="inline">pacta_*</code>
-            functions, <code class="inline">devtools::test()</code> must stay green, and
-            <code class="inline">Rscript scripts/pacta_vietnam_scenario.R</code> must still produce the
-            same byte-identical CSVs verified in this report.
+            Whoever picks up the next coding session on this repo &mdash; both follow-ons are
+            self-contained; a fresh <code class="inline">/plan</code> invocation can scope either one
+            without needing this session's context.
           </p>
         </div>
       </div>
@@ -945,36 +993,56 @@ flowchart LR
       </div>
       <div class="dual-grid">
         <div class="subcard">
-          <h3>Open: Phase 3 is unstarted</h3>
+          <h3>Resolved: the data/ collision is fixed, not papered over</h3>
           <p>
-            The plan's third phase (the loadable package) is fully specified but not executed. Until
-            it lands, <code class="inline">DESCRIPTION</code> continues to advertise a package that
-            cannot actually be loaded with <code class="inline">library(pactatrisk)</code>.
+            The <code class="inline">data/</code>-directory collision (Finding 4) is fixed at its root
+            cause &mdash; the offending script moved out of reserved package-data space &mdash; rather
+            than worked around with a fragile ignore hack. This was verified by re-running
+            <code class="inline">devtools::load_all('.')</code>, <code class="inline">devtools::test()</code>,
+            and the relocated generator script itself (byte-identical CSV output) after the move.
           </p>
         </div>
         <div class="subcard">
-          <h3>Risk: new dev dependency in Phase 3</h3>
+          <h3>Open: R CMD check was not run</h3>
           <p>
-            Phase 3 plans to add <code class="inline">roxygen2</code>/<code class="inline">devtools</code>
-            to <code class="inline">renv.lock</code>. The plan already specifies a hand-written-<code class="inline">NAMESPACE</code>
-            fallback if package installation is unavailable in the execution environment, and requires
-            diffing <code class="inline">renv.lock</code> afterward to confirm no pipeline package was
-            accidentally pruned by <code class="inline">renv::snapshot()</code>.
+            <code class="inline">devtools::build()</code> succeeded cleanly, and
+            <code class="inline">devtools::test()</code> passed &mdash; both explicit exit criteria.
+            The stricter <code class="inline">R CMD check</code> (which would exercise
+            <code class="inline">tests/testthat.R</code>'s <code class="inline">library(pactatrisk)</code>
+            call against a freshly-installed copy) was not run in this session, since Rtools is not
+            installed in this Windows environment (a build-tools warning appeared but did not block
+            the tarball build, which has no compiled code to build). Worth running once Rtools is
+            available, though it is not a named exit criterion of this plan.
           </p>
         </div>
         <div class="subcard">
           <h3>Non-risk: PNG/HTML nondeterminism</h3>
           <p>
-            The regenerated coverage/coal-trajectory/renewables/EV/cement PNGs and the HTML report
-            changed in this session's git diff. This is expected and explicitly allowed by the plan's
-            acceptance bar (PNG compression is nondeterministic; the HTML report's only textual diff
-            was the generated-date). No CSV drift occurred.
+            Regenerated PNGs and HTML reports changed in git diffs during verification. This is
+            expected and explicitly allowed by the plan's acceptance bar (PNG compression is
+            nondeterministic; HTML reports differ only in the generated-timestamp text). No CSV drift
+            occurred at any point across all three phases.
+          </p>
+        </div>
+        <div class="subcard">
+          <h3>Caught in verification: an over-broad regression check</h3>
+          <p>
+            Confirming the relocated <code class="inline">data/generate_vietnam_data.R</code> didn't
+            break the pipeline involved running <code class="inline">Rscript scripts/pipeline_refresh.R</code>
+            in full, which legitimately regenerated the public <code class="inline">dashboard/data/</code>
+            snapshot and TRISK sensitivity run artifacts &mdash; output unrelated to this plan's scope.
+            Those regenerated files were identified and reverted via <code class="inline">git checkout --</code>
+            before committing, so PHASE-03's commit contains only its intended changes. (One recovery
+            step in that process briefly over-deleted a pre-existing tracked run-history directory via
+            an overly broad <code class="inline">rm -rf</code>; it was restored immediately via
+            <code class="inline">git checkout --</code> before anything was staged. No data loss
+            occurred, but a narrower revert command would have avoided the extra step.)
           </p>
         </div>
         <div class="subcard">
           <h3>Open: Python test suite not re-verified</h3>
           <p>
-            <code class="inline">dashboard/tests</code> was not re-run in this session because
+            <code class="inline">dashboard/tests</code> was not run in this session because
             <code class="inline">pytest</code> was not installed in the execution environment, and this
             plan's scope never touches <code class="inline">dashboard/</code> code. Low risk, but worth
             confirming in CI (where <code class="inline">python-tests</code> already runs on every push).
@@ -997,6 +1065,7 @@ flowchart LR
             <tr><th>Commit</th><th>Phase</th><th>Summary</th></tr>
             <tr><td><code class="inline">fd6b112</code></td><td>1</td><td>Repo laws documentation (CLAUDE.md, AGENTS.md refresh)</td></tr>
             <tr><td><code class="inline">9d05817</code></td><td>2</td><td>Decompose PACTA monolith into tested R/pacta_core.R functions</td></tr>
+            <tr><td><code class="inline">17357ed</code></td><td>3</td><td>Make pactatrisk a genuinely loadable R package</td></tr>
           </table>
         </div>
         <div class="subcard technical-frame">
@@ -1007,15 +1076,19 @@ flowchart LR
             <tr><td><code class="inline">R/pacta_core.R</code></td><td>&mdash; (new)</td><td>1,422</td></tr>
             <tr><td><code class="inline">tests/testthat/test_pacta_core.R</code></td><td>&mdash; (new)</td><td>67</td></tr>
             <tr><td><code class="inline">CLAUDE.md</code></td><td>&mdash; (new)</td><td>59</td></tr>
+            <tr><td><code class="inline">NAMESPACE</code> + <code class="inline">man/*.Rd</code></td><td>&mdash; (new)</td><td>1 + 19 files</td></tr>
           </table>
         </div>
         <div class="subcard technical-frame">
-          <h4>Test suite results</h4>
+          <h4>Test suite &amp; build results</h4>
           <table>
             <tr><th>Checkpoint</th><th>Result</th></tr>
             <tr><td>Before any change (baseline)</td><td>126 passed, 0 failed</td></tr>
             <tr><td>After PHASE-02 decompose</td><td>130 passed, 0 failed</td></tr>
-            <tr><td>CSV byte-identity (7 files)</td><td>7 / 7 matched (MD5)</td></tr>
+            <tr><td>After PHASE-03 package changes (devtools::test())</td><td>130 passed, 0 failed</td></tr>
+            <tr><td>CSV byte-identity, all checkpoints</td><td>7 / 7 (PACTA) + 5 / 5 (data generator) matched (MD5)</td></tr>
+            <tr><td>devtools::build() tarball</td><td>35,710 bytes, 0 warnings, 0 errors</td></tr>
+            <tr><td>Exported functions (NAMESPACE)</td><td>18</td></tr>
           </table>
         </div>
         <div class="subcard technical-frame">
