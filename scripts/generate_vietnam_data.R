@@ -10,8 +10,17 @@
 #   vietnam_region_isos.csv    - VN country-region mapping
 #
 # Run from project root:
-#   "C:\Program Files\R\R-4.5.2\bin\Rscript.exe" data/generate_vietnam_data.R
+#   "C:\Program Files\R\R-4.5.2\bin\Rscript.exe" scripts/generate_vietnam_data.R
 # ==============================================================================
+#
+# NOTE: this script previously lived at data/generate_vietnam_data.R. It moved
+# to scripts/ (2026-07) because a top-level data/ directory is a reserved R
+# package location — pkgload::load_all() (used by devtools::load_all(),
+# devtools::test(), and roxygen2::roxygenise()) sources every *.R file inside
+# data/ as a package "lazy data" script, which crashed here. Keeping all
+# executable pipeline scripts under scripts/ (where every other stage script
+# already lives) avoids the collision. Writes still land in data/*.csv via
+# relative paths resolved from the repo root, unchanged.
 
 library(dplyr)
 library(readr)

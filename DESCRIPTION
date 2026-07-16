@@ -4,3 +4,29 @@ Version: 0.1.0
 Description: PACTA alignment and TRISK transition risk analysis for Vietnamese bank loanbooks.
 License: Proprietary
 Encoding: UTF-8
+Imports:
+    arrow,
+    base64enc,
+    dplyr,
+    fs,
+    ggplot2,
+    ggrepel,
+    jsonlite,
+    pacta.loanbook,
+    purrr,
+    r2dii.analysis,
+    r2dii.data,
+    r2dii.match,
+    r2dii.plot,
+    readr,
+    rlang,
+    scales,
+    stringi,
+    tibble,
+    tidyr
+Suggests:
+    testthat,
+    roxygen2,
+    devtools
+RoxygenNote: 8.0.0
+Roxygen: list(markdown = TRUE)

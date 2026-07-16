@@ -32,7 +32,7 @@ steps <- list(
 if (full_mode) {
   steps <- c(
     list(
-      list(name = "generate_vietnam_data", script = "data/generate_vietnam_data.R", args = character()),
+      list(name = "generate_vietnam_data", script = "scripts/generate_vietnam_data.R", args = character()),
       list(name = "pacta_vietnam_scenario", script = "scripts/pacta_vietnam_scenario.R", args = character())
     ),
     steps,

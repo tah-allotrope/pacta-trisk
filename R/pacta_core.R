@@ -24,6 +24,7 @@
 #'
 #' @param cfg list — engagement config from load_engagement_config().
 #' @return list(loanbook, abcd, scenario, co2, region) — the 5 input tibbles.
+#' @export
 pacta_load_inputs <- function(cfg) {
   cat("--- Section 1: Loading Vietnam data ---\n\n")
 
@@ -35,7 +36,7 @@ pacta_load_inputs <- function(cfg) {
   missing <- required_files[!file.exists(required_files)]
   if (length(missing) > 0) {
     stop(paste(
-      "Missing data files. Run data/generate_vietnam_data.R first.\nMissing:",
+      "Missing data files. Run scripts/generate_vietnam_data.R first.\nMissing:",
       paste(missing, collapse = "\n  ")
     ))
   }
@@ -71,6 +72,7 @@ pacta_load_inputs <- function(cfg) {
 #'
 #' @param loanbook tbl — the raw loanbook (from pacta_load_inputs()$loanbook).
 #' @return tbl — loanbook_classified, with sector_classified/borderline_classified columns added.
+#' @export
 pacta_prejoin_sectors <- function(loanbook) {
   cat("--- Section 2: Sector pre-join (ISIC classification) ---\n\n")
 
@@ -144,6 +146,7 @@ pacta_prejoin_sectors <- function(loanbook) {
 #' @return list(raw, prioritized, abcd_norm) — raw match candidates, one
 #'   best match per loan, and the ASCII-normalized ABCD used for matching
 #'   (also consumed by pacta_market_share() and pacta_sda()).
+#' @export
 pacta_match_and_prioritize <- function(loanbook_classified, abcd, output_dir) {
   cat("--- Section 3: Fuzzy matching ---\n\n")
 
@@ -227,6 +230,7 @@ pacta_match_and_prioritize <- function(loanbook_classified, abcd, output_dir) {
 #' @param bank_name chr — full bank name, used in the chart subtitle.
 #' @param bank_short chr — short bank label, used in the chart title.
 #' @return tbl — sector_coverage, one row per sector with match_pct.
+#' @export
 pacta_coverage <- function(loanbook_classified, matched, output_dir, bank_name, bank_short) {
   cat("--- Section 4: Coverage analysis ---\n\n")
 
@@ -327,6 +331,7 @@ pacta_coverage <- function(loanbook_classified, matched, output_dir, bank_name, 
 #' @return list(ms_portfolio, ms_company, target_pdp8) — portfolio- and
 #'   company-level market-share tables, and the resolved PDP8 target metric
 #'   name (also consumed by pacta_alignment_gaps()).
+#' @export
 pacta_market_share <- function(matched, abcd_norm, scenario, region, output_dir, bank_short) {
   cat("--- Section 5: Market share analysis ---\n\n")
 
@@ -505,6 +510,7 @@ pacta_market_share <- function(matched, abcd_norm, scenario, region, output_dir,
 #' @return list(sda_portfolio, sda_target_pdp8) — SDA emission-factor table
 #'   and the resolved PDP8 SDA target metric name (also consumed by
 #'   pacta_alignment_gaps()).
+#' @export
 pacta_sda <- function(matched, abcd_norm, co2, output_dir, bank_short) {
   cat("--- Section 6: SDA analysis (cement + steel) ---\n\n")
 
@@ -628,6 +634,7 @@ pacta_sda <- function(matched, abcd_norm, co2, output_dir, bank_short) {
 #' @param bank_short chr — short bank label, used in chart titles.
 #' @return list(ms_alignment_2030, sda_alignment_2030) — alignment tables
 #'   also consumed by pacta_build_report().
+#' @export
 pacta_alignment_gaps <- function(ms_portfolio, target_pdp8, sda_portfolio, sda_target_pdp8,
                                   loanbook, output_dir, bank_short) {
   cat("--- Section 7: Alignment gap (vs PDP8/NDC) ---\n\n")
@@ -778,6 +785,7 @@ pacta_alignment_gaps <- function(ms_portfolio, target_pdp8, sda_portfolio, sda_t
 #' @return list — named list of `data:image/png;base64,...` URIs (or NULL for
 #'   any chart that was not generated), keyed by the labels used in
 #'   pacta_build_report()'s chart_html() calls.
+#' @export
 pacta_encode_charts <- function(output_dir) {
   cat("--- Section 8: Encoding charts for HTML report ---\n\n")
 
@@ -846,6 +854,7 @@ chart_html <- function(imgs, key, caption = "") {
 #' @param imgs list — pacta_encode_charts() output.
 #' @param report_dir chr — directory to write the HTML report into.
 #' @return chr (invisible) — the path the report was written to.
+#' @export
 pacta_build_report <- function(bank_name, bank_short, loanbook, matched,
                                 ms_alignment_2030, sda_alignment_2030, imgs, report_dir) {
   cat("--- Section 9: Building Vietnam HTML report ---\n\n")

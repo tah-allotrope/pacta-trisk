@@ -8,7 +8,7 @@
 # loanbook against Vietnam's Power Development Plan 8 (PDP8), NDC targets,
 # and global IEA NZE benchmarks.
 #
-# Prerequisites: run data/generate_vietnam_data.R first to produce input CSVs.
+# Prerequisites: run scripts/generate_vietnam_data.R first to produce input CSVs.
 #
 # Run from project root:
 #   "C:\Program Files\R\R-4.5.2\bin\Rscript.exe" scripts/pacta_vietnam_scenario.R

@@ -21,6 +21,7 @@ suppressPackageStartupMessages({
 #'
 #' @param x character — one or more names.
 #' @return character — the ASCII-transliterated names, same length as `x`.
+#' @export
 normalize_vn_name <- function(x) {
   stringi::stri_trans_general(x, "Latin-ASCII")
 }

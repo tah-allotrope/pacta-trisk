@@ -24,6 +24,7 @@ if (requireNamespace("base64enc", quietly = TRUE)) {
 #'
 #' @param path character — path to a PNG file.
 #' @return character — a `data:image/png;base64,...` URI string.
+#' @export
 img_to_base64 <- function(path) {
   raw <- readBin(path, "raw", file.info(path)$size)
   b64 <- base64enc::base64encode(raw)
@@ -37,6 +38,7 @@ img_to_base64 <- function(path) {
 #' after this module existed, not a shared stylesheet those retrofit to.
 #'
 #' @return character — a single `<style>...</style>` block.
+#' @export
 report_css <- function() {
   paste0(
     "<style>\n",
@@ -70,6 +72,7 @@ report_css <- function() {
 #' @param use_bytes logical — passed to writeLines()'s useBytes argument;
 #'   default TRUE matches the existing report generators.
 #' @return invisible(character) — the path written.
+#' @export
 write_html_report <- function(html, path, use_bytes = TRUE) {
   dir.create(dirname(path), showWarnings = FALSE, recursive = TRUE)
   writeLines(html, path, useBytes = use_bytes)

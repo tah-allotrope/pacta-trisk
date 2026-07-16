@@ -22,6 +22,7 @@ suppressPackageStartupMessages({
 #'
 #' @return tibble — one row per sector (power, cement, steel) with the merged
 #'   metadata columns from both formerly-duplicated sources.
+#' @export
 sector_registry <- function() {
   tibble::tibble(
     sector = c("power", "cement", "steel"),
@@ -63,6 +64,7 @@ sector_registry <- function() {
 #'
 #' @return list — the 7 TRISK base parameters, values identical to the
 #'   literals previously inlined in scripts/trisk_sector_demo.R.
+#' @export
 trisk_base_params <- function() {
   list(
     shock_year = 2028,
@@ -82,6 +84,7 @@ trisk_base_params <- function() {
 #' @return list — sector metadata with keys label, title, subtitle,
 #'   scenario_geography, carbon_price_model, baseline_scenario,
 #'   target_scenario, alignment_mode, company_aliases.
+#' @export
 sector_meta <- function(sector) {
   registry <- sector_registry()
   row <- registry[registry$sector == sector, ]

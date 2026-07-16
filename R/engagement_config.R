@@ -121,6 +121,7 @@ suppressPackageStartupMessages({
 #' @param config_path character|NULL — path to a JSON engagement config, or
 #'   NULL to use the built-in MCB defaults untouched.
 #' @return list — the fully-populated named config list.
+#' @export
 load_engagement_config <- function(config_path = NULL) {
   defaults <- .default_engagement_config()
 
@@ -143,6 +144,7 @@ load_engagement_config <- function(config_path = NULL) {
 #' @param args character — CLI arguments, defaults to
 #'   commandArgs(trailingOnly = TRUE).
 #' @return character|NULL — the config path, or NULL if the flag is absent.
+#' @export
 get_config_arg <- function(args = commandArgs(trailingOnly = TRUE)) {
   idx <- which(args == "--config")
   if (length(idx) == 0 || idx[[1]] >= length(args)) {
