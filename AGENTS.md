@@ -1,22 +1,41 @@
-# Project: PACTA Vietnam
-One-sentence What/Why: End-to-end PACTA (Paris Agreement Capital Transition Assessment) demo and reporting pipeline to learn the methodology and produce shareable alignment outputs.
+# Project: PACTA + TRISK Vietnam
+One-sentence What/Why: End-to-end PACTA (Paris Agreement Capital Transition
+Assessment) + TRISK transition-risk demo and reporting pipeline for a synthetic
+Vietnamese bank case, feeding a Streamlit dashboard and client engagement
+deliverables.
 
 High-level map:
-- scripts/: runnable PACTA pipelines and report builders
-- compare/: staff implementation and comparison artifacts
-- output/ and synthesis_output/: generated datasets and plots
-- reports/: rendered HTML reports
-- docs/: domain guides and references
+- `scripts/`: R pipeline stages (PACTA, TRISK, prioritization, engagement
+  scoring, letters, disclosure) and the `pipeline_refresh.R` orchestrator
+- `R/`: shared R modules sourced by `scripts/*.R` (engagement config loader,
+  sector registry, report toolkit, matching helpers)
+- `data/` and `synthesis_output/`: synthetic inputs and generated pipeline
+  outputs
+- `dashboard/`: the Streamlit app (`app.py`, `pages/`, `lib/`, `tests/`) and
+  its frozen snapshot (`dashboard/data/`)
+- `reports/`: rendered self-contained HTML reports
+- `docs/`: methodology guides, deployment notes, assumption registers
+- `attic/`: superseded methodology-reference scripts (see `attic/README.md`),
+  kept for historical context only — not part of any pipeline
+
+For the full architecture diagram and repository map, see `README.md`. For
+repo-specific laws, traps, and exact commands, see `CLAUDE.md` — it is the
+source of truth and takes precedence over this file.
 
 How to run (package manager / runtime):
-- Use base R with Rscript (no Node/npm).
-- Dependencies are installed with install.packages to the user library on Windows.
+- Base R via `Rscript` (no Node/npm) for the pipeline; Python 3.11+ with
+  Streamlit for the dashboard.
+- R dependencies pinned in `renv.lock`; restore with `Rscript -e "renv::restore()"`
+  or the no-renv fallback `Rscript scripts/ci/install_deps.R`.
 
-Essential commands (discover exact entrypoints by listing scripts/ and compare/):
-- Run main pipeline: `Rscript scripts/<pipeline>.R`
-- Build reports: `Rscript scripts/<report_builder>.R`
-- Run AI vs staff comparison: `Rscript compare/<comparison>.R`
+Essential commands (see `CLAUDE.md` for the full list):
+- Run PACTA pipeline: `Rscript scripts/pacta_vietnam_scenario.R`
+- Run full pipeline refresh: `Rscript scripts/pipeline_refresh.R`
+- Run R tests: `Rscript -e "testthat::test_dir('tests/testthat')"`
+- Run dashboard tests: `python -m pytest dashboard/tests`
 
 Progressive disclosure:
-- For methodology, data dictionary, and domain rules, see docs/.
-- Use directory listing and search to locate current entrypoints before executing.
+- For methodology, data dictionary, and domain rules, see `docs/`.
+- For implementation plans and research briefs, see `plans/` and `research/`.
+- Use directory listing and search to locate current entrypoints before
+  executing.
