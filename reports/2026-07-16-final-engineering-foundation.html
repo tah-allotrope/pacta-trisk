@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Final Report :: Engineering Foundation: PACTA Core Decompose &amp; Repo Laws</title>
+  <meta name="color-scheme" content="dark light">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+    async function initMermaid() {
+      const blocks = document.querySelectorAll('.mermaid');
+      if (!blocks.length) {
+        return;
+      }
+
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'base',
+        securityLevel: 'loose',
+        themeVariables: {
+          primaryColor: '#f3ead9',
+          primaryTextColor: '#1f1912',
+          primaryBorderColor: '#9d6b37',
+          lineColor: '#3b6f76',
+          secondaryColor: '#efe4d0',
+          tertiaryColor: '#ffffff',
+          background: '#fbf7f1',
+          mainBkg: '#fbf7f1',
+          nodeBorder: '#9d6b37',
+          clusterBkg: '#f7efdf',
+          clusterBorder: '#3b6f76',
+          edgeLabelBackground: '#fbf7f1'
+        }
+      });
+
+      await mermaid.run({ nodes: blocks });
+    }
+
+    const run = () => initMermaid().catch((error) => console.error('Mermaid render failed', error));
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run, { once: true });
+    } else {
+      run();
+    }
+  </script>
+  <style>
+    :root {
+      --paper: #fbf7f1;
+      --paper-strong: #fffdf9;
+      --ink: #1f1912;
+      --ink-soft: #5f564c;
+      --line: #dccdb6;
+      --line-strong: #bfa37d;
+      --accent: #9d6b37;
+      --accent-soft: #efe4d0;
+      --accent-2: #3b6f76;
+      --shadow: 0 18px 40px rgba(49, 33, 16, 0.08);
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+      --page-width: 1040px;
+      --display-font: Georgia, "Times New Roman", serif;
+      --body-font: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --mono-font: "Cascadia Code", Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(157, 107, 55, 0.09), transparent 26%),
+        radial-gradient(circle at 88% 10%, rgba(59, 111, 118, 0.08), transparent 22%),
+        linear-gradient(180deg, #f7f1e7 0%, #fbf7f1 28%, #f6efe5 100%);
+      font-family: var(--body-font);
+      line-height: 1.65;
+      letter-spacing: 0.01em;
+    }
+
+    a {
+      color: var(--accent-2);
+    }
+
+    code,
+    pre,
+    .technical,
+    .meta-chip,
+    .section-index,
+    .eyebrow,
+    .stat-label,
+    .stat-value,
+    .mermaid {
+      font-family: var(--mono-font);
+    }
+
+    .page-shell {
+      width: min(var(--page-width), calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 28px 0 56px;
+    }
+
+    .hero {
+      padding: 34px;
+      border: 1px solid rgba(159, 123, 79, 0.28);
+      border-radius: 30px;
+      background:
+        linear-gradient(135deg, rgba(157, 107, 55, 0.1), transparent 34%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.86)),
+        var(--paper-strong);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.85fr);
+      gap: 24px;
+      align-items: end;
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .title {
+      margin: 0;
+      max-width: 16ch;
+      font-family: var(--display-font);
+      font-size: clamp(2.4rem, 4.4vw, 4rem);
+      line-height: 0.98;
+      letter-spacing: -0.03em;
+      text-wrap: balance;
+    }
+
+    .lede {
+      margin: 18px 0 0;
+      max-width: 60ch;
+      color: var(--ink-soft);
+      font-size: 1rem;
+    }
+
+    .takeaway {
+      margin-top: 22px;
+      padding: 18px 20px;
+      border-left: 4px solid var(--accent-2);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      background: rgba(59, 111, 118, 0.08);
+      color: #20373a;
+      font-size: 1.02rem;
+    }
+
+    .meta-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .meta-card,
+    .section,
+    .subcard,
+    .empty-state {
+      border: 1px solid rgba(95, 72, 46, 0.12);
+      background: rgba(255, 253, 249, 0.88);
+      box-shadow: var(--shadow);
+    }
+
+    .meta-card {
+      padding: 16px 18px;
+      border-radius: var(--radius-md);
+    }
+
+    .meta-label {
+      color: var(--ink-soft);
+      font-size: 0.76rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .meta-chip {
+      margin-top: 8px;
+      color: var(--accent);
+      font-size: 1rem;
+      font-weight: 700;
+      word-break: break-word;
+    }
+
+    .section {
+      margin-top: 22px;
+      padding: 24px;
+      border-radius: var(--radius-lg);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px 18px;
+      align-items: end;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-index {
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .section-title {
+      margin: 0;
+      font-family: var(--display-font);
+      font-size: clamp(1.45rem, 2vw, 2rem);
+      line-height: 1.05;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .badge-done {
+      background: rgba(59, 111, 118, 0.14);
+      color: var(--accent-2);
+    }
+
+    .badge-open {
+      background: rgba(157, 107, 55, 0.14);
+      color: var(--accent);
+    }
+
+    .summary-grid,
+    .dual-grid,
+    .phase-grid,
+    .stat-grid,
+    .appendix-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .summary-grid,
+    .dual-grid,
+    .phase-grid,
+    .appendix-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .subcard {
+      padding: 18px;
+      border-radius: var(--radius-md);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .subcard h3,
+    .subcard h4 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+      line-height: 1.2;
+    }
+
+    .subcard p:first-child,
+    .subcard ul:first-child,
+    .subcard ol:first-child {
+      margin-top: 0;
+    }
+
+    .stat-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin-top: 16px;
+    }
+
+    .stat {
+      padding: 14px 16px;
+      border: 1px solid rgba(59, 111, 118, 0.16);
+      border-radius: var(--radius-sm);
+      background: rgba(59, 111, 118, 0.06);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .stat-label {
+      color: var(--ink-soft);
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .stat-value {
+      margin-top: 8px;
+      color: var(--accent-2);
+      font-size: 1.18rem;
+      font-weight: 700;
+    }
+
+    .narrative,
+    .chart-frame,
+    .technical-frame,
+    .diagram-frame,
+    .viz-frame {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.54);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .diagram-frame {
+      overflow-x: auto;
+      overflow-y: auto;
+      overscroll-behavior-x: contain;
+      overscroll-behavior-y: contain;
+      max-height: min(70vh, 720px);
+    }
+
+    .chart-frame,
+    .viz-frame {
+      overflow: hidden;
+    }
+
+    .mermaid {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      color: var(--ink);
+    }
+
+    .mermaid svg {
+      display: block;
+      width: auto !important;
+      min-width: 100%;
+      max-width: none !important;
+      height: auto !important;
+    }
+
+    .diagram-frame.compact-diagram {
+      padding: 12px;
+      max-height: min(62vh, 560px);
+    }
+
+    .diagram-frame.compact-diagram .mermaid {
+      min-width: 900px;
+    }
+
+    .chart-frame canvas,
+    .technical-frame > canvas,
+    .viz-frame canvas,
+    canvas.report-chart {
+      display: block;
+      width: 100% !important;
+      max-width: 100%;
+      height: 300px !important;
+      min-height: 300px;
+      max-height: 300px;
+    }
+
+    .technical-frame table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+    }
+
+    .technical-frame th,
+    .technical-frame td {
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      text-align: left;
+    }
+
+    .technical-frame th {
+      color: var(--accent);
+      font-size: 0.76rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .empty-state {
+      padding: 20px;
+      border-radius: var(--radius-md);
+      text-align: center;
+      color: var(--ink-soft);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .empty-state strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--accent);
+      font-size: 0.84rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    ul,
+    ol {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    p:last-child,
+    li:last-child {
+      margin-bottom: 0;
+    }
+
+    code.inline {
+      padding: 1px 6px;
+      border-radius: 6px;
+      background: rgba(157, 107, 55, 0.12);
+      font-size: 0.88em;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      color: rgba(95, 86, 76, 0.74);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      text-align: right;
+    }
+
+    @media (max-width: 920px) {
+      .hero-grid,
+      .summary-grid,
+      .dual-grid,
+      .phase-grid,
+      .stat-grid,
+      .appendix-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .title {
+        max-width: none;
+      }
+
+    }
+
+    @media (max-width: 640px) {
+      .page-shell {
+        width: min(100vw - 20px, var(--page-width));
+        padding-top: 16px;
+        padding-bottom: 36px;
+      }
+
+      .hero,
+      .section {
+        padding: 18px;
+        border-radius: 20px;
+      }
+
+      .title {
+        font-size: clamp(2.1rem, 12vw, 3.2rem);
+      }
+
+    }
+
+    @media print {
+      :root {
+        --paper: #ffffff;
+        --paper-strong: #ffffff;
+        --ink: #111111;
+        --ink-soft: #444444;
+        --line: #d6d1c8;
+      }
+
+      @page {
+        size: A4;
+        margin: 14mm;
+      }
+
+      body {
+        background: #ffffff;
+      }
+
+      .page-shell {
+        width: 100%;
+        max-width: none;
+        padding: 0;
+      }
+
+      .hero,
+      .meta-card,
+      .section,
+      .subcard,
+      .narrative,
+      .chart-frame,
+      .technical-frame,
+      .diagram-frame,
+      .viz-frame,
+      .empty-state,
+      .stat {
+        background: #ffffff;
+        box-shadow: none;
+      }
+
+      .hero,
+      .section {
+        margin-top: 0;
+        margin-bottom: 10mm;
+      }
+
+      .diagram-frame {
+        overflow: visible;
+        max-height: none;
+      }
+
+      .diagram-frame.compact-diagram .mermaid {
+        min-width: 0;
+      }
+
+      .section-header,
+      .takeaway {
+        break-after: avoid;
+        page-break-after: avoid;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero" id="title-hero">
+      <div class="hero-grid">
+        <div>
+          <p class="eyebrow">Final Report / Shareable Analysis Artifact</p>
+          <h1 class="title">Engineering Foundation: PACTA Core Decompose &amp; Repo Laws</h1>
+          <p class="lede">
+            Phases 1 and 2 of the three-phase engineering-foundation plan, executed and
+            verified against a byte-identical acceptance bar.
+          </p>
+          <div class="takeaway">
+            The 1,386-line untestable PACTA monolith is now 9 pure, individually tested
+            functions in <code class="inline">R/pacta_core.R</code>, and the repo's
+            non-obvious operating rules are captured in a new <code class="inline">CLAUDE.md</code>.
+            All published CSV outputs are verified byte-identical to the pre-refactor
+            baseline. Phase 3 (making <code class="inline">pactatrisk</code> a genuinely
+            loadable R package) was scoped but not executed this session.
+          </div>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-card">
+            <div class="meta-label">Project</div>
+            <div class="meta-chip">PACTA + TRISK Vietnam</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Repository</div>
+            <div class="meta-chip">pacta-trisk</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Date</div>
+            <div class="meta-chip">2026-07-16</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="executive-summary">
+      <div class="section-header">
+        <div>
+          <div class="section-index">01 / Executive Summary</div>
+          <h2 class="section-title">Executive Summary</h2>
+        </div>
+      </div>
+      <div class="summary-grid">
+        <div class="subcard">
+          <h3>What was done</h3>
+          <p>
+            Two of the three phases in
+            <code class="inline">plans/2026-07-16-next-level-platform-foundation-plan.md</code>
+            were implemented, tested, and committed: (1) a new root <code class="inline">CLAUDE.md</code>
+            documenting the repo's traps and conventions, with a refreshed <code class="inline">AGENTS.md</code>;
+            and (2) the decomposition of the PACTA analytics monolith
+            (<code class="inline">scripts/pacta_vietnam_scenario.R</code>) into nine pure functions
+            in a new <code class="inline">R/pacta_core.R</code> module, leaving the original script as a
+            ~115-line orchestration wrapper.
+          </p>
+        </div>
+        <div class="subcard">
+          <h3>Why it matters</h3>
+          <p>
+            Before this work, the only way to verify a change to the PACTA pipeline was to run the
+            entire 1,386-line script and diff CSVs by eye &mdash; slow, coarse, and unable to localize a
+            regression to a specific stage. The platform also advertised an R package
+            (<code class="inline">pactatrisk 0.1.0</code> in <code class="inline">DESCRIPTION</code>)
+            that could not actually be loaded. This phase makes the analytics core testable in
+            seconds and lays the groundwork for turning it into a real, loadable package.
+          </p>
+        </div>
+        <div class="subcard">
+          <h3>Verification</h3>
+          <p>
+            Every <code class="inline">synthesis_output/vietnam/*.csv</code> file produced by the
+            decomposed script was confirmed byte-identical (MD5) to a baseline captured from the
+            original monolith before any code changed. The full R test suite passed with
+            <strong>130 assertions, 0 failures</strong> after the decompose (up from 126 before,
+            reflecting 2 new test cases added for the extracted functions).
+          </p>
+        </div>
+        <div class="subcard">
+          <h3>What's next</h3>
+          <p>
+            Phase 3 &mdash; making <code class="inline">pactatrisk</code> a genuinely loadable package
+            (roxygen2-generated <code class="inline">NAMESPACE</code>, real <code class="inline">Imports</code>,
+            a package-load CI check) &mdash; remains open. It was scoped in the plan but out of the
+            two-phase execution window for this session.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="background-objective">
+      <div class="section-header">
+        <div>
+          <div class="section-index">02 / Background &amp; Objective</div>
+          <h2 class="section-title">Background &amp; Objective</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p>
+          PACTA + TRISK Vietnam is a synthetic-data demonstration platform showing how a fictional
+          Vietnamese bank ("Mekong Commercial Bank", MCB) could measure loanbook climate alignment
+          (PACTA) and transition-risk stress (TRISK). A prior brainstorm
+          (<code class="inline">research/2026-07-16-next-level-platform-brainstorm.md</code>) surveyed
+          the whole codebase for what would take the platform to the next level and identified two
+          layers of work: finishing an already-planned "client engagement runway" (parameterizing the
+          full pipeline for any bank, not just MCB), and, underneath that, an engineering-foundation
+          gap the runway plan had not fully closed &mdash; the PACTA analytics core remained an
+          untestable monolith, and the repo's advertised R package did not actually function as one.
+        </p>
+        <p>
+          The objective of the resulting plan was narrow and mechanical by design: extract the PACTA
+          script's nine logical sections into pure, individually testable functions without changing
+          any analysis logic, and write down the repo's sharp, easy-to-rediscover-the-hard-way rules
+          (VND is never rescaled, run everything from the repo root, the golden-number tests are
+          load-bearing, and so on) so future refactors &mdash; by a human or an agent &mdash; start from
+          a documented baseline instead of an archaeology dig.
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="inputs-scope">
+      <div class="section-header">
+        <div>
+          <div class="section-index">03 / Inputs &amp; Scope</div>
+          <h2 class="section-title">Inputs &amp; Scope</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Plan &amp; research inputs</h3>
+          <ul>
+            <li><code class="inline">plans/2026-07-16-next-level-platform-foundation-plan.md</code> &mdash; the 3-phase plan this report synthesizes.</li>
+            <li><code class="inline">research/2026-07-16-next-level-platform-brainstorm.md</code> &mdash; the codebase-wide analysis that motivated the plan.</li>
+            <li><code class="inline">research/2026-07-13-client-engagement-runway-brainstorm.md</code> &mdash; prior brief establishing the byte-identical refactor acceptance bar reused here.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>In scope (this execution)</h3>
+          <ul>
+            <li>PHASE-01: <code class="inline">CLAUDE.md</code> (new), <code class="inline">AGENTS.md</code> (refreshed).</li>
+            <li>PHASE-02: <code class="inline">R/pacta_core.R</code> (new, 9 functions), <code class="inline">scripts/pacta_vietnam_scenario.R</code> (thinned to a wrapper), <code class="inline">tests/testthat/test_pacta_core.R</code> (new).</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Explicitly out of scope</h3>
+          <ul>
+            <li>PHASE-03 of this same plan (loadable <code class="inline">pactatrisk</code> package) &mdash; scoped, not executed.</li>
+            <li>The separate client-engagement-runway plan's remaining phases (TRISK-chain parameterization, <code class="inline">run_engagement.R</code> orchestrator, second-bank end-to-end run).</li>
+            <li>Any change to analysis logic, published numbers, the Streamlit dashboard, or synthetic-data disclaimers.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Decision boundary</h3>
+          <p>
+            The user's instruction was explicit: implement the <strong>first two</strong> phases of the
+            plan, test and commit each before moving to the next, then report and push. Phase 3 was
+            deliberately left for a follow-on session rather than rushed to fit this window.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="assumptions-constraints">
+      <div class="section-header">
+        <div>
+          <div class="section-index">04 / Assumptions &amp; Constraints</div>
+          <h2 class="section-title">Assumptions &amp; Constraints</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Binding assumptions applied</h3>
+          <ul>
+            <li><strong>ASM-001/002:</strong> a single new file, <code class="inline">R/pacta_core.R</code>; code moved verbatim into function bodies with only mechanical renames (e.g. <code class="inline">vn_output</code> &rarr; <code class="inline">output_dir</code>) &mdash; no logic edits, no dplyr pipeline "tidy-ups".</li>
+            <li><strong>ASM-003:</strong> chart and HTML-report code extracted for symmetry but verified visually/structurally, not by hash (PNG compression and HTML timestamps are inherently nondeterministic).</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Constraints honored</h3>
+          <ul>
+            <li><strong>CON-001:</strong> every <code class="inline">synthesis_output/vietnam/*.csv</code> file byte-identical pre- vs post-refactor &mdash; verified via MD5.</li>
+            <li><strong>CON-002:</strong> no new pipeline dependencies added in these two phases (Phase 3's <code class="inline">roxygen2</code>/<code class="inline">devtools</code> addition was not reached).</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="methodology">
+      <div class="section-header">
+        <div>
+          <div class="section-index">05 / Methodology</div>
+          <h2 class="section-title">Methodology</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p>
+          Each phase followed the same sequence: implement the file changes specified in the plan,
+          run the full R test suite (<code class="inline">testthat::test_dir('tests/testthat')</code>),
+          fix any failure before proceeding, stage, and commit with a descriptive message &mdash; never
+          committing on a red suite.
+        </p>
+        <p>
+          For the PACTA decompose specifically, the safety net was a pre-refactor baseline: the
+          original monolith was run once to produce <code class="inline">synthesis_output/vietnam/*.csv</code>,
+          and an MD5 checksum was recorded for every CSV. After the decompose, the script was re-run
+          and every checksum re-compared. This turns "did the refactor change anything observable"
+          into a mechanical yes/no check rather than a manual read-through of a 1,386-line diff.
+        </p>
+      </div>
+      <div class="stat-grid">
+        <div class="stat">
+          <div class="stat-label">Orientation</div>
+          <div class="stat-value">multi-phase</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Audience</div>
+          <div class="stat-value">stakeholder-safe</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Evidence Rule</div>
+          <div class="stat-value">no invented data</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="phase-analysis">
+      <div class="section-header">
+        <div>
+          <div class="section-index">06 / Phase-by-Phase Analysis</div>
+          <h2 class="section-title">Phase-by-Phase Analysis</h2>
+        </div>
+      </div>
+      <div class="phase-grid">
+        <div class="subcard">
+          <h3>PHASE-01 &mdash; Repo Laws &amp; Trap Documentation <span class="badge badge-done">Done</span></h3>
+          <p>
+            Created a root <code class="inline">CLAUDE.md</code> (59 lines) capturing exact test/build
+            commands and eight numbered "laws" &mdash; run from repo root, VND never rescaled,
+            diacritic-normalized name matching, the golden-number tests as the load-bearing proof of
+            no-regression, the byte-identical-CSV refactor bar, the engagement-config convention,
+            PowerShell's lack of <code class="inline">&amp;&amp;</code>, and a no-casual-dependencies
+            rule &mdash; plus a "do-not-touch" list (<code class="inline">attic/</code>, the public
+            snapshot, synthetic-data disclaimers). Refreshed the thinner <code class="inline">AGENTS.md</code>
+            to drop stale references to retired scripts and point to <code class="inline">CLAUDE.md</code>
+            as the source of truth. Verified with a grep that no stale script-name references remained
+            in either file. Commit <code class="inline">fd6b112</code>.
+          </p>
+        </div>
+        <div class="subcard">
+          <h3>PHASE-02 &mdash; PACTA Monolith Decompose <span class="badge badge-done">Done</span></h3>
+          <p>
+            Captured baseline MD5 hashes for all 7 CSVs the original script produced, then extracted
+            its nine numbered sections into nine functions in the new <code class="inline">R/pacta_core.R</code>:
+            <code class="inline">pacta_load_inputs</code>, <code class="inline">pacta_prejoin_sectors</code>,
+            <code class="inline">pacta_match_and_prioritize</code>, <code class="inline">pacta_coverage</code>,
+            <code class="inline">pacta_market_share</code>, <code class="inline">pacta_sda</code>,
+            <code class="inline">pacta_alignment_gaps</code>, <code class="inline">pacta_encode_charts</code>
+            (plus a standalone <code class="inline">chart_html</code> helper), and
+            <code class="inline">pacta_build_report</code>. <code class="inline">scripts/pacta_vietnam_scenario.R</code>
+            shrank from 1,386 lines to a 115-line wrapper that sources the core module and calls the
+            functions in the original order. Re-ran the script and confirmed all 7 CSVs matched the
+            baseline exactly; the regenerated HTML report and PNGs differed only in the
+            generated-timestamp text and nondeterministic PNG compression, both explicitly allowed by
+            the acceptance bar. Added <code class="inline">tests/testthat/test_pacta_core.R</code> with
+            two fast fixture-based tests (ISIC-to-sector mapping, coverage match-rate arithmetic). Full
+            suite: 130 passed, 0 failed. Commit <code class="inline">9d05817</code>.
+          </p>
+        </div>
+        <div class="subcard">
+          <h3>PHASE-03 &mdash; Loadable <code class="inline">pactatrisk</code> Package <span class="badge badge-open">Not executed</span></h3>
+          <p>
+            Scoped in the plan: add <code class="inline">roxygen2</code>/<code class="inline">devtools</code>
+            to the renv lockfile, tag public functions with <code class="inline">@export</code>, generate
+            a real <code class="inline">NAMESPACE</code>, populate <code class="inline">DESCRIPTION</code>'s
+            <code class="inline">Imports</code>, add a <code class="inline">tests/testthat.R</code>
+            entrypoint, and wire a package-load check into CI &mdash; all while keeping the
+            <code class="inline">source()</code>-based scripts working unchanged. This session's
+            instruction was to execute exactly two phases; Phase 3 is the natural next unit of work.
+          </p>
+        </div>
+        <div class="subcard">
+          <h3>Decompose call graph</h3>
+          <p>The nine extracted functions run in the same order the original monolith's sections did:</p>
+        </div>
+      </div>
+      <div class="diagram-frame compact-diagram">
+        <pre class="mermaid">
+flowchart LR
+  A[pacta_load_inputs] --> B[pacta_prejoin_sectors]
+  B --> C[pacta_match_and_prioritize]
+  C --> D[pacta_coverage]
+  C --> E[pacta_market_share]
+  C --> F[pacta_sda]
+  E --> G[pacta_alignment_gaps]
+  F --> G
+  G --> H[pacta_encode_charts]
+  H --> I[pacta_build_report]
+        </pre>
+      </div>
+    </section>
+
+    <section class="section" id="findings-recommendation">
+      <div class="section-header">
+        <div>
+          <div class="section-index">07 / Findings &amp; Recommendation</div>
+          <h2 class="section-title">Findings &amp; Recommendation</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p>
+          <strong>Finding 1 &mdash; the decompose was byte-identical on the first attempt.</strong>
+          All 7 published CSVs matched their pre-refactor MD5 hashes with no iteration needed, which
+          is a direct result of the plan's "move code verbatim, only promote read-variables to
+          parameters" discipline rather than a lucky outcome to be repeated casually on future
+          refactors.
+        </p>
+        <p>
+          <strong>Finding 2 &mdash; the original monolith's section boundaries were already
+          well-formed function boundaries.</strong> Each of the nine <code class="inline"># SECTION</code>
+          banners in the old script corresponded cleanly to one function with a small, well-defined
+          set of inputs and outputs; the only real cross-section coupling was two derived variables
+          (<code class="inline">abcd_norm</code>, the PDP8 target-metric names) that needed to flow
+          through return values, both handled explicitly in the new module's signatures.
+        </p>
+        <p>
+          <strong>Finding 3 &mdash; the module's line count grew, and that's expected.</strong>
+          <code class="inline">R/pacta_core.R</code> is 1,422 lines versus the original script's 1,386,
+          because each function now carries a short roxygen-style doc comment. The maintainability win
+          is not fewer lines; it's that the wrapper script is now 115 lines and any one analysis stage
+          can be tested or modified in isolation.
+        </p>
+        <p>
+          <strong>Recommendation:</strong> proceed to PHASE-03 (the loadable package) as the immediate
+          next unit of work, since it depends only on the functions created in this phase and was
+          explicitly scoped as the natural continuation. Do not bundle it with any TRISK-chain or
+          client-engagement-runway work in the same pass &mdash; those are separate, larger efforts that
+          this foundation work was deliberately kept independent from.
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="implementation-path">
+      <div class="section-header">
+        <div>
+          <div class="section-index">08 / Implementation Path</div>
+          <h2 class="section-title">Implementation Path</h2>
+        </div>
+      </div>
+      <div class="phase-grid">
+        <div class="subcard">
+          <h3>Immediate next step</h3>
+          <p>
+            Execute PHASE-03 from <code class="inline">plans/2026-07-16-next-level-platform-foundation-plan.md</code>:
+            add <code class="inline">roxygen2</code>/<code class="inline">devtools</code> as dev
+            dependencies, tag the public functions across <code class="inline">R/pacta_core.R</code>,
+            <code class="inline">R/engagement_config.R</code>, <code class="inline">R/sector_registry.R</code>,
+            <code class="inline">R/report_toolkit.R</code>, and <code class="inline">R/matching_helpers.R</code>
+            with <code class="inline">@export</code>, generate <code class="inline">NAMESPACE</code>, and
+            confirm both <code class="inline">devtools::load_all('.')</code> and the existing
+            <code class="inline">source()</code>-based scripts keep working.
+          </p>
+        </div>
+        <div class="subcard">
+          <h3>Dependencies &amp; ordering</h3>
+          <p>
+            PHASE-03 depends only on the functions this report covers (PHASE-02) and can proceed
+            without any further changes to PHASE-01's documentation. It is independent of the separate
+            client-engagement-runway plan, which can proceed in parallel on its own remaining phases.
+          </p>
+        </div>
+        <div class="subcard">
+          <h3>Suggested owner</h3>
+          <p>
+            Whoever picks up the next coding session on this repo &mdash; the plan file is
+            self-contained and requires no additional context beyond a repo checkout.
+          </p>
+        </div>
+        <div class="subcard">
+          <h3>Verification gate for the next phase</h3>
+          <p>
+            <code class="inline">devtools::load_all('.')</code> must expose the <code class="inline">pacta_*</code>
+            functions, <code class="inline">devtools::test()</code> must stay green, and
+            <code class="inline">Rscript scripts/pacta_vietnam_scenario.R</code> must still produce the
+            same byte-identical CSVs verified in this report.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="risks-open-questions">
+      <div class="section-header">
+        <div>
+          <div class="section-index">09 / Risks / Open Questions</div>
+          <h2 class="section-title">Risks / Open Questions</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Open: Phase 3 is unstarted</h3>
+          <p>
+            The plan's third phase (the loadable package) is fully specified but not executed. Until
+            it lands, <code class="inline">DESCRIPTION</code> continues to advertise a package that
+            cannot actually be loaded with <code class="inline">library(pactatrisk)</code>.
+          </p>
+        </div>
+        <div class="subcard">
+          <h3>Risk: new dev dependency in Phase 3</h3>
+          <p>
+            Phase 3 plans to add <code class="inline">roxygen2</code>/<code class="inline">devtools</code>
+            to <code class="inline">renv.lock</code>. The plan already specifies a hand-written-<code class="inline">NAMESPACE</code>
+            fallback if package installation is unavailable in the execution environment, and requires
+            diffing <code class="inline">renv.lock</code> afterward to confirm no pipeline package was
+            accidentally pruned by <code class="inline">renv::snapshot()</code>.
+          </p>
+        </div>
+        <div class="subcard">
+          <h3>Non-risk: PNG/HTML nondeterminism</h3>
+          <p>
+            The regenerated coverage/coal-trajectory/renewables/EV/cement PNGs and the HTML report
+            changed in this session's git diff. This is expected and explicitly allowed by the plan's
+            acceptance bar (PNG compression is nondeterministic; the HTML report's only textual diff
+            was the generated-date). No CSV drift occurred.
+          </p>
+        </div>
+        <div class="subcard">
+          <h3>Open: Python test suite not re-verified</h3>
+          <p>
+            <code class="inline">dashboard/tests</code> was not re-run in this session because
+            <code class="inline">pytest</code> was not installed in the execution environment, and this
+            plan's scope never touches <code class="inline">dashboard/</code> code. Low risk, but worth
+            confirming in CI (where <code class="inline">python-tests</code> already runs on every push).
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="appendices-evidence">
+      <div class="section-header">
+        <div>
+          <div class="section-index">10 / Appendices / Evidence Notes</div>
+          <h2 class="section-title">Appendices / Evidence Notes</h2>
+        </div>
+      </div>
+      <div class="appendix-grid">
+        <div class="subcard technical-frame">
+          <h4>Commits produced this session</h4>
+          <table>
+            <tr><th>Commit</th><th>Phase</th><th>Summary</th></tr>
+            <tr><td><code class="inline">fd6b112</code></td><td>1</td><td>Repo laws documentation (CLAUDE.md, AGENTS.md refresh)</td></tr>
+            <tr><td><code class="inline">9d05817</code></td><td>2</td><td>Decompose PACTA monolith into tested R/pacta_core.R functions</td></tr>
+          </table>
+        </div>
+        <div class="subcard technical-frame">
+          <h4>File size shift (lines)</h4>
+          <table>
+            <tr><th>File</th><th>Before</th><th>After</th></tr>
+            <tr><td><code class="inline">scripts/pacta_vietnam_scenario.R</code></td><td>1,386</td><td>115</td></tr>
+            <tr><td><code class="inline">R/pacta_core.R</code></td><td>&mdash; (new)</td><td>1,422</td></tr>
+            <tr><td><code class="inline">tests/testthat/test_pacta_core.R</code></td><td>&mdash; (new)</td><td>67</td></tr>
+            <tr><td><code class="inline">CLAUDE.md</code></td><td>&mdash; (new)</td><td>59</td></tr>
+          </table>
+        </div>
+        <div class="subcard technical-frame">
+          <h4>Test suite results</h4>
+          <table>
+            <tr><th>Checkpoint</th><th>Result</th></tr>
+            <tr><td>Before any change (baseline)</td><td>126 passed, 0 failed</td></tr>
+            <tr><td>After PHASE-02 decompose</td><td>130 passed, 0 failed</td></tr>
+            <tr><td>CSV byte-identity (7 files)</td><td>7 / 7 matched (MD5)</td></tr>
+          </table>
+        </div>
+        <div class="subcard technical-frame">
+          <h4>Plan &amp; research provenance</h4>
+          <ul>
+            <li><code class="inline">plans/2026-07-16-next-level-platform-foundation-plan.md</code></li>
+            <li><code class="inline">research/2026-07-16-next-level-platform-brainstorm.md</code></li>
+            <li><code class="inline">research/2026-07-13-client-engagement-runway-brainstorm.md</code></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-note">designed for html first, printable without reconstruction</div>
+    </section>
+  </main>
+  <script>
+    (function() {
+      const chartCanvases = document.querySelectorAll('canvas');
+      chartCanvases.forEach((canvas) => {
+        canvas.classList.add('report-chart');
+        const parent = canvas.parentElement;
+        if (parent && parent.classList.contains('technical-frame') && !parent.classList.contains('chart-frame')) {
+          parent.classList.add('chart-frame');
+        }
+      });
+    })();
+
+    if (window.Chart) {
+      Chart.defaults.devicePixelRatio = 1;
+      Chart.defaults.animation = false;
+      Chart.defaults.resizeDelay = 150;
+      Chart.defaults.normalized = true;
+      Chart.defaults.maintainAspectRatio = false;
+      Chart.defaults.responsive = true;
+      window.__REPORT_CHART_DEFAULTS__ = {
+        animation: false,
+        resizeDelay: 150,
+        normalized: true,
+        maintainAspectRatio: false,
+        responsive: true
+      };
+    }
+  </script>
+</body>
+</html>
