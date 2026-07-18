@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 # refresh_dashboard_data.R
 # Republish the dashboard data snapshot from current pipeline outputs.
-# Usage: Rscript scripts/refresh_dashboard_data.R
+# Usage: Rscript scripts/refresh_dashboard_data.R [--config <path>]
 
 suppressPackageStartupMessages({
   library(dplyr)
@@ -9,7 +9,10 @@ suppressPackageStartupMessages({
   library(tibble)
 })
 
+source("R/engagement_config.R")
 source("R/sector_registry.R")
+
+cfg <- load_engagement_config(get_config_arg())
 
 clear_dir <- function(path) {
   if (dir.exists(path)) {
@@ -58,14 +61,14 @@ copy_png_group <- function(src_dir, dest_dir, required = TRUE) {
   }
 }
 
-pacta_files <- c(
-  "synthesis_output/vietnam/02_vn_matched_prioritized.csv",
-  "synthesis_output/vietnam/04_vn_ms_company.csv",
-  "synthesis_output/vietnam/04_vn_ms_portfolio.csv",
-  "synthesis_output/vietnam/05_vn_sda_portfolio.csv",
-  "synthesis_output/vietnam/06_vn_ms_alignment_2030.csv",
-  "synthesis_output/vietnam/06_vn_sda_alignment_2030.csv"
-)
+pacta_files <- file.path(cfg$paths$pacta_output_dir, c(
+  "02_vn_matched_prioritized.csv",
+  "04_vn_ms_company.csv",
+  "04_vn_ms_portfolio.csv",
+  "05_vn_sda_portfolio.csv",
+  "06_vn_ms_alignment_2030.csv",
+  "06_vn_sda_alignment_2030.csv"
+))
 
 report_files <- c(
   "reports/PACTA_Vietnam_Bank_Report.html",
@@ -95,32 +98,36 @@ trisk_sector_files <- c(
   "top_borrowers_alignment_trisk.csv"
 )
 
+snapshot_dir <- cfg$paths$snapshot_dir
+
 trisk_manifest <- sector_registry() %>%
+  filter(sector %in% cfg$trisk_sectors) %>%
   select(sector, label, folder, price_unit, pathway_unit, alignment_mode, grid_available, disclaimer)
 
 for (f in pacta_files) {
-  copy_file(f, "dashboard/data/pacta")
+  copy_file(f, file.path(snapshot_dir, "pacta"))
 }
 
-copy_png_group("synthesis_output/vietnam", "dashboard/data/pacta")
+copy_png_group(cfg$paths$pacta_output_dir, file.path(snapshot_dir, "pacta"))
 
 # Reports are optional (warn only): a missing rendered report should not block
 # the data snapshot from publishing.
 for (f in report_files) {
-  copy_file(f, "dashboard/data/reports", required = FALSE)
+  copy_file(f, file.path(snapshot_dir, "reports"), required = FALSE)
 }
 
-if (!dir.exists("dashboard/data/trisk")) dir.create("dashboard/data/trisk", recursive = TRUE)
-clear_dir("dashboard/data/trisk")
+trisk_dest <- file.path(snapshot_dir, "trisk")
+if (!dir.exists(trisk_dest)) dir.create(trisk_dest, recursive = TRUE)
+clear_dir(trisk_dest)
 
-grid_root <- file.path("dashboard", "data", "trisk", "grid")
+grid_root <- file.path(trisk_dest, "grid")
 dir.create(grid_root, recursive = TRUE, showWarnings = FALSE)
 
 for (i in seq_len(nrow(trisk_manifest))) {
   sector <- trisk_manifest$sector[[i]]
-  src_root <- file.path("synthesis_output", "trisk", paste0(sector, "_demo"))
-  input_root <- file.path("output", "trisk_inputs", paste0(sector, "_demo"))
-  dest_root <- file.path("dashboard", "data", "trisk", sector)
+  src_root <- file.path(cfg$paths$trisk_output_root, paste0(sector, "_demo"))
+  input_root <- file.path(cfg$paths$trisk_input_root, paste0(sector, "_demo"))
+  dest_root <- file.path(trisk_dest, sector)
   if (!dir.exists(dest_root)) dir.create(dest_root, recursive = TRUE, showWarnings = FALSE)
 
   for (name in trisk_sector_files) {
@@ -136,19 +143,19 @@ for (i in seq_len(nrow(trisk_manifest))) {
 
   # The app reads only the consolidated grid artifacts; raw per-run CSVs under
   # runs/ stay in synthesis_output and are never published to the snapshot.
-  grid_src_root <- file.path("synthesis_output", "trisk", "grid", sector)
+  grid_src_root <- file.path(cfg$paths$trisk_output_root, "grid", sector)
   grid_dest_root <- file.path(grid_root, sector)
   grid_file_names <- c("scenarios.csv", "borrower_results.parquet", "grid_meta.json")
   if (!dir.exists(grid_dest_root)) dir.create(grid_dest_root, recursive = TRUE, showWarnings = FALSE)
   for (name in grid_file_names) {
-    copy_file(file.path(grid_src_root, name), grid_dest_root)
+    copy_file(file.path(grid_src_root, name), grid_dest_root, required = cfg$run_grid)
   }
   grid_files <- file.path(grid_dest_root, grid_file_names)
   trisk_manifest$grid_available[[i]] <- all(file.exists(grid_files))
 }
 
-write_csv(trisk_manifest, file.path("dashboard", "data", "trisk", "manifest.csv"))
-message("  [OK] dashboard/data/trisk/manifest.csv written")
+write_csv(trisk_manifest, file.path(trisk_dest, "manifest.csv"))
+message(sprintf("  [OK] %s written", file.path(trisk_dest, "manifest.csv")))
 
 if (length(misses_required) > 0) {
   message("\nMISSING REQUIRED artifacts — snapshot refresh FAILED:")

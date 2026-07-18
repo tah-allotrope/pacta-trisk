@@ -44,6 +44,8 @@ suppressWarnings(suppressMessages({
   library(tidyr)
 }))
 
+source("R/engagement_config.R")
+
 # --- Section 1: Configuration ------------------------------------------------
 
 args <- commandArgs(trailingOnly = TRUE)
@@ -56,6 +58,8 @@ parse_arg <- function(args, name, default) {
   default
 }
 
+cfg <- load_engagement_config(get_config_arg(args))
+
 w_align <- parse_arg(args, "w_align", 0.5)
 w_trisk <- parse_arg(args, "w_trisk", 0.5)
 
@@ -64,14 +68,14 @@ auto_scenario   <- "pdp8_2023"      # scenario_source used for the borrower gap
 auto_target_met <- "target_pdp8_ndc" # PDP8 target metric in the company file
 
 base_dir   <- getwd()
-trisk_dir  <- file.path(base_dir, "dashboard", "data", "trisk")
-pacta_file <- file.path(base_dir, "synthesis_output", "vietnam", "04_vn_ms_company.csv")
-matched_file <- file.path(base_dir, "synthesis_output", "vietnam", "02_vn_matched_prioritized.csv")
-output_dir <- file.path(base_dir, "output", "engagement")
+trisk_dir  <- file.path(base_dir, cfg$paths$snapshot_dir, "trisk")
+pacta_file <- file.path(base_dir, cfg$paths$pacta_output_dir, "04_vn_ms_company.csv")
+matched_file <- file.path(base_dir, cfg$paths$pacta_output_dir, "02_vn_matched_prioritized.csv")
+output_dir <- file.path(base_dir, cfg$paths$engagement_output_dir)
 
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
-trisk_sectors <- c("power", "cement", "steel")
+trisk_sectors <- cfg$trisk_sectors
 data_source   <- "MCB_synthetic"
 
 cat(sprintf("Engagement Scoring — weights: alignment=%.2f, trisk=%.2f (target year %d)\n",

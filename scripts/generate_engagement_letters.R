@@ -28,6 +28,8 @@ suppressWarnings(suppressMessages({
   library(readr)
 }))
 
+source("R/engagement_config.R")
+
 # --- Section 1: Configuration & pre-flight (TASK-02-06) ----------------------
 
 args <- commandArgs(trailingOnly = TRUE)
@@ -38,11 +40,13 @@ parse_arg <- function(args, name, default) {
 }
 top_n <- parse_arg(args, "top_n", 10)
 
+cfg <- load_engagement_config(get_config_arg(args))
+
 base_dir      <- getwd()
-priority_file <- file.path(base_dir, "output", "engagement", "engagement_priority.csv")
+priority_file <- file.path(base_dir, cfg$paths$engagement_output_dir, "engagement_priority.csv")
 template_file <- file.path(base_dir, "templates", "engagement", "letter_template.html")
 prompt_file   <- file.path(base_dir, "templates", "engagement", "engagement_prompt_templates.csv")
-output_dir    <- file.path(base_dir, "output", "engagement_letters")
+output_dir    <- file.path(base_dir, cfg$paths$letters_output_dir)
 
 fail <- function(msg) { cat(sprintf("ERROR: %s\n", msg)); quit(status = 1, save = "no") }
 
@@ -226,7 +230,7 @@ index_html <- paste0(
   ".foot{margin-top:18px;color:#5a6b78;font-size:0.74rem;}",
   "</style></head><body><div class=\"wrap\">",
   "<div class=\"band\">Synthetic data — illustrative only · Requires human &amp; legal review before any external use</div>",
-  "<h1>Mekong Commercial Bank — Engagement Letters</h1>",
+  sprintf("<h1>%s — Engagement Letters</h1>", cfg$bank_name),
   sprintf("<p class=\"sub\">Top %d borrowers by composite engagement score · generated %s</p>",
           nrow(manifest_df), generated_at),
   "<table><thead><tr><th>#</th><th>Borrower</th><th>Sector</th><th>Composite</th><th>TRISK status</th></tr></thead><tbody>\n",

@@ -21,6 +21,8 @@ suppressWarnings(suppressMessages({
   library(readr)
 }))
 
+source("R/engagement_config.R")
+
 # --- Section 1: Args ---------------------------------------------------------
 
 args <- commandArgs(trailingOnly = TRUE)
@@ -41,18 +43,22 @@ parse_flag <- function(args, name, default = FALSE) {
 top_n     <- parse_num(args, "top_n", 10)
 anonymize <- parse_flag(args, "anonymize", FALSE)
 
+cfg <- load_engagement_config(get_config_arg(args))
+bank_short <- if (identical(cfg$bank_name, "Mekong Commercial Bank")) "MCB" else cfg$bank_name
+bank_label <- if (identical(bank_short, cfg$bank_name)) cfg$bank_name else sprintf("%s (%s)", cfg$bank_name, bank_short)
+
 base_dir   <- getwd()
-output_dir <- file.path(base_dir, "output", "disclosure")
+output_dir <- file.path(base_dir, cfg$paths$disclosure_output_dir)
 output_path <- file.path(output_dir, "disclosure_pack.html")
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 report_date <- format(Sys.Date(), "%d %B %Y")
 
 inputs <- list(
-  priority     = file.path(base_dir, "output", "engagement", "engagement_priority.csv"),
-  ms_align     = file.path(base_dir, "synthesis_output", "vietnam", "06_vn_ms_alignment_2030.csv"),
-  sda_align    = file.path(base_dir, "synthesis_output", "vietnam", "06_vn_sda_alignment_2030.csv"),
-  overview_png = file.path(base_dir, "synthesis_output", "vietnam", "12_vn_alignment_overview.png"),
-  coal_png     = file.path(base_dir, "synthesis_output", "vietnam", "13_vn_coal_stranded_risk.png"),
+  priority     = file.path(base_dir, cfg$paths$engagement_output_dir, "engagement_priority.csv"),
+  ms_align     = file.path(base_dir, cfg$paths$pacta_output_dir, "06_vn_ms_alignment_2030.csv"),
+  sda_align    = file.path(base_dir, cfg$paths$pacta_output_dir, "06_vn_sda_alignment_2030.csv"),
+  overview_png = file.path(base_dir, cfg$paths$pacta_output_dir, "12_vn_alignment_overview.png"),
+  coal_png     = file.path(base_dir, cfg$paths$pacta_output_dir, "13_vn_coal_stranded_risk.png"),
   tcfd_md      = file.path(base_dir, "templates", "disclosure", "disclosure_sections.md"),
   pacta_doc    = file.path(base_dir, "docs", "PACTA_Beginner_Guide.md"),
   trisk_doc    = file.path(base_dir, "docs", "TRISK_Demo_Assumptions.md"),
@@ -150,7 +156,7 @@ if (!is.null(priority)) {
   worst_sda <- if (!is.null(sda_align)) max(sda_align$gap_pct, na.rm = TRUE) else NA
   exec_html <- paste0(
     synthetic_note,
-    "<p>This pack summarises Mekong Commercial Bank's climate transition-risk position across ",
+    sprintf("<p>This pack summarises %s's climate transition-risk position across ", cfg$bank_name),
     n_sec, " high-emitting sectors, covering <strong>", n_borr,
     "</strong> financed counterparties. Alignment is measured against Vietnam's PDP8 / NDC / IEA-NZE pathways; ",
     "transition stress is quantified with TRISK.</p>",
@@ -299,7 +305,7 @@ body <- paste0(
 '<meta name="viewport" content="width=device-width, initial-scale=1">',
 '<title>MCB Climate Transition Disclosure Pack</title><style>', css, '</style></head><body>',
 '<div class="hero"><h1>Climate Transition Disclosure Pack</h1>',
-'<div class="subtitle">Mekong Commercial Bank (MCB) — TCFD-aligned, with ISSB IFRS S2 cross-references &amp; Decision 263 mapping</div>',
+sprintf('<div class="subtitle">%s — TCFD-aligned, with ISSB IFRS S2 cross-references &amp; Decision 263 mapping</div>', bank_label),
 '<div class="meta">Prepared ', report_date, ' · ', mode_label, '</div>',
 '<div class="confidential">SYNTHETIC DATA · ILLUSTRATIVE · CONFIDENTIAL DRAFT</div></div>',
 '<div class="container">',
@@ -322,7 +328,7 @@ body <- paste0(
 tcfd_html, '</div>',
 '<div class="section" id="methodology"><h2>5. Methodology Appendix</h2>', methodology_html, '</div>',
 
-'<div class="foot">Mekong Commercial Bank (MCB) — synthetic demonstration. PACTA + TRISK climate analytics. Not financial advice, not a credit decision, not a regulatory filing.</div>',
+sprintf('<div class="foot">%s — synthetic demonstration. PACTA + TRISK climate analytics. Not financial advice, not a credit decision, not a regulatory filing.</div>', bank_label),
 '</div></body></html>'
 )
 
