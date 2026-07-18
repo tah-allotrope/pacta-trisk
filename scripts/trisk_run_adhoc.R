@@ -25,7 +25,8 @@ suppressPackageStartupMessages({
   library(tidyr)
 })
 
-source(file.path(getwd(), "scripts", "trisk_sector_demo.R"), local = TRUE)
+source("R/sector_registry.R")
+source("R/trisk_core.R")
 
 carbon_price_model_map <- list(
   power = c(

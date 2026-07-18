@@ -15,6 +15,7 @@ test_that("default config (no path) reproduces MCB defaults", {
   expect_equal(cfg$trisk_sectors, c("power", "cement", "steel"))
   expect_equal(cfg$bank_name, "Mekong Commercial Bank")
   expect_equal(cfg$bank_slug, "mcb-demo")
+  expect_equal(cfg$paths$prioritization_output_dir, "synthesis_output/prioritization")
 })
 
 test_that("mcb-demo engagement_config.json is identical to the built-in defaults", {

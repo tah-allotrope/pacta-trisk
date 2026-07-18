@@ -41,7 +41,8 @@ suppressPackageStartupMessages({
       reports_dir = "reports",
       engagement_output_dir = "output/engagement",
       letters_output_dir = "output/engagement_letters",
-      disclosure_output_dir = "output/disclosure"
+      disclosure_output_dir = "output/disclosure",
+      prioritization_output_dir = "synthesis_output/prioritization"
     ),
     anonymize = FALSE
   )

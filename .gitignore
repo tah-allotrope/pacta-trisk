@@ -1,5 +1,10 @@
 nul
 Rplots.pdf
+trisk_baseline_run*.txt
+trisk_baseline_hashes.txt
+trisk_volatile_files.txt
+scratch_hash_*.R
+pacta_baseline_hashes.txt
 localhostrun-tunnel*.log
 .playwright-mcp/
 .claude/worktrees/
