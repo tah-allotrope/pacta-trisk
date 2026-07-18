@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Final Report :: Engagement Runway Completion — Phases 1–2</title>
+  <meta name="color-scheme" content="dark light">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+    async function initMermaid() {
+      const blocks = document.querySelectorAll('.mermaid');
+      if (!blocks.length) {
+        return;
+      }
+
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'base',
+        securityLevel: 'loose',
+        themeVariables: {
+          primaryColor: '#f3ead9',
+          primaryTextColor: '#1f1912',
+          primaryBorderColor: '#9d6b37',
+          lineColor: '#3b6f76',
+          secondaryColor: '#efe4d0',
+          tertiaryColor: '#ffffff',
+          background: '#fbf7f1',
+          mainBkg: '#fbf7f1',
+          nodeBorder: '#9d6b37',
+          clusterBkg: '#f7efdf',
+          clusterBorder: '#3b6f76',
+          edgeLabelBackground: '#fbf7f1'
+        }
+      });
+
+      await mermaid.run({ nodes: blocks });
+    }
+
+    const run = () => initMermaid().catch((error) => console.error('Mermaid render failed', error));
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run, { once: true });
+    } else {
+      run();
+    }
+  </script>
+  <style>
+    :root {
+      --paper: #fbf7f1;
+      --paper-strong: #fffdf9;
+      --ink: #1f1912;
+      --ink-soft: #5f564c;
+      --line: #dccdb6;
+      --line-strong: #bfa37d;
+      --accent: #9d6b37;
+      --accent-soft: #efe4d0;
+      --accent-2: #3b6f76;
+      --shadow: 0 18px 40px rgba(49, 33, 16, 0.08);
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+      --page-width: 1040px;
+      --display-font: Georgia, "Times New Roman", serif;
+      --body-font: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --mono-font: "Cascadia Code", Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(157, 107, 55, 0.09), transparent 26%),
+        radial-gradient(circle at 88% 10%, rgba(59, 111, 118, 0.08), transparent 22%),
+        linear-gradient(180deg, #f7f1e7 0%, #fbf7f1 28%, #f6efe5 100%);
+      font-family: var(--body-font);
+      line-height: 1.65;
+      letter-spacing: 0.01em;
+    }
+
+    a { color: var(--accent-2); }
+
+    code, pre, .technical, .meta-chip, .section-index, .eyebrow, .stat-label, .stat-value, .mermaid {
+      font-family: var(--mono-font);
+    }
+
+    .page-shell {
+      width: min(var(--page-width), calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 28px 0 56px;
+    }
+
+    .hero {
+      padding: 34px;
+      border: 1px solid rgba(159, 123, 79, 0.28);
+      border-radius: 30px;
+      background:
+        linear-gradient(135deg, rgba(157, 107, 55, 0.1), transparent 34%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.86)),
+        var(--paper-strong);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.85fr);
+      gap: 24px;
+      align-items: end;
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .title {
+      margin: 0;
+      max-width: 16ch;
+      font-family: var(--display-font);
+      font-size: clamp(2.4rem, 4.4vw, 4rem);
+      line-height: 0.98;
+      letter-spacing: -0.03em;
+      text-wrap: balance;
+    }
+
+    .lede {
+      margin: 18px 0 0;
+      max-width: 60ch;
+      color: var(--ink-soft);
+      font-size: 1rem;
+    }
+
+    .takeaway {
+      margin-top: 22px;
+      padding: 18px 20px;
+      border-left: 4px solid var(--accent-2);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      background: rgba(59, 111, 118, 0.08);
+      color: #20373a;
+      font-size: 1.02rem;
+    }
+
+    .meta-grid { display: grid; gap: 12px; }
+
+    .meta-card, .section, .subcard, .empty-state {
+      border: 1px solid rgba(95, 72, 46, 0.12);
+      background: rgba(255, 253, 249, 0.88);
+      box-shadow: var(--shadow);
+    }
+
+    .meta-card { padding: 16px 18px; border-radius: var(--radius-md); }
+
+    .meta-label {
+      color: var(--ink-soft);
+      font-size: 0.76rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .meta-chip {
+      margin-top: 8px;
+      color: var(--accent);
+      font-size: 1rem;
+      font-weight: 700;
+      word-break: break-word;
+    }
+
+    .section {
+      margin-top: 22px;
+      padding: 24px;
+      border-radius: var(--radius-lg);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px 18px;
+      align-items: end;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-index {
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .section-title {
+      margin: 0;
+      font-family: var(--display-font);
+      font-size: clamp(1.45rem, 2vw, 2rem);
+      line-height: 1.05;
+    }
+
+    .summary-grid, .dual-grid, .phase-grid, .stat-grid, .appendix-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .summary-grid, .dual-grid, .phase-grid, .appendix-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .subcard {
+      padding: 18px;
+      border-radius: var(--radius-md);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .subcard h3, .subcard h4 { margin: 0 0 10px; font-size: 1rem; line-height: 1.2; }
+    .subcard p:first-child, .subcard ul:first-child, .subcard ol:first-child { margin-top: 0; }
+
+    .stat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 16px; }
+
+    .stat {
+      padding: 14px 16px;
+      border: 1px solid rgba(59, 111, 118, 0.16);
+      border-radius: var(--radius-sm);
+      background: rgba(59, 111, 118, 0.06);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .stat-label { color: var(--ink-soft); font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; }
+    .stat-value { margin-top: 8px; color: var(--accent-2); font-size: 1.18rem; font-weight: 700; }
+
+    .narrative, .chart-frame, .technical-frame, .diagram-frame, .viz-frame {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.54);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .diagram-frame {
+      overflow-x: auto;
+      overflow-y: auto;
+      overscroll-behavior-x: contain;
+      overscroll-behavior-y: contain;
+      max-height: min(70vh, 720px);
+    }
+
+    .chart-frame, .viz-frame { overflow: hidden; }
+
+    .mermaid { width: 100%; max-width: 100%; min-width: 0; color: var(--ink); }
+
+    .mermaid svg {
+      display: block;
+      width: auto !important;
+      min-width: 100%;
+      max-width: none !important;
+      height: auto !important;
+    }
+
+    .diagram-frame.compact-diagram { padding: 12px; max-height: min(62vh, 560px); }
+    .diagram-frame.compact-diagram .mermaid { min-width: 900px; }
+
+    .chart-frame canvas, .technical-frame > canvas, .viz-frame canvas, canvas.report-chart {
+      display: block;
+      width: 100% !important;
+      max-width: 100%;
+      height: 300px !important;
+      min-height: 300px;
+      max-height: 300px;
+    }
+
+    .technical-frame table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+    .technical-frame th, .technical-frame td { padding: 12px 10px; border-bottom: 1px solid var(--line); vertical-align: top; text-align: left; }
+    .technical-frame th { color: var(--accent); font-size: 0.76rem; letter-spacing: 0.1em; text-transform: uppercase; }
+
+    .empty-state { padding: 20px; border-radius: var(--radius-md); text-align: center; color: var(--ink-soft); break-inside: avoid; page-break-inside: avoid; }
+    .empty-state strong { display: block; margin-bottom: 6px; color: var(--accent); font-size: 0.84rem; letter-spacing: 0.12em; text-transform: uppercase; }
+
+    ul, ol { margin: 0; padding-left: 20px; }
+    li { margin-bottom: 8px; }
+    p:last-child, li:last-child { margin-bottom: 0; }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-left: 8px;
+    }
+    .badge-done { background: rgba(59, 111, 118, 0.14); color: var(--accent-2); }
+    .badge-pending { background: rgba(157, 107, 55, 0.14); color: var(--accent); }
+
+    .footer-note { margin-top: 18px; color: rgba(95, 86, 76, 0.74); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; text-align: right; }
+
+    @media (max-width: 920px) {
+      .hero-grid, .summary-grid, .dual-grid, .phase-grid, .stat-grid, .appendix-grid { grid-template-columns: 1fr; }
+      .title { max-width: none; }
+    }
+
+    @media (max-width: 640px) {
+      .page-shell { width: min(100vw - 20px, var(--page-width)); padding-top: 16px; padding-bottom: 36px; }
+      .hero, .section { padding: 18px; border-radius: 20px; }
+      .title { font-size: clamp(2.1rem, 12vw, 3.2rem); }
+    }
+
+    @media print {
+      :root { --paper: #ffffff; --paper-strong: #ffffff; --ink: #111111; --ink-soft: #444444; --line: #d6d1c8; }
+      @page { size: A4; margin: 14mm; }
+      body { background: #ffffff; }
+      .page-shell { width: 100%; max-width: none; padding: 0; }
+      .hero, .meta-card, .section, .subcard, .narrative, .chart-frame, .technical-frame, .diagram-frame, .viz-frame, .empty-state, .stat {
+        background: #ffffff; box-shadow: none;
+      }
+      .hero, .section { margin-top: 0; margin-bottom: 10mm; }
+      .diagram-frame { overflow: visible; max-height: none; }
+      .diagram-frame.compact-diagram .mermaid { min-width: 0; }
+      .section-header, .takeaway { break-after: avoid; page-break-after: avoid; }
+      a { color: inherit; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero" id="title-hero">
+      <div class="hero-grid">
+        <div>
+          <p class="eyebrow">Final Report / Shareable Analysis Artifact</p>
+          <h1 class="title">Engagement Runway Completion — Phases 1&ndash;2</h1>
+          <p class="lede">
+            A synthesis of the first two phases of the Engagement Runway Completion plan: the merged
+            TRISK parameterize + decompose pass, and the config-driven downstream generators — for
+            readers who need context, evidence, and a clear path to the remaining three phases.
+          </p>
+          <div class="takeaway">
+            Phases 1&ndash;2 of 5 are complete and merged to <code>main</code>. The TRISK chain and all
+            client-facing generators now accept an engagement config with byte-identical default (MCB)
+            behavior proven by two full pipeline runs. The orchestrator, the SDB dress rehearsal, and
+            the ABCD/scenario-versioning closers (Phases 3&ndash;5) remain to be executed.
+          </div>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-card">
+            <div class="meta-label">Project</div>
+            <div class="meta-chip">PACTA + TRISK Vietnam</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Repository</div>
+            <div class="meta-chip">pacta-trisk</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Date</div>
+            <div class="meta-chip">2026-07-18</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="executive-summary">
+      <div class="section-header">
+        <div>
+          <div class="section-index">01 / Executive Summary</div>
+          <h2 class="section-title">Executive Summary</h2>
+        </div>
+      </div>
+      <div class="summary-grid">
+        <div class="subcard">
+          <h3>What was done</h3>
+          <p>
+            The platform's TRISK analysis chain — previously three monolithic scripts hardcoded to the
+            synthetic Mekong Commercial Bank (MCB) book — was decomposed into config-parameterized
+            package functions (<code>R/trisk_core.R</code>, <code>R/prioritization_core.R</code>),
+            mirroring the pattern already proven for PACTA. The four downstream generators (dashboard
+            snapshot publisher, engagement scoring, engagement letters, disclosure pack) were then
+            updated to read every path and the bank name from the same engagement config, so a
+            non-MCB engagement can run end-to-end without writing into the public tree.
+          </p>
+        </div>
+        <div class="subcard">
+          <h3>Why it matters</h3>
+          <p>
+            This closes the single largest gap between the platform's demo state and its commercial
+            promise: running the whole PACTA + TRISK pipeline for a new bank's loanbook. Before this
+            work, only the PACTA stage was config-driven — the TRISK chain and every client-facing
+            output (scoring, letters, disclosure) still assumed MCB. Phases 1&ndash;2 make every
+            pipeline stage parameterizable; only the orchestrator, a live rehearsal, and a handful of
+            data-dependency closers remain.
+          </p>
+        </div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat">
+          <div class="stat-label">Phases complete</div>
+          <div class="stat-value">2 of 5</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">R test suite</div>
+          <div class="stat-value">171 passed, 0 failed</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Byte-identity checks</div>
+          <div class="stat-value">2 full pipeline runs, clean</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="background-objective">
+      <div class="section-header">
+        <div>
+          <div class="section-index">02 / Background &amp; Objective</div>
+          <h2 class="section-title">Background &amp; Objective</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p>
+          PACTA + TRISK Vietnam is a synthetic-data demonstration platform showing how a fictional
+          Vietnamese bank ("Mekong Commercial Bank," MCB) could measure loanbook climate alignment
+          (PACTA) and transition-risk stress (TRISK). A prior engineering-foundation effort decomposed
+          the PACTA analysis into a genuinely loadable R package (<code>pactatrisk</code>) with an
+          engagement-config layer, but — as the 2026-07-18 brainstorm
+          (<code>research/2026-07-18-runway-completion-and-credibility-brainstorm.md</code>) documented
+          — that foundation work landed <em>before</em> the "client-engagement runway" plan that was
+          supposed to make the whole pipeline runnable for any bank. Only 2 of that runway's 6 phases
+          had shipped: the TRISK chain, sector prioritization, snapshot publishing, engagement scoring,
+          and the letter/disclosure generators all still hardcoded MCB's paths and bank name.
+        </p>
+        <p>
+          The objective of this plan (<code>plans/2026-07-18-engagement-runway-completion-plan.md</code>)
+          is to finish that runway on top of the new package foundation, with one deliberate change from
+          the original runway plan: merge the TRISK parameterization with a TRISK decompose into a single
+          pass — since both operations touch the same ~1,300 lines of script, doing them separately would
+          mean rewriting the same code twice under the same byte-identity acceptance gate. This report
+          covers execution of Phases 1 and 2 of that plan.
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="inputs-scope">
+      <div class="section-header">
+        <div>
+          <div class="section-index">03 / Inputs &amp; Scope</div>
+          <h2 class="section-title">Inputs &amp; Scope</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Plan &amp; research inputs</h3>
+          <ul>
+            <li><code>plans/2026-07-18-engagement-runway-completion-plan.md</code> &mdash; the 5-phase
+              implementation plan this report covers.</li>
+            <li><code>research/2026-07-18-runway-completion-and-credibility-brainstorm.md</code> &mdash;
+              the brainstorm establishing that the runway was 2/6 done and recommending the merged
+              parameterize+decompose pass.</li>
+            <li><code>CLAUDE.md</code> &mdash; repo laws: byte-identical MCB CSV acceptance bar, VND
+              never rescaled, run from repo root, the golden-number test suite is load-bearing.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Scope of this report</h3>
+          <ul>
+            <li><strong>In scope, completed:</strong> Phase 1 (TRISK core decompose) and Phase 2
+              (downstream generator parameterization).</li>
+            <li><strong>Out of scope for this report:</strong> Phase 3 (<code>run_engagement.R</code>
+              orchestrator), Phase 4 (Saigon Delta Bank dress rehearsal + second golden fixture), Phase
+              5 (ABCD sourcing brief, scenario versioning, NA bug fixes).</li>
+            <li><strong>Explicitly out of scope for the whole plan:</strong> automotive TRISK, steel
+              synthetic-book enrichment, multi-scenario traffic-light view, VN i18n, PDF export, real
+              bank data execution.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="assumptions-constraints">
+      <div class="section-header">
+        <div>
+          <div class="section-index">04 / Assumptions &amp; Constraints</div>
+          <h2 class="section-title">Assumptions &amp; Constraints</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Binding assumptions applied</h3>
+          <ul>
+            <li><strong>ASM-002 (verbatim move):</strong> code was moved into functions with only
+              path/bank-name parameterization — no logic edits. One accidental logic edit (dropping an
+              undefined <code>lib.loc = lib</code> argument while moving TRISK-grid code) was caught and
+              reverted to preserve the exact pre-existing behavior, including its latent (dormant, never
+              actually executed) bug.</li>
+            <li><strong>ASM-003 (volatility handling):</strong> a double-baseline run (two back-to-back
+              executions of the <em>unmodified</em> pipeline) established that five TRISK output
+              filenames per sector (<code>npv_results_latest.csv</code>, <code>pd_results_latest.csv</code>,
+              <code>params_latest.csv</code>, <code>company_trajectories_latest.csv</code>,
+              <code>run_catalog.csv</code>) carry a <code>run_id</code>/<code>run_path</code> UUID that
+              <code>trisk.model::run_trisk()</code> regenerates on every invocation. These were excluded
+              from the strict byte-identity comparison; every other CSV was held to byte-identity.</li>
+            <li><strong>ASM-004 (side-copy scope):</strong> the legacy <code>data/vietnam_trisk_*.csv</code>
+              duplicate files are now written only in default (MCB) mode, confirmed by grep that nothing
+              else in the repo reads them.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Constraints &amp; environment notes</h3>
+          <ul>
+            <li>R 4.5.2 via <code>Rscript</code>, not on PATH by default on this Windows machine
+              (<code>C:\Program Files\R\R-4.5.2\bin</code> added to session PATH for every run).</li>
+            <li><code>core.autocrlf=true</code> on this checkout made raw <code>md5sum</code> comparisons
+              unreliable across <code>git checkout</code> operations; <code>git diff</code> (which
+              normalizes line endings) was used as the authoritative byte-identity check instead, after
+              confirming the discrepancy was a self-inflicted testing artifact.</li>
+            <li>The dashboard Python test environment initially lacked <code>dashboard/requirements.txt</code>
+              dependencies; installed mid-session.</li>
+            <li>Confidence is high for Phases 1&ndash;2 (directly executed and verified this session).
+              Confidence in Phase 3&ndash;5 scope/effort is inherited from the plan document and has not
+              been re-validated by execution.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="methodology">
+      <div class="section-header">
+        <div>
+          <div class="section-index">05 / Methodology</div>
+          <h2 class="section-title">Methodology</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p>
+          Each phase followed the same discipline established by the prior PACTA decompose: capture a
+          pre-change baseline, move code into functions with minimal, mechanical edits, run the full
+          R test suite, run the full pipeline, and diff every output against the baseline before
+          committing. For Phase 1, a genuine methodological gap was discovered mid-execution: a naive
+          <code>tools::md5sum()</code> comparison across a <code>git checkout --</code>-reset tree
+          produced 70 false-positive "drifted" files. Root-causing this (rather than accepting or
+          silently re-baselining it) revealed it was <code>core.autocrlf</code> line-ending churn from
+          the test harness itself, not a refactor defect — confirmed by re-checking with
+          <code>git diff --stat</code>, which correctly normalizes line endings and showed the real
+          diff was limited to intentional edits, PNG compression noise, timestamp text, and the known
+          <code>run_id</code> volatility.
+        </p>
+        <p>
+          Both phases were verified with: the full <code>testthat</code> suite
+          (<code>Rscript -e "testthat::test_dir('tests/testthat')"</code>), a full pipeline execution
+          (<code>Rscript scripts/pipeline_refresh.R</code> and, for Phase 2, the
+          <code>--full</code> variant which also regenerates PACTA and engagement scoring), a package
+          load check (<code>devtools::load_all('.')</code>), and the Python dashboard suite
+          (<code>python -m pytest dashboard/tests</code>). One Python test failure
+          (<code>test_auth.py::test_no_password_renders_landing</code>, a hardcoded 3-second Streamlit
+          AppTest timeout) was isolated by stashing all session changes and re-running against the
+          untouched HEAD commit — it failed identically, confirming it as a pre-existing environmental
+          flake rather than a regression.
+        </p>
+      </div>
+      <div class="stat-grid">
+        <div class="stat">
+          <div class="stat-label">Orientation</div>
+          <div class="stat-value">multi-phase</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Audience</div>
+          <div class="stat-value">stakeholder-safe</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Evidence Rule</div>
+          <div class="stat-value">no invented data</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="phase-analysis">
+      <div class="section-header">
+        <div>
+          <div class="section-index">06 / Phase-by-Phase Analysis</div>
+          <h2 class="section-title">Phase-by-Phase Analysis</h2>
+        </div>
+      </div>
+      <div class="phase-grid">
+        <div class="subcard">
+          <h3>Phase 1 &mdash; TRISK core decompose <span class="badge badge-done">Done</span></h3>
+          <p>
+            Extracted <code>scripts/trisk_prepare_inputs.R</code>, <code>scripts/trisk_sector_demo.R</code>,
+            and <code>scripts/trisk_scenario_grid.R</code> into <code>R/trisk_core.R</code>
+            (<code>trisk_prepare_sector_inputs()</code>, <code>trisk_run_sector()</code>,
+            <code>trisk_run_grid()</code> + supporting helpers), and
+            <code>scripts/sector_prioritization.R</code> into <code>R/prioritization_core.R</code>
+            (<code>prioritize_sectors()</code>). All four scripts became thin CLI wrappers that load an
+            engagement config and call the core functions. <code>scripts/trisk_run_adhoc.R</code> was
+            updated to source the new core file directly (the functions it depended on moved out of
+            <code>trisk_sector_demo.R</code>). Added a <code>backfill_zero_baseline()</code> helper
+            (unit-tested, not yet wired in &mdash; that's the Phase 5 Dung Quat fix) and a new
+            <code>tests/testthat/test_trisk_core.R</code> with 13 test cases covering the grid,
+            backfill, and path-resolution functions. Full suite after this phase: 162 passed, 0 failed.
+          </p>
+        </div>
+        <div class="subcard">
+          <h3>Phase 2 &mdash; downstream generators <span class="badge badge-done">Done</span></h3>
+          <p>
+            Config-drove <code>scripts/refresh_dashboard_data.R</code> (snapshot publisher),
+            <code>scripts/engagement_scoring.R</code>, <code>scripts/generate_engagement_letters.R</code>,
+            and <code>scripts/generate_disclosure_pack.R</code>. A real subprocess smoke test
+            (<code>tests/testthat/test_config_paths.R</code>) caught a genuine bug: these scripts used
+            <code>file.path(getwd(), cfg$paths$X)</code>, which silently produces a broken concatenated
+            path when a config supplies an absolute directory. Fixed by using <code>cfg$paths$X</code>
+            directly, consistent with the repo law that every script already assumes it runs from the
+            repo root.
+          </p>
+        </div>
+        <div class="subcard">
+          <h3>Phase 3 &mdash; orchestrator <span class="badge badge-pending">Not started</span></h3>
+          <p>
+            Per the plan: extract <code>R/step_runner.R</code> from
+            <code>scripts/pipeline_refresh.R</code>, add <code>scripts/run_engagement.R</code> with a
+            <code>--dry-run</code> flag and a guard rail preventing a non-MCB config from writing into
+            the public <code>dashboard/data</code> snapshot, and bump the package to v0.2.0.
+          </p>
+        </div>
+        <div class="subcard">
+          <h3>Phase 4&ndash;5 &mdash; rehearsal &amp; data closers <span class="badge badge-pending">Not started</span></h3>
+          <p>
+            Phase 4 runs the Saigon Delta Bank fixture end-to-end and freezes a second golden-number
+            test set. Phase 5 writes the ABCD sourcing decision brief, versions the scenario inputs, and
+            fixes the Dung Quat zero-baseline and power-2025 NA bugs. Both depend on Phase 3's
+            orchestrator; Phase 5's ABCD brief has no code dependency and could start in parallel at any
+            time.
+          </p>
+        </div>
+      </div>
+      <div class="diagram-frame compact-diagram">
+        <pre class="mermaid">
+flowchart LR
+  A["Plan: 5 phases"] --> B["Phase 1: TRISK core\ndecompose"]
+  B --> C["Phase 2: downstream\ngenerators"]
+  C -.this report ends here.-> D["Phase 3: run_engagement.R\norchestrator"]
+  D --> E["Phase 4: SDB dress\nrehearsal + 2nd goldens"]
+  E --> F["Phase 5: ABCD brief,\nscenario versioning,\nNA fixes"]
+  F --> G["Runway complete:\none-command engagement run"]
+
+  classDef done fill:#efe4d0,stroke:#9d6b37,color:#1f1912;
+  classDef pending fill:#fbf7f1,stroke:#3b6f76,stroke-dasharray: 4 3,color:#1f1912;
+  class B,C done;
+  class D,E,F,G pending;
+        </pre>
+      </div>
+    </section>
+
+    <section class="section" id="findings-recommendation">
+      <div class="section-header">
+        <div>
+          <div class="section-index">07 / Findings &amp; Recommendation</div>
+          <h2 class="section-title">Findings &amp; Recommendation</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p>
+          <strong>Finding 1 &mdash; the merge was the right call.</strong> Combining TRISK
+          parameterization with the decompose in one pass, as the brainstorm recommended, meant the
+          ~1,300 lines of TRISK script logic were touched exactly once under one byte-identity gate,
+          instead of twice under two separate gates. This matches how the PACTA decompose was already
+          proven safe in the prior foundation phase.
+        </p>
+        <p>
+          <strong>Finding 2 &mdash; the byte-identity discipline caught two real bugs before they
+          shipped.</strong> The verbatim-move rule surfaced an accidental fix (the undefined
+          <code>lib</code> variable) that would have silently changed behavior on a rare, previously
+          impossible-to-trigger code path, and a subprocess smoke test caught a real absolute-path
+          bug in every downstream generator that would only have surfaced once a real (non-relative-path)
+          engagement config was used &mdash; i.e., during Phase 4's rehearsal, at a much more expensive
+          point to debug.
+        </p>
+        <p>
+          <strong>Recommendation.</strong> Proceed directly to Phase 3. The plan's acceptance criteria
+          for Phase 3 (step-runner extraction, <code>--dry-run</code>, the public-snapshot guard rail)
+          are unblocked: every stage now accepts <code>--config</code>. Start Phase 5's ABCD sourcing
+          brief in parallel &mdash; it has no code dependency and gates the commercial conversation for
+          any real engagement.
+        </p>
+      </div>
+      <div class="viz-frame">
+        <canvas id="testSuiteChart" role="img" aria-label="R test suite pass counts by phase"></canvas>
+      </div>
+    </section>
+
+    <section class="section" id="implementation-path">
+      <div class="section-header">
+        <div>
+          <div class="section-index">08 / Implementation Path</div>
+          <h2 class="section-title">Implementation Path</h2>
+        </div>
+      </div>
+      <div class="phase-grid">
+        <div class="subcard">
+          <h3>Immediate next step</h3>
+          <p>
+            Execute Phase 3 of <code>plans/2026-07-18-engagement-runway-completion-plan.md</code>:
+            extract <code>R/step_runner.R</code>, build <code>scripts/run_engagement.R</code>, verify
+            <code>pipeline_refresh.R</code>'s manifest shape is unchanged (locked by
+            <code>test_manifest_json.R</code> / <code>dashboard/tests/test_manifest.py</code>), and
+            bump the package to v0.2.0.
+          </p>
+        </div>
+        <div class="subcard">
+          <h3>Parallel track</h3>
+          <p>
+            Start Phase 5's <code>docs/abcd_sourcing_decision.md</code> brief now &mdash; it has zero
+            code dependency and is the highest-leverage unblock for any real (non-synthetic) bank
+            conversation.
+          </p>
+        </div>
+        <div class="subcard">
+          <h3>Sequencing after Phase 3</h3>
+          <p>
+            Phase 4 (SDB rehearsal) must follow Phase 3, since it exercises
+            <code>run_engagement.R</code> end-to-end. Phase 5's remaining items (scenario versioning,
+            Dung Quat/power-2025 NA fixes, golden refreeze) depend on Phase 4's second golden fixture
+            existing so both golden sets can be re-checked together.
+          </p>
+        </div>
+        <div class="subcard">
+          <h3>Owner &amp; cadence</h3>
+          <p>
+            No explicit owner is named in the plan; the existing pattern in this repo is one phase per
+            commit, verified against its own exit criteria before the next begins. The weekly
+            <code>refresh.yml</code> auto-commit is test-gated, so a red suite at any point blocks
+            Monday's publish by design &mdash; land each remaining phase only once its tests are green.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="risks-open-questions">
+      <div class="section-header">
+        <div>
+          <div class="section-index">09 / Risks / Open Questions</div>
+          <h2 class="section-title">Risks / Open Questions</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Risks carried forward</h3>
+          <ul>
+            <li><strong>Phase 4 SDB fixture may hit deeper zero-match assumptions</strong> than inline
+              guards can absorb (e.g., PACTA logic implicitly assuming every sector has matched
+              exposure). The plan explicitly scopes Phase 4 to guard-and-log, not redesign &mdash;
+              anything structural becomes a named backlog item.</li>
+            <li><strong>The <code>lib.loc = lib</code> latent bug</strong> in the TRISK scenario-grid
+              code (an undefined variable reference) was deliberately preserved rather than fixed, per
+              the verbatim-move discipline. It has never executed in practice (the grid is always
+              served from cache in the committed tree) but would crash a genuine full grid regeneration.
+              This is now a known, documented risk rather than a silent one, and remains someone's call
+              to fix in a future phase.</li>
+            <li><strong>Python test environment</strong> for this sandbox required a mid-session
+              dependency install; a CI environment following <code>dashboard/requirements.txt</code>
+              exactly would not hit this.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Open questions for the next executor</h3>
+          <ul>
+            <li>Does Phase 3's <code>run_engagement.R</code> orchestrate via loaded
+              <code>pactatrisk::</code> functions in-process, or via <code>system2("Rscript", ...)</code>
+              per step (matching <code>pipeline_refresh.R</code>'s existing mechanism)? The plan's
+              ALT-002 already resolves this in favor of script-chaining for process-isolation and
+              failure-semantics reasons &mdash; worth re-confirming before implementation.</li>
+            <li>Should the accumulating <code>synthesis_output/trisk/*_demo/runs/</code> archive
+              (hundreds of timestamped directories, growing every pipeline run and every test run) be
+              addressed before Phase 4 adds a second engagement's worth of runs? This is pre-existing
+              repo behavior, not introduced by Phases 1&ndash;2, but it compounds with every future
+              run.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="appendices-evidence">
+      <div class="section-header">
+        <div>
+          <div class="section-index">10 / Appendices / Evidence Notes</div>
+          <h2 class="section-title">Appendices / Evidence Notes</h2>
+        </div>
+      </div>
+      <div class="appendix-grid">
+        <div class="subcard">
+          <h3>Commits</h3>
+          <div class="technical-frame">
+            <table>
+              <thead><tr><th>Commit</th><th>Summary</th></tr></thead>
+              <tbody>
+                <tr><td><code>d299496</code></td><td>phase-1: merged TRISK parameterize + decompose (R/trisk_core.R)</td></tr>
+                <tr><td><code>408e95c</code></td><td>phase-2: parameterize downstream generators (snapshot, scoring, letters, disclosure)</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="subcard">
+          <h3>Verification commands run</h3>
+          <div class="technical-frame">
+            <table>
+              <thead><tr><th>Command</th><th>Result</th></tr></thead>
+              <tbody>
+                <tr><td><code>testthat::test_dir('tests/testthat')</code></td><td>171 passed, 0 failed</td></tr>
+                <tr><td><code>devtools::load_all('.')</code></td><td>package loads, TRISK core functions exposed</td></tr>
+                <tr><td><code>Rscript scripts/pipeline_refresh.R</code></td><td>exit 0, byte-identical (excl. documented volatility)</td></tr>
+                <tr><td><code>Rscript scripts/pipeline_refresh.R --full</code></td><td>exit 0, golden rank-1 borrower reproduced (Nghi Son Power LLC, composite 1.000)</td></tr>
+                <tr><td><code>python -m pytest dashboard/tests</code></td><td>57/58 passed (1 pre-existing environmental flake, confirmed via git stash against HEAD)</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="footer-note">designed for html first, printable without reconstruction</div>
+    </section>
+  </main>
+  <script>
+    (function() {
+      const chartCanvases = document.querySelectorAll('canvas');
+      chartCanvases.forEach((canvas) => {
+        canvas.classList.add('report-chart');
+        const parent = canvas.parentElement;
+        if (parent && parent.classList.contains('technical-frame') && !parent.classList.contains('chart-frame')) {
+          parent.classList.add('chart-frame');
+        }
+      });
+    })();
+
+    if (window.Chart) {
+      Chart.defaults.devicePixelRatio = 1;
+      Chart.defaults.animation = false;
+      Chart.defaults.resizeDelay = 150;
+      Chart.defaults.normalized = true;
+      Chart.defaults.maintainAspectRatio = false;
+      Chart.defaults.responsive = true;
+      window.__REPORT_CHART_DEFAULTS__ = {
+        animation: false,
+        resizeDelay: 150,
+        normalized: true,
+        maintainAspectRatio: false,
+        responsive: true
+      };
+    }
+
+    (function() {
+      const el = document.getElementById('testSuiteChart');
+      if (!el || !window.Chart) return;
+      new Chart(el, {
+        type: 'bar',
+        data: {
+          labels: ['After Phase 1', 'After Phase 2'],
+          datasets: [{
+            label: 'R testthat suite: tests passed',
+            data: [162, 171],
+            backgroundColor: ['#c9a876', '#9d6b37'],
+            borderRadius: 6
+          }]
+        },
+        options: {
+          animation: false,
+          resizeDelay: 150,
+          normalized: true,
+          maintainAspectRatio: false,
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, ticks: { precision: 0 } }
+          }
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
