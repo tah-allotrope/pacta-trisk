@@ -64,6 +64,25 @@ python -m streamlit run dashboard/app.py
 On Linux/macOS use plain `Rscript` on PATH. Always run from the repo root —
 all R scripts resolve paths relative to the working directory.
 
+## Refactor acceptance check
+
+Any change touching `scripts/` or `R/` must leave every default-mode CSV output
+byte-identical to its pre-change content (PNGs and generated-timestamp text are
+exempt). Verify this with one command instead of hand-diffing:
+
+```powershell
+$env:Path += ";C:\Program Files\R\R-4.5.2\bin"
+Rscript tools/verify_refactor.R
+```
+
+This reruns `scripts/pipeline_refresh.R` and classifies every tracked file
+`git diff` reports as changed into expected churn (timestamps/manifests),
+known-volatile noise (a short, named list of TRISK CSVs with a regenerated
+run-id column), or genuine drift. It prints `BYTE-IDENTITY PASS` and exits 0
+only when no genuine drift is found. Pass `--full` to check against a
+`pipeline_refresh.R --full` run, or `--skip-refresh` to classify the current
+working tree without rerunning the pipeline.
+
 ## Repository map
 
 | Path | Contents |
