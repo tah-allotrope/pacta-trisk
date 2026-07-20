@@ -16,6 +16,8 @@ suppressPackageStartupMessages({
   library(jsonlite)
 })
 
+source("R/step_runner.R")
+
 args <- commandArgs(trailingOnly = TRUE)
 full_mode <- "--full" %in% args
 
@@ -50,35 +52,7 @@ if (full_mode) {
   )
 }
 
-git_sha <- tryCatch(
-  trimws(system("git rev-parse HEAD", intern = TRUE)),
-  error = function(e) NA_character_
-)
-if (length(git_sha) == 0 || identical(git_sha, "")) git_sha <- NA_character_
-
-count_rows <- function(path) {
-  if (!file.exists(path)) return(NA_integer_)
-  tryCatch(length(readLines(path)) - 1L, error = function(e) NA_integer_)
-}
-
-run_step <- function(step) {
-  cat(sprintf("\n=== %s ===\n", step$name))
-  t0 <- Sys.time()
-  cmd <- c("Rscript", step$script, step$args)
-  status <- system2("Rscript", args = c(step$script, step$args))
-  elapsed <- as.numeric(difftime(Sys.time(), t0, units = "secs"))
-  list(name = step$name, status = if (status == 0) "ok" else "failed", seconds = round(elapsed, 1))
-}
-
-step_results <- list()
-for (step in steps) {
-  result <- run_step(step)
-  step_results[[length(step_results) + 1]] <- result
-  if (result$status != "ok") {
-    cat(sprintf("\n[FAILED] Step '%s' exited non-zero. Stopping pipeline.\n", result$name))
-    break
-  }
-}
+step_results <- run_steps(steps)
 
 snapshot_files <- c(
   "dashboard/data/trisk/power/company_trajectories_latest.csv",
@@ -89,19 +63,12 @@ snapshot_files <- c(
   "dashboard/data/trisk/steel/npv_results_latest.csv"
 )
 
-manifest <- list(
-  generated_at = format(Sys.time(), "%Y-%m-%dT%H:%M:%S%z"),
-  git_sha = git_sha,
-  steps = step_results,
-  status = if (all(vapply(step_results, function(s) s$status == "ok", logical(1)))) "ok" else "failed",
-  row_counts = setNames(as.list(vapply(snapshot_files, count_rows, integer(1))), snapshot_files)
-)
-
 manifest_path <- "dashboard/data/pipeline_manifest.json"
-write(toJSON(manifest, auto_unbox = TRUE, pretty = TRUE), manifest_path)
+write_pipeline_manifest(step_results, manifest_path, row_count_files = snapshot_files)
 cat(sprintf("\n[OK] Manifest written: %s\n", manifest_path))
 
-if (!identical(manifest$status, "ok")) {
+manifest_status <- if (all(vapply(step_results, function(s) s$status == "ok", logical(1)))) "ok" else "failed"
+if (!identical(manifest_status, "ok")) {
   quit(status = 1)
 }
 

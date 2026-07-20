@@ -83,6 +83,29 @@ only when no genuine drift is found. Pass `--full` to check against a
 `pipeline_refresh.R --full` run, or `--skip-refresh` to classify the current
 working tree without rerunning the pipeline.
 
+## Running a client engagement
+
+`scripts/run_engagement.R` runs the full delivery flow — intake, validation
+report, PACTA, TRISK, prioritization, snapshot, scoring, letters, disclosure
+— for any engagement config in one command:
+
+```powershell
+$env:Path += ";C:\Program Files\R\R-4.5.2\bin"
+Rscript scripts/run_engagement.R --config engagements/<slug>/engagement_config.json --raw-loanbook <path/to/loanbook.csv>
+```
+
+`system2("Rscript", ...)` needs `Rscript` on PATH even when the outer call
+used a full path — set `$env:Path` first as shown above (same requirement as
+`scripts/pipeline_refresh.R`). Add `--dry-run` to print the resolved step
+list without executing or writing anything — useful for checking which
+steps a config will run (e.g. whether the scenario grid is included) before
+committing to a full run. Omit `--raw-loanbook` to run against the loanbook
+already named in the engagement config, or add `--skip-intake` to skip
+intake and re-run only the downstream stages. `mcb-demo` is the only
+engagement allowed to publish into the public `dashboard/data` snapshot; any
+other engagement's `snapshot_dir` must point elsewhere, or the run refuses
+to start.
+
 ## Repository map
 
 | Path | Contents |
