@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Final Report :: Wave 0 Completion: Verify Tool, Engagement Orchestrator, SDB Rehearsal + CI/Scaffolding, Data Closers with Deterministic Run IDs</title>
+  <meta name="color-scheme" content="dark light">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+    async function initMermaid() {
+      const blocks = document.querySelectorAll('.mermaid');
+      if (!blocks.length) {
+        return;
+      }
+
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'base',
+        securityLevel: 'loose',
+        themeVariables: {
+          primaryColor: '#f3ead9',
+          primaryTextColor: '#1f1912',
+          primaryBorderColor: '#9d6b37',
+          lineColor: '#3b6f76',
+          secondaryColor: '#efe4d0',
+          tertiaryColor: '#ffffff',
+          background: '#fbf7f1',
+          mainBkg: '#fbf7f1',
+          nodeBorder: '#9d6b37',
+          clusterBkg: '#f7efdf',
+          clusterBorder: '#3b6f76',
+          edgeLabelBackground: '#fbf7f1'
+        }
+      });
+
+      await mermaid.run({ nodes: blocks });
+    }
+
+    const run = () => initMermaid().catch((error) => console.error('Mermaid render failed', error));
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run, { once: true });
+    } else {
+      run();
+    }
+  </script>
+  <style>
+    :root {
+      --paper: #fbf7f1;
+      --paper-strong: #fffdf9;
+      --ink: #1f1912;
+      --ink-soft: #5f564c;
+      --line: #dccdb6;
+      --line-strong: #bfa37d;
+      --accent: #9d6b37;
+      --accent-soft: #efe4d0;
+      --accent-2: #3b6f76;
+      --shadow: 0 18px 40px rgba(49, 33, 16, 0.08);
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+      --page-width: 1040px;
+      --display-font: Georgia, "Times New Roman", serif;
+      --body-font: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --mono-font: "Cascadia Code", Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(157, 107, 55, 0.09), transparent 26%),
+        radial-gradient(circle at 88% 10%, rgba(59, 111, 118, 0.08), transparent 22%),
+        linear-gradient(180deg, #f7f1e7 0%, #fbf7f1 28%, #f6efe5 100%);
+      font-family: var(--body-font);
+      line-height: 1.65;
+      letter-spacing: 0.01em;
+    }
+
+    a { color: var(--accent-2); }
+
+    code, pre, .technical, .meta-chip, .section-index, .eyebrow, .stat-label, .stat-value, .mermaid {
+      font-family: var(--mono-font);
+    }
+
+    .page-shell {
+      width: min(var(--page-width), calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 28px 0 56px;
+    }
+
+    .hero {
+      padding: 34px;
+      border: 1px solid rgba(159, 123, 79, 0.28);
+      border-radius: 30px;
+      background:
+        linear-gradient(135deg, rgba(157, 107, 55, 0.1), transparent 34%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.86)),
+        var(--paper-strong);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.85fr);
+      gap: 24px;
+      align-items: end;
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .title {
+      margin: 0;
+      max-width: 16ch;
+      font-family: var(--display-font);
+      font-size: clamp(2.8rem, 5vw, 4.8rem);
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+      text-wrap: balance;
+    }
+
+    .lede {
+      margin: 18px 0 0;
+      max-width: 60ch;
+      color: var(--ink-soft);
+      font-size: 1rem;
+    }
+
+    .takeaway {
+      margin-top: 22px;
+      padding: 18px 20px;
+      border-left: 4px solid var(--accent-2);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      background: rgba(59, 111, 118, 0.08);
+      color: #20373a;
+      font-size: 1.02rem;
+    }
+
+    .meta-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .meta-card, .section, .subcard, .empty-state {
+      border: 1px solid rgba(95, 72, 46, 0.12);
+      background: rgba(255, 253, 249, 0.88);
+      box-shadow: var(--shadow);
+    }
+
+    .meta-card {
+      padding: 16px 18px;
+      border-radius: var(--radius-md);
+    }
+
+    .meta-label {
+      color: var(--ink-soft);
+      font-size: 0.76rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .meta-chip {
+      margin-top: 8px;
+      color: var(--accent);
+      font-size: 1rem;
+      font-weight: 700;
+      word-break: break-word;
+    }
+
+    .section {
+      margin-top: 22px;
+      padding: 24px;
+      border-radius: var(--radius-lg);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px 18px;
+      align-items: end;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-index {
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .section-title {
+      margin: 0;
+      font-family: var(--display-font);
+      font-size: clamp(1.45rem, 2vw, 2rem);
+      line-height: 1.05;
+    }
+
+    .summary-grid, .dual-grid, .phase-grid, .stat-grid, .appendix-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .summary-grid, .dual-grid, .phase-grid, .appendix-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .subcard {
+      padding: 18px;
+      border-radius: var(--radius-md);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .subcard h3, .subcard h4 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+      line-height: 1.2;
+    }
+
+    .subcard p:first-child, .subcard ul:first-child, .subcard ol:first-child {
+      margin-top: 0;
+    }
+
+    .stat-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin-top: 16px;
+    }
+
+    .stat {
+      padding: 14px 16px;
+      border: 1px solid rgba(59, 111, 118, 0.16);
+      border-radius: var(--radius-sm);
+      background: rgba(59, 111, 118, 0.06);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .stat-label {
+      color: var(--ink-soft);
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .stat-value {
+      margin-top: 8px;
+      color: var(--accent-2);
+      font-size: 1.18rem;
+      font-weight: 700;
+    }
+
+    .narrative, .chart-frame, .technical-frame, .diagram-frame, .viz-frame {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.54);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .diagram-frame {
+      overflow-x: auto;
+      overflow-y: auto;
+      overscroll-behavior-x: contain;
+      overscroll-behavior-y: contain;
+      max-height: min(70vh, 720px);
+    }
+
+    .chart-frame, .viz-frame {
+      overflow: hidden;
+    }
+
+    .mermaid {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      color: var(--ink);
+    }
+
+    .mermaid svg {
+      display: block;
+      width: auto !important;
+      min-width: 100%;
+      max-width: none !important;
+      height: auto !important;
+    }
+
+    .diagram-frame.compact-diagram {
+      padding: 12px;
+      max-height: min(62vh, 560px);
+    }
+
+    .diagram-frame.compact-diagram .mermaid {
+      min-width: 900px;
+    }
+
+    .chart-frame canvas, .technical-frame > canvas, .viz-frame canvas, canvas.report-chart {
+      display: block;
+      width: 100% !important;
+      max-width: 100%;
+      height: 300px !important;
+      min-height: 300px;
+      max-height: 300px;
+    }
+
+    .technical-frame table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+    }
+
+    .technical-frame th, .technical-frame td {
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      text-align: left;
+    }
+
+    .technical-frame th {
+      color: var(--accent);
+      font-size: 0.76rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .empty-state {
+      padding: 20px;
+      border-radius: var(--radius-md);
+      text-align: center;
+      color: var(--ink-soft);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .empty-state strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--accent);
+      font-size: 0.84rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    ul, ol {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    li { margin-bottom: 8px; }
+
+    p:last-child, li:last-child { margin-bottom: 0; }
+
+    .footer-note {
+      margin-top: 18px;
+      color: rgba(95, 86, 76, 0.74);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      text-align: right;
+    }
+
+    @media (max-width: 920px) {
+      .hero-grid, .summary-grid, .dual-grid, .phase-grid, .stat-grid, .appendix-grid {
+        grid-template-columns: 1fr;
+      }
+      .title { max-width: none; }
+    }
+
+    @media (max-width: 640px) {
+      .page-shell {
+        width: min(100vw - 20px, var(--page-width));
+        padding-top: 16px; padding-bottom: 36px;
+      }
+      .hero, .section { padding: 18px; border-radius: 20px; }
+      .title { font-size: clamp(2.1rem, 12vw, 3.2rem); }
+    }
+
+    @media print {
+      :root {
+        --paper: #ffffff; --paper-strong: #ffffff; --ink: #111111;
+        --ink-soft: #444444; --line: #d6d1c8;
+      }
+      @page { size: A4; margin: 14mm; }
+      body { background: #ffffff; }
+      .page-shell { width: 100%; max-width: none; padding: 0; }
+      .hero, .meta-card, .section, .subcard, .narrative, .chart-frame,
+      .technical-frame, .diagram-frame, .viz-frame, .empty-state, .stat {
+        background: #ffffff; box-shadow: none;
+      }
+      .hero, .section { margin-top: 0; margin-bottom: 10mm; }
+      .diagram-frame { overflow: visible; max-height: none; }
+      .diagram-frame.compact-diagram .mermaid { min-width: 0; }
+      .section-header, .takeaway { break-after: avoid; page-break-after: avoid; }
+      a { color: inherit; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero" id="title-hero">
+      <div class="hero-grid">
+        <div>
+          <p class="eyebrow">Final Report / Shareable Analysis Artifact</p>
+          <h1 class="title">Wave 0 Completion: Verify Tool, Engagement Orchestrator, SDB Rehearsal + CI/Scaffolding, Data Closers with Deterministic Run IDs</h1>
+          <p class="lede">
+            A presentation-ready synthesis of a four-phase analysis that graduated the PACTA + TRISK platform from a single-bank demo to a config-driven multi-bank engagement engine.
+          </p>
+          <div class="takeaway">
+            The PACTA + TRISK platform now runs any engagement end-to-end from a raw loanbook to client deliverables, with byte-identical deterministic outputs, two golden test suites, a weekly CI guard, and a one-command refactor acceptance bar.
+          </div>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-card">
+            <div class="meta-label">Project</div>
+            <div class="meta-chip">PACTA + TRISK Vietnam</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Repository</div>
+            <div class="meta-chip">pacta-trisk</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Date</div>
+            <div class="meta-chip">2026-07-22</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="executive-summary">
+      <div class="section-header">
+        <div>
+          <div class="section-index">01 / Executive Summary</div>
+          <h2 class="section-title">Executive Summary</h2>
+        </div>
+      </div>
+      <div class="summary-grid">
+        <div class="subcard">
+          <h3>What Was Delivered</h3>
+          <p>Wave 0 delivered four integrated phases: a byte-identity verification tool for refactor acceptance, an engagement orchestrator with step-runner extraction and guard rails, the end-to-end Saigon Delta Bank rehearsal with a second golden fixture and weekly CI job, and the data closers (ABCD sourcing brief, scenario versioning, Dung Quat/power-2025 bug fixes, deterministic run IDs). Every phase was acceptance-checked by <code>tools/verify_refactor.R</code> before the next began.</p>
+        </div>
+        <div class="subcard">
+          <h3>Refreeze &amp; Verification</h3>
+          <p>The single golden refreeze commit (<code>0e57fd9</code>) covers scenario versioning, two NA-producing bug fixes, deterministic run IDs, and both golden test suites. Post-refreeze: two consecutive default refreshes produce byte-identical CSVs. The volatile <code>run_id</code>/<code>run_path</code> column list in the verify tool is now <code>character(0)</code>. Full R suite: 203 pass. Python suite: 57 pass, 1 known environmental flake (<code>test_auth.py</code> timeout).</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="background-objective">
+      <div class="section-header">
+        <div>
+          <div class="section-index">02 / Background &amp; Objective</div>
+          <h2 class="section-title">Background &amp; Objective</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p>The PACTA + TRISK Vietnam project evaluates climate transition risk for Vietnamese banks using fully synthetic data. Before Wave 0, the platform only served one fictional bank (Mekong Commercial Bank, MCB) in a hand-configured pipeline with manually verified outputs. The core R modules were already config-driven (commits <code>d299496</code>, <code>408e95c</code>), but four gaps prevented a second engagement from running:</p>
+        <ol>
+          <li><strong>No acceptance bar:</strong> Every refactor was verified by hand-rolling a full refresh plus git diff — error-prone and irreproducible.</li>
+          <li><strong>No engagement orchestrator:</strong> Running a new bank required executing 10+ scripts manually with ad-hoc paths.</li>
+          <li><strong>No multi-bank proof:</strong> Only MCB had ever run end-to-end; regressions that "work only for MCB" were undetectable.</li>
+          <li><strong>Volatile outputs:</strong> TRISK CSVs had per-invocation UUIDs in <code>run_id</code>/<code>run_path</code>, breaking byte-identity comparisons between identical runs.</li>
+        </ol>
+        <p>Wave 0's objective was to close all four gaps in a single tightly-scoped execution cycle, produce a golden refreeze covering every fix, and guard the result with automated verification.</p>
+      </div>
+    </section>
+
+    <section class="section" id="inputs-scope">
+      <div class="section-header">
+        <div>
+          <div class="section-index">03 / Inputs &amp; Scope</div>
+          <h2 class="section-title">Inputs &amp; Scope</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Inputs</h3>
+          <ul>
+            <li><strong>Plan:</strong> <code>plans/2026-07-20-wave0-orchestrator-sdb-closers-plan.md</code> (887 lines, 4 phases)</li>
+            <li><strong>Research:</strong> Two runway brainstorms (<code>research/2026-07-20-runway-final-phases-and-beyond-brainstorm.md</code>, <code>research/2026-07-18-runway-completion-and-credibility-brainstorm.md</code>)</li>
+            <li><strong>MCB loanbook:</strong> Synthetic Mekong Commercial Bank fixture (default pipeline)</li>
+            <li><strong>SDB fixture:</strong> <code>data/fixtures/unseen_bank_loanbook.csv</code> — 40 raw rows, 24 after intake normalization</li>
+            <li><strong>ABCD:</strong> <code>data/vietnam_abcd.csv</code> (synthetic asset-level company data)</li>
+            <li><strong>Scenarios:</strong> <code>data/vietnam_scenario_ms.csv</code>, <code>data/vietnam_scenario_co2.csv</code> (PDP8-2023 vintage)</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Scope Boundaries</h3>
+          <p><strong>In-scope:</strong> Verify tool (<code>tools/verify_refactor.R</code>), engagement orchestrator (<code>scripts/run_engagement.R</code>), step-runner extraction, engagement scaffolder (<code>scripts/new_engagement.R</code>), SDB end-to-end rehearsal, second golden fixture and CI guard, ABCD sourcing brief and intake contract, scenario versioning (<code>data/scenarios/pdp8-2023/</code>), Dung Quat zero-baseline bug fix, power-2025 NA bug fix, deterministic run IDs, single golden refreeze, package 0.2.0.</p>
+          <p><strong>Out-of-scope:</strong> Automotive TRISK; multi-scenario traffic-light view; executive summary generator; Vietnamese i18n; PDF export; <code>targets</code>/caching migration; real bank data execution; changes to engagement-scoring math; changes to the 243-cell grid lever ranges; multi-tenant auth; upstream package changes.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="assumptions-constraints">
+      <div class="section-header">
+        <div>
+          <div class="section-index">04 / Assumptions &amp; Constraints</div>
+          <h2 class="section-title">Assumptions &amp; Constraints</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Technical Constraints</h3>
+          <ul>
+            <li>Byte-identity acceptance applies to CSV outputs via autocrlf-aware <code>git diff</code> — PNGs and timestamp-bearing HTML/manifest files are classified as noise, never fail.</li>
+            <li>VND loanbook money is never rescaled (magnitudes 1e5–5e12 raw).</li>
+            <li>No <code>--config</code> flag → MCB defaults remain byte-identical to the pre-Wave-0 baseline.</li>
+            <li>R files must work both <code>source()</code>d and package-loaded; <code>yaml</code> is deliberately not a dependency — configs are JSON via <code>jsonlite</code>.</li>
+            <li>PowerShell 5.1 has no <code>&&</code>; all commands are portable <code>Rscript -e "..."</code> one-liners.</li>
+            <li>Streamlit Community Cloud has no R runtime; the dashboard has no R dependency.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Process Constraints</h3>
+          <ul>
+            <li>Weekly CI auto-commits to <code>main</code> (Mondays 02:00 UTC, test-gated) — a red testthat suite blocks publish by design.</li>
+            <li>Engagement scoring reads from the engagement snapshot, not <code>synthesis_output/</code> — the orchestrator step order enforces this.</li>
+            <li>Vietnamese diacritics: CSVs are UTF-8 without BOM; the intake reader falls back to latin1, which silently mangles diacritics.</li>
+            <li><code>dashboard/tests/test_auth.py::test_no_password_renders_landing</code> is a known environmental flake (hardcoded 3-second Streamlit AppTest timeout).</li>
+            <li>Golden literals in test files come from committed CSVs, never from plan text.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="methodology">
+      <div class="section-header">
+        <div>
+          <div class="section-index">05 / Methodology</div>
+          <h2 class="section-title">Methodology</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p>The work was sequenced as four phases, each with shell-verifiable exit criteria gating the next, plus two parallel no-code tasks (ABCD sourcing brief and intake contract) that ran from day one:</p>
+        <ol>
+          <li><strong>PHASE-01 — Verify tool:</strong> Build <code>tools/verify_refactor.R</code> first because every later phase needs it for acceptance. Proved on the untouched tree before any code moved.</li>
+          <li><strong>PHASE-02 — Orchestrator:</strong> Extract the step-runner from <code>pipeline_refresh.R</code> into <code>R/step_runner.R</code> (preserving byte-identical default-mode output), then build the engagement orchestrator with an independent manifest. Validated with <code>--dry-run</code> and the snapshot-dir guard rail.</li>
+          <li><strong>PHASE-03 — SDB rehearsal:</strong> Run the dirty SDB fixture through the full orchestrator. Every crash was patched with an inline guard (zero-match PACTA sectors, empty TRISK sectors, empty letter target lists). Cross-contamination verified by git status. Golden literals frozen from committed files. CI job added to <code>refresh.yml</code>.</li>
+          <li><strong>PHASE-04 — Data closers + refreeze:</strong> Close ABCD docs, version scenarios, fix Dung Quat and power-2025 bugs, make run IDs deterministic. Run a full pipeline, verify drift classification, freeze golden literals across both test suites, empty the volatile basenames list, commit everything as one refreeze commit. Prove determinism with two consecutive runs.</li>
+        </ol>
+        <p>The <code>tools/verify_refactor.R</code> decision logic classifies each changed tracked path by the first matching rule: <code>.png</code> → png-noise (ignore), <code>.html</code> or manifest basenames → timestamp-class (list), basename in a volatile vector → volatile (list), anything else → DRIFT (fail). After the refreeze, the volatile vector is <code>character(0)</code> so every non-PNG/non-timestamp change fails — the strictest possible bar.</p>
+      </div>
+      <div class="stat-grid">
+        <div class="stat">
+          <div class="stat-label">Orientation</div>
+          <div class="stat-value">multi-phase</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Audience</div>
+          <div class="stat-value">stakeholder-safe</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Evidence Rule</div>
+          <div class="stat-value">no invented data</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="phase-analysis">
+      <div class="section-header">
+        <div>
+          <div class="section-index">06 / Phase-by-Phase Analysis</div>
+          <h2 class="section-title">Phase-by-Phase Analysis</h2>
+        </div>
+      </div>
+      <div class="phase-grid">
+        <div class="subcard">
+          <h3>Phase 1 &mdash; Byte-Identity Verification Tool</h3>
+          <p><strong>Deliverable:</strong> <code>tools/verify_refactor.R</code></p>
+          <p>Codified the hand-rolled acceptance check used by the two prior refactors. The pure function <code>classify_path()</code> maps any tracked path to one of four classes by a priority-ordered rule cascade: extension <code>.png</code> → png-noise (ignored), extension <code>.html</code> or basenames in a manifest/timestamp set → timestamp-class (listed but not failing), basenames in a configurable volatile vector → volatile (listed but not failing), anything else → DRIFT (exits 1).</p>
+          <p>Proved on the untouched tree: <code>BYTE-IDENTITY PASS</code> with the five pre-refreeze volatile TRISK CSVs listed. Proved DRIFT detection: touching a tracked non-CSV non-PNG file exits 1. Tool is dev-side only (base R + <code>jsonlite</code>), no new <code>renv.lock</code> dependency.</p>
+        </div>
+        <div class="subcard">
+          <h3>Phase 2 &mdash; Engagement Orchestrator, Step Runner, Package 0.2.0</h3>
+          <p><strong>Deliverables:</strong> <code>R/step_runner.R</code>, <code>scripts/run_engagement.R</code>, <code>NEWS.md</code>, DESCRIPTION 0.2.0</p>
+          <p>Extracted <code>run_steps()</code> and <code>write_pipeline_manifest()</code> from <code>scripts/pipeline_refresh.R</code> into <code>R/step_runner.R</code> with roxygen <code>@export</code> tags. Refactored <code>pipeline_refresh.R</code> to source the shared runner — verified byte-identical default-mode JSON manifest keys. Built <code>scripts/run_engagement.R</code> chaining intake → validation → PACTA → TRISK → prioritization → snapshot → scoring → letters → disclosure in a fixed step order. Key guard: if <code>cfg$paths$snapshot_dir == "dashboard/data"</code> and <code>cfg$bank_slug != "mcb-demo"</code>, the orchestrator stops with a clear error. <code>--dry-run</code> lists steps without executing. Regenerated <code>NAMESPACE</code>, bumped to 0.2.0, created <code>NEWS.md</code>.</p>
+        </div>
+        <div class="subcard">
+          <h3>Phase 3 &mdash; SDB Rehearsal, Scaffolder, CI Guard, Second Golden Fixture</h3>
+          <p><strong>Deliverables:</strong> <code>engagements/sdb-rehearsal/</code> artifacts, <code>scripts/new_engagement.R</code>, <code>tests/testthat/test_sdb_engagement.R</code>, CI job</p>
+          <p>Created <code>scripts/new_engagement.R</code> — scaffolds a single <code>engagement_config.json</code> with slug validation (<code>^[a-z0-9-]+$</code>), all nine <code>paths</code> values rooted under <code>engagements/&lt;slug&gt;/</code>. Generated the SDB config with <code>--slug sdb-rehearsal --name "Saigon Delta Bank"</code>. Ran the dirty SDB fixture (40 rows → 24 after intake) through the orchestrator. Fixed three classes of crashes: zero-matched PACTA sectors (skip chart, log note), empty TRISK sectors (skip sector, mark unavailable), empty letter target lists (write zero letters plus index note). Cross-contamination verified: no writes outside <code>engagements/sdb-rehearsal/</code>.</p>
+          <p>Froze golden literals from committed files: 24 intake rows, all VND currency, rank-1 borrower <em>Nghi Son Power LLC</em> with composite score 1.000, manifest <code>status == "ok"</code> and <code>bank_slug == "sdb-rehearsal"</code>. Added <code>sdb-engagement</code> job to <code>.github/workflows/refresh.yml</code> (weekly + workflow_dispatch, parallel to the MCB refresh, commits nothing).</p>
+        </div>
+        <div class="subcard">
+          <h3>Phase 4 &mdash; Data Closers, Deterministic Run IDs, Golden Refreeze</h3>
+          <p><strong>Deliverables:</strong> ABCD docs, <code>data/scenarios/pdp8-2023/</code>, bug fixes, deterministic run IDs, golden refreeze</p>
+          <p>Closed two week-one external dependencies of a real engagement: ABCD sourcing decision brief (<code>docs/abcd_sourcing_decision.md</code>) with per-sector coverage table and hybrid recommendation, and ABCD intake contract (<code>intake/SCHEMA.md</code> appendix + <code>intake/templates/abcd_template.csv</code>).</p>
+          <p>Versioned scenario files under <code>data/scenarios/pdp8-2023/</code> with dual-write generator and an <code>md5sum</code> cross-reference guard in the snapshot contract test. Wired <code>backfill_zero_baseline()</code> into <code>trisk_prepare_sector_inputs</code> to fix Dung Quat's pre-commissioning zero baseline. Backfilled power-2025 NAs in <code>scripts/generate_vietnam_data.R</code> using the same interpolation used for scenario anchors. Rewrote <code>run_id</code>/<code>run_path</code> at write time in <code>write_trisk_demo_outputs()</code> to <code>sprintf("%s_%s", sector, run_label)</code> — deterministic across runs.</p>
+          <p>Single golden refreeze commit: ran <code>pipeline_refresh.R --full</code>, verified drift classification (scenario paths, Dung Quat, power-2025, run IDs), refroze both <code>test_golden_numbers.R</code> and <code>test_sdb_engagement.R</code> literals from generated files, emptied <code>VOLATILE_BASENAMES &lt;- character(0)</code>. Post-refreeze proof: two consecutive default refreshes produce byte-identical CSVs.</p>
+        </div>
+      </div>
+      <div class="diagram-frame compact-diagram">
+        <div class="mermaid">
+flowchart LR
+    A["Phase 1: Verify Tool"]
+    B["Phase 2: Orchestrator"]
+    C["Phase 3: SDB Rehearsal"]
+    D["Phase 4: Data Closers"]
+    E["Golden Refreeze"]
+    F["Byte-Identity Pass"]
+    G["Push"]
+
+    A -- "tools/verify_refactor.R" --> B
+    B -- "run_engagement.R" --> C
+    C -- "test_sdb_engagement.R + CI" --> D
+    D -- "deterministic IDs, bugs, scenarios" --> E
+    E -- "single refreeze commit 0e57fd9" --> F
+    F -- "VOLATILE_BASENAMES = character(0)" --> G
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="findings-recommendation">
+      <div class="section-header">
+        <div>
+          <div class="section-index">07 / Findings &amp; Recommendation</div>
+          <h2 class="section-title">Findings &amp; Recommendation</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <h3>Key Findings</h3>
+        <ol>
+          <li><strong>The verify tool is viable as a permanent acceptance gate.</strong> It caught real drift (scenario path changes, run-id rewrites) during Phase 4 while correctly classifying PNG noise and manifest timestamps as non-failing. After the refreeze, empty <code>VOLATILE_BASENAMES</code> means any non-PNG/non-timestamp change fails — the strictest possible bar.</li>
+          <li><strong>Multi-bank parameterization surfaces new edge cases.</strong> SDB's 24-row book exercised zero-matched PACTA sectors, empty TRISK sector inputs, and empty letter targets — conditions MCB's 2,200-row book never triggers. All were fixable with small inline guards behind emptiness checks that MCB's path never enters.</li>
+          <li><strong>Deterministic run IDs are essential for reproducibility.</strong> The UUID-per-invocation scheme from <code>trisk.model::run_trisk()</code> made every second run produce different CSVs even with identical inputs. The rewrite to <code>sector_run_label</code> at write time in <code>write_trisk_demo_outputs()</code> eliminated this volatility without modifying <code>trisk.model</code> itself.</li>
+          <li><strong>Weekly CI is the right cadence for SDB regression detection.</strong> The SDB engagement runs in minutes with <code>run_grid: false</code> (no 243-cell grid), and a weekly cadence catches regressions without taxing every PR push.</li>
+        </ol>
+        <h3>Recommendation</h3>
+        <p><strong>Push the refreeze commit to <code>main</code>.</strong> The commit covers scenario versioning, two bug fixes, deterministic run IDs, and both golden test suites. After push, the platform is production-safe for any new synthetic engagement: run <code>Rscript scripts/new_engagement.R --slug &lt;slug&gt; --name "..."; Rscript scripts/run_engagement.R --config engagements/&lt;slug&gt;/engagement_config.json --raw-loanbook &lt;csv&gt;</code> from a clean checkout and verify with <code>tools/verify_refactor.R</code>.</p>
+      </div>
+      <div class="chart-frame">
+        <canvas id="testCountsChart"></canvas>
+      </div>
+    </section>
+
+    <section class="section" id="implementation-path">
+      <div class="section-header">
+        <div>
+          <div class="section-index">08 / Implementation Path</div>
+          <h2 class="section-title">Implementation Path</h2>
+        </div>
+      </div>
+      <div class="phase-grid">
+        <div class="subcard">
+          <h3>Immediate (this session)</h3>
+          <ul>
+            <li><strong>Push</strong> the refreeze commit (<code>0e57fd9</code>) to <code>origin/main</code> after this report is committed.</li>
+            <li><strong>Verify CI</strong> after push: the weekly refresh workflow runs both the MCB and SDB jobs on the next schedule or via <code>workflow_dispatch</code>.</li>
+            <li><strong>Review</strong> the SDB validation report HTML under <code>engagements/sdb-rehearsal/reports/</code> for "Saigon Delta Bank" branding and synthetic-data disclaimer.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Short-term (next 1–2 weeks)</h3>
+          <ul>
+            <li><strong>Onboard</strong> the first real-bank test engagement (if applicable) using <code>scripts/new_engagement.R</code> + <code>run_engagement.R</code> with a real loanbook — the ABCD sourcing brief provides the decision framework for data procurement.</li>
+            <li><strong>Extend</strong> the replay audit to cross-reference both golden test suites against each scheduled Monday refresh.</li>
+            <li><strong>Evaluate</strong> automotive TRISK and steel synthetic-book enrichment if those sectors are in scope for the next engagement.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="risks-open-questions">
+      <div class="section-header">
+        <div>
+          <div class="section-index">09 / Risks / Open Questions</div>
+          <h2 class="section-title">Risks / Open Questions</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Risks</h3>
+          <ul>
+            <li><strong>CI auto-commit drift:</strong> The weekly refresh workflow auto-commits to <code>main</code>. If a future commit changes MCB default outputs beyond the sanctioned refreeze, the bot commit produces a dirty tree. Mitigation: the verify tool is the gate — a pre-commit hook using <code>tools/verify_refactor.R --skip-refresh</code> would catch it before the bot runs.</li>
+            <li><strong>Hidden UUID consumer:</strong> If any dashboard or downstream code parses the <code>run_id</code> UUID format (now deterministic strings), it breaks silently. Mitigation: the grep sweep in Phase 4 found no such consumers; the R and Python test suites pass against refrozen data.</li>
+            <li><strong>Dual scenario drift:</strong> The scenario files are dual-written by <code>generate_vietnam_data.R</code>. If someone edits only one copy, the <code>md5sum</code> assertion in <code>test_snapshot_contract.R</code> fails — but only when the test runs. Mitigation: run the full test suite before any commit that touches scenario files.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Open Questions</h3>
+          <ul>
+            <li><strong>ABCD pricing:</strong> Asset Impact license costs are marked "to be confirmed with vendor" in the sourcing brief. The commercial trigger point ("decide before signing the data-phase start date") is documented but untested.</li>
+            <li><strong>Real data ramp:</strong> The orchestrator assumes a CSV file matching the intake schema. A real bank's data will have format surprises that the synthetic fixture did not exercise. The intake validation report provides the first line of defense.</li>
+            <li><strong>Engagement letter customization:</strong> The letters generator produces templated output. A real engagement may demand bank-specific branding, multiple signatories, or bilingual Vietnamese/English output that the current generator does not support.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="appendices-evidence">
+      <div class="section-header">
+        <div>
+          <div class="section-index">10 / Appendices / Evidence Notes</div>
+          <h2 class="section-title">Appendices / Evidence Notes</h2>
+        </div>
+      </div>
+      <div class="appendix-grid">
+        <div class="subcard">
+          <h3>Key Commit</h3>
+          <p><strong><code>0e57fd9</code></strong> — refactor(wave0): SDB rehearsal, data closers, deterministic run IDs, golden refreeze</p>
+          <p>This single commit (ASM-004) covers: scenario versioning, Dung Quat zero-baseline fix, power-2025 NA fix, deterministic run IDs, refrozen golden literals in both test suites, empty volatile basenames, updated .gitignore for engagement intermediates.</p>
+        </div>
+        <div class="subcard">
+          <h3>Test Suite Status</h3>
+          <table class="technical">
+            <tr><th>Suite</th><th>Pass</th><th>Fail</th><th>Note</th></tr>
+            <tr><td>R testthat</td><td>203</td><td>0</td><td>Full <code>test_dir()</code></td></tr>
+            <tr><td>Python pytest (dashboard)</td><td>57</td><td>0*</td><td>*1 known flake: test_auth.py timeout</td></tr>
+          </table>
+        </div>
+        <div class="subcard">
+          <h3>Key Artifacts</h3>
+          <ul>
+            <li><code>tools/verify_refactor.R</code> — byte-identity verification tool</li>
+            <li><code>R/step_runner.R</code> — shared runner + manifest writer</li>
+            <li><code>scripts/run_engagement.R</code> — engagement orchestrator</li>
+            <li><code>scripts/new_engagement.R</code> — config scaffolder</li>
+            <li><code>tests/testthat/test_sdb_engagement.R</code> — SDB golden fixture</li>
+            <li><code>data/scenarios/pdp8-2023/</code> — versioned scenario inputs</li>
+            <li><code>docs/abcd_sourcing_decision.md</code> — ABCD procurement brief</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Determinism Proof</h3>
+          <p>Two consecutive <code>pipeline_refresh.R</code> runs (default mode) produce byte-identical CSVs. Verified with:</p>
+          <p><code>Rscript tools/verify_refactor.R --skip-refresh</code> → <code>BYTE-IDENTITY PASS</code> with empty volatile section.</p>
+        </div>
+      </div>
+      <div class="footer-note">designed for html first, printable without reconstruction</div>
+    </section>
+  </main>
+  <script>
+    (function() {
+      const chartCanvases = document.querySelectorAll('canvas');
+      chartCanvases.forEach((canvas) => {
+        canvas.classList.add('report-chart');
+        const parent = canvas.parentElement;
+        if (parent && parent.classList.contains('technical-frame') && !parent.classList.contains('chart-frame')) {
+          parent.classList.add('chart-frame');
+        }
+      });
+    })();
+
+    if (window.Chart) {
+      Chart.defaults.devicePixelRatio = 1;
+      Chart.defaults.animation = false;
+      Chart.defaults.resizeDelay = 150;
+      Chart.defaults.normalized = true;
+      Chart.defaults.maintainAspectRatio = false;
+      Chart.defaults.responsive = true;
+      window.__REPORT_CHART_DEFAULTS__ = {
+        animation: false,
+        resizeDelay: 150,
+        normalized: true,
+        maintainAspectRatio: false,
+        responsive: true
+      };
+
+      document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('testCountsChart');
+        if (!ctx) return;
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['R testthat (203)', 'Python pytest (57)', 'Known flake (1)'],
+            datasets: [{
+              label: 'Tests',
+              data: [203, 57, 1],
+              backgroundColor: ['#3b6f76', '#9d6b37', '#bfa37d'],
+              borderRadius: 6
+            }]
+          },
+          options: {
+            animation: false,
+            resizeDelay: 150,
+            normalized: true,
+            maintainAspectRatio: false,
+            responsive: true,
+            plugins: {
+              legend: { display: false },
+              tooltip: { enabled: false }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: { stepSize: 50 }
+              }
+            }
+          }
+        });
+      });
+    }
+  </script>
+</body>
+</html>

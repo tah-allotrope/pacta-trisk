@@ -56,3 +56,21 @@ engagements/*/output/engagement_letters/
 engagements/*/output/disclosure/
 engagements/*/output/trisk/*/runs/
 engagements/*/output/trisk_inputs/
+
+# Per-engagement intake intermediates (only normalized_loanbook.csv is tracked).
+engagements/*/intake/*
+!engagements/*/intake/normalized_loanbook.csv
+
+# Per-engagement effective config copy.
+engagements/*/engagement_config.resolved.json
+
+# Per-engagement output tree: only engagement_priority.csv and the two TRISK
+# regression-test CSVs per sector are tracked; everything else is local-only.
+engagements/*/output/*
+!engagements/*/output/engagement/
+!engagements/*/output/trisk/
+engagements/*/output/engagement/*
+!engagements/*/output/engagement/engagement_priority.csv
+engagements/*/output/trisk/*/*
+!engagements/*/output/trisk/*/npv_results_latest.csv
+!engagements/*/output/trisk/*/company_summary.csv
