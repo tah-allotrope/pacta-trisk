@@ -5,8 +5,8 @@ VN_PDP8_BASELINE,baseline,Vietnam,Power,CoalCap,2027,USD/MWh-equivalent,68.8,MW,
 VN_PDP8_BASELINE,baseline,Vietnam,Power,CoalCap,2028,USD/MWh-equivalent,69.2,MW,33562,carbontech,0.625,NA,synthetic_vietnam_demo
 VN_PDP8_BASELINE,baseline,Vietnam,Power,CoalCap,2029,USD/MWh-equivalent,69.6,MW,32224,carbontech,0.6,NA,synthetic_vietnam_demo
 VN_PDP8_BASELINE,baseline,Vietnam,Power,CoalCap,2030,USD/MWh-equivalent,70,MW,30668,carbontech,0.575,NA,synthetic_vietnam_demo
-VN_PDP8_BASELINE,baseline,Vietnam,Power,GasCap,2025,USD/MWh-equivalent,60,MW,11400,carbontech,0.55,NA,synthetic_vietnam_demo
-VN_PDP8_BASELINE,baseline,Vietnam,Power,GasCap,2026,USD/MWh-equivalent,60.6,MW,12762.4,carbontech,0.56,NA,synthetic_vietnam_demo
+VN_PDP8_BASELINE,baseline,Vietnam,Power,GasCap,2025,USD/MWh-equivalent,60,MW,12200,carbontech,0.55,NA,synthetic_vietnam_demo
+VN_PDP8_BASELINE,baseline,Vietnam,Power,GasCap,2026,USD/MWh-equivalent,60.6,MW,13610.4,carbontech,0.56,NA,synthetic_vietnam_demo
 VN_PDP8_BASELINE,baseline,Vietnam,Power,GasCap,2027,USD/MWh-equivalent,61.2,MW,16279.2,carbontech,0.57,NA,synthetic_vietnam_demo
 VN_PDP8_BASELINE,baseline,Vietnam,Power,GasCap,2028,USD/MWh-equivalent,61.8,MW,19778.4,carbontech,0.58,NA,synthetic_vietnam_demo
 VN_PDP8_BASELINE,baseline,Vietnam,Power,GasCap,2029,USD/MWh-equivalent,62.4,MW,22604.5,carbontech,0.59,NA,synthetic_vietnam_demo
@@ -29,8 +29,8 @@ VN_STEPS_BASELINE,baseline,Vietnam,Power,CoalCap,2027,USD/MWh-equivalent,67.8,MW
 VN_STEPS_BASELINE,baseline,Vietnam,Power,CoalCap,2028,USD/MWh-equivalent,67.7,MW,35292,carbontech,0.58,NA,synthetic_vietnam_demo
 VN_STEPS_BASELINE,baseline,Vietnam,Power,CoalCap,2029,USD/MWh-equivalent,67.6,MW,34598.4,carbontech,0.54,NA,synthetic_vietnam_demo
 VN_STEPS_BASELINE,baseline,Vietnam,Power,CoalCap,2030,USD/MWh-equivalent,67.5,MW,33620,carbontech,0.5,NA,synthetic_vietnam_demo
-VN_STEPS_BASELINE,baseline,Vietnam,Power,GasCap,2025,USD/MWh-equivalent,60,MW,11400,carbontech,0.55,NA,synthetic_vietnam_demo
-VN_STEPS_BASELINE,baseline,Vietnam,Power,GasCap,2026,USD/MWh-equivalent,60.1,MW,12341,carbontech,0.545,NA,synthetic_vietnam_demo
+VN_STEPS_BASELINE,baseline,Vietnam,Power,GasCap,2025,USD/MWh-equivalent,60,MW,12200,carbontech,0.55,NA,synthetic_vietnam_demo
+VN_STEPS_BASELINE,baseline,Vietnam,Power,GasCap,2026,USD/MWh-equivalent,60.1,MW,13161,carbontech,0.545,NA,synthetic_vietnam_demo
 VN_STEPS_BASELINE,baseline,Vietnam,Power,GasCap,2027,USD/MWh-equivalent,60.2,MW,14994,carbontech,0.54,NA,synthetic_vietnam_demo
 VN_STEPS_BASELINE,baseline,Vietnam,Power,GasCap,2028,USD/MWh-equivalent,60.3,MW,17286,carbontech,0.535,NA,synthetic_vietnam_demo
 VN_STEPS_BASELINE,baseline,Vietnam,Power,GasCap,2029,USD/MWh-equivalent,60.4,MW,18766,carbontech,0.53,NA,synthetic_vietnam_demo
@@ -53,8 +53,8 @@ VN_NZE_STRESS,target,Vietnam,Power,CoalCap,2027,USD/MWh-equivalent,64.8,MW,31063
 VN_NZE_STRESS,target,Vietnam,Power,CoalCap,2028,USD/MWh-equivalent,63.2,MW,27680,carbontech,0.46,NA,synthetic_vietnam_demo
 VN_NZE_STRESS,target,Vietnam,Power,CoalCap,2029,USD/MWh-equivalent,61.6,MW,24422.4,carbontech,0.38,NA,synthetic_vietnam_demo
 VN_NZE_STRESS,target,Vietnam,Power,CoalCap,2030,USD/MWh-equivalent,60,MW,20992,carbontech,0.3,NA,synthetic_vietnam_demo
-VN_NZE_STRESS,target,Vietnam,Power,GasCap,2025,USD/MWh-equivalent,60,MW,11400,carbontech,0.55,NA,synthetic_vietnam_demo
-VN_NZE_STRESS,target,Vietnam,Power,GasCap,2026,USD/MWh-equivalent,59.7,MW,12642,carbontech,0.53,NA,synthetic_vietnam_demo
+VN_NZE_STRESS,target,Vietnam,Power,GasCap,2025,USD/MWh-equivalent,60,MW,12200,carbontech,0.55,NA,synthetic_vietnam_demo
+VN_NZE_STRESS,target,Vietnam,Power,GasCap,2026,USD/MWh-equivalent,59.7,MW,13482,carbontech,0.53,NA,synthetic_vietnam_demo
 VN_NZE_STRESS,target,Vietnam,Power,GasCap,2027,USD/MWh-equivalent,59.4,MW,15708,carbontech,0.51,NA,synthetic_vietnam_demo
 VN_NZE_STRESS,target,Vietnam,Power,GasCap,2028,USD/MWh-equivalent,59.1,MW,17848.8,carbontech,0.49,NA,synthetic_vietnam_demo
 VN_NZE_STRESS,target,Vietnam,Power,GasCap,2029,USD/MWh-equivalent,58.8,MW,19107.2,carbontech,0.47,NA,synthetic_vietnam_demo

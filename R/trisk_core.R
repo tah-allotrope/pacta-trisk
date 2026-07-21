@@ -132,7 +132,7 @@ backfill_zero_baseline <- function(assets, value_col, year_col = "year") {
 
   assets %>%
     mutate(.row_order = row_number()) %>%
-    group_by(across(all_of(group_cols[group_cols %in% names(assets)][1]))) %>%
+    group_by(across(all_of(group_cols[group_cols %in% names(assets)]))) %>%
     group_modify(function(.x, .y) {
       .x <- .x %>% arrange(.data[[year_col]])
       values <- .x[[value_col]]
@@ -436,7 +436,20 @@ trisk_prepare_sector_inputs <- function(cfg, sectors = cfg$trisk_sectors) {
     sector_input_dir <- file.path(output_dir, paste0(sector_name, "_demo"))
     dir.create(sector_input_dir, recursive = TRUE, showWarnings = FALSE)
 
+    sector_rows <- vietnam_abcd %>%
+      filter(sector == spec$sector_local) %>%
+      inner_join(spec$technologies, by = c("technology" = "technology_local"))
+
+    if (nrow(sector_rows) == 0) {
+      cat(sprintf(
+        "[NOTE] No ABCD rows for sector '%s' — skipping TRISK input preparation.\n",
+        sector_name
+      ))
+      return(NULL)
+    }
+
     assets <- .trisk_build_assets(spec, vietnam_abcd)
+    assets <- backfill_zero_baseline(assets, "capacity", "production_year")
     scenarios <- if (identical(spec$scenario_source, "ms")) {
       .trisk_build_power_scenarios(spec, assets, vietnam_scenario_ms)
     } else {
@@ -465,6 +478,7 @@ trisk_prepare_sector_inputs <- function(cfg, sectors = cfg$trisk_sectors) {
   }
 
   sector_results <- imap(.trisk_input_sector_specs[sectors], build_sector_inputs)
+  sector_results <- sector_results[!vapply(sector_results, is.null, logical(1))]
 
   walk(sector_results, function(result) {
     cat(sprintf(
@@ -565,46 +579,70 @@ assert_required_input_files <- function(input_dir) {
 #'   "synthesis_output/vietnam" (today's literal).
 #' @return tbl — company-level alignment context.
 load_alignment_context <- function(sector, meta, input_dir, pacta_output_dir = "synthesis_output/vietnam") {
-  power_alignment <- read_csv(
-    file.path(getwd(), pacta_output_dir, "04_vn_ms_company.csv"),
-    show_col_types = FALSE
-  ) %>%
-    filter(
-      sector == "power",
-      scenario_source == "pdp8_2023",
-      year == 2030,
-      metric %in% c("projected", "target_pdp8_ndc")
-    ) %>%
-    select(name_abcd, technology, metric, technology_share) %>%
-    group_by(name_abcd, technology, metric) %>%
-    summarise(technology_share = mean(technology_share, na.rm = TRUE), .groups = "drop") %>%
-    pivot_wider(names_from = metric, values_from = technology_share) %>%
-    mutate(
-      target_share = target_pdp8_ndc,
-      projected_share = projected,
-      alignment_gap_pp = (projected_share - target_share) * 100
-    ) %>%
-    filter(!is.na(alignment_gap_pp)) %>%
-    group_by(name_abcd) %>%
-    summarise(
-      mean_abs_alignment_gap_pp = if_else(
-        all(is.na(alignment_gap_pp)),
-        0,
-        mean(abs(alignment_gap_pp), na.rm = TRUE)
-      ),
-      worst_alignment_gap_pp = if_else(
-        all(is.na(alignment_gap_pp)),
-        0,
-        alignment_gap_pp[which.max(abs(alignment_gap_pp))]
-      ),
-      alignment_context = "Borrower-level PACTA market-share gap",
-      .groups = "drop"
-    )
+  if (meta$alignment_mode == "company_ms") {
+    ms_file <- file.path(getwd(), pacta_output_dir, "04_vn_ms_company.csv")
+    if (!file.exists(ms_file)) {
+      return(tibble(
+        company_name = character(),
+        mean_abs_alignment_gap_pp = numeric(),
+        worst_alignment_gap_pp = numeric(),
+        alignment_context = character()
+      ))
+    }
+    power_alignment <- read_csv(ms_file, show_col_types = FALSE) %>%
+      filter(
+        sector == "power",
+        scenario_source == "pdp8_2023",
+        year == 2030,
+        metric %in% c("projected", "target_pdp8_ndc")
+      ) %>%
+      select(name_abcd, technology, metric, technology_share) %>%
+      group_by(name_abcd, technology, metric) %>%
+      summarise(technology_share = mean(technology_share, na.rm = TRUE), .groups = "drop") %>%
+      pivot_wider(names_from = metric, values_from = technology_share) %>%
+      mutate(
+        target_share = target_pdp8_ndc,
+        projected_share = projected,
+        alignment_gap_pp = (projected_share - target_share) * 100
+      ) %>%
+      filter(!is.na(alignment_gap_pp)) %>%
+      group_by(name_abcd) %>%
+      summarise(
+        mean_abs_alignment_gap_pp = if_else(
+          all(is.na(alignment_gap_pp)),
+          0,
+          mean(abs(alignment_gap_pp), na.rm = TRUE)
+        ),
+        worst_alignment_gap_pp = if_else(
+          all(is.na(alignment_gap_pp)),
+          0,
+          alignment_gap_pp[which.max(abs(alignment_gap_pp))]
+        ),
+        alignment_context = "Borrower-level PACTA market-share gap",
+        .groups = "drop"
+      )
 
-  sda_alignment <- read_csv(
-    file.path(getwd(), pacta_output_dir, "06_vn_sda_alignment_2030.csv"),
-    show_col_types = FALSE
-  ) %>%
+    if (nrow(power_alignment) == 0) {
+      return(tibble(
+        company_name = character(),
+        mean_abs_alignment_gap_pp = numeric(),
+        worst_alignment_gap_pp = numeric(),
+        alignment_context = character()
+      ))
+    }
+    return(power_alignment %>% rename(company_name = name_abcd))
+  }
+
+  sda_file <- file.path(getwd(), pacta_output_dir, "06_vn_sda_alignment_2030.csv")
+  if (!file.exists(sda_file)) {
+    return(tibble(
+      company_name = character(),
+      mean_abs_alignment_gap_pp = numeric(),
+      worst_alignment_gap_pp = numeric(),
+      alignment_context = character()
+    ))
+  }
+  sda_alignment <- read_csv(sda_file, show_col_types = FALSE) %>%
     mutate(
       mean_abs_alignment_gap_pp = abs(gap_pct),
       worst_alignment_gap_pp = gap_pct,
@@ -612,18 +650,23 @@ load_alignment_context <- function(sector, meta, input_dir, pacta_output_dir = "
     ) %>%
     select(sector, mean_abs_alignment_gap_pp, worst_alignment_gap_pp, alignment_context)
 
-  if (meta$alignment_mode == "company_ms") {
-    power_alignment %>% rename(company_name = name_abcd)
-  } else {
-    sector_gap <- sda_alignment %>% filter(sector == !!sector)
-    assets <- read_csv(file.path(input_dir, "assets.csv"), show_col_types = FALSE)
-    tibble(company_name = unique(assets$company_name)) %>%
-      mutate(
-        mean_abs_alignment_gap_pp = sector_gap$mean_abs_alignment_gap_pp[[1]],
-        worst_alignment_gap_pp = sector_gap$worst_alignment_gap_pp[[1]],
-        alignment_context = sector_gap$alignment_context[[1]]
-      )
+  sector_gap <- sda_alignment %>% filter(sector == !!sector)
+  if (nrow(sector_gap) == 0) {
+    return(tibble(
+      company_name = character(),
+      mean_abs_alignment_gap_pp = numeric(),
+      worst_alignment_gap_pp = numeric(),
+      alignment_context = character()
+    ))
   }
+
+  assets <- read_csv(file.path(input_dir, "assets.csv"), show_col_types = FALSE)
+  tibble(company_name = unique(assets$company_name)) %>%
+    mutate(
+      mean_abs_alignment_gap_pp = sector_gap$mean_abs_alignment_gap_pp[[1]],
+      worst_alignment_gap_pp = sector_gap$worst_alignment_gap_pp[[1]],
+      alignment_context = sector_gap$alignment_context[[1]]
+    )
 }
 
 build_run_params <- function(meta, input_dir, output_path, overrides = list()) {
@@ -770,13 +813,37 @@ run_trisk_sensitivity_case <- function(run_label, parameter_name, parameter_valu
 write_trisk_demo_outputs <- function(sector, output_root, meta, run_results) {
   base_run <- run_results[["base"]]
 
+  # Deterministic run IDs: trisk.model::run_trisk() generates a fresh UUID per
+  # invocation, which makes the five *_latest.csv files differ byte-for-byte on
+  # every run. Before writing our own CSVs, replace run_id with a stable
+  # sector_label string (e.g. "power_base") and run_catalog$run_path with the
+  # same scheme. All in-memory joins have already happened by this point.
+  deterministic_run_id <- function(df, run_label) {
+    if ("run_id" %in% names(df)) {
+      df$run_id <- sprintf("%s_%s", sector, run_label)
+    }
+    df
+  }
+
   write_csv(base_run$company_summary, file.path(output_root, "company_summary.csv"))
   write_csv(base_run$prioritization, file.path(output_root, "top_borrowers_alignment_trisk.csv"))
-  write_csv(base_run$params, file.path(output_root, "params_latest.csv"))
+  write_csv(
+    deterministic_run_id(base_run$params, "base"),
+    file.path(output_root, "params_latest.csv")
+  )
   write_csv(base_run$pd_summary, file.path(output_root, "pd_summary.csv"))
-  write_csv(base_run$npv_results, file.path(output_root, "npv_results_latest.csv"))
-  write_csv(base_run$pd_results, file.path(output_root, "pd_results_latest.csv"))
-  write_csv(base_run$company_trajectories, file.path(output_root, "company_trajectories_latest.csv"))
+  write_csv(
+    deterministic_run_id(base_run$npv_results, "base"),
+    file.path(output_root, "npv_results_latest.csv")
+  )
+  write_csv(
+    deterministic_run_id(base_run$pd_results, "base"),
+    file.path(output_root, "pd_results_latest.csv")
+  )
+  write_csv(
+    deterministic_run_id(base_run$company_trajectories, "base"),
+    file.path(output_root, "company_trajectories_latest.csv")
+  )
 
   sensitivity_results <- imap_dfr(run_results, function(result, result_run_label) {
     result$prioritization %>%
@@ -835,6 +902,7 @@ write_trisk_demo_outputs <- function(sector, output_root, meta, run_results) {
     parameter_value = map_chr(run_results, "parameter_value"),
     run_path = map_chr(run_results, "run_path")
   )
+  run_catalog$run_path <- sprintf("%s_%s", sector, run_catalog$run_label)
 
   write_csv(sensitivity_results, file.path(output_root, "sensitivity_results.csv"))
   write_csv(sensitivity_summary, file.path(output_root, "sensitivity_summary.csv"))
@@ -932,8 +1000,25 @@ trisk_run_sector <- function(cfg, sector) {
   input_dir <- paths$input_dir
   output_root <- paths$output_root
 
-  assert_required_input_files(input_dir)
+  required_files <- file.path(input_dir, c(
+    "assets.csv", "scenarios.csv", "financial_features.csv", "ngfs_carbon_price.csv"
+  ))
+  if (!all(file.exists(required_files))) {
+    cat(sprintf(
+      "[NOTE] Missing TRISK input files for sector '%s' — skipping.\n  Expected: %s\n\n",
+      sector, input_dir
+    ))
+    return(invisible(list(sector = sector, skipped = TRUE, reason = "missing_input_files")))
+  }
+
   alignment_company <- load_alignment_context(sector, meta, input_dir, cfg$paths$pacta_output_dir)
+  if (nrow(alignment_company) == 0) {
+    cat(sprintf(
+      "[NOTE] No alignment context for sector '%s' — skipping TRISK run.\n\n",
+      sector
+    ))
+    return(invisible(list(sector = sector, skipped = TRUE, reason = "empty_alignment_context")))
+  }
 
   cat("Executing base and sensitivity TRISK runs...\n\n")
 

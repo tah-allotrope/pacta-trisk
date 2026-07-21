@@ -43,6 +43,10 @@ Sử dụng file `loanbook_template.xlsx` hoặc `loanbook_template.csv` làm kh
 
 Ngân hàng có thể thay thế tên bên vay bằng mã số (ví dụ: "KH_001", "KH_002") trước khi gửi để tăng cường bảo mật. Việc này là hoàn toàn tự nguyện.
 
+## Dữ liệu ABCD (Asset-Based Company Data)
+
+Ngoài danh mục cho vay, hệ thống còn cần file ABCD để ánh xạ công ty với tài sản vật lý. Xem `intake/SCHEMA.md` phần "ABCD (Asset-Based Company Data) Schema" và file mẫu `abcd_template.csv`.
+
 ## Hỗ trợ
 
 Liên hệ đội ngũ vận hành nếu cần hỗ trợ thêm về định dạng dữ liệu.

@@ -31,6 +31,12 @@ output/disclosure/*
 dashboard/data/trisk/grid/*/runs/
 synthesis_output/trisk/grid/*/runs/
 
+# Raw per-run TRISK demo outputs (timestamped subdirectories). The dashboard
+# and downstream tests read only the *_latest.csv files and the figures/
+# folder; the per-sensitivity run folders are local-only build artifacts.
+dashboard/data/trisk/*/runs/
+synthesis_output/trisk/*/runs/
+
 # Pseudonym mapping from --anonymize intake runs. Operator-held, never committed.
 intake/output*/pseudonym_map.csv
 
@@ -39,11 +45,14 @@ intake/output_rehearsal/
 intake/output_rehearsal_named/
 
 # Per-engagement generated artifacts (charts, HTML, letters, disclosure,
-# private snapshots). Only engagement_config.json and the small
-# regression-test artifacts named explicitly in each engagement's plan are
-# committed; everything bulky/regeneratable stays local-only.
+# private snapshots, raw per-run TRISK folders, intermediate TRISK inputs).
+# Only engagement_config.json and the small regression-test artifacts named
+# explicitly in each engagement's plan are committed; everything
+# bulky/regeneratable stays local-only.
 engagements/*/snapshot/
 engagements/*/reports/
 engagements/*/output/**/figures/
 engagements/*/output/engagement_letters/
 engagements/*/output/disclosure/
+engagements/*/output/trisk/*/runs/
+engagements/*/output/trisk_inputs/

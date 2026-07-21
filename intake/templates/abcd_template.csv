@@ -1,0 +1,4 @@
+company_id,name_company,lei,sector,technology,production_unit,year,production,emission_factor,plant_location,is_ultimate_owner,emission_factor_unit,data_source,as_of_year
+VN_ABCD_001,EVN (Electricity of Vietnam),NA,power,coalcap,MW,2025,12500,NA,VN,TRUE,NA,synthetic_demo,2025
+VN_ABCD_020,VICEM,NA,cement,integrated facility,tonnes,2025,12500000,0.82,VN,TRUE,tonnes of CO2 per tonne,synthetic_demo,2025
+VN_ABCD_022,Hoa Phat Group JSC,NA,steel,open_hearth,tonnes,2025,7500000,1.85,VN,TRUE,tonnes of CO2 per tonne,synthetic_demo,2025

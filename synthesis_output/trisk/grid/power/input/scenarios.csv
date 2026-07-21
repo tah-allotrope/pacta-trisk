@@ -7,8 +7,8 @@ VN_NZE_STRESS,target,Vietnam,Power,CoalCap,carbontech,USD/MWh-equivalent,MW,NA,s
 VN_NZE_STRESS,target,Vietnam,Power,CoalCap,carbontech,USD/MWh-equivalent,MW,NA,synthetic_vietnam_demo,2030,60,20992,0.3
 VN_NZE_STRESS,target,Vietnam,Power,CoalCap,carbontech,USD/MWh-equivalent,MW,NA,synthetic_vietnam_demo,2031,58.4,17561.6,0.21999999999999997
 VN_NZE_STRESS,target,Vietnam,Power,CoalCap,carbontech,USD/MWh-equivalent,MW,NA,synthetic_vietnam_demo,2032,56.8,14131.199999999997,0.13999999999999996
-VN_NZE_STRESS,target,Vietnam,Power,GasCap,carbontech,USD/MWh-equivalent,MW,NA,synthetic_vietnam_demo,2025,60,11400,0.55
-VN_NZE_STRESS,target,Vietnam,Power,GasCap,carbontech,USD/MWh-equivalent,MW,NA,synthetic_vietnam_demo,2026,59.7,12642,0.53
+VN_NZE_STRESS,target,Vietnam,Power,GasCap,carbontech,USD/MWh-equivalent,MW,NA,synthetic_vietnam_demo,2025,60,12200,0.55
+VN_NZE_STRESS,target,Vietnam,Power,GasCap,carbontech,USD/MWh-equivalent,MW,NA,synthetic_vietnam_demo,2026,59.7,13482,0.53
 VN_NZE_STRESS,target,Vietnam,Power,GasCap,carbontech,USD/MWh-equivalent,MW,NA,synthetic_vietnam_demo,2027,59.4,15708,0.51
 VN_NZE_STRESS,target,Vietnam,Power,GasCap,carbontech,USD/MWh-equivalent,MW,NA,synthetic_vietnam_demo,2028,59.1,17848.8,0.49
 VN_NZE_STRESS,target,Vietnam,Power,GasCap,carbontech,USD/MWh-equivalent,MW,NA,synthetic_vietnam_demo,2029,58.8,19107.2,0.47
@@ -39,8 +39,8 @@ VN_PDP8_BASELINE,baseline,Vietnam,Power,CoalCap,carbontech,USD/MWh-equivalent,MW
 VN_PDP8_BASELINE,baseline,Vietnam,Power,CoalCap,carbontech,USD/MWh-equivalent,MW,NA,synthetic_vietnam_demo,2030,70,30668,0.575
 VN_PDP8_BASELINE,baseline,Vietnam,Power,CoalCap,carbontech,USD/MWh-equivalent,MW,NA,synthetic_vietnam_demo,2031,70.4,29112,0.5499999999999999
 VN_PDP8_BASELINE,baseline,Vietnam,Power,CoalCap,carbontech,USD/MWh-equivalent,MW,NA,synthetic_vietnam_demo,2032,70.80000000000001,27556,0.5249999999999999
-VN_PDP8_BASELINE,baseline,Vietnam,Power,GasCap,carbontech,USD/MWh-equivalent,MW,NA,synthetic_vietnam_demo,2025,60,11400,0.55
-VN_PDP8_BASELINE,baseline,Vietnam,Power,GasCap,carbontech,USD/MWh-equivalent,MW,NA,synthetic_vietnam_demo,2026,60.6,12762.4,0.56
+VN_PDP8_BASELINE,baseline,Vietnam,Power,GasCap,carbontech,USD/MWh-equivalent,MW,NA,synthetic_vietnam_demo,2025,60,12200,0.55
+VN_PDP8_BASELINE,baseline,Vietnam,Power,GasCap,carbontech,USD/MWh-equivalent,MW,NA,synthetic_vietnam_demo,2026,60.6,13610.4,0.56
 VN_PDP8_BASELINE,baseline,Vietnam,Power,GasCap,carbontech,USD/MWh-equivalent,MW,NA,synthetic_vietnam_demo,2027,61.2,16279.2,0.57
 VN_PDP8_BASELINE,baseline,Vietnam,Power,GasCap,carbontech,USD/MWh-equivalent,MW,NA,synthetic_vietnam_demo,2028,61.8,19778.4,0.58
 VN_PDP8_BASELINE,baseline,Vietnam,Power,GasCap,carbontech,USD/MWh-equivalent,MW,NA,synthetic_vietnam_demo,2029,62.4,22604.5,0.59
@@ -71,8 +71,8 @@ VN_STEPS_BASELINE,baseline,Vietnam,Power,CoalCap,carbontech,USD/MWh-equivalent,M
 VN_STEPS_BASELINE,baseline,Vietnam,Power,CoalCap,carbontech,USD/MWh-equivalent,MW,NA,synthetic_vietnam_demo,2030,67.5,33620,0.5
 VN_STEPS_BASELINE,baseline,Vietnam,Power,CoalCap,carbontech,USD/MWh-equivalent,MW,NA,synthetic_vietnam_demo,2031,67.4,32641.6,0.45999999999999996
 VN_STEPS_BASELINE,baseline,Vietnam,Power,CoalCap,carbontech,USD/MWh-equivalent,MW,NA,synthetic_vietnam_demo,2032,67.30000000000001,31663.199999999997,0.41999999999999993
-VN_STEPS_BASELINE,baseline,Vietnam,Power,GasCap,carbontech,USD/MWh-equivalent,MW,NA,synthetic_vietnam_demo,2025,60,11400,0.55
-VN_STEPS_BASELINE,baseline,Vietnam,Power,GasCap,carbontech,USD/MWh-equivalent,MW,NA,synthetic_vietnam_demo,2026,60.1,12341,0.545
+VN_STEPS_BASELINE,baseline,Vietnam,Power,GasCap,carbontech,USD/MWh-equivalent,MW,NA,synthetic_vietnam_demo,2025,60,12200,0.55
+VN_STEPS_BASELINE,baseline,Vietnam,Power,GasCap,carbontech,USD/MWh-equivalent,MW,NA,synthetic_vietnam_demo,2026,60.1,13161,0.545
 VN_STEPS_BASELINE,baseline,Vietnam,Power,GasCap,carbontech,USD/MWh-equivalent,MW,NA,synthetic_vietnam_demo,2027,60.2,14994,0.54
 VN_STEPS_BASELINE,baseline,Vietnam,Power,GasCap,carbontech,USD/MWh-equivalent,MW,NA,synthetic_vietnam_demo,2028,60.3,17286,0.535
 VN_STEPS_BASELINE,baseline,Vietnam,Power,GasCap,carbontech,USD/MWh-equivalent,MW,NA,synthetic_vietnam_demo,2029,60.4,18766,0.53

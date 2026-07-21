@@ -755,118 +755,118 @@ power,coalcap,2030,vietnam,steps_2023,PVN Power Corporation,projected,600,0.0810
 power,coalcap,2030,vietnam,steps_2023,PVN Power Corporation,target_steps,630,0.073943661971831,technology,0.05
 power,coalcap,2030,vietnam,steps_2023,Vinacomin Power JSC,projected,2400,1,technology,-0.07692307692307693
 power,coalcap,2030,vietnam,steps_2023,Vinacomin Power JSC,target_steps,2730,0.65625,technology,0.05
-power,gascap,2025,vietnam,nze_2023,Dung Quat LNG Power Consortium,projected,0,NA,technology,NA
-power,gascap,2025,vietnam,nze_2023,Dung Quat LNG Power Consortium,target_nze_global,0,NA,technology,NA
+power,gascap,2025,vietnam,nze_2023,Dung Quat LNG Power Consortium,projected,400,1,technology,0
+power,gascap,2025,vietnam,nze_2023,Dung Quat LNG Power Consortium,target_nze_global,400,0.6578947368421053,technology,0
 power,gascap,2025,vietnam,nze_2023,EVN (Electricity of Vietnam),projected,1500,0.06880733944954129,technology,0
 power,gascap,2025,vietnam,nze_2023,EVN (Electricity of Vietnam),target_nze_global,1500,0.04526798647996137,technology,0
 power,gascap,2025,vietnam,nze_2023,PVN Power Corporation,projected,4200,0.875,technology,0
 power,gascap,2025,vietnam,nze_2023,PVN Power Corporation,target_nze_global,4200,0.5756578947368421,technology,0
-power,gascap,2025,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,projected,0,NA,technology,NA
-power,gascap,2025,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,target_pdp8_ndc,0,NA,technology,NA
+power,gascap,2025,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,projected,400,1,technology,0
+power,gascap,2025,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,target_pdp8_ndc,400,0.6578947368421053,technology,0
 power,gascap,2025,vietnam,pdp8_2023,EVN (Electricity of Vietnam),projected,1500,0.06880733944954129,technology,0
 power,gascap,2025,vietnam,pdp8_2023,EVN (Electricity of Vietnam),target_pdp8_ndc,1500,0.04526798647996137,technology,0
 power,gascap,2025,vietnam,pdp8_2023,PVN Power Corporation,projected,4200,0.875,technology,0
 power,gascap,2025,vietnam,pdp8_2023,PVN Power Corporation,target_pdp8_ndc,4200,0.5756578947368421,technology,0
-power,gascap,2025,vietnam,steps_2023,Dung Quat LNG Power Consortium,projected,0,NA,technology,NA
-power,gascap,2025,vietnam,steps_2023,Dung Quat LNG Power Consortium,target_steps,0,NA,technology,NA
+power,gascap,2025,vietnam,steps_2023,Dung Quat LNG Power Consortium,projected,400,1,technology,0
+power,gascap,2025,vietnam,steps_2023,Dung Quat LNG Power Consortium,target_steps,400,0.6578947368421053,technology,0
 power,gascap,2025,vietnam,steps_2023,EVN (Electricity of Vietnam),projected,1500,0.06880733944954129,technology,0
 power,gascap,2025,vietnam,steps_2023,EVN (Electricity of Vietnam),target_steps,1500,0.04526798647996137,technology,0
 power,gascap,2025,vietnam,steps_2023,PVN Power Corporation,projected,4200,0.875,technology,0
 power,gascap,2025,vietnam,steps_2023,PVN Power Corporation,target_steps,4200,0.5756578947368421,technology,0
-power,gascap,2026,vietnam,nze_2023,Dung Quat LNG Power Consortium,projected,0,NA,technology,NA
-power,gascap,2026,vietnam,nze_2023,Dung Quat LNG Power Consortium,target_nze_global,0,NA,technology,NA
+power,gascap,2026,vietnam,nze_2023,Dung Quat LNG Power Consortium,projected,400,1,technology,0
+power,gascap,2026,vietnam,nze_2023,Dung Quat LNG Power Consortium,target_nze_global,440.00000000000006,0.6707317073170732,technology,0.10000000000000014
 power,gascap,2026,vietnam,nze_2023,EVN (Electricity of Vietnam),projected,1520,0.0695016003657979,technology,0.013333333333333334
 power,gascap,2026,vietnam,nze_2023,EVN (Electricity of Vietnam),target_nze_global,1650.0000000000002,0.05081300813008131,technology,0.10000000000000016
 power,gascap,2026,vietnam,nze_2023,PVN Power Corporation,projected,4500,0.8823529411764706,technology,0.07142857142857142
 power,gascap,2026,vietnam,nze_2023,PVN Power Corporation,target_nze_global,4620,0.5959752321981424,technology,0.1
-power,gascap,2026,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,projected,0,NA,technology,NA
-power,gascap,2026,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,target_pdp8_ndc,0,NA,technology,NA
+power,gascap,2026,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,projected,400,1,technology,0
+power,gascap,2026,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,target_pdp8_ndc,448.00000000000006,0.6787878787878788,technology,0.12000000000000015
 power,gascap,2026,vietnam,pdp8_2023,EVN (Electricity of Vietnam),projected,1520,0.0695016003657979,technology,0.013333333333333334
 power,gascap,2026,vietnam,pdp8_2023,EVN (Electricity of Vietnam),target_pdp8_ndc,1680.0000000000002,0.0500984075863303,technology,0.12000000000000015
 power,gascap,2026,vietnam,pdp8_2023,PVN Power Corporation,projected,4500,0.8823529411764706,technology,0.07142857142857142
 power,gascap,2026,vietnam,pdp8_2023,PVN Power Corporation,target_pdp8_ndc,4704,0.599388379204893,technology,0.12
-power,gascap,2026,vietnam,steps_2023,Dung Quat LNG Power Consortium,projected,0,NA,technology,NA
-power,gascap,2026,vietnam,steps_2023,Dung Quat LNG Power Consortium,target_steps,0,NA,technology,NA
+power,gascap,2026,vietnam,steps_2023,Dung Quat LNG Power Consortium,projected,400,1,technology,0
+power,gascap,2026,vietnam,steps_2023,Dung Quat LNG Power Consortium,target_steps,420,0.6687898089171974,technology,0.05
 power,gascap,2026,vietnam,steps_2023,EVN (Electricity of Vietnam),projected,1520,0.0695016003657979,technology,0.013333333333333334
 power,gascap,2026,vietnam,steps_2023,EVN (Electricity of Vietnam),target_steps,1575,0.04706972296105914,technology,0.05
 power,gascap,2026,vietnam,steps_2023,PVN Power Corporation,projected,4500,0.8823529411764706,technology,0.07142857142857142
 power,gascap,2026,vietnam,steps_2023,PVN Power Corporation,target_steps,4410,0.5865921787709497,technology,0.05
-power,gascap,2027,vietnam,nze_2023,Dung Quat LNG Power Consortium,projected,400,1,technology,Inf
-power,gascap,2027,vietnam,nze_2023,Dung Quat LNG Power Consortium,target_nze_global,0,NA,technology,NA
+power,gascap,2027,vietnam,nze_2023,Dung Quat LNG Power Consortium,projected,400,1,technology,0
+power,gascap,2027,vietnam,nze_2023,Dung Quat LNG Power Consortium,target_nze_global,480,0.6703910614525139,technology,0.2
 power,gascap,2027,vietnam,nze_2023,EVN (Electricity of Vietnam),projected,1540,0.07182835820895522,technology,0.02666666666666667
 power,gascap,2027,vietnam,nze_2023,EVN (Electricity of Vietnam),target_nze_global,1800,0.0560974849627575,technology,0.2
 power,gascap,2027,vietnam,nze_2023,PVN Power Corporation,projected,5200,0.896551724137931,technology,0.23809523809523808
 power,gascap,2027,vietnam,nze_2023,PVN Power Corporation,target_nze_global,5040,0.6047516198704104,technology,0.2
-power,gascap,2027,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,projected,400,1,technology,Inf
-power,gascap,2027,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,target_pdp8_ndc,0,NA,technology,NA
+power,gascap,2027,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,projected,400,1,technology,0
+power,gascap,2027,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,target_pdp8_ndc,512,0.7032967032967034,technology,0.28
 power,gascap,2027,vietnam,pdp8_2023,EVN (Electricity of Vietnam),projected,1540,0.07182835820895522,technology,0.02666666666666667
 power,gascap,2027,vietnam,pdp8_2023,EVN (Electricity of Vietnam),target_pdp8_ndc,1920,0.057113960198708985,technology,0.28
 power,gascap,2027,vietnam,pdp8_2023,PVN Power Corporation,projected,5200,0.896551724137931,technology,0.23809523809523808
 power,gascap,2027,vietnam,pdp8_2023,PVN Power Corporation,target_pdp8_ndc,5376,0.6287719298245614,technology,0.28
-power,gascap,2027,vietnam,steps_2023,Dung Quat LNG Power Consortium,projected,400,1,technology,Inf
-power,gascap,2027,vietnam,steps_2023,Dung Quat LNG Power Consortium,target_steps,0,NA,technology,NA
+power,gascap,2027,vietnam,steps_2023,Dung Quat LNG Power Consortium,projected,400,1,technology,0
+power,gascap,2027,vietnam,steps_2023,Dung Quat LNG Power Consortium,target_steps,440.00000000000006,0.6748466257668712,technology,0.10000000000000014
 power,gascap,2027,vietnam,steps_2023,EVN (Electricity of Vietnam),projected,1540,0.07182835820895522,technology,0.02666666666666667
 power,gascap,2027,vietnam,steps_2023,EVN (Electricity of Vietnam),target_steps,1650.0000000000002,0.04870273620827062,technology,0.10000000000000016
 power,gascap,2027,vietnam,steps_2023,PVN Power Corporation,projected,5200,0.896551724137931,technology,0.23809523809523808
 power,gascap,2027,vietnam,steps_2023,PVN Power Corporation,target_steps,4620,0.5936777178103315,technology,0.1
-power,gascap,2028,vietnam,nze_2023,Dung Quat LNG Power Consortium,projected,680,1,technology,Inf
-power,gascap,2028,vietnam,nze_2023,Dung Quat LNG Power Consortium,target_nze_global,0,NA,technology,NA
+power,gascap,2028,vietnam,nze_2023,Dung Quat LNG Power Consortium,projected,680,1,technology,0.7
+power,gascap,2028,vietnam,nze_2023,Dung Quat LNG Power Consortium,target_nze_global,488,0.6524064171122995,technology,0.22
 power,gascap,2028,vietnam,nze_2023,EVN (Electricity of Vietnam),projected,1560,0.07320506804317221,technology,0.04
 power,gascap,2028,vietnam,nze_2023,EVN (Electricity of Vietnam),target_nze_global,1830,0.058466453674121406,technology,0.22
 power,gascap,2028,vietnam,nze_2023,PVN Power Corporation,projected,5800,0.90625,technology,0.38095238095238093
 power,gascap,2028,vietnam,nze_2023,PVN Power Corporation,target_nze_global,5124,0.595536959553696,technology,0.22
-power,gascap,2028,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,projected,680,1,technology,Inf
-power,gascap,2028,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,target_pdp8_ndc,0,NA,technology,NA
+power,gascap,2028,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,projected,680,1,technology,0.7
+power,gascap,2028,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,target_pdp8_ndc,584,0.73,technology,0.46
 power,gascap,2028,vietnam,pdp8_2023,EVN (Electricity of Vietnam),projected,1560,0.07320506804317221,technology,0.04
 power,gascap,2028,vietnam,pdp8_2023,EVN (Electricity of Vietnam),target_pdp8_ndc,2190,0.0653497254714729,technology,0.46
 power,gascap,2028,vietnam,pdp8_2023,PVN Power Corporation,projected,5800,0.90625,technology,0.38095238095238093
 power,gascap,2028,vietnam,pdp8_2023,PVN Power Corporation,target_pdp8_ndc,6132,0.6602067183462532,technology,0.46
-power,gascap,2028,vietnam,steps_2023,Dung Quat LNG Power Consortium,projected,680,1,technology,Inf
-power,gascap,2028,vietnam,steps_2023,Dung Quat LNG Power Consortium,target_steps,0,NA,technology,NA
+power,gascap,2028,vietnam,steps_2023,Dung Quat LNG Power Consortium,projected,680,1,technology,0.7
+power,gascap,2028,vietnam,steps_2023,Dung Quat LNG Power Consortium,target_steps,459.99999999999994,0.6804733727810651,technology,0.14999999999999986
 power,gascap,2028,vietnam,steps_2023,EVN (Electricity of Vietnam),projected,1560,0.07320506804317221,technology,0.04
 power,gascap,2028,vietnam,steps_2023,EVN (Electricity of Vietnam),target_steps,1724.9999999999998,0.050295944251683815,technology,0.14999999999999986
 power,gascap,2028,vietnam,steps_2023,PVN Power Corporation,projected,5800,0.90625,technology,0.38095238095238093
 power,gascap,2028,vietnam,steps_2023,PVN Power Corporation,target_steps,4830,0.6002982848620433,technology,0.15
-power,gascap,2029,vietnam,nze_2023,Dung Quat LNG Power Consortium,projected,750,1,technology,Inf
-power,gascap,2029,vietnam,nze_2023,Dung Quat LNG Power Consortium,target_nze_global,0,NA,technology,NA
+power,gascap,2029,vietnam,nze_2023,Dung Quat LNG Power Consortium,projected,750,1,technology,0.875
+power,gascap,2029,vietnam,nze_2023,Dung Quat LNG Power Consortium,target_nze_global,496,0.6391752577319588,technology,0.24
 power,gascap,2029,vietnam,nze_2023,EVN (Electricity of Vietnam),projected,1580,0.07495256166982922,technology,0.05333333333333334
 power,gascap,2029,vietnam,nze_2023,EVN (Electricity of Vietnam),target_nze_global,1860,0.0611439842209073,technology,0.24
 power,gascap,2029,vietnam,nze_2023,PVN Power Corporation,projected,6200,0.9117647058823529,technology,0.47619047619047616
 power,gascap,2029,vietnam,nze_2023,PVN Power Corporation,target_nze_global,5208,0.5896739130434783,technology,0.24
-power,gascap,2029,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,projected,750,1,technology,Inf
-power,gascap,2029,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,target_pdp8_ndc,0,NA,technology,NA
+power,gascap,2029,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,projected,750,1,technology,0.875
+power,gascap,2029,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,target_pdp8_ndc,660,0.7534246575342466,technology,0.65
 power,gascap,2029,vietnam,pdp8_2023,EVN (Electricity of Vietnam),projected,1580,0.07495256166982922,technology,0.05333333333333334
 power,gascap,2029,vietnam,pdp8_2023,EVN (Electricity of Vietnam),target_pdp8_ndc,2475,0.07433102081268583,technology,0.65
 power,gascap,2029,vietnam,pdp8_2023,PVN Power Corporation,projected,6200,0.9117647058823529,technology,0.47619047619047616
 power,gascap,2029,vietnam,pdp8_2023,PVN Power Corporation,target_pdp8_ndc,6930,0.6887298747763864,technology,0.65
-power,gascap,2029,vietnam,steps_2023,Dung Quat LNG Power Consortium,projected,750,1,technology,Inf
-power,gascap,2029,vietnam,steps_2023,Dung Quat LNG Power Consortium,target_steps,0,NA,technology,NA
+power,gascap,2029,vietnam,steps_2023,Dung Quat LNG Power Consortium,projected,750,1,technology,0.875
+power,gascap,2029,vietnam,steps_2023,Dung Quat LNG Power Consortium,target_steps,480,0.6896551724137931,technology,0.2
 power,gascap,2029,vietnam,steps_2023,EVN (Electricity of Vietnam),projected,1580,0.07495256166982922,technology,0.05333333333333334
 power,gascap,2029,vietnam,steps_2023,EVN (Electricity of Vietnam),target_steps,1800,0.0523682066798557,technology,0.2
 power,gascap,2029,vietnam,steps_2023,PVN Power Corporation,projected,6200,0.9117647058823529,technology,0.47619047619047616
 power,gascap,2029,vietnam,steps_2023,PVN Power Corporation,target_steps,5040,0.6104651162790697,technology,0.2
-power,gascap,2030,vietnam,nze_2023,Dung Quat LNG Power Consortium,projected,750,1,technology,Inf
-power,gascap,2030,vietnam,nze_2023,Dung Quat LNG Power Consortium,target_nze_global,0,NA,technology,NA
+power,gascap,2030,vietnam,nze_2023,Dung Quat LNG Power Consortium,projected,750,1,technology,0.875
+power,gascap,2030,vietnam,nze_2023,Dung Quat LNG Power Consortium,target_nze_global,500,0.625,technology,0.25
 power,gascap,2030,vietnam,nze_2023,EVN (Electricity of Vietnam),projected,1600,0.07729468599033816,technology,0.06666666666666667
 power,gascap,2030,vietnam,nze_2023,EVN (Electricity of Vietnam),target_nze_global,1875,0.06350550381033022,technology,0.25
 power,gascap,2030,vietnam,nze_2023,PVN Power Corporation,projected,6800,0.918918918918919,technology,0.6190476190476191
 power,gascap,2030,vietnam,nze_2023,PVN Power Corporation,target_nze_global,5250,0.582168995342648,technology,0.25
-power,gascap,2030,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,projected,750,1,technology,Inf
-power,gascap,2030,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,target_pdp8_ndc,0,NA,technology,NA
+power,gascap,2030,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,projected,750,1,technology,0.875
+power,gascap,2030,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,target_pdp8_ndc,752,0.7736625514403292,technology,0.88
 power,gascap,2030,vietnam,pdp8_2023,EVN (Electricity of Vietnam),projected,1600,0.07729468599033816,technology,0.06666666666666667
 power,gascap,2030,vietnam,pdp8_2023,EVN (Electricity of Vietnam),target_pdp8_ndc,2820,0.08421681349858146,technology,0.88
 power,gascap,2030,vietnam,pdp8_2023,PVN Power Corporation,projected,6800,0.918918918918919,technology,0.6190476190476191
 power,gascap,2030,vietnam,pdp8_2023,PVN Power Corporation,target_pdp8_ndc,7896,0.7140531741725448,technology,0.88
-power,gascap,2030,vietnam,steps_2023,Dung Quat LNG Power Consortium,projected,750,1,technology,Inf
-power,gascap,2030,vietnam,steps_2023,Dung Quat LNG Power Consortium,target_steps,0,NA,technology,NA
+power,gascap,2030,vietnam,steps_2023,Dung Quat LNG Power Consortium,projected,750,1,technology,0.875
+power,gascap,2030,vietnam,steps_2023,Dung Quat LNG Power Consortium,target_steps,500,0.6944444444444444,technology,0.25
 power,gascap,2030,vietnam,steps_2023,EVN (Electricity of Vietnam),projected,1600,0.07729468599033816,technology,0.06666666666666667
 power,gascap,2030,vietnam,steps_2023,EVN (Electricity of Vietnam),target_steps,1875,0.05389479735556194,technology,0.25
 power,gascap,2030,vietnam,steps_2023,PVN Power Corporation,projected,6800,0.918918918918919,technology,0.6190476190476191
 power,gascap,2030,vietnam,steps_2023,PVN Power Corporation,target_steps,5250,0.6161971830985916,technology,0.25
 power,hydrocap,2025,vietnam,nze_2023,BIM Group,projected,0,0,sector,0
 power,hydrocap,2025,vietnam,nze_2023,BIM Group,target_nze_global,98.8,0.17105263157894735,sector,0
-power,hydrocap,2025,vietnam,nze_2023,Dung Quat LNG Power Consortium,projected,0,NA,sector,NA
-power,hydrocap,2025,vietnam,nze_2023,Dung Quat LNG Power Consortium,target_nze_global,0,NA,sector,NA
+power,hydrocap,2025,vietnam,nze_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,0
+power,hydrocap,2025,vietnam,nze_2023,Dung Quat LNG Power Consortium,target_nze_global,104,0.17105263157894737,sector,0
 power,hydrocap,2025,vietnam,nze_2023,EVN (Electricity of Vietnam),projected,7800,0.3577981651376147,sector,0
 power,hydrocap,2025,vietnam,nze_2023,EVN (Electricity of Vietnam),target_nze_global,13468,0.4064461612747465,sector,0
 power,hydrocap,2025,vietnam,nze_2023,Gia Lai Electricity JSC,projected,0,0,sector,0
@@ -891,8 +891,8 @@ power,hydrocap,2025,vietnam,nze_2023,Xuan Thien Group,projected,0,0,sector,0
 power,hydrocap,2025,vietnam,nze_2023,Xuan Thien Group,target_nze_global,169,0.17105263157894737,sector,0
 power,hydrocap,2025,vietnam,pdp8_2023,BIM Group,projected,0,0,sector,0
 power,hydrocap,2025,vietnam,pdp8_2023,BIM Group,target_pdp8_ndc,98.8,0.17105263157894735,sector,0
-power,hydrocap,2025,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,projected,0,NA,sector,NA
-power,hydrocap,2025,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,target_pdp8_ndc,0,NA,sector,NA
+power,hydrocap,2025,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,0
+power,hydrocap,2025,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,target_pdp8_ndc,104,0.17105263157894737,sector,0
 power,hydrocap,2025,vietnam,pdp8_2023,EVN (Electricity of Vietnam),projected,7800,0.3577981651376147,sector,0
 power,hydrocap,2025,vietnam,pdp8_2023,EVN (Electricity of Vietnam),target_pdp8_ndc,13468,0.4064461612747465,sector,0
 power,hydrocap,2025,vietnam,pdp8_2023,Gia Lai Electricity JSC,projected,0,0,sector,0
@@ -917,8 +917,8 @@ power,hydrocap,2025,vietnam,pdp8_2023,Xuan Thien Group,projected,0,0,sector,0
 power,hydrocap,2025,vietnam,pdp8_2023,Xuan Thien Group,target_pdp8_ndc,169,0.17105263157894737,sector,0
 power,hydrocap,2025,vietnam,steps_2023,BIM Group,projected,0,0,sector,0
 power,hydrocap,2025,vietnam,steps_2023,BIM Group,target_steps,98.8,0.17105263157894735,sector,0
-power,hydrocap,2025,vietnam,steps_2023,Dung Quat LNG Power Consortium,projected,0,NA,sector,NA
-power,hydrocap,2025,vietnam,steps_2023,Dung Quat LNG Power Consortium,target_steps,0,NA,sector,NA
+power,hydrocap,2025,vietnam,steps_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,0
+power,hydrocap,2025,vietnam,steps_2023,Dung Quat LNG Power Consortium,target_steps,104,0.17105263157894737,sector,0
 power,hydrocap,2025,vietnam,steps_2023,EVN (Electricity of Vietnam),projected,7800,0.3577981651376147,sector,0
 power,hydrocap,2025,vietnam,steps_2023,EVN (Electricity of Vietnam),target_steps,13468,0.4064461612747465,sector,0
 power,hydrocap,2025,vietnam,steps_2023,Gia Lai Electricity JSC,projected,0,0,sector,0
@@ -943,8 +943,8 @@ power,hydrocap,2025,vietnam,steps_2023,Xuan Thien Group,projected,0,0,sector,0
 power,hydrocap,2025,vietnam,steps_2023,Xuan Thien Group,target_steps,169,0.17105263157894737,sector,0
 power,hydrocap,2026,vietnam,nze_2023,BIM Group,projected,0,0,sector,0
 power,hydrocap,2026,vietnam,nze_2023,BIM Group,target_nze_global,91.2,0.15584415584415584,sector,-0.013157894736842094
-power,hydrocap,2026,vietnam,nze_2023,Dung Quat LNG Power Consortium,projected,0,NA,sector,NA
-power,hydrocap,2026,vietnam,nze_2023,Dung Quat LNG Power Consortium,target_nze_global,0,NA,sector,NA
+power,hydrocap,2026,vietnam,nze_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,0
+power,hydrocap,2026,vietnam,nze_2023,Dung Quat LNG Power Consortium,target_nze_global,96,0.14634146341463414,sector,-0.013157894736842105
 power,hydrocap,2026,vietnam,nze_2023,EVN (Electricity of Vietnam),projected,7850,0.35893918609967995,sector,0.0022935779816513763
 power,hydrocap,2026,vietnam,nze_2023,EVN (Electricity of Vietnam),target_nze_global,13032,0.401330376940133,sector,-0.013157894736842105
 power,hydrocap,2026,vietnam,nze_2023,Gia Lai Electricity JSC,projected,0,0,sector,0
@@ -969,8 +969,8 @@ power,hydrocap,2026,vietnam,nze_2023,Xuan Thien Group,projected,0,0,sector,0
 power,hydrocap,2026,vietnam,nze_2023,Xuan Thien Group,target_nze_global,156,0.15584415584415584,sector,-0.013157894736842105
 power,hydrocap,2026,vietnam,pdp8_2023,BIM Group,projected,0,0,sector,0
 power,hydrocap,2026,vietnam,pdp8_2023,BIM Group,target_pdp8_ndc,95,0.16339869281045752,sector,-0.006578947368421047
-power,hydrocap,2026,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,projected,0,NA,sector,NA
-power,hydrocap,2026,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,target_pdp8_ndc,0,NA,sector,NA
+power,hydrocap,2026,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,0
+power,hydrocap,2026,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,target_pdp8_ndc,100,0.15151515151515152,sector,-0.006578947368421052
 power,hydrocap,2026,vietnam,pdp8_2023,EVN (Electricity of Vietnam),projected,7850,0.35893918609967995,sector,0.0022935779816513763
 power,hydrocap,2026,vietnam,pdp8_2023,EVN (Electricity of Vietnam),target_pdp8_ndc,13250,0.395121369356474,sector,-0.006578947368421052
 power,hydrocap,2026,vietnam,pdp8_2023,Gia Lai Electricity JSC,projected,0,0,sector,0
@@ -995,8 +995,8 @@ power,hydrocap,2026,vietnam,pdp8_2023,Xuan Thien Group,projected,0,0,sector,0
 power,hydrocap,2026,vietnam,pdp8_2023,Xuan Thien Group,target_pdp8_ndc,162.5,0.16339869281045752,sector,-0.006578947368421052
 power,hydrocap,2026,vietnam,steps_2023,BIM Group,projected,0,0,sector,0
 power,hydrocap,2026,vietnam,steps_2023,BIM Group,target_steps,95,0.1644736842105263,sector,-0.006578947368421047
-power,hydrocap,2026,vietnam,steps_2023,Dung Quat LNG Power Consortium,projected,0,NA,sector,NA
-power,hydrocap,2026,vietnam,steps_2023,Dung Quat LNG Power Consortium,target_steps,0,NA,sector,NA
+power,hydrocap,2026,vietnam,steps_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,0
+power,hydrocap,2026,vietnam,steps_2023,Dung Quat LNG Power Consortium,target_steps,100,0.1592356687898089,sector,-0.006578947368421052
 power,hydrocap,2026,vietnam,steps_2023,EVN (Electricity of Vietnam),projected,7850,0.35893918609967995,sector,0.0022935779816513763
 power,hydrocap,2026,vietnam,steps_2023,EVN (Electricity of Vietnam),target_steps,13250,0.3959833836406563,sector,-0.006578947368421052
 power,hydrocap,2026,vietnam,steps_2023,Gia Lai Electricity JSC,projected,0,0,sector,0
@@ -1021,8 +1021,8 @@ power,hydrocap,2026,vietnam,steps_2023,Xuan Thien Group,projected,0,0,sector,0
 power,hydrocap,2026,vietnam,steps_2023,Xuan Thien Group,target_steps,162.5,0.16447368421052633,sector,-0.006578947368421052
 power,hydrocap,2027,vietnam,nze_2023,BIM Group,projected,0,0,sector,0
 power,hydrocap,2027,vietnam,nze_2023,BIM Group,target_nze_global,83.6,0.13836477987421383,sector,-0.026315789473684216
-power,hydrocap,2027,vietnam,nze_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,NA
-power,hydrocap,2027,vietnam,nze_2023,Dung Quat LNG Power Consortium,target_nze_global,0,NA,sector,NA
+power,hydrocap,2027,vietnam,nze_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,0
+power,hydrocap,2027,vietnam,nze_2023,Dung Quat LNG Power Consortium,target_nze_global,88,0.12290502793296089,sector,-0.02631578947368421
 power,hydrocap,2027,vietnam,nze_2023,EVN (Electricity of Vietnam),projected,7900,0.36847014925373134,sector,0.0045871559633027525
 power,hydrocap,2027,vietnam,nze_2023,EVN (Electricity of Vietnam),target_nze_global,12596,0.3925577336616075,sector,-0.02631578947368421
 power,hydrocap,2027,vietnam,nze_2023,Gia Lai Electricity JSC,projected,0,0,sector,0
@@ -1047,8 +1047,8 @@ power,hydrocap,2027,vietnam,nze_2023,Xuan Thien Group,projected,0,0,sector,0
 power,hydrocap,2027,vietnam,nze_2023,Xuan Thien Group,target_nze_global,143,0.13836477987421383,sector,-0.02631578947368421
 power,hydrocap,2027,vietnam,pdp8_2023,BIM Group,projected,0,0,sector,0
 power,hydrocap,2027,vietnam,pdp8_2023,BIM Group,target_pdp8_ndc,91.2,0.15584415584415584,sector,-0.013157894736842094
-power,hydrocap,2027,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,NA
-power,hydrocap,2027,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,target_pdp8_ndc,0,NA,sector,NA
+power,hydrocap,2027,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,0
+power,hydrocap,2027,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,target_pdp8_ndc,96,0.13186813186813187,sector,-0.013157894736842105
 power,hydrocap,2027,vietnam,pdp8_2023,EVN (Electricity of Vietnam),projected,7900,0.36847014925373134,sector,0.0045871559633027525
 power,hydrocap,2027,vietnam,pdp8_2023,EVN (Electricity of Vietnam),target_pdp8_ndc,13032,0.3876610048487372,sector,-0.013157894736842105
 power,hydrocap,2027,vietnam,pdp8_2023,Gia Lai Electricity JSC,projected,0,0,sector,0
@@ -1073,8 +1073,8 @@ power,hydrocap,2027,vietnam,pdp8_2023,Xuan Thien Group,projected,0,0,sector,0
 power,hydrocap,2027,vietnam,pdp8_2023,Xuan Thien Group,target_pdp8_ndc,156,0.15584415584415584,sector,-0.013157894736842105
 power,hydrocap,2027,vietnam,steps_2023,BIM Group,projected,0,0,sector,0
 power,hydrocap,2027,vietnam,steps_2023,BIM Group,target_steps,95,0.16339869281045752,sector,-0.006578947368421047
-power,hydrocap,2027,vietnam,steps_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,NA
-power,hydrocap,2027,vietnam,steps_2023,Dung Quat LNG Power Consortium,target_steps,0,NA,sector,NA
+power,hydrocap,2027,vietnam,steps_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,0
+power,hydrocap,2027,vietnam,steps_2023,Dung Quat LNG Power Consortium,target_steps,100,0.15337423312883433,sector,-0.006578947368421052
 power,hydrocap,2027,vietnam,steps_2023,EVN (Electricity of Vietnam),projected,7900,0.36847014925373134,sector,0.0045871559633027525
 power,hydrocap,2027,vietnam,steps_2023,EVN (Electricity of Vietnam),target_steps,13250,0.3910977301573246,sector,-0.006578947368421052
 power,hydrocap,2027,vietnam,steps_2023,Gia Lai Electricity JSC,projected,0,0,sector,0
@@ -1099,8 +1099,8 @@ power,hydrocap,2027,vietnam,steps_2023,Xuan Thien Group,projected,0,0,sector,0
 power,hydrocap,2027,vietnam,steps_2023,Xuan Thien Group,target_steps,162.5,0.16339869281045752,sector,-0.006578947368421052
 power,hydrocap,2028,vietnam,nze_2023,BIM Group,projected,0,0,sector,0
 power,hydrocap,2028,vietnam,nze_2023,BIM Group,target_nze_global,79.8,0.12727272727272726,sector,-0.03289473684210526
-power,hydrocap,2028,vietnam,nze_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,NA
-power,hydrocap,2028,vietnam,nze_2023,Dung Quat LNG Power Consortium,target_nze_global,0,NA,sector,NA
+power,hydrocap,2028,vietnam,nze_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,0
+power,hydrocap,2028,vietnam,nze_2023,Dung Quat LNG Power Consortium,target_nze_global,84,0.11229946524064172,sector,-0.03289473684210526
 power,hydrocap,2028,vietnam,nze_2023,EVN (Electricity of Vietnam),projected,7950,0.3730642890661661,sector,0.006880733944954129
 power,hydrocap,2028,vietnam,nze_2023,EVN (Electricity of Vietnam),target_nze_global,12378,0.3954632587859425,sector,-0.03289473684210526
 power,hydrocap,2028,vietnam,nze_2023,Gia Lai Electricity JSC,projected,0,0,sector,0
@@ -1125,8 +1125,8 @@ power,hydrocap,2028,vietnam,nze_2023,Xuan Thien Group,projected,0,0,sector,0
 power,hydrocap,2028,vietnam,nze_2023,Xuan Thien Group,target_nze_global,136.5,0.12727272727272726,sector,-0.03289473684210526
 power,hydrocap,2028,vietnam,pdp8_2023,BIM Group,projected,0,0,sector,0
 power,hydrocap,2028,vietnam,pdp8_2023,BIM Group,target_pdp8_ndc,87.4,0.14935064935064934,sector,-0.019736842105263143
-power,hydrocap,2028,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,NA
-power,hydrocap,2028,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,target_pdp8_ndc,0,NA,sector,NA
+power,hydrocap,2028,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,0
+power,hydrocap,2028,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,target_pdp8_ndc,92,0.115,sector,-0.019736842105263157
 power,hydrocap,2028,vietnam,pdp8_2023,EVN (Electricity of Vietnam),projected,7950,0.3730642890661661,sector,0.006880733944954129
 power,hydrocap,2028,vietnam,pdp8_2023,EVN (Electricity of Vietnam),target_pdp8_ndc,12814,0.38237049415134877,sector,-0.019736842105263157
 power,hydrocap,2028,vietnam,pdp8_2023,Gia Lai Electricity JSC,projected,0,0,sector,0
@@ -1151,8 +1151,8 @@ power,hydrocap,2028,vietnam,pdp8_2023,Xuan Thien Group,projected,0,0,sector,0
 power,hydrocap,2028,vietnam,pdp8_2023,Xuan Thien Group,target_pdp8_ndc,149.5,0.14935064935064934,sector,-0.019736842105263157
 power,hydrocap,2028,vietnam,steps_2023,BIM Group,projected,0,0,sector,0
 power,hydrocap,2028,vietnam,steps_2023,BIM Group,target_steps,95,0.16233766233766236,sector,-0.006578947368421047
-power,hydrocap,2028,vietnam,steps_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,NA
-power,hydrocap,2028,vietnam,steps_2023,Dung Quat LNG Power Consortium,target_steps,0,NA,sector,NA
+power,hydrocap,2028,vietnam,steps_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,0
+power,hydrocap,2028,vietnam,steps_2023,Dung Quat LNG Power Consortium,target_steps,100,0.14792899408284027,sector,-0.006578947368421052
 power,hydrocap,2028,vietnam,steps_2023,EVN (Electricity of Vietnam),projected,7950,0.3730642890661661,sector,0.006880733944954129
 power,hydrocap,2028,vietnam,steps_2023,EVN (Electricity of Vietnam),target_steps,13250,0.38633116599119455,sector,-0.006578947368421052
 power,hydrocap,2028,vietnam,steps_2023,Gia Lai Electricity JSC,projected,0,0,sector,0
@@ -1177,8 +1177,8 @@ power,hydrocap,2028,vietnam,steps_2023,Xuan Thien Group,projected,0,0,sector,0
 power,hydrocap,2028,vietnam,steps_2023,Xuan Thien Group,target_steps,162.5,0.16233766233766234,sector,-0.006578947368421052
 power,hydrocap,2029,vietnam,nze_2023,BIM Group,projected,0,0,sector,0
 power,hydrocap,2029,vietnam,nze_2023,BIM Group,target_nze_global,76,0.11764705882352941,sector,-0.03947368421052631
-power,hydrocap,2029,vietnam,nze_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,NA
-power,hydrocap,2029,vietnam,nze_2023,Dung Quat LNG Power Consortium,target_nze_global,0,NA,sector,NA
+power,hydrocap,2029,vietnam,nze_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,0
+power,hydrocap,2029,vietnam,nze_2023,Dung Quat LNG Power Consortium,target_nze_global,80,0.10309278350515465,sector,-0.039473684210526314
 power,hydrocap,2029,vietnam,nze_2023,EVN (Electricity of Vietnam),projected,8000,0.3795066413662239,sector,0.009174311926605505
 power,hydrocap,2029,vietnam,nze_2023,EVN (Electricity of Vietnam),target_nze_global,12160,0.3997370151216305,sector,-0.039473684210526314
 power,hydrocap,2029,vietnam,nze_2023,Gia Lai Electricity JSC,projected,0,0,sector,0
@@ -1203,8 +1203,8 @@ power,hydrocap,2029,vietnam,nze_2023,Xuan Thien Group,projected,0,0,sector,0
 power,hydrocap,2029,vietnam,nze_2023,Xuan Thien Group,target_nze_global,130,0.11764705882352941,sector,-0.039473684210526314
 power,hydrocap,2029,vietnam,pdp8_2023,BIM Group,projected,0,0,sector,0
 power,hydrocap,2029,vietnam,pdp8_2023,BIM Group,target_pdp8_ndc,83.6,0.14285714285714285,sector,-0.026315789473684216
-power,hydrocap,2029,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,NA
-power,hydrocap,2029,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,target_pdp8_ndc,0,NA,sector,NA
+power,hydrocap,2029,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,0
+power,hydrocap,2029,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,target_pdp8_ndc,88,0.1004566210045662,sector,-0.02631578947368421
 power,hydrocap,2029,vietnam,pdp8_2023,EVN (Electricity of Vietnam),projected,8000,0.3795066413662239,sector,0.009174311926605505
 power,hydrocap,2029,vietnam,pdp8_2023,EVN (Electricity of Vietnam),target_pdp8_ndc,12596,0.37829233864912754,sector,-0.02631578947368421
 power,hydrocap,2029,vietnam,pdp8_2023,Gia Lai Electricity JSC,projected,0,0,sector,0
@@ -1229,8 +1229,8 @@ power,hydrocap,2029,vietnam,pdp8_2023,Xuan Thien Group,projected,0,0,sector,0
 power,hydrocap,2029,vietnam,pdp8_2023,Xuan Thien Group,target_pdp8_ndc,143,0.14285714285714285,sector,-0.02631578947368421
 power,hydrocap,2029,vietnam,steps_2023,BIM Group,projected,0,0,sector,0
 power,hydrocap,2029,vietnam,steps_2023,BIM Group,target_steps,91.2,0.15584415584415584,sector,-0.013157894736842094
-power,hydrocap,2029,vietnam,steps_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,NA
-power,hydrocap,2029,vietnam,steps_2023,Dung Quat LNG Power Consortium,target_steps,0,NA,sector,NA
+power,hydrocap,2029,vietnam,steps_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,0
+power,hydrocap,2029,vietnam,steps_2023,Dung Quat LNG Power Consortium,target_steps,96,0.13793103448275862,sector,-0.013157894736842105
 power,hydrocap,2029,vietnam,steps_2023,EVN (Electricity of Vietnam),projected,8000,0.3795066413662239,sector,0.009174311926605505
 power,hydrocap,2029,vietnam,steps_2023,EVN (Electricity of Vietnam),target_steps,13032,0.3791458163621553,sector,-0.013157894736842105
 power,hydrocap,2029,vietnam,steps_2023,Gia Lai Electricity JSC,projected,0,0,sector,0
@@ -1255,8 +1255,8 @@ power,hydrocap,2029,vietnam,steps_2023,Xuan Thien Group,projected,0,0,sector,0
 power,hydrocap,2029,vietnam,steps_2023,Xuan Thien Group,target_steps,156,0.15584415584415584,sector,-0.013157894736842105
 power,hydrocap,2030,vietnam,nze_2023,BIM Group,projected,0,0,sector,0
 power,hydrocap,2030,vietnam,nze_2023,BIM Group,target_nze_global,72.2,0.1085714285714286,sector,-0.04605263157894736
-power,hydrocap,2030,vietnam,nze_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,NA
-power,hydrocap,2030,vietnam,nze_2023,Dung Quat LNG Power Consortium,target_nze_global,0,NA,sector,NA
+power,hydrocap,2030,vietnam,nze_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,0
+power,hydrocap,2030,vietnam,nze_2023,Dung Quat LNG Power Consortium,target_nze_global,76,0.095,sector,-0.046052631578947366
 power,hydrocap,2030,vietnam,nze_2023,EVN (Electricity of Vietnam),projected,8100,0.391304347826087,sector,0.013761467889908258
 power,hydrocap,2030,vietnam,nze_2023,EVN (Electricity of Vietnam),target_nze_global,11942,0.4044707874682472,sector,-0.046052631578947366
 power,hydrocap,2030,vietnam,nze_2023,Gia Lai Electricity JSC,projected,0,0,sector,0
@@ -1281,8 +1281,8 @@ power,hydrocap,2030,vietnam,nze_2023,Xuan Thien Group,projected,0,0,sector,0
 power,hydrocap,2030,vietnam,nze_2023,Xuan Thien Group,target_nze_global,123.5,0.10857142857142857,sector,-0.046052631578947366
 power,hydrocap,2030,vietnam,pdp8_2023,BIM Group,projected,0,0,sector,0
 power,hydrocap,2030,vietnam,pdp8_2023,BIM Group,target_pdp8_ndc,79.8,0.13548387096774192,sector,-0.03289473684210526
-power,hydrocap,2030,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,NA
-power,hydrocap,2030,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,target_pdp8_ndc,0,NA,sector,NA
+power,hydrocap,2030,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,0
+power,hydrocap,2030,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,target_pdp8_ndc,84,0.08641975308641975,sector,-0.03289473684210526
 power,hydrocap,2030,vietnam,pdp8_2023,EVN (Electricity of Vietnam),projected,8100,0.391304347826087,sector,0.013761467889908258
 power,hydrocap,2030,vietnam,pdp8_2023,EVN (Electricity of Vietnam),target_pdp8_ndc,12378,0.36965805584590117,sector,-0.03289473684210526
 power,hydrocap,2030,vietnam,pdp8_2023,Gia Lai Electricity JSC,projected,0,0,sector,0
@@ -1307,8 +1307,8 @@ power,hydrocap,2030,vietnam,pdp8_2023,Xuan Thien Group,projected,0,0,sector,0
 power,hydrocap,2030,vietnam,pdp8_2023,Xuan Thien Group,target_pdp8_ndc,136.5,0.13548387096774195,sector,-0.03289473684210526
 power,hydrocap,2030,vietnam,steps_2023,BIM Group,projected,0,0,sector,0
 power,hydrocap,2030,vietnam,steps_2023,BIM Group,target_steps,91.2,0.15483870967741936,sector,-0.013157894736842094
-power,hydrocap,2030,vietnam,steps_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,NA
-power,hydrocap,2030,vietnam,steps_2023,Dung Quat LNG Power Consortium,target_steps,0,NA,sector,NA
+power,hydrocap,2030,vietnam,steps_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,0
+power,hydrocap,2030,vietnam,steps_2023,Dung Quat LNG Power Consortium,target_steps,96,0.13333333333333333,sector,-0.013157894736842105
 power,hydrocap,2030,vietnam,steps_2023,EVN (Electricity of Vietnam),projected,8100,0.391304347826087,sector,0.013761467889908258
 power,hydrocap,2030,vietnam,steps_2023,EVN (Electricity of Vietnam),target_steps,13032,0.3745903995400977,sector,-0.013157894736842105
 power,hydrocap,2030,vietnam,steps_2023,Gia Lai Electricity JSC,projected,0,0,sector,0
@@ -1333,8 +1333,8 @@ power,hydrocap,2030,vietnam,steps_2023,Xuan Thien Group,projected,0,0,sector,0
 power,hydrocap,2030,vietnam,steps_2023,Xuan Thien Group,target_steps,156,0.15483870967741936,sector,-0.013157894736842105
 power,renewablescap,2025,vietnam,nze_2023,BIM Group,projected,380,1,sector,0
 power,renewablescap,2025,vietnam,nze_2023,BIM Group,target_nze_global,478.8,0.8289473684210527,sector,0
-power,renewablescap,2025,vietnam,nze_2023,Dung Quat LNG Power Consortium,projected,0,NA,sector,NA
-power,renewablescap,2025,vietnam,nze_2023,Dung Quat LNG Power Consortium,target_nze_global,0,NA,sector,NA
+power,renewablescap,2025,vietnam,nze_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,0
+power,renewablescap,2025,vietnam,nze_2023,Dung Quat LNG Power Consortium,target_nze_global,104,0.17105263157894737,sector,0
 power,renewablescap,2025,vietnam,nze_2023,EVN (Electricity of Vietnam),projected,0,0,sector,0
 power,renewablescap,2025,vietnam,nze_2023,EVN (Electricity of Vietnam),target_nze_global,5668,0.17105263157894737,sector,0
 power,renewablescap,2025,vietnam,nze_2023,Gia Lai Electricity JSC,projected,350,1,sector,0
@@ -1359,8 +1359,8 @@ power,renewablescap,2025,vietnam,nze_2023,Xuan Thien Group,projected,650,1,secto
 power,renewablescap,2025,vietnam,nze_2023,Xuan Thien Group,target_nze_global,819,0.8289473684210527,sector,0
 power,renewablescap,2025,vietnam,pdp8_2023,BIM Group,projected,380,1,sector,0
 power,renewablescap,2025,vietnam,pdp8_2023,BIM Group,target_pdp8_ndc,478.8,0.8289473684210527,sector,0
-power,renewablescap,2025,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,projected,0,NA,sector,NA
-power,renewablescap,2025,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,target_pdp8_ndc,0,NA,sector,NA
+power,renewablescap,2025,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,0
+power,renewablescap,2025,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,target_pdp8_ndc,104,0.17105263157894737,sector,0
 power,renewablescap,2025,vietnam,pdp8_2023,EVN (Electricity of Vietnam),projected,0,0,sector,0
 power,renewablescap,2025,vietnam,pdp8_2023,EVN (Electricity of Vietnam),target_pdp8_ndc,5668,0.17105263157894737,sector,0
 power,renewablescap,2025,vietnam,pdp8_2023,Gia Lai Electricity JSC,projected,350,1,sector,0
@@ -1385,8 +1385,8 @@ power,renewablescap,2025,vietnam,pdp8_2023,Xuan Thien Group,projected,650,1,sect
 power,renewablescap,2025,vietnam,pdp8_2023,Xuan Thien Group,target_pdp8_ndc,819,0.8289473684210527,sector,0
 power,renewablescap,2025,vietnam,steps_2023,BIM Group,projected,380,1,sector,0
 power,renewablescap,2025,vietnam,steps_2023,BIM Group,target_steps,478.8,0.8289473684210527,sector,0
-power,renewablescap,2025,vietnam,steps_2023,Dung Quat LNG Power Consortium,projected,0,NA,sector,NA
-power,renewablescap,2025,vietnam,steps_2023,Dung Quat LNG Power Consortium,target_steps,0,NA,sector,NA
+power,renewablescap,2025,vietnam,steps_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,0
+power,renewablescap,2025,vietnam,steps_2023,Dung Quat LNG Power Consortium,target_steps,104,0.17105263157894737,sector,0
 power,renewablescap,2025,vietnam,steps_2023,EVN (Electricity of Vietnam),projected,0,0,sector,0
 power,renewablescap,2025,vietnam,steps_2023,EVN (Electricity of Vietnam),target_steps,5668,0.17105263157894737,sector,0
 power,renewablescap,2025,vietnam,steps_2023,Gia Lai Electricity JSC,projected,350,1,sector,0
@@ -1411,8 +1411,8 @@ power,renewablescap,2025,vietnam,steps_2023,Xuan Thien Group,projected,650,1,sec
 power,renewablescap,2025,vietnam,steps_2023,Xuan Thien Group,target_steps,819,0.8289473684210527,sector,0
 power,renewablescap,2026,vietnam,nze_2023,BIM Group,projected,420,1,sector,0.10526315789473684
 power,renewablescap,2026,vietnam,nze_2023,BIM Group,target_nze_global,494,0.8441558441558441,sector,0.026315789473684188
-power,renewablescap,2026,vietnam,nze_2023,Dung Quat LNG Power Consortium,projected,0,NA,sector,NA
-power,renewablescap,2026,vietnam,nze_2023,Dung Quat LNG Power Consortium,target_nze_global,0,NA,sector,NA
+power,renewablescap,2026,vietnam,nze_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,0
+power,renewablescap,2026,vietnam,nze_2023,Dung Quat LNG Power Consortium,target_nze_global,120,0.18292682926829268,sector,0.02631578947368421
 power,renewablescap,2026,vietnam,nze_2023,EVN (Electricity of Vietnam),projected,0,0,sector,0
 power,renewablescap,2026,vietnam,nze_2023,EVN (Electricity of Vietnam),target_nze_global,6540,0.20140428677014044,sector,0.02631578947368421
 power,renewablescap,2026,vietnam,nze_2023,Gia Lai Electricity JSC,projected,380,1,sector,0.08571428571428572
@@ -1437,8 +1437,8 @@ power,renewablescap,2026,vietnam,nze_2023,Xuan Thien Group,projected,730,1,secto
 power,renewablescap,2026,vietnam,nze_2023,Xuan Thien Group,target_nze_global,845,0.8441558441558441,sector,0.02631578947368421
 power,renewablescap,2026,vietnam,pdp8_2023,BIM Group,projected,420,1,sector,0.10526315789473684
 power,renewablescap,2026,vietnam,pdp8_2023,BIM Group,target_pdp8_ndc,486.4,0.8366013071895425,sector,0.013157894736842046
-power,renewablescap,2026,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,projected,0,NA,sector,NA
-power,renewablescap,2026,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,target_pdp8_ndc,0,NA,sector,NA
+power,renewablescap,2026,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,0
+power,renewablescap,2026,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,target_pdp8_ndc,112.00000000000001,0.1696969696969697,sector,0.013157894736842129
 power,renewablescap,2026,vietnam,pdp8_2023,EVN (Electricity of Vietnam),projected,0,0,sector,0
 power,renewablescap,2026,vietnam,pdp8_2023,EVN (Electricity of Vietnam),target_pdp8_ndc,6104.000000000001,0.1820242142303334,sector,0.013157894736842132
 power,renewablescap,2026,vietnam,pdp8_2023,Gia Lai Electricity JSC,projected,380,1,sector,0.08571428571428572
@@ -1463,8 +1463,8 @@ power,renewablescap,2026,vietnam,pdp8_2023,Xuan Thien Group,projected,730,1,sect
 power,renewablescap,2026,vietnam,pdp8_2023,Xuan Thien Group,target_pdp8_ndc,832,0.8366013071895425,sector,0.013157894736842105
 power,renewablescap,2026,vietnam,steps_2023,BIM Group,projected,420,1,sector,0.10526315789473684
 power,renewablescap,2026,vietnam,steps_2023,BIM Group,target_steps,482.6,0.8355263157894737,sector,0.006578947368421072
-power,renewablescap,2026,vietnam,steps_2023,Dung Quat LNG Power Consortium,projected,0,NA,sector,NA
-power,renewablescap,2026,vietnam,steps_2023,Dung Quat LNG Power Consortium,target_steps,0,NA,sector,NA
+power,renewablescap,2026,vietnam,steps_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,0
+power,renewablescap,2026,vietnam,steps_2023,Dung Quat LNG Power Consortium,target_steps,108,0.17197452229299362,sector,0.006578947368421052
 power,renewablescap,2026,vietnam,steps_2023,EVN (Electricity of Vietnam),projected,0,0,sector,0
 power,renewablescap,2026,vietnam,steps_2023,EVN (Electricity of Vietnam),target_steps,5886,0.1759062789516153,sector,0.006578947368421052
 power,renewablescap,2026,vietnam,steps_2023,Gia Lai Electricity JSC,projected,380,1,sector,0.08571428571428572
@@ -1489,8 +1489,8 @@ power,renewablescap,2026,vietnam,steps_2023,Xuan Thien Group,projected,730,1,sec
 power,renewablescap,2026,vietnam,steps_2023,Xuan Thien Group,target_steps,825.5,0.8355263157894737,sector,0.006578947368421052
 power,renewablescap,2027,vietnam,nze_2023,BIM Group,projected,460,1,sector,0.21052631578947367
 power,renewablescap,2027,vietnam,nze_2023,BIM Group,target_nze_global,520.6,0.8616352201257862,sector,0.0723684210526316
-power,renewablescap,2027,vietnam,nze_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,NA
-power,renewablescap,2027,vietnam,nze_2023,Dung Quat LNG Power Consortium,target_nze_global,0,NA,sector,NA
+power,renewablescap,2027,vietnam,nze_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,0
+power,renewablescap,2027,vietnam,nze_2023,Dung Quat LNG Power Consortium,target_nze_global,148,0.20670391061452514,sector,0.07236842105263158
 power,renewablescap,2027,vietnam,nze_2023,EVN (Electricity of Vietnam),projected,0,0,sector,0
 power,renewablescap,2027,vietnam,nze_2023,EVN (Electricity of Vietnam),target_nze_global,8066,0.25137906317200115,sector,0.07236842105263158
 power,renewablescap,2027,vietnam,nze_2023,Gia Lai Electricity JSC,projected,410,1,sector,0.17142857142857143
@@ -1515,8 +1515,8 @@ power,renewablescap,2027,vietnam,nze_2023,Xuan Thien Group,projected,810,1,secto
 power,renewablescap,2027,vietnam,nze_2023,Xuan Thien Group,target_nze_global,890.5,0.8616352201257862,sector,0.07236842105263158
 power,renewablescap,2027,vietnam,pdp8_2023,BIM Group,projected,460,1,sector,0.21052631578947367
 power,renewablescap,2027,vietnam,pdp8_2023,BIM Group,target_pdp8_ndc,494,0.8441558441558441,sector,0.026315789473684188
-power,renewablescap,2027,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,NA
-power,renewablescap,2027,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,target_pdp8_ndc,0,NA,sector,NA
+power,renewablescap,2027,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,0
+power,renewablescap,2027,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,target_pdp8_ndc,120,0.16483516483516483,sector,0.02631578947368421
 power,renewablescap,2027,vietnam,pdp8_2023,EVN (Electricity of Vietnam),projected,0,0,sector,0
 power,renewablescap,2027,vietnam,pdp8_2023,EVN (Electricity of Vietnam),target_pdp8_ndc,6540,0.19454442692685248,sector,0.02631578947368421
 power,renewablescap,2027,vietnam,pdp8_2023,Gia Lai Electricity JSC,projected,410,1,sector,0.17142857142857143
@@ -1541,8 +1541,8 @@ power,renewablescap,2027,vietnam,pdp8_2023,Xuan Thien Group,projected,810,1,sect
 power,renewablescap,2027,vietnam,pdp8_2023,Xuan Thien Group,target_pdp8_ndc,845,0.8441558441558441,sector,0.02631578947368421
 power,renewablescap,2027,vietnam,steps_2023,BIM Group,projected,460,1,sector,0.21052631578947367
 power,renewablescap,2027,vietnam,steps_2023,BIM Group,target_steps,486.4,0.8366013071895425,sector,0.013157894736842046
-power,renewablescap,2027,vietnam,steps_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,NA
-power,renewablescap,2027,vietnam,steps_2023,Dung Quat LNG Power Consortium,target_steps,0,NA,sector,NA
+power,renewablescap,2027,vietnam,steps_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,0
+power,renewablescap,2027,vietnam,steps_2023,Dung Quat LNG Power Consortium,target_steps,112.00000000000001,0.17177914110429446,sector,0.013157894736842129
 power,renewablescap,2027,vietnam,steps_2023,EVN (Electricity of Vietnam),projected,0,0,sector,0
 power,renewablescap,2027,vietnam,steps_2023,EVN (Electricity of Vietnam),target_steps,6104.000000000001,0.1801706071607781,sector,0.013157894736842132
 power,renewablescap,2027,vietnam,steps_2023,Gia Lai Electricity JSC,projected,410,1,sector,0.17142857142857143
@@ -1567,8 +1567,8 @@ power,renewablescap,2027,vietnam,steps_2023,Xuan Thien Group,projected,810,1,sec
 power,renewablescap,2027,vietnam,steps_2023,Xuan Thien Group,target_steps,832,0.8366013071895425,sector,0.013157894736842105
 power,renewablescap,2028,vietnam,nze_2023,BIM Group,projected,510,1,sector,0.34210526315789475
 power,renewablescap,2028,vietnam,nze_2023,BIM Group,target_nze_global,547.2,0.8727272727272728,sector,0.118421052631579
-power,renewablescap,2028,vietnam,nze_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,NA
-power,renewablescap,2028,vietnam,nze_2023,Dung Quat LNG Power Consortium,target_nze_global,0,NA,sector,NA
+power,renewablescap,2028,vietnam,nze_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,0
+power,renewablescap,2028,vietnam,nze_2023,Dung Quat LNG Power Consortium,target_nze_global,176,0.23529411764705882,sector,0.11842105263157894
 power,renewablescap,2028,vietnam,nze_2023,EVN (Electricity of Vietnam),projected,0,0,sector,0
 power,renewablescap,2028,vietnam,nze_2023,EVN (Electricity of Vietnam),target_nze_global,9592,0.30645367412140573,sector,0.11842105263157894
 power,renewablescap,2028,vietnam,nze_2023,Gia Lai Electricity JSC,projected,450,1,sector,0.2857142857142857
@@ -1593,8 +1593,8 @@ power,renewablescap,2028,vietnam,nze_2023,Xuan Thien Group,projected,880,1,secto
 power,renewablescap,2028,vietnam,nze_2023,Xuan Thien Group,target_nze_global,936,0.8727272727272727,sector,0.11842105263157894
 power,renewablescap,2028,vietnam,pdp8_2023,BIM Group,projected,510,1,sector,0.34210526315789475
 power,renewablescap,2028,vietnam,pdp8_2023,BIM Group,target_pdp8_ndc,497.8,0.8506493506493507,sector,0.03289473684210526
-power,renewablescap,2028,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,NA
-power,renewablescap,2028,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,target_pdp8_ndc,0,NA,sector,NA
+power,renewablescap,2028,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,0
+power,renewablescap,2028,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,target_pdp8_ndc,124,0.155,sector,0.03289473684210526
 power,renewablescap,2028,vietnam,pdp8_2023,EVN (Electricity of Vietnam),projected,0,0,sector,0
 power,renewablescap,2028,vietnam,pdp8_2023,EVN (Electricity of Vietnam),target_pdp8_ndc,6758,0.2016591071854858,sector,0.03289473684210526
 power,renewablescap,2028,vietnam,pdp8_2023,Gia Lai Electricity JSC,projected,450,1,sector,0.2857142857142857
@@ -1619,8 +1619,8 @@ power,renewablescap,2028,vietnam,pdp8_2023,Xuan Thien Group,projected,880,1,sect
 power,renewablescap,2028,vietnam,pdp8_2023,Xuan Thien Group,target_pdp8_ndc,851.5,0.8506493506493507,sector,0.03289473684210526
 power,renewablescap,2028,vietnam,steps_2023,BIM Group,projected,510,1,sector,0.34210526315789475
 power,renewablescap,2028,vietnam,steps_2023,BIM Group,target_steps,490.2,0.8376623376623377,sector,0.01973684210526312
-power,renewablescap,2028,vietnam,steps_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,NA
-power,renewablescap,2028,vietnam,steps_2023,Dung Quat LNG Power Consortium,target_steps,0,NA,sector,NA
+power,renewablescap,2028,vietnam,steps_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,0
+power,renewablescap,2028,vietnam,steps_2023,Dung Quat LNG Power Consortium,target_steps,115.99999999999999,0.1715976331360947,sector,0.019736842105263136
 power,renewablescap,2028,vietnam,steps_2023,EVN (Electricity of Vietnam),projected,0,0,sector,0
 power,renewablescap,2028,vietnam,steps_2023,EVN (Electricity of Vietnam),target_steps,6322,0.18433099104877979,sector,0.019736842105263157
 power,renewablescap,2028,vietnam,steps_2023,Gia Lai Electricity JSC,projected,450,1,sector,0.2857142857142857
@@ -1645,8 +1645,8 @@ power,renewablescap,2028,vietnam,steps_2023,Xuan Thien Group,projected,880,1,sec
 power,renewablescap,2028,vietnam,steps_2023,Xuan Thien Group,target_steps,838.5,0.8376623376623377,sector,0.019736842105263157
 power,renewablescap,2029,vietnam,nze_2023,BIM Group,projected,560,1,sector,0.47368421052631576
 power,renewablescap,2029,vietnam,nze_2023,BIM Group,target_nze_global,570,0.8823529411764706,sector,0.15789473684210523
-power,renewablescap,2029,vietnam,nze_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,NA
-power,renewablescap,2029,vietnam,nze_2023,Dung Quat LNG Power Consortium,target_nze_global,0,NA,sector,NA
+power,renewablescap,2029,vietnam,nze_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,0
+power,renewablescap,2029,vietnam,nze_2023,Dung Quat LNG Power Consortium,target_nze_global,200,0.2577319587628866,sector,0.15789473684210525
 power,renewablescap,2029,vietnam,nze_2023,EVN (Electricity of Vietnam),projected,0,0,sector,0
 power,renewablescap,2029,vietnam,nze_2023,EVN (Electricity of Vietnam),target_nze_global,10900,0.35831689677843526,sector,0.15789473684210525
 power,renewablescap,2029,vietnam,nze_2023,Gia Lai Electricity JSC,projected,480,1,sector,0.37142857142857144
@@ -1671,8 +1671,8 @@ power,renewablescap,2029,vietnam,nze_2023,Xuan Thien Group,projected,950,1,secto
 power,renewablescap,2029,vietnam,nze_2023,Xuan Thien Group,target_nze_global,975,0.8823529411764706,sector,0.15789473684210525
 power,renewablescap,2029,vietnam,pdp8_2023,BIM Group,projected,560,1,sector,0.47368421052631576
 power,renewablescap,2029,vietnam,pdp8_2023,BIM Group,target_pdp8_ndc,501.6,0.8571428571428571,sector,0.039473684210526334
-power,renewablescap,2029,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,NA
-power,renewablescap,2029,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,target_pdp8_ndc,0,NA,sector,NA
+power,renewablescap,2029,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,0
+power,renewablescap,2029,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,target_pdp8_ndc,128,0.1461187214611872,sector,0.039473684210526314
 power,renewablescap,2029,vietnam,pdp8_2023,EVN (Electricity of Vietnam),projected,0,0,sector,0
 power,renewablescap,2029,vietnam,pdp8_2023,EVN (Electricity of Vietnam),target_pdp8_ndc,6976,0.20950836411688742,sector,0.039473684210526314
 power,renewablescap,2029,vietnam,pdp8_2023,Gia Lai Electricity JSC,projected,480,1,sector,0.37142857142857144
@@ -1697,8 +1697,8 @@ power,renewablescap,2029,vietnam,pdp8_2023,Xuan Thien Group,projected,950,1,sect
 power,renewablescap,2029,vietnam,pdp8_2023,Xuan Thien Group,target_pdp8_ndc,858,0.8571428571428571,sector,0.039473684210526314
 power,renewablescap,2029,vietnam,steps_2023,BIM Group,projected,560,1,sector,0.47368421052631576
 power,renewablescap,2029,vietnam,steps_2023,BIM Group,target_steps,494,0.8441558441558441,sector,0.026315789473684188
-power,renewablescap,2029,vietnam,steps_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,NA
-power,renewablescap,2029,vietnam,steps_2023,Dung Quat LNG Power Consortium,target_steps,0,NA,sector,NA
+power,renewablescap,2029,vietnam,steps_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,0
+power,renewablescap,2029,vietnam,steps_2023,Dung Quat LNG Power Consortium,target_steps,120,0.1724137931034483,sector,0.02631578947368421
 power,renewablescap,2029,vietnam,steps_2023,EVN (Electricity of Vietnam),projected,0,0,sector,0
 power,renewablescap,2029,vietnam,steps_2023,EVN (Electricity of Vietnam),target_steps,6540,0.19027115093680905,sector,0.02631578947368421
 power,renewablescap,2029,vietnam,steps_2023,Gia Lai Electricity JSC,projected,480,1,sector,0.37142857142857144
@@ -1723,8 +1723,8 @@ power,renewablescap,2029,vietnam,steps_2023,Xuan Thien Group,projected,950,1,sec
 power,renewablescap,2029,vietnam,steps_2023,Xuan Thien Group,target_steps,845,0.8441558441558441,sector,0.02631578947368421
 power,renewablescap,2030,vietnam,nze_2023,BIM Group,projected,600,1,sector,0.5789473684210527
 power,renewablescap,2030,vietnam,nze_2023,BIM Group,target_nze_global,592.8,0.8914285714285715,sector,0.19736842105263147
-power,renewablescap,2030,vietnam,nze_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,NA
-power,renewablescap,2030,vietnam,nze_2023,Dung Quat LNG Power Consortium,target_nze_global,0,NA,sector,NA
+power,renewablescap,2030,vietnam,nze_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,0
+power,renewablescap,2030,vietnam,nze_2023,Dung Quat LNG Power Consortium,target_nze_global,224.00000000000003,0.28,sector,0.19736842105263164
 power,renewablescap,2030,vietnam,nze_2023,EVN (Electricity of Vietnam),projected,0,0,sector,0
 power,renewablescap,2030,vietnam,nze_2023,EVN (Electricity of Vietnam),target_nze_global,12208.000000000002,0.4134801016088061,sector,0.19736842105263164
 power,renewablescap,2030,vietnam,nze_2023,Gia Lai Electricity JSC,projected,500,1,sector,0.42857142857142855
@@ -1749,8 +1749,8 @@ power,renewablescap,2030,vietnam,nze_2023,Xuan Thien Group,projected,1000,1,sect
 power,renewablescap,2030,vietnam,nze_2023,Xuan Thien Group,target_nze_global,1014,0.8914285714285715,sector,0.19736842105263158
 power,renewablescap,2030,vietnam,pdp8_2023,BIM Group,projected,600,1,sector,0.5789473684210527
 power,renewablescap,2030,vietnam,pdp8_2023,BIM Group,target_pdp8_ndc,509.20000000000005,0.8645161290322582,sector,0.05263157894736848
-power,renewablescap,2030,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,NA
-power,renewablescap,2030,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,target_pdp8_ndc,0,NA,sector,NA
+power,renewablescap,2030,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,0
+power,renewablescap,2030,vietnam,pdp8_2023,Dung Quat LNG Power Consortium,target_pdp8_ndc,136,0.13991769547325103,sector,0.05263157894736842
 power,renewablescap,2030,vietnam,pdp8_2023,EVN (Electricity of Vietnam),projected,0,0,sector,0
 power,renewablescap,2030,vietnam,pdp8_2023,EVN (Electricity of Vietnam),target_pdp8_ndc,7412.000000000001,0.22135284455726448,sector,0.052631578947368446
 power,renewablescap,2030,vietnam,pdp8_2023,Gia Lai Electricity JSC,projected,500,1,sector,0.42857142857142855
@@ -1775,8 +1775,8 @@ power,renewablescap,2030,vietnam,pdp8_2023,Xuan Thien Group,projected,1000,1,sec
 power,renewablescap,2030,vietnam,pdp8_2023,Xuan Thien Group,target_pdp8_ndc,871,0.864516129032258,sector,0.05263157894736842
 power,renewablescap,2030,vietnam,steps_2023,BIM Group,projected,600,1,sector,0.5789473684210527
 power,renewablescap,2030,vietnam,steps_2023,BIM Group,target_steps,497.8,0.8451612903225807,sector,0.03289473684210526
-power,renewablescap,2030,vietnam,steps_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,NA
-power,renewablescap,2030,vietnam,steps_2023,Dung Quat LNG Power Consortium,target_steps,0,NA,sector,NA
+power,renewablescap,2030,vietnam,steps_2023,Dung Quat LNG Power Consortium,projected,0,0,sector,0
+power,renewablescap,2030,vietnam,steps_2023,Dung Quat LNG Power Consortium,target_steps,124,0.17222222222222222,sector,0.03289473684210526
 power,renewablescap,2030,vietnam,steps_2023,EVN (Electricity of Vietnam),projected,0,0,sector,0
 power,renewablescap,2030,vietnam,steps_2023,EVN (Electricity of Vietnam),target_steps,6758,0.19425122161540673,sector,0.03289473684210526
 power,renewablescap,2030,vietnam,steps_2023,Gia Lai Electricity JSC,projected,500,1,sector,0.42857142857142855
@@ -1961,24 +1961,24 @@ automotive,ice,2030,global,steps_2023,corporate_economy,corporate_economy,268000
 automotive,ice,2030,vietnam,nze_2023,corporate_economy,corporate_economy,268000,0.5317460317460317,technology,-0.032490974729241874
 automotive,ice,2030,vietnam,pdp8_2023,corporate_economy,corporate_economy,268000,0.5317460317460317,technology,-0.032490974729241874
 automotive,ice,2030,vietnam,steps_2023,corporate_economy,corporate_economy,268000,0.5317460317460317,technology,-0.032490974729241874
-power,coalcap,2025,asia_pacific,nze_2023,corporate_economy,corporate_economy,15700,0.44818726805595205,technology,0
-power,coalcap,2025,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,15700,0.44818726805595205,technology,0
-power,coalcap,2025,asia_pacific,steps_2023,corporate_economy,corporate_economy,15700,0.44818726805595205,technology,0
-power,coalcap,2025,global,nze_2023,corporate_economy,corporate_economy,15700,0.44818726805595205,technology,0
-power,coalcap,2025,global,pdp8_2023,corporate_economy,corporate_economy,15700,0.44818726805595205,technology,0
-power,coalcap,2025,global,steps_2023,corporate_economy,corporate_economy,15700,0.44818726805595205,technology,0
-power,coalcap,2025,vietnam,nze_2023,corporate_economy,corporate_economy,15700,0.44818726805595205,technology,0
-power,coalcap,2025,vietnam,pdp8_2023,corporate_economy,corporate_economy,15700,0.44818726805595205,technology,0
-power,coalcap,2025,vietnam,steps_2023,corporate_economy,corporate_economy,15700,0.44818726805595205,technology,0
-power,coalcap,2026,asia_pacific,nze_2023,corporate_economy,corporate_economy,15680,0.43567657682689637,technology,-0.0012738853503184713
-power,coalcap,2026,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,15680,0.43567657682689637,technology,-0.0012738853503184713
-power,coalcap,2026,asia_pacific,steps_2023,corporate_economy,corporate_economy,15680,0.43567657682689637,technology,-0.0012738853503184713
-power,coalcap,2026,global,nze_2023,corporate_economy,corporate_economy,15680,0.43567657682689637,technology,-0.0012738853503184713
-power,coalcap,2026,global,pdp8_2023,corporate_economy,corporate_economy,15680,0.43567657682689637,technology,-0.0012738853503184713
-power,coalcap,2026,global,steps_2023,corporate_economy,corporate_economy,15680,0.43567657682689637,technology,-0.0012738853503184713
-power,coalcap,2026,vietnam,nze_2023,corporate_economy,corporate_economy,15680,0.43567657682689637,technology,-0.0012738853503184713
-power,coalcap,2026,vietnam,pdp8_2023,corporate_economy,corporate_economy,15680,0.43567657682689637,technology,-0.0012738853503184713
-power,coalcap,2026,vietnam,steps_2023,corporate_economy,corporate_economy,15680,0.43567657682689637,technology,-0.0012738853503184713
+power,coalcap,2025,asia_pacific,nze_2023,corporate_economy,corporate_economy,15700,0.4431272932543043,technology,0
+power,coalcap,2025,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,15700,0.4431272932543043,technology,0
+power,coalcap,2025,asia_pacific,steps_2023,corporate_economy,corporate_economy,15700,0.4431272932543043,technology,0
+power,coalcap,2025,global,nze_2023,corporate_economy,corporate_economy,15700,0.4431272932543043,technology,0
+power,coalcap,2025,global,pdp8_2023,corporate_economy,corporate_economy,15700,0.4431272932543043,technology,0
+power,coalcap,2025,global,steps_2023,corporate_economy,corporate_economy,15700,0.4431272932543043,technology,0
+power,coalcap,2025,vietnam,nze_2023,corporate_economy,corporate_economy,15700,0.4431272932543043,technology,0
+power,coalcap,2025,vietnam,pdp8_2023,corporate_economy,corporate_economy,15700,0.4431272932543043,technology,0
+power,coalcap,2025,vietnam,steps_2023,corporate_economy,corporate_economy,15700,0.4431272932543043,technology,0
+power,coalcap,2026,asia_pacific,nze_2023,corporate_economy,corporate_economy,15680,0.43088760648529817,technology,-0.0012738853503184713
+power,coalcap,2026,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,15680,0.43088760648529817,technology,-0.0012738853503184713
+power,coalcap,2026,asia_pacific,steps_2023,corporate_economy,corporate_economy,15680,0.43088760648529817,technology,-0.0012738853503184713
+power,coalcap,2026,global,nze_2023,corporate_economy,corporate_economy,15680,0.43088760648529817,technology,-0.0012738853503184713
+power,coalcap,2026,global,pdp8_2023,corporate_economy,corporate_economy,15680,0.43088760648529817,technology,-0.0012738853503184713
+power,coalcap,2026,global,steps_2023,corporate_economy,corporate_economy,15680,0.43088760648529817,technology,-0.0012738853503184713
+power,coalcap,2026,vietnam,nze_2023,corporate_economy,corporate_economy,15680,0.43088760648529817,technology,-0.0012738853503184713
+power,coalcap,2026,vietnam,pdp8_2023,corporate_economy,corporate_economy,15680,0.43088760648529817,technology,-0.0012738853503184713
+power,coalcap,2026,vietnam,steps_2023,corporate_economy,corporate_economy,15680,0.43088760648529817,technology,-0.0012738853503184713
 power,coalcap,2027,asia_pacific,nze_2023,corporate_economy,corporate_economy,15150,0.40725806451612906,technology,-0.03503184713375796
 power,coalcap,2027,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,15150,0.40725806451612906,technology,-0.03503184713375796
 power,coalcap,2027,asia_pacific,steps_2023,corporate_economy,corporate_economy,15150,0.40725806451612906,technology,-0.03503184713375796
@@ -2015,165 +2015,165 @@ power,coalcap,2030,global,steps_2023,corporate_economy,corporate_economy,14000,0
 power,coalcap,2030,vietnam,nze_2023,corporate_economy,corporate_economy,14000,0.3495630461922597,technology,-0.10828025477707007
 power,coalcap,2030,vietnam,pdp8_2023,corporate_economy,corporate_economy,14000,0.3495630461922597,technology,-0.10828025477707007
 power,coalcap,2030,vietnam,steps_2023,corporate_economy,corporate_economy,14000,0.3495630461922597,technology,-0.10828025477707007
-power,gascap,2025,asia_pacific,nze_2023,corporate_economy,corporate_economy,5700,0.1627176705680845,technology,0
-power,gascap,2025,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,5700,0.1627176705680845,technology,0
-power,gascap,2025,asia_pacific,steps_2023,corporate_economy,corporate_economy,5700,0.1627176705680845,technology,0
-power,gascap,2025,global,nze_2023,corporate_economy,corporate_economy,5700,0.1627176705680845,technology,0
-power,gascap,2025,global,pdp8_2023,corporate_economy,corporate_economy,5700,0.1627176705680845,technology,0
-power,gascap,2025,global,steps_2023,corporate_economy,corporate_economy,5700,0.1627176705680845,technology,0
-power,gascap,2025,vietnam,nze_2023,corporate_economy,corporate_economy,5700,0.1627176705680845,technology,0
-power,gascap,2025,vietnam,pdp8_2023,corporate_economy,corporate_economy,5700,0.1627176705680845,technology,0
-power,gascap,2025,vietnam,steps_2023,corporate_economy,corporate_economy,5700,0.1627176705680845,technology,0
-power,gascap,2026,asia_pacific,nze_2023,corporate_economy,corporate_economy,6020,0.16726868574604056,technology,0.056140350877192984
-power,gascap,2026,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,6020,0.16726868574604056,technology,0.056140350877192984
-power,gascap,2026,asia_pacific,steps_2023,corporate_economy,corporate_economy,6020,0.16726868574604056,technology,0.056140350877192984
-power,gascap,2026,global,nze_2023,corporate_economy,corporate_economy,6020,0.16726868574604056,technology,0.056140350877192984
-power,gascap,2026,global,pdp8_2023,corporate_economy,corporate_economy,6020,0.16726868574604056,technology,0.056140350877192984
-power,gascap,2026,global,steps_2023,corporate_economy,corporate_economy,6020,0.16726868574604056,technology,0.056140350877192984
-power,gascap,2026,vietnam,nze_2023,corporate_economy,corporate_economy,6020,0.16726868574604056,technology,0.056140350877192984
-power,gascap,2026,vietnam,pdp8_2023,corporate_economy,corporate_economy,6020,0.16726868574604056,technology,0.056140350877192984
-power,gascap,2026,vietnam,steps_2023,corporate_economy,corporate_economy,6020,0.16726868574604056,technology,0.056140350877192984
-power,gascap,2027,asia_pacific,nze_2023,corporate_economy,corporate_economy,7140,0.19193548387096773,technology,0.25263157894736843
-power,gascap,2027,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,7140,0.19193548387096773,technology,0.25263157894736843
-power,gascap,2027,asia_pacific,steps_2023,corporate_economy,corporate_economy,7140,0.19193548387096773,technology,0.25263157894736843
-power,gascap,2027,global,nze_2023,corporate_economy,corporate_economy,7140,0.19193548387096773,technology,0.25263157894736843
-power,gascap,2027,global,pdp8_2023,corporate_economy,corporate_economy,7140,0.19193548387096773,technology,0.25263157894736843
-power,gascap,2027,global,steps_2023,corporate_economy,corporate_economy,7140,0.19193548387096773,technology,0.25263157894736843
-power,gascap,2027,vietnam,nze_2023,corporate_economy,corporate_economy,7140,0.19193548387096773,technology,0.25263157894736843
-power,gascap,2027,vietnam,pdp8_2023,corporate_economy,corporate_economy,7140,0.19193548387096773,technology,0.25263157894736843
-power,gascap,2027,vietnam,steps_2023,corporate_economy,corporate_economy,7140,0.19193548387096773,technology,0.25263157894736843
-power,gascap,2028,asia_pacific,nze_2023,corporate_economy,corporate_economy,8040,0.208668569945497,technology,0.4105263157894737
-power,gascap,2028,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,8040,0.208668569945497,technology,0.4105263157894737
-power,gascap,2028,asia_pacific,steps_2023,corporate_economy,corporate_economy,8040,0.208668569945497,technology,0.4105263157894737
-power,gascap,2028,global,nze_2023,corporate_economy,corporate_economy,8040,0.208668569945497,technology,0.4105263157894737
-power,gascap,2028,global,pdp8_2023,corporate_economy,corporate_economy,8040,0.208668569945497,technology,0.4105263157894737
-power,gascap,2028,global,steps_2023,corporate_economy,corporate_economy,8040,0.208668569945497,technology,0.4105263157894737
-power,gascap,2028,vietnam,nze_2023,corporate_economy,corporate_economy,8040,0.208668569945497,technology,0.4105263157894737
-power,gascap,2028,vietnam,pdp8_2023,corporate_economy,corporate_economy,8040,0.208668569945497,technology,0.4105263157894737
-power,gascap,2028,vietnam,steps_2023,corporate_economy,corporate_economy,8040,0.208668569945497,technology,0.4105263157894737
-power,gascap,2029,asia_pacific,nze_2023,corporate_economy,corporate_economy,8530,0.2167725540025413,technology,0.49649122807017543
-power,gascap,2029,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,8530,0.2167725540025413,technology,0.49649122807017543
-power,gascap,2029,asia_pacific,steps_2023,corporate_economy,corporate_economy,8530,0.2167725540025413,technology,0.49649122807017543
-power,gascap,2029,global,nze_2023,corporate_economy,corporate_economy,8530,0.2167725540025413,technology,0.49649122807017543
-power,gascap,2029,global,pdp8_2023,corporate_economy,corporate_economy,8530,0.2167725540025413,technology,0.49649122807017543
-power,gascap,2029,global,steps_2023,corporate_economy,corporate_economy,8530,0.2167725540025413,technology,0.49649122807017543
-power,gascap,2029,vietnam,nze_2023,corporate_economy,corporate_economy,8530,0.2167725540025413,technology,0.49649122807017543
-power,gascap,2029,vietnam,pdp8_2023,corporate_economy,corporate_economy,8530,0.2167725540025413,technology,0.49649122807017543
-power,gascap,2029,vietnam,steps_2023,corporate_economy,corporate_economy,8530,0.2167725540025413,technology,0.49649122807017543
-power,gascap,2030,asia_pacific,nze_2023,corporate_economy,corporate_economy,9150,0.22846441947565543,technology,0.6052631578947368
-power,gascap,2030,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,9150,0.22846441947565543,technology,0.6052631578947368
-power,gascap,2030,asia_pacific,steps_2023,corporate_economy,corporate_economy,9150,0.22846441947565543,technology,0.6052631578947368
-power,gascap,2030,global,nze_2023,corporate_economy,corporate_economy,9150,0.22846441947565543,technology,0.6052631578947368
-power,gascap,2030,global,pdp8_2023,corporate_economy,corporate_economy,9150,0.22846441947565543,technology,0.6052631578947368
-power,gascap,2030,global,steps_2023,corporate_economy,corporate_economy,9150,0.22846441947565543,technology,0.6052631578947368
-power,gascap,2030,vietnam,nze_2023,corporate_economy,corporate_economy,9150,0.22846441947565543,technology,0.6052631578947368
-power,gascap,2030,vietnam,pdp8_2023,corporate_economy,corporate_economy,9150,0.22846441947565543,technology,0.6052631578947368
-power,gascap,2030,vietnam,steps_2023,corporate_economy,corporate_economy,9150,0.22846441947565543,technology,0.6052631578947368
-power,hydrocap,2025,asia_pacific,nze_2023,corporate_economy,corporate_economy,10200,0.2911789894376249,sector,0
-power,hydrocap,2025,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,10200,0.2911789894376249,sector,0
-power,hydrocap,2025,asia_pacific,steps_2023,corporate_economy,corporate_economy,10200,0.2911789894376249,sector,0
-power,hydrocap,2025,global,nze_2023,corporate_economy,corporate_economy,10200,0.2911789894376249,sector,0
-power,hydrocap,2025,global,pdp8_2023,corporate_economy,corporate_economy,10200,0.2911789894376249,sector,0
-power,hydrocap,2025,global,steps_2023,corporate_economy,corporate_economy,10200,0.2911789894376249,sector,0
-power,hydrocap,2025,vietnam,nze_2023,corporate_economy,corporate_economy,10200,0.2911789894376249,sector,0
-power,hydrocap,2025,vietnam,pdp8_2023,corporate_economy,corporate_economy,10200,0.2911789894376249,sector,0
-power,hydrocap,2025,vietnam,steps_2023,corporate_economy,corporate_economy,10200,0.2911789894376249,sector,0
-power,hydrocap,2026,asia_pacific,nze_2023,corporate_economy,corporate_economy,10270,0.28535704362322867,sector,0.0019982871824150727
-power,hydrocap,2026,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,10270,0.28535704362322867,sector,0.0019982871824150727
-power,hydrocap,2026,asia_pacific,steps_2023,corporate_economy,corporate_economy,10270,0.28535704362322867,sector,0.0019982871824150727
-power,hydrocap,2026,global,nze_2023,corporate_economy,corporate_economy,10270,0.28535704362322867,sector,0.0019982871824150727
-power,hydrocap,2026,global,pdp8_2023,corporate_economy,corporate_economy,10270,0.28535704362322867,sector,0.0019982871824150727
-power,hydrocap,2026,global,steps_2023,corporate_economy,corporate_economy,10270,0.28535704362322867,sector,0.0019982871824150727
-power,hydrocap,2026,vietnam,nze_2023,corporate_economy,corporate_economy,10270,0.28535704362322867,sector,0.0019982871824150727
-power,hydrocap,2026,vietnam,pdp8_2023,corporate_economy,corporate_economy,10270,0.28535704362322867,sector,0.0019982871824150727
-power,hydrocap,2026,vietnam,steps_2023,corporate_economy,corporate_economy,10270,0.28535704362322867,sector,0.0019982871824150727
-power,hydrocap,2027,asia_pacific,nze_2023,corporate_economy,corporate_economy,10350,0.2782258064516129,sector,0.004282043962318013
-power,hydrocap,2027,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,10350,0.2782258064516129,sector,0.004282043962318013
-power,hydrocap,2027,asia_pacific,steps_2023,corporate_economy,corporate_economy,10350,0.2782258064516129,sector,0.004282043962318013
-power,hydrocap,2027,global,nze_2023,corporate_economy,corporate_economy,10350,0.2782258064516129,sector,0.004282043962318013
-power,hydrocap,2027,global,pdp8_2023,corporate_economy,corporate_economy,10350,0.2782258064516129,sector,0.004282043962318013
-power,hydrocap,2027,global,steps_2023,corporate_economy,corporate_economy,10350,0.2782258064516129,sector,0.004282043962318013
-power,hydrocap,2027,vietnam,nze_2023,corporate_economy,corporate_economy,10350,0.2782258064516129,sector,0.004282043962318013
-power,hydrocap,2027,vietnam,pdp8_2023,corporate_economy,corporate_economy,10350,0.2782258064516129,sector,0.004282043962318013
-power,hydrocap,2027,vietnam,steps_2023,corporate_economy,corporate_economy,10350,0.2782258064516129,sector,0.004282043962318013
-power,hydrocap,2028,asia_pacific,nze_2023,corporate_economy,corporate_economy,10450,0.27121723332468206,sector,0.007136739937196689
-power,hydrocap,2028,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,10450,0.27121723332468206,sector,0.007136739937196689
-power,hydrocap,2028,asia_pacific,steps_2023,corporate_economy,corporate_economy,10450,0.27121723332468206,sector,0.007136739937196689
-power,hydrocap,2028,global,nze_2023,corporate_economy,corporate_economy,10450,0.27121723332468206,sector,0.007136739937196689
-power,hydrocap,2028,global,pdp8_2023,corporate_economy,corporate_economy,10450,0.27121723332468206,sector,0.007136739937196689
-power,hydrocap,2028,global,steps_2023,corporate_economy,corporate_economy,10450,0.27121723332468206,sector,0.007136739937196689
-power,hydrocap,2028,vietnam,nze_2023,corporate_economy,corporate_economy,10450,0.27121723332468206,sector,0.007136739937196689
-power,hydrocap,2028,vietnam,pdp8_2023,corporate_economy,corporate_economy,10450,0.27121723332468206,sector,0.007136739937196689
-power,hydrocap,2028,vietnam,steps_2023,corporate_economy,corporate_economy,10450,0.27121723332468206,sector,0.007136739937196689
-power,hydrocap,2029,asia_pacific,nze_2023,corporate_economy,corporate_economy,10550,0.2681067344345616,sector,0.009991435912075365
-power,hydrocap,2029,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,10550,0.2681067344345616,sector,0.009991435912075365
-power,hydrocap,2029,asia_pacific,steps_2023,corporate_economy,corporate_economy,10550,0.2681067344345616,sector,0.009991435912075365
-power,hydrocap,2029,global,nze_2023,corporate_economy,corporate_economy,10550,0.2681067344345616,sector,0.009991435912075365
-power,hydrocap,2029,global,pdp8_2023,corporate_economy,corporate_economy,10550,0.2681067344345616,sector,0.009991435912075365
-power,hydrocap,2029,global,steps_2023,corporate_economy,corporate_economy,10550,0.2681067344345616,sector,0.009991435912075365
-power,hydrocap,2029,vietnam,nze_2023,corporate_economy,corporate_economy,10550,0.2681067344345616,sector,0.009991435912075365
-power,hydrocap,2029,vietnam,pdp8_2023,corporate_economy,corporate_economy,10550,0.2681067344345616,sector,0.009991435912075365
-power,hydrocap,2029,vietnam,steps_2023,corporate_economy,corporate_economy,10550,0.2681067344345616,sector,0.009991435912075365
-power,hydrocap,2030,asia_pacific,nze_2023,corporate_economy,corporate_economy,10700,0.2671660424469413,sector,0.014273479874393378
-power,hydrocap,2030,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,10700,0.2671660424469413,sector,0.014273479874393378
-power,hydrocap,2030,asia_pacific,steps_2023,corporate_economy,corporate_economy,10700,0.2671660424469413,sector,0.014273479874393378
-power,hydrocap,2030,global,nze_2023,corporate_economy,corporate_economy,10700,0.2671660424469413,sector,0.014273479874393378
-power,hydrocap,2030,global,pdp8_2023,corporate_economy,corporate_economy,10700,0.2671660424469413,sector,0.014273479874393378
-power,hydrocap,2030,global,steps_2023,corporate_economy,corporate_economy,10700,0.2671660424469413,sector,0.014273479874393378
-power,hydrocap,2030,vietnam,nze_2023,corporate_economy,corporate_economy,10700,0.2671660424469413,sector,0.014273479874393378
-power,hydrocap,2030,vietnam,pdp8_2023,corporate_economy,corporate_economy,10700,0.2671660424469413,sector,0.014273479874393378
-power,hydrocap,2030,vietnam,steps_2023,corporate_economy,corporate_economy,10700,0.2671660424469413,sector,0.014273479874393378
-power,renewablescap,2025,asia_pacific,nze_2023,corporate_economy,corporate_economy,3430,0.09791607193833857,sector,0
-power,renewablescap,2025,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,3430,0.09791607193833857,sector,0
-power,renewablescap,2025,asia_pacific,steps_2023,corporate_economy,corporate_economy,3430,0.09791607193833857,sector,0
-power,renewablescap,2025,global,nze_2023,corporate_economy,corporate_economy,3430,0.09791607193833857,sector,0
-power,renewablescap,2025,global,pdp8_2023,corporate_economy,corporate_economy,3430,0.09791607193833857,sector,0
-power,renewablescap,2025,global,steps_2023,corporate_economy,corporate_economy,3430,0.09791607193833857,sector,0
-power,renewablescap,2025,vietnam,nze_2023,corporate_economy,corporate_economy,3430,0.09791607193833857,sector,0
-power,renewablescap,2025,vietnam,pdp8_2023,corporate_economy,corporate_economy,3430,0.09791607193833857,sector,0
-power,renewablescap,2025,vietnam,steps_2023,corporate_economy,corporate_economy,3430,0.09791607193833857,sector,0
-power,renewablescap,2026,asia_pacific,nze_2023,corporate_economy,corporate_economy,4020,0.1116976938038344,sector,0.016842706251784186
-power,renewablescap,2026,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,4020,0.1116976938038344,sector,0.016842706251784186
-power,renewablescap,2026,asia_pacific,steps_2023,corporate_economy,corporate_economy,4020,0.1116976938038344,sector,0.016842706251784186
-power,renewablescap,2026,global,nze_2023,corporate_economy,corporate_economy,4020,0.1116976938038344,sector,0.016842706251784186
-power,renewablescap,2026,global,pdp8_2023,corporate_economy,corporate_economy,4020,0.1116976938038344,sector,0.016842706251784186
-power,renewablescap,2026,global,steps_2023,corporate_economy,corporate_economy,4020,0.1116976938038344,sector,0.016842706251784186
-power,renewablescap,2026,vietnam,nze_2023,corporate_economy,corporate_economy,4020,0.1116976938038344,sector,0.016842706251784186
-power,renewablescap,2026,vietnam,pdp8_2023,corporate_economy,corporate_economy,4020,0.1116976938038344,sector,0.016842706251784186
-power,renewablescap,2026,vietnam,steps_2023,corporate_economy,corporate_economy,4020,0.1116976938038344,sector,0.016842706251784186
-power,renewablescap,2027,asia_pacific,nze_2023,corporate_economy,corporate_economy,4560,0.12258064516129032,sector,0.03225806451612903
-power,renewablescap,2027,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,4560,0.12258064516129032,sector,0.03225806451612903
-power,renewablescap,2027,asia_pacific,steps_2023,corporate_economy,corporate_economy,4560,0.12258064516129032,sector,0.03225806451612903
-power,renewablescap,2027,global,nze_2023,corporate_economy,corporate_economy,4560,0.12258064516129032,sector,0.03225806451612903
-power,renewablescap,2027,global,pdp8_2023,corporate_economy,corporate_economy,4560,0.12258064516129032,sector,0.03225806451612903
-power,renewablescap,2027,global,steps_2023,corporate_economy,corporate_economy,4560,0.12258064516129032,sector,0.03225806451612903
-power,renewablescap,2027,vietnam,nze_2023,corporate_economy,corporate_economy,4560,0.12258064516129032,sector,0.03225806451612903
-power,renewablescap,2027,vietnam,pdp8_2023,corporate_economy,corporate_economy,4560,0.12258064516129032,sector,0.03225806451612903
-power,renewablescap,2027,vietnam,steps_2023,corporate_economy,corporate_economy,4560,0.12258064516129032,sector,0.03225806451612903
-power,renewablescap,2028,asia_pacific,nze_2023,corporate_economy,corporate_economy,5140,0.13340254347261873,sector,0.04881530117042535
-power,renewablescap,2028,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,5140,0.13340254347261873,sector,0.04881530117042535
-power,renewablescap,2028,asia_pacific,steps_2023,corporate_economy,corporate_economy,5140,0.13340254347261873,sector,0.04881530117042535
-power,renewablescap,2028,global,nze_2023,corporate_economy,corporate_economy,5140,0.13340254347261873,sector,0.04881530117042535
-power,renewablescap,2028,global,pdp8_2023,corporate_economy,corporate_economy,5140,0.13340254347261873,sector,0.04881530117042535
-power,renewablescap,2028,global,steps_2023,corporate_economy,corporate_economy,5140,0.13340254347261873,sector,0.04881530117042535
-power,renewablescap,2028,vietnam,nze_2023,corporate_economy,corporate_economy,5140,0.13340254347261873,sector,0.04881530117042535
-power,renewablescap,2028,vietnam,pdp8_2023,corporate_economy,corporate_economy,5140,0.13340254347261873,sector,0.04881530117042535
-power,renewablescap,2028,vietnam,steps_2023,corporate_economy,corporate_economy,5140,0.13340254347261873,sector,0.04881530117042535
-power,renewablescap,2029,asia_pacific,nze_2023,corporate_economy,corporate_economy,5710,0.1451080050825921,sector,0.0650870682272338
-power,renewablescap,2029,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,5710,0.1451080050825921,sector,0.0650870682272338
-power,renewablescap,2029,asia_pacific,steps_2023,corporate_economy,corporate_economy,5710,0.1451080050825921,sector,0.0650870682272338
-power,renewablescap,2029,global,nze_2023,corporate_economy,corporate_economy,5710,0.1451080050825921,sector,0.0650870682272338
-power,renewablescap,2029,global,pdp8_2023,corporate_economy,corporate_economy,5710,0.1451080050825921,sector,0.0650870682272338
-power,renewablescap,2029,global,steps_2023,corporate_economy,corporate_economy,5710,0.1451080050825921,sector,0.0650870682272338
-power,renewablescap,2029,vietnam,nze_2023,corporate_economy,corporate_economy,5710,0.1451080050825921,sector,0.0650870682272338
-power,renewablescap,2029,vietnam,pdp8_2023,corporate_economy,corporate_economy,5710,0.1451080050825921,sector,0.0650870682272338
-power,renewablescap,2029,vietnam,steps_2023,corporate_economy,corporate_economy,5710,0.1451080050825921,sector,0.0650870682272338
-power,renewablescap,2030,asia_pacific,nze_2023,corporate_economy,corporate_economy,6200,0.15480649188514356,sector,0.0790750785041393
-power,renewablescap,2030,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,6200,0.15480649188514356,sector,0.0790750785041393
-power,renewablescap,2030,asia_pacific,steps_2023,corporate_economy,corporate_economy,6200,0.15480649188514356,sector,0.0790750785041393
-power,renewablescap,2030,global,nze_2023,corporate_economy,corporate_economy,6200,0.15480649188514356,sector,0.0790750785041393
-power,renewablescap,2030,global,pdp8_2023,corporate_economy,corporate_economy,6200,0.15480649188514356,sector,0.0790750785041393
-power,renewablescap,2030,global,steps_2023,corporate_economy,corporate_economy,6200,0.15480649188514356,sector,0.0790750785041393
-power,renewablescap,2030,vietnam,nze_2023,corporate_economy,corporate_economy,6200,0.15480649188514356,sector,0.0790750785041393
-power,renewablescap,2030,vietnam,pdp8_2023,corporate_economy,corporate_economy,6200,0.15480649188514356,sector,0.0790750785041393
-power,renewablescap,2030,vietnam,steps_2023,corporate_economy,corporate_economy,6200,0.15480649188514356,sector,0.0790750785041393
+power,gascap,2025,asia_pacific,nze_2023,corporate_economy,corporate_economy,6100,0.17217047699689528,technology,0
+power,gascap,2025,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,6100,0.17217047699689528,technology,0
+power,gascap,2025,asia_pacific,steps_2023,corporate_economy,corporate_economy,6100,0.17217047699689528,technology,0
+power,gascap,2025,global,nze_2023,corporate_economy,corporate_economy,6100,0.17217047699689528,technology,0
+power,gascap,2025,global,pdp8_2023,corporate_economy,corporate_economy,6100,0.17217047699689528,technology,0
+power,gascap,2025,global,steps_2023,corporate_economy,corporate_economy,6100,0.17217047699689528,technology,0
+power,gascap,2025,vietnam,nze_2023,corporate_economy,corporate_economy,6100,0.17217047699689528,technology,0
+power,gascap,2025,vietnam,pdp8_2023,corporate_economy,corporate_economy,6100,0.17217047699689528,technology,0
+power,gascap,2025,vietnam,steps_2023,corporate_economy,corporate_economy,6100,0.17217047699689528,technology,0
+power,gascap,2026,asia_pacific,nze_2023,corporate_economy,corporate_economy,6420,0.17642209398186315,technology,0.05245901639344262
+power,gascap,2026,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,6420,0.17642209398186315,technology,0.05245901639344262
+power,gascap,2026,asia_pacific,steps_2023,corporate_economy,corporate_economy,6420,0.17642209398186315,technology,0.05245901639344262
+power,gascap,2026,global,nze_2023,corporate_economy,corporate_economy,6420,0.17642209398186315,technology,0.05245901639344262
+power,gascap,2026,global,pdp8_2023,corporate_economy,corporate_economy,6420,0.17642209398186315,technology,0.05245901639344262
+power,gascap,2026,global,steps_2023,corporate_economy,corporate_economy,6420,0.17642209398186315,technology,0.05245901639344262
+power,gascap,2026,vietnam,nze_2023,corporate_economy,corporate_economy,6420,0.17642209398186315,technology,0.05245901639344262
+power,gascap,2026,vietnam,pdp8_2023,corporate_economy,corporate_economy,6420,0.17642209398186315,technology,0.05245901639344262
+power,gascap,2026,vietnam,steps_2023,corporate_economy,corporate_economy,6420,0.17642209398186315,technology,0.05245901639344262
+power,gascap,2027,asia_pacific,nze_2023,corporate_economy,corporate_economy,7140,0.19193548387096773,technology,0.17049180327868851
+power,gascap,2027,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,7140,0.19193548387096773,technology,0.17049180327868851
+power,gascap,2027,asia_pacific,steps_2023,corporate_economy,corporate_economy,7140,0.19193548387096773,technology,0.17049180327868851
+power,gascap,2027,global,nze_2023,corporate_economy,corporate_economy,7140,0.19193548387096773,technology,0.17049180327868851
+power,gascap,2027,global,pdp8_2023,corporate_economy,corporate_economy,7140,0.19193548387096773,technology,0.17049180327868851
+power,gascap,2027,global,steps_2023,corporate_economy,corporate_economy,7140,0.19193548387096773,technology,0.17049180327868851
+power,gascap,2027,vietnam,nze_2023,corporate_economy,corporate_economy,7140,0.19193548387096773,technology,0.17049180327868851
+power,gascap,2027,vietnam,pdp8_2023,corporate_economy,corporate_economy,7140,0.19193548387096773,technology,0.17049180327868851
+power,gascap,2027,vietnam,steps_2023,corporate_economy,corporate_economy,7140,0.19193548387096773,technology,0.17049180327868851
+power,gascap,2028,asia_pacific,nze_2023,corporate_economy,corporate_economy,8040,0.208668569945497,technology,0.3180327868852459
+power,gascap,2028,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,8040,0.208668569945497,technology,0.3180327868852459
+power,gascap,2028,asia_pacific,steps_2023,corporate_economy,corporate_economy,8040,0.208668569945497,technology,0.3180327868852459
+power,gascap,2028,global,nze_2023,corporate_economy,corporate_economy,8040,0.208668569945497,technology,0.3180327868852459
+power,gascap,2028,global,pdp8_2023,corporate_economy,corporate_economy,8040,0.208668569945497,technology,0.3180327868852459
+power,gascap,2028,global,steps_2023,corporate_economy,corporate_economy,8040,0.208668569945497,technology,0.3180327868852459
+power,gascap,2028,vietnam,nze_2023,corporate_economy,corporate_economy,8040,0.208668569945497,technology,0.3180327868852459
+power,gascap,2028,vietnam,pdp8_2023,corporate_economy,corporate_economy,8040,0.208668569945497,technology,0.3180327868852459
+power,gascap,2028,vietnam,steps_2023,corporate_economy,corporate_economy,8040,0.208668569945497,technology,0.3180327868852459
+power,gascap,2029,asia_pacific,nze_2023,corporate_economy,corporate_economy,8530,0.2167725540025413,technology,0.3983606557377049
+power,gascap,2029,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,8530,0.2167725540025413,technology,0.3983606557377049
+power,gascap,2029,asia_pacific,steps_2023,corporate_economy,corporate_economy,8530,0.2167725540025413,technology,0.3983606557377049
+power,gascap,2029,global,nze_2023,corporate_economy,corporate_economy,8530,0.2167725540025413,technology,0.3983606557377049
+power,gascap,2029,global,pdp8_2023,corporate_economy,corporate_economy,8530,0.2167725540025413,technology,0.3983606557377049
+power,gascap,2029,global,steps_2023,corporate_economy,corporate_economy,8530,0.2167725540025413,technology,0.3983606557377049
+power,gascap,2029,vietnam,nze_2023,corporate_economy,corporate_economy,8530,0.2167725540025413,technology,0.3983606557377049
+power,gascap,2029,vietnam,pdp8_2023,corporate_economy,corporate_economy,8530,0.2167725540025413,technology,0.3983606557377049
+power,gascap,2029,vietnam,steps_2023,corporate_economy,corporate_economy,8530,0.2167725540025413,technology,0.3983606557377049
+power,gascap,2030,asia_pacific,nze_2023,corporate_economy,corporate_economy,9150,0.22846441947565543,technology,0.5
+power,gascap,2030,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,9150,0.22846441947565543,technology,0.5
+power,gascap,2030,asia_pacific,steps_2023,corporate_economy,corporate_economy,9150,0.22846441947565543,technology,0.5
+power,gascap,2030,global,nze_2023,corporate_economy,corporate_economy,9150,0.22846441947565543,technology,0.5
+power,gascap,2030,global,pdp8_2023,corporate_economy,corporate_economy,9150,0.22846441947565543,technology,0.5
+power,gascap,2030,global,steps_2023,corporate_economy,corporate_economy,9150,0.22846441947565543,technology,0.5
+power,gascap,2030,vietnam,nze_2023,corporate_economy,corporate_economy,9150,0.22846441947565543,technology,0.5
+power,gascap,2030,vietnam,pdp8_2023,corporate_economy,corporate_economy,9150,0.22846441947565543,technology,0.5
+power,gascap,2030,vietnam,steps_2023,corporate_economy,corporate_economy,9150,0.22846441947565543,technology,0.5
+power,hydrocap,2025,asia_pacific,nze_2023,corporate_economy,corporate_economy,10200,0.28789161727349705,sector,0
+power,hydrocap,2025,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,10200,0.28789161727349705,sector,0
+power,hydrocap,2025,asia_pacific,steps_2023,corporate_economy,corporate_economy,10200,0.28789161727349705,sector,0
+power,hydrocap,2025,global,nze_2023,corporate_economy,corporate_economy,10200,0.28789161727349705,sector,0
+power,hydrocap,2025,global,pdp8_2023,corporate_economy,corporate_economy,10200,0.28789161727349705,sector,0
+power,hydrocap,2025,global,steps_2023,corporate_economy,corporate_economy,10200,0.28789161727349705,sector,0
+power,hydrocap,2025,vietnam,nze_2023,corporate_economy,corporate_economy,10200,0.28789161727349705,sector,0
+power,hydrocap,2025,vietnam,pdp8_2023,corporate_economy,corporate_economy,10200,0.28789161727349705,sector,0
+power,hydrocap,2025,vietnam,steps_2023,corporate_economy,corporate_economy,10200,0.28789161727349705,sector,0
+power,hydrocap,2026,asia_pacific,nze_2023,corporate_economy,corporate_economy,10270,0.2822203902170926,sector,0.0019757267852102737
+power,hydrocap,2026,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,10270,0.2822203902170926,sector,0.0019757267852102737
+power,hydrocap,2026,asia_pacific,steps_2023,corporate_economy,corporate_economy,10270,0.2822203902170926,sector,0.0019757267852102737
+power,hydrocap,2026,global,nze_2023,corporate_economy,corporate_economy,10270,0.2822203902170926,sector,0.0019757267852102737
+power,hydrocap,2026,global,pdp8_2023,corporate_economy,corporate_economy,10270,0.2822203902170926,sector,0.0019757267852102737
+power,hydrocap,2026,global,steps_2023,corporate_economy,corporate_economy,10270,0.2822203902170926,sector,0.0019757267852102737
+power,hydrocap,2026,vietnam,nze_2023,corporate_economy,corporate_economy,10270,0.2822203902170926,sector,0.0019757267852102737
+power,hydrocap,2026,vietnam,pdp8_2023,corporate_economy,corporate_economy,10270,0.2822203902170926,sector,0.0019757267852102737
+power,hydrocap,2026,vietnam,steps_2023,corporate_economy,corporate_economy,10270,0.2822203902170926,sector,0.0019757267852102737
+power,hydrocap,2027,asia_pacific,nze_2023,corporate_economy,corporate_economy,10350,0.2782258064516129,sector,0.004233700254022015
+power,hydrocap,2027,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,10350,0.2782258064516129,sector,0.004233700254022015
+power,hydrocap,2027,asia_pacific,steps_2023,corporate_economy,corporate_economy,10350,0.2782258064516129,sector,0.004233700254022015
+power,hydrocap,2027,global,nze_2023,corporate_economy,corporate_economy,10350,0.2782258064516129,sector,0.004233700254022015
+power,hydrocap,2027,global,pdp8_2023,corporate_economy,corporate_economy,10350,0.2782258064516129,sector,0.004233700254022015
+power,hydrocap,2027,global,steps_2023,corporate_economy,corporate_economy,10350,0.2782258064516129,sector,0.004233700254022015
+power,hydrocap,2027,vietnam,nze_2023,corporate_economy,corporate_economy,10350,0.2782258064516129,sector,0.004233700254022015
+power,hydrocap,2027,vietnam,pdp8_2023,corporate_economy,corporate_economy,10350,0.2782258064516129,sector,0.004233700254022015
+power,hydrocap,2027,vietnam,steps_2023,corporate_economy,corporate_economy,10350,0.2782258064516129,sector,0.004233700254022015
+power,hydrocap,2028,asia_pacific,nze_2023,corporate_economy,corporate_economy,10450,0.27121723332468206,sector,0.007056167090036692
+power,hydrocap,2028,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,10450,0.27121723332468206,sector,0.007056167090036692
+power,hydrocap,2028,asia_pacific,steps_2023,corporate_economy,corporate_economy,10450,0.27121723332468206,sector,0.007056167090036692
+power,hydrocap,2028,global,nze_2023,corporate_economy,corporate_economy,10450,0.27121723332468206,sector,0.007056167090036692
+power,hydrocap,2028,global,pdp8_2023,corporate_economy,corporate_economy,10450,0.27121723332468206,sector,0.007056167090036692
+power,hydrocap,2028,global,steps_2023,corporate_economy,corporate_economy,10450,0.27121723332468206,sector,0.007056167090036692
+power,hydrocap,2028,vietnam,nze_2023,corporate_economy,corporate_economy,10450,0.27121723332468206,sector,0.007056167090036692
+power,hydrocap,2028,vietnam,pdp8_2023,corporate_economy,corporate_economy,10450,0.27121723332468206,sector,0.007056167090036692
+power,hydrocap,2028,vietnam,steps_2023,corporate_economy,corporate_economy,10450,0.27121723332468206,sector,0.007056167090036692
+power,hydrocap,2029,asia_pacific,nze_2023,corporate_economy,corporate_economy,10550,0.2681067344345616,sector,0.009878633926051369
+power,hydrocap,2029,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,10550,0.2681067344345616,sector,0.009878633926051369
+power,hydrocap,2029,asia_pacific,steps_2023,corporate_economy,corporate_economy,10550,0.2681067344345616,sector,0.009878633926051369
+power,hydrocap,2029,global,nze_2023,corporate_economy,corporate_economy,10550,0.2681067344345616,sector,0.009878633926051369
+power,hydrocap,2029,global,pdp8_2023,corporate_economy,corporate_economy,10550,0.2681067344345616,sector,0.009878633926051369
+power,hydrocap,2029,global,steps_2023,corporate_economy,corporate_economy,10550,0.2681067344345616,sector,0.009878633926051369
+power,hydrocap,2029,vietnam,nze_2023,corporate_economy,corporate_economy,10550,0.2681067344345616,sector,0.009878633926051369
+power,hydrocap,2029,vietnam,pdp8_2023,corporate_economy,corporate_economy,10550,0.2681067344345616,sector,0.009878633926051369
+power,hydrocap,2029,vietnam,steps_2023,corporate_economy,corporate_economy,10550,0.2681067344345616,sector,0.009878633926051369
+power,hydrocap,2030,asia_pacific,nze_2023,corporate_economy,corporate_economy,10700,0.2671660424469413,sector,0.014112334180073384
+power,hydrocap,2030,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,10700,0.2671660424469413,sector,0.014112334180073384
+power,hydrocap,2030,asia_pacific,steps_2023,corporate_economy,corporate_economy,10700,0.2671660424469413,sector,0.014112334180073384
+power,hydrocap,2030,global,nze_2023,corporate_economy,corporate_economy,10700,0.2671660424469413,sector,0.014112334180073384
+power,hydrocap,2030,global,pdp8_2023,corporate_economy,corporate_economy,10700,0.2671660424469413,sector,0.014112334180073384
+power,hydrocap,2030,global,steps_2023,corporate_economy,corporate_economy,10700,0.2671660424469413,sector,0.014112334180073384
+power,hydrocap,2030,vietnam,nze_2023,corporate_economy,corporate_economy,10700,0.2671660424469413,sector,0.014112334180073384
+power,hydrocap,2030,vietnam,pdp8_2023,corporate_economy,corporate_economy,10700,0.2671660424469413,sector,0.014112334180073384
+power,hydrocap,2030,vietnam,steps_2023,corporate_economy,corporate_economy,10700,0.2671660424469413,sector,0.014112334180073384
+power,renewablescap,2025,asia_pacific,nze_2023,corporate_economy,corporate_economy,3430,0.09681061247530341,sector,0
+power,renewablescap,2025,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,3430,0.09681061247530341,sector,0
+power,renewablescap,2025,asia_pacific,steps_2023,corporate_economy,corporate_economy,3430,0.09681061247530341,sector,0
+power,renewablescap,2025,global,nze_2023,corporate_economy,corporate_economy,3430,0.09681061247530341,sector,0
+power,renewablescap,2025,global,pdp8_2023,corporate_economy,corporate_economy,3430,0.09681061247530341,sector,0
+power,renewablescap,2025,global,steps_2023,corporate_economy,corporate_economy,3430,0.09681061247530341,sector,0
+power,renewablescap,2025,vietnam,nze_2023,corporate_economy,corporate_economy,3430,0.09681061247530341,sector,0
+power,renewablescap,2025,vietnam,pdp8_2023,corporate_economy,corporate_economy,3430,0.09681061247530341,sector,0
+power,renewablescap,2025,vietnam,steps_2023,corporate_economy,corporate_economy,3430,0.09681061247530341,sector,0
+power,renewablescap,2026,asia_pacific,nze_2023,corporate_economy,corporate_economy,4020,0.11046990931574609,sector,0.016652554332486594
+power,renewablescap,2026,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,4020,0.11046990931574609,sector,0.016652554332486594
+power,renewablescap,2026,asia_pacific,steps_2023,corporate_economy,corporate_economy,4020,0.11046990931574609,sector,0.016652554332486594
+power,renewablescap,2026,global,nze_2023,corporate_economy,corporate_economy,4020,0.11046990931574609,sector,0.016652554332486594
+power,renewablescap,2026,global,pdp8_2023,corporate_economy,corporate_economy,4020,0.11046990931574609,sector,0.016652554332486594
+power,renewablescap,2026,global,steps_2023,corporate_economy,corporate_economy,4020,0.11046990931574609,sector,0.016652554332486594
+power,renewablescap,2026,vietnam,nze_2023,corporate_economy,corporate_economy,4020,0.11046990931574609,sector,0.016652554332486594
+power,renewablescap,2026,vietnam,pdp8_2023,corporate_economy,corporate_economy,4020,0.11046990931574609,sector,0.016652554332486594
+power,renewablescap,2026,vietnam,steps_2023,corporate_economy,corporate_economy,4020,0.11046990931574609,sector,0.016652554332486594
+power,renewablescap,2027,asia_pacific,nze_2023,corporate_economy,corporate_economy,4560,0.12258064516129032,sector,0.031893875246965846
+power,renewablescap,2027,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,4560,0.12258064516129032,sector,0.031893875246965846
+power,renewablescap,2027,asia_pacific,steps_2023,corporate_economy,corporate_economy,4560,0.12258064516129032,sector,0.031893875246965846
+power,renewablescap,2027,global,nze_2023,corporate_economy,corporate_economy,4560,0.12258064516129032,sector,0.031893875246965846
+power,renewablescap,2027,global,pdp8_2023,corporate_economy,corporate_economy,4560,0.12258064516129032,sector,0.031893875246965846
+power,renewablescap,2027,global,steps_2023,corporate_economy,corporate_economy,4560,0.12258064516129032,sector,0.031893875246965846
+power,renewablescap,2027,vietnam,nze_2023,corporate_economy,corporate_economy,4560,0.12258064516129032,sector,0.031893875246965846
+power,renewablescap,2027,vietnam,pdp8_2023,corporate_economy,corporate_economy,4560,0.12258064516129032,sector,0.031893875246965846
+power,renewablescap,2027,vietnam,steps_2023,corporate_economy,corporate_economy,4560,0.12258064516129032,sector,0.031893875246965846
+power,renewablescap,2028,asia_pacific,nze_2023,corporate_economy,corporate_economy,5140,0.13340254347261873,sector,0.04826418289585097
+power,renewablescap,2028,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,5140,0.13340254347261873,sector,0.04826418289585097
+power,renewablescap,2028,asia_pacific,steps_2023,corporate_economy,corporate_economy,5140,0.13340254347261873,sector,0.04826418289585097
+power,renewablescap,2028,global,nze_2023,corporate_economy,corporate_economy,5140,0.13340254347261873,sector,0.04826418289585097
+power,renewablescap,2028,global,pdp8_2023,corporate_economy,corporate_economy,5140,0.13340254347261873,sector,0.04826418289585097
+power,renewablescap,2028,global,steps_2023,corporate_economy,corporate_economy,5140,0.13340254347261873,sector,0.04826418289585097
+power,renewablescap,2028,vietnam,nze_2023,corporate_economy,corporate_economy,5140,0.13340254347261873,sector,0.04826418289585097
+power,renewablescap,2028,vietnam,pdp8_2023,corporate_economy,corporate_economy,5140,0.13340254347261873,sector,0.04826418289585097
+power,renewablescap,2028,vietnam,steps_2023,corporate_economy,corporate_economy,5140,0.13340254347261873,sector,0.04826418289585097
+power,renewablescap,2029,asia_pacific,nze_2023,corporate_economy,corporate_economy,5710,0.1451080050825921,sector,0.06435224386113463
+power,renewablescap,2029,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,5710,0.1451080050825921,sector,0.06435224386113463
+power,renewablescap,2029,asia_pacific,steps_2023,corporate_economy,corporate_economy,5710,0.1451080050825921,sector,0.06435224386113463
+power,renewablescap,2029,global,nze_2023,corporate_economy,corporate_economy,5710,0.1451080050825921,sector,0.06435224386113463
+power,renewablescap,2029,global,pdp8_2023,corporate_economy,corporate_economy,5710,0.1451080050825921,sector,0.06435224386113463
+power,renewablescap,2029,global,steps_2023,corporate_economy,corporate_economy,5710,0.1451080050825921,sector,0.06435224386113463
+power,renewablescap,2029,vietnam,nze_2023,corporate_economy,corporate_economy,5710,0.1451080050825921,sector,0.06435224386113463
+power,renewablescap,2029,vietnam,pdp8_2023,corporate_economy,corporate_economy,5710,0.1451080050825921,sector,0.06435224386113463
+power,renewablescap,2029,vietnam,steps_2023,corporate_economy,corporate_economy,5710,0.1451080050825921,sector,0.06435224386113463
+power,renewablescap,2030,asia_pacific,nze_2023,corporate_economy,corporate_economy,6200,0.15480649188514356,sector,0.07818233135760655
+power,renewablescap,2030,asia_pacific,pdp8_2023,corporate_economy,corporate_economy,6200,0.15480649188514356,sector,0.07818233135760655
+power,renewablescap,2030,asia_pacific,steps_2023,corporate_economy,corporate_economy,6200,0.15480649188514356,sector,0.07818233135760655
+power,renewablescap,2030,global,nze_2023,corporate_economy,corporate_economy,6200,0.15480649188514356,sector,0.07818233135760655
+power,renewablescap,2030,global,pdp8_2023,corporate_economy,corporate_economy,6200,0.15480649188514356,sector,0.07818233135760655
+power,renewablescap,2030,global,steps_2023,corporate_economy,corporate_economy,6200,0.15480649188514356,sector,0.07818233135760655
+power,renewablescap,2030,vietnam,nze_2023,corporate_economy,corporate_economy,6200,0.15480649188514356,sector,0.07818233135760655
+power,renewablescap,2030,vietnam,pdp8_2023,corporate_economy,corporate_economy,6200,0.15480649188514356,sector,0.07818233135760655
+power,renewablescap,2030,vietnam,steps_2023,corporate_economy,corporate_economy,6200,0.15480649188514356,sector,0.07818233135760655

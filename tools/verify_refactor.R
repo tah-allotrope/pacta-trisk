@@ -15,17 +15,11 @@
 # byte-identical-after-normalization file shows as unchanged in `git diff`
 # even when raw md5sum would differ across Windows/Linux line endings.
 #
-# PHASE-04 of plans/2026-07-20-wave0-orchestrator-sdb-closers-plan.md empties
-# VOLATILE_BASENAMES once the five listed files are made deterministic --
-# until then, they differ between two unmodified runs only in a run_id /
-# run_path UUID that trisk.model::run_trisk() regenerates per invocation.
-VOLATILE_BASENAMES <- c(
-  "company_trajectories_latest.csv",
-  "npv_results_latest.csv",
-  "params_latest.csv",
-  "pd_results_latest.csv",
-  "run_catalog.csv"
-)
+# PHASE-04 of plans/2026-07-20-wave0-orchestrator-sdb-closers-plan.md emptied
+# this vector after deterministic run IDs were implemented in
+# write_trisk_demo_outputs() (R/trisk_core.R). The five listed files no longer
+# carry per-invocation UUIDs; any future diff in them is genuine drift.
+VOLATILE_BASENAMES <- character(0)
 
 # TIMESTAMP_BASENAMES: files whose only expected diff is generated-timestamp
 # text or a run-scoped git_sha, never numeric content.

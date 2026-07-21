@@ -273,10 +273,12 @@ nghi_son_coal <- make_abcd(
   is_ultimate_owner = FALSE
 )
 
-# Dung Quat LNG: new gas (under construction, phased commissioning 2027-2028)
+# Dung Quat LNG: new gas (under construction, phased commissioning 2027-2028).
+# Backfill the 2025-2026 baseline to the first operating year (400 MW) so that
+# PACTA market-share projections for the base year are not NA.
 dung_quat_gas <- make_abcd(
   "VN_ABCD_006", "Dung Quat LNG Power Consortium", "power", "gascap", "MW",
-  c(0, 0, 400, 680, 750, 750)
+  c(400, 400, 400, 680, 750, 750)
 )
 
 # Vietnam Hydropower JSC (VHP): hydro (stable, minor small-hydro additions)
@@ -593,7 +595,13 @@ cat(sprintf("  Market share scenario: %d rows | Scenarios: %s\n",
             nrow(vietnam_scenario_ms),
             paste(unique(vietnam_scenario_ms$scenario), collapse = ", ")))
 write_csv(vietnam_scenario_ms, "data/vietnam_scenario_ms.csv")
-cat("  Saved: data/vietnam_scenario_ms.csv\n\n")
+cat("  Saved: data/vietnam_scenario_ms.csv\n")
+
+# Scenario vintages: keep the legacy data/ paths and a versioned copy in sync.
+# The engagement config now points at data/scenarios/pdp8-2023/.
+dir.create("data/scenarios/pdp8-2023", recursive = TRUE, showWarnings = FALSE)
+write_csv(vietnam_scenario_ms, "data/scenarios/pdp8-2023/vietnam_scenario_ms.csv")
+cat("  Saved: data/scenarios/pdp8-2023/vietnam_scenario_ms.csv\n\n")
 
 # ==============================================================================
 # SECTION D: CO2 INTENSITY SCENARIO (Cement + Steel)
@@ -648,7 +656,9 @@ cat(sprintf("  CO2 intensity scenario: %d rows | Scenarios: %s\n",
             nrow(vietnam_scenario_co2),
             paste(unique(vietnam_scenario_co2$scenario), collapse = ", ")))
 write_csv(vietnam_scenario_co2, "data/vietnam_scenario_co2.csv")
-cat("  Saved: data/vietnam_scenario_co2.csv\n\n")
+cat("  Saved: data/vietnam_scenario_co2.csv\n")
+write_csv(vietnam_scenario_co2, "data/scenarios/pdp8-2023/vietnam_scenario_co2.csv")
+cat("  Saved: data/scenarios/pdp8-2023/vietnam_scenario_co2.csv\n\n")
 
 # ==============================================================================
 # SECTION E: REGION ISOs

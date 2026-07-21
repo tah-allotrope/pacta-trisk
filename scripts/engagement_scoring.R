@@ -186,6 +186,32 @@ if (nrow(unmatched) > 0) {
   )
 }
 
+if (nrow(borrowers) == 0) {
+  cat("\n[NOTE] No borrowers to score — writing empty engagement_priority.csv.\n")
+  priority <- tibble::tibble(
+    name_abcd = character(),
+    sector = character(),
+    exposure_vnd = numeric(),
+    alignment_gap = numeric(),
+    npv_change = numeric(),
+    pd_change = numeric(),
+    trisk_priority_score = numeric(),
+    trisk_status = character(),
+    composite_score = numeric(),
+    composite_partial = logical(),
+    norm_alignment = numeric(),
+    norm_trisk_priority = numeric(),
+    alignment_basis = character(),
+    data_source = character()
+  )
+  out_file <- file.path(output_dir, "engagement_priority.csv")
+  readr::write_csv(priority, out_file)
+  cat(sprintf("  Written: %s (0 borrowers)\n", out_file))
+  cat("\n=== Engagement Priority — Top 10 ===\n  (empty)\n")
+  cat(sprintf("\nOutputs in: %s\n", output_dir))
+  quit(status = 0)
+}
+
 borrowers <- borrowers |>
   dplyr::mutate(
     norm_alignment       = normalise_01(alignment_gap),

@@ -49,3 +49,33 @@ The normalized output matches the 13-column format of `data/vietnam_loanbook.csv
 - Strip the leading letter prefix from VSIC codes (e.g., `D3511` → `3511`)
 - Zero-pad to 4 digits (e.g., `511` → `0511`)
 - Codes outside the known ISIC→PACTA mapping are classified as "not in scope"
+
+## ABCD (Asset-Based Company Data) Schema
+
+The pipeline also consumes an ABCD file that maps companies to physical assets. For a real engagement this is a sourcing decision (see `docs/abcd_sourcing_decision.md`); in the demo it is the synthetic `data/vietnam_abcd.csv`.
+
+### Required Columns
+
+| Column | Type | Description | Example |
+|--------|------|-------------|---------|
+| `company_id` | string | Stable company identifier | VN_ABCD_001 |
+| `name_company` | string | Company name (must match loanbook ultimate-parent or direct-loantaker names after normalization) | EVN (Electricity of Vietnam) |
+| `lei` | string | Legal Entity Identifier, or `NA` | NA |
+| `sector` | string | PACTA sector | power |
+| `technology` | string | PACTA technology | coalcap |
+| `production_unit` | string | Unit of production | MW |
+| `year` | integer | Year of the observation | 2025 |
+| `production` | numeric | Production / capacity value | 12500 |
+| `emission_factor` | numeric | Emission factor where applicable; `NA` otherwise | NA |
+| `plant_location` | string | ISO country code | VN |
+| `is_ultimate_owner` | logical | Whether this row represents the ultimate owner | TRUE |
+| `emission_factor_unit` | string | Unit for emission factor, or `NA` | NA |
+
+### Provenance Columns
+
+| Column | Type | Description | Example |
+|--------|------|-------------|---------|
+| `data_source` | string | Origin of the row (e.g., Asset Impact, company report, GEM tracker) | synthetic_demo |
+| `as_of_year` | integer | Year the data was collected / valid for | 2025 |
+
+A template with illustrative synthetic rows is available at `intake/templates/abcd_template.csv`.

@@ -1,0 +1,70 @@
+{
+  "generated_at": "2026-07-21T22:52:14+0700",
+  "git_sha": "bc935283cb02ea2e271609e8a55317960e587a32",
+  "steps": [
+    {
+      "name": "intake",
+      "status": "ok",
+      "seconds": 5.6
+    },
+    {
+      "name": "validation_report",
+      "status": "ok",
+      "seconds": 2.9
+    },
+    {
+      "name": "pacta_vietnam_scenario",
+      "status": "ok",
+      "seconds": 25.5
+    },
+    {
+      "name": "trisk_prepare_inputs",
+      "status": "ok",
+      "seconds": 6
+    },
+    {
+      "name": "trisk_sector_demo_power",
+      "status": "ok",
+      "seconds": 42.2
+    },
+    {
+      "name": "trisk_sector_demo_cement",
+      "status": "ok",
+      "seconds": 26.6
+    },
+    {
+      "name": "trisk_sector_demo_steel",
+      "status": "ok",
+      "seconds": 25.9
+    },
+    {
+      "name": "sector_prioritization",
+      "status": "ok",
+      "seconds": 5.7
+    },
+    {
+      "name": "refresh_dashboard_data",
+      "status": "ok",
+      "seconds": 3.1
+    },
+    {
+      "name": "engagement_scoring",
+      "status": "ok",
+      "seconds": 3.2
+    },
+    {
+      "name": "generate_engagement_letters",
+      "status": "ok",
+      "seconds": 3.3
+    },
+    {
+      "name": "generate_disclosure_pack",
+      "status": "ok",
+      "seconds": 3.4
+    }
+  ],
+  "status": "ok",
+  "row_counts": {},
+  "bank_slug": "sdb-rehearsal",
+  "config_path": "engagements/sdb-rehearsal/engagement_config.resolved.json"
+}

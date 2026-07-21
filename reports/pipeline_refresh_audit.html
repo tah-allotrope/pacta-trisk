@@ -18,19 +18,22 @@
 <body>
 
 <h1>Pipeline Refresh Audit</h1>
-<p class="meta">Generated: 2026-07-18T11:57:38+0700 &middot; Commit: <code>330e17d</code></p>
+<p class="meta">Generated: 2026-07-21T22:46:58+0700 &middot; Commit: <code>bc93528</code></p>
 
 <h2>Step Timings</h2>
 <table>
 <tr><th>Step</th><th>Status</th><th>Duration</th></tr>
-<tr><td>trisk_prepare_inputs</td><td>ok</td><td>5.7s</td></tr>
-<tr><td>trisk_power_demo</td><td>ok</td><td>3.3s</td></tr>
-<tr><td>trisk_sector_demo_cement</td><td>ok</td><td>21.1s</td></tr>
-<tr><td>trisk_sector_demo_steel</td><td>ok</td><td>20.5s</td></tr>
-<tr><td>trisk_scenario_grid</td><td>ok</td><td>5.6s</td></tr>
-<tr><td>sector_prioritization</td><td>ok</td><td>4.7s</td></tr>
+<tr><td>generate_vietnam_data</td><td>ok</td><td>3.2s</td></tr>
+<tr><td>pacta_vietnam_scenario</td><td>ok</td><td>23.2s</td></tr>
+<tr><td>trisk_prepare_inputs</td><td>ok</td><td>6.8s</td></tr>
+<tr><td>trisk_power_demo</td><td>ok</td><td>34.2s</td></tr>
+<tr><td>trisk_sector_demo_cement</td><td>ok</td><td>22.1s</td></tr>
+<tr><td>trisk_sector_demo_steel</td><td>ok</td><td>27.5s</td></tr>
+<tr><td>trisk_scenario_grid</td><td>ok</td><td>7.7s</td></tr>
+<tr><td>sector_prioritization</td><td>ok</td><td>5.8s</td></tr>
 <tr><td>refresh_dashboard_data</td><td>ok</td><td>2.8s</td></tr>
-<tr><td>refresh_audit</td><td>ok</td><td>2.4s</td></tr>
+<tr><td>engagement_scoring</td><td>ok</td><td>2.5s</td></tr>
+<tr><td>refresh_audit</td><td>ok</td><td>1.9s</td></tr>
 
 </table>
 
@@ -38,7 +41,9 @@
 <table>
 <tr><th>File</th><th>Checksum</th></tr>
 <tr><td><code>data/vietnam_loanbook.csv</code></td><td><code>ee3cc91cff6313d450683a6125c5606f</code></td></tr>
-<tr><td><code>data/vietnam_abcd.csv</code></td><td><code>9da390a7c9ffe7538b251fed0b7e78a4</code></td></tr>
+<tr><td><code>data/vietnam_abcd.csv</code></td><td><code>3fdcdc76f095647761aea1e422dc2a68</code></td></tr>
+<tr><td><code>data/scenarios/pdp8-2023/vietnam_scenario_ms.csv</code></td><td><code>1827b2776aa0df5f50b72ff866d54665</code></td></tr>
+<tr><td><code>data/scenarios/pdp8-2023/vietnam_scenario_co2.csv</code></td><td><code>ce806a7c4cdfa4d835ff925759ab695e</code></td></tr>
 
 </table>
 
@@ -59,8 +64,8 @@
 <tr><td>Nghi Son Power LLC</td><td>100.00</td></tr>
 <tr><td>Vinacomin Power JSC</td><td>99.66</td></tr>
 <tr><td>International Power Mong Duong</td><td>99.22</td></tr>
-<tr><td>EVN (Electricity of Vietnam)</td><td>63.94</td></tr>
-<tr><td>PVN Power Corporation</td><td>45.53</td></tr>
+<tr><td>EVN (Electricity of Vietnam)</td><td>59.39</td></tr>
+<tr><td>PVN Power Corporation</td><td>39.51</td></tr>
 
 </table>
 
@@ -68,10 +73,10 @@
 <table>
 <tr><th>Company</th><th>Composite Score</th></tr>
 <tr><td>Nghi Son Power LLC</td><td>1.0000</td></tr>
-<tr><td>Vinacomin Power JSC</td><td>0.9982</td></tr>
-<tr><td>International Power Mong Duong</td><td>0.9959</td></tr>
-<tr><td>Ford Motor Company</td><td>0.8501</td></tr>
-<tr><td>Hyundai Motor Company</td><td>0.8501</td></tr>
+<tr><td>Vinacomin Power JSC</td><td>0.9983</td></tr>
+<tr><td>International Power Mong Duong</td><td>0.9960</td></tr>
+<tr><td>Ford Motor Company</td><td>0.8368</td></tr>
+<tr><td>Hyundai Motor Company</td><td>0.8368</td></tr>
 
 </table>
 
@@ -82,6 +87,8 @@
 <tr><td>n_engagement</td><td>23</td><td>23</td><td></td></tr>
 <tr><td>top_trisk_borrower</td><td>Nghi Son Power LLC</td><td>Nghi Son Power LLC</td><td></td></tr>
 <tr><td>top_engagement</td><td>Nghi Son Power LLC</td><td>Nghi Son Power LLC</td><td></td></tr>
+<tr><td>scenario_ms_checksum</td><td>1827b2776aa0df5f50b72ff866d54665</td><td>1827b2776aa0df5f50b72ff866d54665</td><td></td></tr>
+<tr><td>scenario_co2_checksum</td><td>ce806a7c4cdfa4d835ff925759ab695e</td><td>ce806a7c4cdfa4d835ff925759ab695e</td><td></td></tr>
 
 </table>
 

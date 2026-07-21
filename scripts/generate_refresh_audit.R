@@ -30,7 +30,9 @@ step_timings <- manifest$steps
 
 input_files <- c(
   "data/vietnam_loanbook.csv",
-  "data/vietnam_abcd.csv"
+  "data/vietnam_abcd.csv",
+  "data/scenarios/pdp8-2023/vietnam_scenario_ms.csv",
+  "data/scenarios/pdp8-2023/vietnam_scenario_co2.csv"
 )
 
 input_checksums <- list()
@@ -78,7 +80,9 @@ current_metrics <- list(
   n_pacta_matched = if (file.exists(pacta_matched_path)) nrow(read_csv(pacta_matched_path, show_col_types = FALSE)) else 0,
   n_engagement = if (file.exists(engagement_path)) nrow(read_csv(engagement_path, show_col_types = FALSE)) else 0,
   top_trisk_borrower = if (nrow(trisk_top5) > 0) trisk_top5$company_name[1] else NA_character_,
-  top_engagement = if (nrow(engagement_top5) > 0) engagement_top5$name_abcd[1] else NA_character_
+  top_engagement = if (nrow(engagement_top5) > 0) engagement_top5$name_abcd[1] else NA_character_,
+  scenario_ms_checksum = input_checksums[["data/scenarios/pdp8-2023/vietnam_scenario_ms.csv"]] %||% NA_character_,
+  scenario_co2_checksum = input_checksums[["data/scenarios/pdp8-2023/vietnam_scenario_co2.csv"]] %||% NA_character_
 )
 
 write(toJSON(current_metrics, auto_unbox = TRUE, pretty = TRUE), metrics_path)
@@ -131,7 +135,7 @@ if (nrow(engagement_top5) > 0) {
 
 diff_rows <- ""
 if (!is.null(prev_metrics)) {
-  fields <- c("n_pacta_matched", "n_engagement", "top_trisk_borrower", "top_engagement")
+  fields <- c("n_pacta_matched", "n_engagement", "top_trisk_borrower", "top_engagement", "scenario_ms_checksum", "scenario_co2_checksum")
   for (f in fields) {
     prev_val <- prev_metrics[[f]] %||% "N/A"
     curr_val <- current_metrics[[f]] %||% "N/A"

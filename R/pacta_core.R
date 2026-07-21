@@ -164,14 +164,30 @@ pacta_match_and_prioritize <- function(loanbook_classified, abcd, output_dir) {
       name_company = normalize_vn_name(name_company)
     )
 
+  # match_name() validates loanbook sector codes against r2dii.data's
+  # sector_classifications. The VSIC→ISIC extension used by the Vietnam
+  # pipeline must be present here too, otherwise valid ISIC codes from the
+  # normalized loanbook are rejected as unknown.
+  vsic_to_pacta <- tibble::tribble(
+    ~code_system, ~code,  ~sector,      ~borderline,
+    "ISIC",       "3511", "power",       FALSE,
+    "ISIC",       "2910", "automotive",  FALSE,
+    "ISIC",       "2394", "cement",      FALSE,
+    "ISIC",       "2410", "steel",       FALSE,
+    "ISIC",       "0510", "coal",        FALSE,
+    "ISIC",       "0610", "oil and gas", FALSE
+  )
+  sector_classification_ext <- dplyr::bind_rows(r2dii.data::sector_classifications, vsic_to_pacta)
+
   # Match loanbook against ABCD by sector
   # by_sector = TRUE ensures loan sector (from ISIC) matches ABCD sector
   matched_raw <- match_name(
     loanbook_norm, abcd_norm,
-    by_sector  = TRUE,
-    min_score  = 0.8,
-    method     = "jw",
-    p          = 0.1
+    by_sector           = TRUE,
+    min_score           = 0.8,
+    method              = "jw",
+    p                   = 0.1,
+    sector_classification = sector_classification_ext
   )
 
   cat(sprintf("  Raw matches: %d rows\n", nrow(matched_raw)))
@@ -239,10 +255,14 @@ pacta_coverage <- function(loanbook_classified, matched, output_dir, bank_name, 
     summarise(total_outstanding = sum(loan_size_outstanding, na.rm = TRUE),
               .groups = "drop")
 
-  matches_sector_summary <- matched %>%
-    group_by(sector) %>%
-    summarise(matches_outstanding = sum(loan_size_outstanding, na.rm = TRUE),
-              .groups = "drop")
+  matches_sector_summary <- if (nrow(matched) > 0) {
+    matched %>%
+      group_by(sector) %>%
+      summarise(matches_outstanding = sum(loan_size_outstanding, na.rm = TRUE),
+                .groups = "drop")
+  } else {
+    tibble(sector = character(), matches_outstanding = numeric())
+  }
 
   sector_coverage <- loanbook_sector_summary %>%
     left_join(matches_sector_summary, by = c("sector_classified" = "sector")) %>%
@@ -747,32 +767,36 @@ pacta_alignment_gaps <- function(ms_portfolio, target_pdp8, sda_portfolio, sda_t
     summarise(exposure_bn = sum(loan_size_outstanding) / 1000, .groups = "drop") %>%
     arrange(desc(exposure_bn))
 
-  p_stranded <- ggplot(coal_loans,
-                       aes(x = reorder(name_ultimate_parent, exposure_bn),
-                           y = exposure_bn, fill = "Coal & Mining")) +
-    geom_col(fill = "#c0392b") +
-    geom_text(aes(label = paste0(round(exposure_bn), " bn VND")),
-              hjust = -0.1, size = 3) +
-    coord_flip() +
-    scale_y_continuous(expand = expansion(mult = c(0, 0.3)),
-                       labels = label_comma()) +
-    labs(
-      title    = "Stranded Asset Risk: Coal & Mining Exposure by Parent",
-      subtitle = paste0("Total coal power + mining: ",
-                        format(round(coal_exposure_bn), big.mark = ","),
-                        " bn VND",
-                        "\nJETP coal retirement targets early closure of 5-8 GW by 2035"),
-      x = NULL, y = "Exposure (bn VND)"
-    ) +
-    theme_minimal(base_size = 12) +
-    theme(
-      plot.title    = element_text(face = "bold"),
-      legend.position = "none"
-    )
+  if (nrow(coal_loans) > 0) {
+    p_stranded <- ggplot(coal_loans,
+                         aes(x = reorder(name_ultimate_parent, exposure_bn),
+                             y = exposure_bn, fill = "Coal & Mining")) +
+      geom_col(fill = "#c0392b") +
+      geom_text(aes(label = paste0(round(exposure_bn), " bn VND")),
+                hjust = -0.1, size = 3) +
+      coord_flip() +
+      scale_y_continuous(expand = expansion(mult = c(0, 0.3)),
+                         labels = label_comma()) +
+      labs(
+        title    = "Stranded Asset Risk: Coal & Mining Exposure by Parent",
+        subtitle = paste0("Total coal power + mining: ",
+                          format(round(coal_exposure_bn), big.mark = ","),
+                          " bn VND",
+                          "\nJETP coal retirement targets early closure of 5-8 GW by 2035"),
+        x = NULL, y = "Exposure (bn VND)"
+      ) +
+      theme_minimal(base_size = 12) +
+      theme(
+        plot.title    = element_text(face = "bold"),
+        legend.position = "none"
+      )
 
-  ggsave(file.path(output_dir, "13_vn_coal_stranded_risk.png"), p_stranded,
-         width = 11, height = 6, dpi = 150)
-  cat("  Saved: 13_vn_coal_stranded_risk.png\n\n")
+    ggsave(file.path(output_dir, "13_vn_coal_stranded_risk.png"), p_stranded,
+           width = 11, height = 6, dpi = 150)
+    cat("  Saved: 13_vn_coal_stranded_risk.png\n\n")
+  } else {
+    cat("  SKIPPED: no coal power or mining exposure to chart.\n\n")
+  }
 
   list(ms_alignment_2030 = ms_alignment_2030, sda_alignment_2030 = sda_alignment_2030)
 }

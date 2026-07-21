@@ -69,6 +69,37 @@ priority <- readr::read_csv(priority_file, show_col_types = FALSE)
 prompts  <- readr::read_csv(prompt_file, show_col_types = FALSE)
 template <- paste(readLines(template_file, warn = FALSE, encoding = "UTF-8"), collapse = "\n")
 
+if (nrow(priority) == 0) {
+  cat("\n[NOTE] Priority table is empty — no engagement letters generated.\n")
+  dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
+  manifest_df <- tibble::tibble(
+    rank = integer(),
+    borrower = character(),
+    sector = character(),
+    composite_score = numeric(),
+    trisk_status = character(),
+    file = character(),
+    generated_at = generated_at
+  )
+  manifest_path <- file.path(output_dir, "manifest.csv")
+  readr::write_csv(manifest_df, manifest_path)
+
+  index_html <- paste0(
+    "<!DOCTYPE html>\n<html lang=\"en\"><head><meta charset=\"utf-8\">",
+    "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">",
+    "<title>", cfg$bank_name, " — Engagement Letters</title></head><body>",
+    "<h1>", cfg$bank_name, " — Engagement Letters</h1>",
+    "<p>No borrowers met the scoring threshold for this run.</p>",
+    "<p><em>Generated ", generated_at, "</em></p></body></html>"
+  )
+  index_path <- file.path(output_dir, "index.html")
+  writeLines(index_html, index_path, useBytes = TRUE)
+  cat(sprintf("  Manifest: %s\n", manifest_path))
+  cat(sprintf("  Index:    %s\n", index_path))
+  cat("\n=== Generated 0 engagement letters ===\n")
+  quit(status = 0)
+}
+
 n_take <- min(top_n, nrow(priority))
 top <- head(priority, n_take)
 
@@ -219,7 +250,7 @@ rows_html <- vapply(seq_len(nrow(manifest_df)), function(j) {
 index_html <- paste0(
   "<!DOCTYPE html>\n<html lang=\"en\"><head><meta charset=\"utf-8\">",
   "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">",
-  "<title>MCB Engagement Letters — Index</title><style>",
+  "<title>", cfg$bank_name, " — Engagement Letters Index</title><style>",
   "body{font-family:'Segoe UI',Arial,sans-serif;margin:0;background:#eef1f4;color:#1f2933;}",
   ".wrap{max-width:900px;margin:24px auto;background:#fff;border:1px solid #d7dee5;padding:28px 34px;}",
   ".band{background:#fff4f2;color:#b42318;border:1px solid rgba(180,35,24,0.25);padding:8px 12px;",

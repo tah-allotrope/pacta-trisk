@@ -878,3 +878,74 @@ When filtering data to a subset of metrics but providing `scale_*_manual()` mapp
 
 **STATUS: ALL PHASES COMPLETE.** Plan `plans/2026-06-09-bank-prospect-pitch-deck-plan.md` marked `completed`.
 
+---
+
+## Wave 0 Completion: PHASE-03 + PHASE-04 Implementation (2026-07-21)
+
+**Goal:** Implement the remaining two phases of `plans/2026-07-20-wave0-orchestrator-sdb-closers-plan.md` and deliver a final synthesis report.
+
+**Plan source:** `plans/2026-07-20-wave0-orchestrator-sdb-closers-plan.md`
+
+**Already done:** PHASE-01 (verify tool) and PHASE-02 (engagement orchestrator) are committed and green.
+
+### Checklist
+
+- [x] **PHASE-04 docs (no deps)**
+  - [x] `docs/abcd_sourcing_decision.md` — ABCD sourcing brief
+  - [x] `intake/SCHEMA.md` — append ABCD table section
+  - [x] `intake/templates/abcd_template.csv` + templates README note
+- [x] **PHASE-03 scaffolder + SDB config**
+  - [x] `scripts/new_engagement.R`
+  - [x] `engagements/sdb-rehearsal/engagement_config.json`
+  - [x] `.gitignore` engagement-output patterns
+- [x] **PHASE-03 SDB end-to-end run**
+  - [x] Guards for zero-match/empty-sector cases in `R/pacta_core.R`, `R/trisk_core.R`, `scripts/generate_engagement_letters.R`
+  - [x] Run `Rscript scripts/run_engagement.R --config engagements/sdb-rehearsal/engagement_config.json --raw-loanbook data/fixtures/unseen_bank_loanbook.csv`
+  - [x] Cross-contamination check (public dirs unchanged)
+  - [x] Append downstream-run section to `pilot/rehearsal_log.md`
+- [x] **PHASE-03 SDB golden test + CI guard**
+  - [x] `tests/testthat/test_sdb_engagement.R`
+  - [x] `.github/workflows/refresh.yml` `sdb-engagement` job
+- [x] **PHASE-04 data closers + determinism**
+  - [x] `data/scenarios/pdp8-2023/` — versioned scenario copies
+  - [x] `R/engagement_config.R` + `engagements/mcb-demo/engagement_config.json` defaults → versioned paths
+  - [x] `scripts/generate_vietnam_data.R` — dual-write scenarios + power-2025 NA backfill
+  - [x] `scripts/generate_refresh_audit.R` — scenario checksums
+  - [x] `R/trisk_core.R` — wire `backfill_zero_baseline()` into `trisk_prepare_sector_inputs`
+  - [x] `R/trisk_core.R` — deterministic `run_id`/`run_path` rewrite in `write_trisk_demo_outputs()`
+  - [x] `tests/testthat/test_snapshot_contract.R` — dual-copy checksum assertion
+  - [x] `tests/testthat/test_engagement_config.R` — update default-path literal
+  - [x] `tools/verify_refactor.R` — empty `VOLATILE_BASENAMES`
+- [x] **Refreeze + verification**
+  - [x] Refreeze MCB goldens (`tests/testthat/test_golden_numbers.R`)
+  - [x] Refreeze SDB artifacts + test literals
+  - [x] `Rscript tools/verify_refactor.R` → drift classification clean with empty volatile section
+  - [x] `Rscript -e "testthat::test_dir('tests/testthat')"` green (203 passed)
+  - [x] `python -m pytest dashboard/tests` green
+- [ ] **Final report + delivery**
+  - [ ] `/report final plans/2026-07-20-wave0-orchestrator-sdb-closers-plan.md`
+  - [ ] Git commit + push
+
+### Verification Gates
+
+- TEST-003: `Rscript -e "devtools::load_all('.'); stopifnot(is.function(run_steps), is.function(write_pipeline_manifest))"` → exit 0.
+- TEST-004: SDB manifest `status == "ok"` and `bank_slug == "sdb-rehearsal"`.
+- TEST-005: `git status --porcelain synthesis_output output dashboard/data reports` → empty after SDB run.
+- TEST-006: `data/vietnam_scenario_ms.csv` md5 == `data/scenarios/pdp8-2023/vietnam_scenario_ms.csv` md5.
+- TEST-007: Default-mode refresh after the refreeze commit produces deterministic CSVs (formerly volatile files now stable; PNG/HTML timestamp churn ignored as designed).
+- TEST-008: Full R + Python suites green.
+
+### Review / Results
+
+- SDB engagement ran end-to-end: 24 intake rows, all VND, rank-1 borrower `Nghi Son Power LLC` (composite 1.000), manifest `status=ok`, `bank_slug=sdb-rehearsal`.
+- Zero-match/empty-sector guards landed in `R/pacta_core.R`, `R/trisk_core.R`, `R/prioritization_core.R`, `scripts/engagement_scoring.R`, `scripts/generate_engagement_letters.R`.
+- `backfill_zero_baseline()` wired into TRISK input prep; Dung Quat now has non-zero baseline and no NA numeric rows in power sensitivity output.
+- Power-2025 NA fixed at generator level; PACTA power techmix/trajectory outputs no longer carry NA 2025 rows.
+- Scenario versioning implemented: `data/scenarios/pdp8-2023/` holds byte-identical copies; config defaults + audit + test assertion updated.
+- Deterministic run IDs implemented in `write_trisk_demo_outputs()`; `tools/verify_refactor.R` `VOLATILE_BASENAMES` emptied.
+- Full R suite: 203 passed / 0 failed. Python dashboard suite: green.
+- Remaining: generate final report and commit/push.
+
+---
+
+

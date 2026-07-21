@@ -1,0 +1,25 @@
+{
+  "bank_name": "Saigon Delta Bank",
+  "bank_slug": "sdb-rehearsal",
+  "inputs": {
+    "loanbook_csv": "data/vietnam_loanbook.csv",
+    "abcd_csv": "data/vietnam_abcd.csv",
+    "scenario_ms_csv": "data/vietnam_scenario_ms.csv",
+    "scenario_co2_csv": "data/vietnam_scenario_co2.csv",
+    "region_isos_csv": "data/vietnam_region_isos.csv"
+  },
+  "trisk_sectors": ["power", "cement", "steel"],
+  "run_grid": false,
+  "paths": {
+    "pacta_output_dir": "engagements/sdb-rehearsal/output/pacta",
+    "trisk_output_root": "engagements/sdb-rehearsal/output/trisk",
+    "trisk_input_root": "engagements/sdb-rehearsal/output/trisk_inputs",
+    "snapshot_dir": "engagements/sdb-rehearsal/snapshot",
+    "reports_dir": "engagements/sdb-rehearsal/reports",
+    "engagement_output_dir": "engagements/sdb-rehearsal/output/engagement",
+    "letters_output_dir": "engagements/sdb-rehearsal/output/engagement_letters",
+    "disclosure_output_dir": "engagements/sdb-rehearsal/output/disclosure",
+    "prioritization_output_dir": "engagements/sdb-rehearsal/output/prioritization"
+  },
+  "anonymize": false
+}

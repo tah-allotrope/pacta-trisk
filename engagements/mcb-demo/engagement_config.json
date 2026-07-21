@@ -4,8 +4,8 @@
   "inputs": {
     "loanbook_csv": "data/vietnam_loanbook.csv",
     "abcd_csv": "data/vietnam_abcd.csv",
-    "scenario_ms_csv": "data/vietnam_scenario_ms.csv",
-    "scenario_co2_csv": "data/vietnam_scenario_co2.csv",
+    "scenario_ms_csv": "data/scenarios/pdp8-2023/vietnam_scenario_ms.csv",
+    "scenario_co2_csv": "data/scenarios/pdp8-2023/vietnam_scenario_co2.csv",
     "region_isos_csv": "data/vietnam_region_isos.csv"
   },
   "trisk_sectors": ["power", "cement", "steel"],

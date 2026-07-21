@@ -66,7 +66,7 @@ prioritize_sectors <- function(cfg, weights = NULL) {
   dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
   sectors <- c("power", "cement", "steel")
-  data_source <- "MCB_synthetic"
+  data_source <- cfg$bank_slug
 
   cat(sprintf("Sector Prioritization — weights: alignment=%.2f, stress=%.2f, exposure=%.2f\n",
               w_alignment, w_stress, w_exposure))
@@ -75,28 +75,48 @@ prioritize_sectors <- function(cfg, weights = NULL) {
 
   cat("\n[1/6] Loading alignment data...\n")
 
-  ms_align <- readr::read_csv(alignment_file_ms, show_col_types = FALSE)
-  sda_align <- readr::read_csv(alignment_file_sda, show_col_types = FALSE)
+  ms_align <- if (file.exists(alignment_file_ms)) {
+    readr::read_csv(alignment_file_ms, show_col_types = FALSE)
+  } else {
+    tibble::tibble()
+  }
+  sda_align <- if (file.exists(alignment_file_sda)) {
+    readr::read_csv(alignment_file_sda, show_col_types = FALSE)
+  } else {
+    tibble::tibble()
+  }
 
   high_carbon_techs <- c("coalcap", "gascap")
 
-  power_gap <- ms_align |>
-    dplyr::filter(sector == "power", technology %in% high_carbon_techs) |>
-    dplyr::slice_max(share_gap_pp, n = 1) |>
-    dplyr::pull(share_gap_pp)
+  power_gap <- if (nrow(ms_align) > 0 && all(c("sector", "technology", "share_gap_pp") %in% names(ms_align))) {
+    ms_align |>
+      dplyr::filter(sector == "power", technology %in% high_carbon_techs) |>
+      dplyr::slice_max(share_gap_pp, n = 1) |>
+      dplyr::pull(share_gap_pp)
+  } else {
+    numeric(0)
+  }
 
-  cement_gap <- sda_align |>
-    dplyr::filter(sector == "cement") |>
-    dplyr::pull(gap_pct)
+  cement_gap <- if (nrow(sda_align) > 0 && all(c("sector", "gap_pct") %in% names(sda_align))) {
+    sda_align |>
+      dplyr::filter(sector == "cement") |>
+      dplyr::pull(gap_pct)
+  } else {
+    numeric(0)
+  }
 
-  steel_gap <- sda_align |>
-    dplyr::filter(sector == "steel") |>
-    dplyr::pull(gap_pct)
+  steel_gap <- if (nrow(sda_align) > 0 && all(c("sector", "gap_pct") %in% names(sda_align))) {
+    sda_align |>
+      dplyr::filter(sector == "steel") |>
+      dplyr::pull(gap_pct)
+  } else {
+    numeric(0)
+  }
 
   alignment_raw <- c(
-    power  = as.numeric(power_gap),
-    cement = as.numeric(cement_gap),
-    steel  = as.numeric(steel_gap)
+    power  = as.numeric(if (length(power_gap) > 0) power_gap[1] else 0),
+    cement = as.numeric(if (length(cement_gap) > 0) cement_gap[1] else 0),
+    steel  = as.numeric(if (length(steel_gap) > 0) steel_gap[1] else 0)
   )
 
   cat(sprintf("  Power alignment gap:  %.2f pp (coalcap max positive)\n", alignment_raw["power"]))
@@ -127,14 +147,18 @@ prioritize_sectors <- function(cfg, weights = NULL) {
   loanbook <- readr::read_csv(loanbook_file, show_col_types = FALSE)
 
   isic_to_d263 <- c(
-    "D3511" = "power",
-    "C2394" = "cement",
-    "C2410" = "steel"
+    "3511" = "power",
+    "2394" = "cement",
+    "2410" = "steel"
   )
 
   loanbook <- loanbook |>
     dplyr::mutate(
-      d263_sector = dplyr::recode(sector_classification_direct_loantaker, !!!isic_to_d263)
+      # Intake normalizes VSIC/ISIC codes to numeric-ish strings (e.g. "3511"),
+      # while some loanbooks retain the letter section prefix ("D3511").
+      # Strip any leading alphabetic section prefix so both forms map correctly.
+      isic_code_norm = sub("^[A-Za-z]+", "", sector_classification_direct_loantaker),
+      d263_sector = dplyr::recode(isic_code_norm, !!!isic_to_d263)
     ) |>
     dplyr::filter(!is.na(d263_sector))
 
@@ -148,8 +172,13 @@ prioritize_sectors <- function(cfg, weights = NULL) {
 
   total_d263_exposure <- sum(exposure_by_sector$exposure_vnd)
 
-  exposure_by_sector <- exposure_by_sector |>
-    dplyr::mutate(exposure_share = exposure_vnd / total_d263_exposure)
+  if (total_d263_exposure > 0) {
+    exposure_by_sector <- exposure_by_sector |>
+      dplyr::mutate(exposure_share = exposure_vnd / total_d263_exposure)
+  } else {
+    exposure_by_sector <- exposure_by_sector |>
+      dplyr::mutate(exposure_share = 0)
+  }
 
   cat(sprintf("  Total Decision 263 exposure: %s VND\n", formatC(total_d263_exposure, format = "f", big.mark = ",")))
   for (row in seq_len(nrow(exposure_by_sector))) {
@@ -347,7 +376,7 @@ prioritize_sectors <- function(cfg, weights = NULL) {
     ) +
     ggplot2::scale_y_continuous(limits = c(0, 1.15), breaks = seq(0, 1, 0.2)) +
     ggplot2::labs(
-      title = "Sector Transition Risk Priority — MCB Synthetic Portfolio",
+      title = sprintf("Sector Transition Risk Priority — %s", cfg$bank_name),
       subtitle = sprintf("Weights: alignment=%.2f, stress=%.2f, exposure=%.2f", w_alignment, w_stress, w_exposure),
       x = NULL, y = "Composite Score", fill = "Dimension"
     ) +

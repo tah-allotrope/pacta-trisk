@@ -47,8 +47,8 @@ VN_ABCD_005,Nghi Son Power LLC,NA,power,coalcap,MW,2027,1200,NA,VN,FALSE,NA
 VN_ABCD_005,Nghi Son Power LLC,NA,power,coalcap,MW,2028,1200,NA,VN,FALSE,NA
 VN_ABCD_005,Nghi Son Power LLC,NA,power,coalcap,MW,2029,1200,NA,VN,FALSE,NA
 VN_ABCD_005,Nghi Son Power LLC,NA,power,coalcap,MW,2030,1200,NA,VN,FALSE,NA
-VN_ABCD_006,Dung Quat LNG Power Consortium,NA,power,gascap,MW,2025,0,NA,VN,TRUE,NA
-VN_ABCD_006,Dung Quat LNG Power Consortium,NA,power,gascap,MW,2026,0,NA,VN,TRUE,NA
+VN_ABCD_006,Dung Quat LNG Power Consortium,NA,power,gascap,MW,2025,400,NA,VN,TRUE,NA
+VN_ABCD_006,Dung Quat LNG Power Consortium,NA,power,gascap,MW,2026,400,NA,VN,TRUE,NA
 VN_ABCD_006,Dung Quat LNG Power Consortium,NA,power,gascap,MW,2027,400,NA,VN,TRUE,NA
 VN_ABCD_006,Dung Quat LNG Power Consortium,NA,power,gascap,MW,2028,680,NA,VN,TRUE,NA
 VN_ABCD_006,Dung Quat LNG Power Consortium,NA,power,gascap,MW,2029,750,NA,VN,TRUE,NA

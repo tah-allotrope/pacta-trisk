@@ -35,3 +35,15 @@ test_that("TRISK snapshot contains all required sector files", {
     }
   }
 })
+
+test_that("scenario vintage copies are byte-identical to legacy data/ files", {
+  root <- project_root()
+  expect_identical(
+    unname(tools::md5sum(file.path(root, "data", "vietnam_scenario_ms.csv"))),
+    unname(tools::md5sum(file.path(root, "data", "scenarios", "pdp8-2023", "vietnam_scenario_ms.csv")))
+  )
+  expect_identical(
+    unname(tools::md5sum(file.path(root, "data", "vietnam_scenario_co2.csv"))),
+    unname(tools::md5sum(file.path(root, "data", "scenarios", "pdp8-2023", "vietnam_scenario_co2.csv")))
+  )
+})
