@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Final Report :: Wave 1 Consistency — Phases 1-2: Invariant Detector &amp; Provenance Fidelity</title>
+  <meta name="color-scheme" content="dark light">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+    async function initMermaid() {
+      const blocks = document.querySelectorAll('.mermaid');
+      if (!blocks.length) {
+        return;
+      }
+
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'base',
+        securityLevel: 'loose',
+        themeVariables: {
+          primaryColor: '#f3ead9',
+          primaryTextColor: '#1f1912',
+          primaryBorderColor: '#9d6b37',
+          lineColor: '#3b6f76',
+          secondaryColor: '#efe4d0',
+          tertiaryColor: '#ffffff',
+          background: '#fbf7f1',
+          mainBkg: '#fbf7f1',
+          nodeBorder: '#9d6b37',
+          clusterBkg: '#f7efdf',
+          clusterBorder: '#3b6f76',
+          edgeLabelBackground: '#fbf7f1'
+        }
+      });
+
+      await mermaid.run({ nodes: blocks });
+    }
+
+    const run = () => initMermaid().catch((error) => console.error('Mermaid render failed', error));
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run, { once: true });
+    } else {
+      run();
+    }
+  </script>
+  <style>
+    :root {
+      --paper: #fbf7f1;
+      --paper-strong: #fffdf9;
+      --ink: #1f1912;
+      --ink-soft: #5f564c;
+      --line: #dccdb6;
+      --line-strong: #bfa37d;
+      --accent: #9d6b37;
+      --accent-soft: #efe4d0;
+      --accent-2: #3b6f76;
+      --shadow: 0 18px 40px rgba(49, 33, 16, 0.08);
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+      --page-width: 1040px;
+      --display-font: Georgia, "Times New Roman", serif;
+      --body-font: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --mono-font: "Cascadia Code", Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(157, 107, 55, 0.09), transparent 26%),
+        radial-gradient(circle at 88% 10%, rgba(59, 111, 118, 0.08), transparent 22%),
+        linear-gradient(180deg, #f7f1e7 0%, #fbf7f1 28%, #f6efe5 100%);
+      font-family: var(--body-font);
+      line-height: 1.65;
+      letter-spacing: 0.01em;
+    }
+
+    a {
+      color: var(--accent-2);
+    }
+
+    code,
+    pre,
+    .technical,
+    .meta-chip,
+    .section-index,
+    .eyebrow,
+    .stat-label,
+    .stat-value,
+    .mermaid {
+      font-family: var(--mono-font);
+    }
+
+    .page-shell {
+      width: min(var(--page-width), calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 28px 0 56px;
+    }
+
+    .hero {
+      padding: 34px;
+      border: 1px solid rgba(159, 123, 79, 0.28);
+      border-radius: 30px;
+      background:
+        linear-gradient(135deg, rgba(157, 107, 55, 0.1), transparent 34%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.86)),
+        var(--paper-strong);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.85fr);
+      gap: 24px;
+      align-items: end;
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .title {
+      margin: 0;
+      max-width: 16ch;
+      font-family: var(--display-font);
+      font-size: clamp(2.4rem, 4.4vw, 4rem);
+      line-height: 1.0;
+      letter-spacing: -0.03em;
+      text-wrap: balance;
+    }
+
+    .lede {
+      margin: 18px 0 0;
+      max-width: 60ch;
+      color: var(--ink-soft);
+      font-size: 1rem;
+    }
+
+    .takeaway {
+      margin-top: 22px;
+      padding: 18px 20px;
+      border-left: 4px solid var(--accent-2);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      background: rgba(59, 111, 118, 0.08);
+      color: #20373a;
+      font-size: 1.02rem;
+    }
+
+    .meta-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .meta-card,
+    .section,
+    .subcard,
+    .empty-state {
+      border: 1px solid rgba(95, 72, 46, 0.12);
+      background: rgba(255, 253, 249, 0.88);
+      box-shadow: var(--shadow);
+    }
+
+    .meta-card {
+      padding: 16px 18px;
+      border-radius: var(--radius-md);
+    }
+
+    .meta-label {
+      color: var(--ink-soft);
+      font-size: 0.76rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .meta-chip {
+      margin-top: 8px;
+      color: var(--accent);
+      font-size: 1rem;
+      font-weight: 700;
+      word-break: break-word;
+    }
+
+    .section {
+      margin-top: 22px;
+      padding: 24px;
+      border-radius: var(--radius-lg);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px 18px;
+      align-items: end;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-index {
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .section-title {
+      margin: 0;
+      font-family: var(--display-font);
+      font-size: clamp(1.45rem, 2vw, 2rem);
+      line-height: 1.05;
+    }
+
+    .summary-grid,
+    .dual-grid,
+    .phase-grid,
+    .stat-grid,
+    .appendix-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .summary-grid,
+    .dual-grid,
+    .phase-grid,
+    .appendix-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .subcard {
+      padding: 18px;
+      border-radius: var(--radius-md);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .subcard h3,
+    .subcard h4 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+      line-height: 1.2;
+    }
+
+    .subcard p:first-child,
+    .subcard ul:first-child,
+    .subcard ol:first-child {
+      margin-top: 0;
+    }
+
+    .stat-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin-top: 16px;
+    }
+
+    .stat {
+      padding: 14px 16px;
+      border: 1px solid rgba(59, 111, 118, 0.16);
+      border-radius: var(--radius-sm);
+      background: rgba(59, 111, 118, 0.06);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .stat-label {
+      color: var(--ink-soft);
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .stat-value {
+      margin-top: 8px;
+      color: var(--accent-2);
+      font-size: 1.18rem;
+      font-weight: 700;
+    }
+
+    .narrative,
+    .chart-frame,
+    .technical-frame,
+    .diagram-frame,
+    .viz-frame {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.54);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .diagram-frame {
+      overflow-x: auto;
+      overflow-y: auto;
+      overscroll-behavior-x: contain;
+      overscroll-behavior-y: contain;
+      max-height: min(70vh, 720px);
+    }
+
+    .chart-frame,
+    .viz-frame {
+      overflow: hidden;
+    }
+
+    .mermaid {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      color: var(--ink);
+    }
+
+    .mermaid svg {
+      display: block;
+      width: auto !important;
+      min-width: 100%;
+      max-width: none !important;
+      height: auto !important;
+    }
+
+    .diagram-frame.compact-diagram {
+      padding: 12px;
+      max-height: min(62vh, 560px);
+    }
+
+    .diagram-frame.compact-diagram .mermaid {
+      min-width: 900px;
+    }
+
+    .chart-frame canvas,
+    .technical-frame > canvas,
+    .viz-frame canvas,
+    canvas.report-chart {
+      display: block;
+      width: 100% !important;
+      max-width: 100%;
+      height: 300px !important;
+      min-height: 300px;
+      max-height: 300px;
+    }
+
+    .technical-frame table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+    }
+
+    .technical-frame th,
+    .technical-frame td {
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      text-align: left;
+    }
+
+    .technical-frame th {
+      color: var(--accent);
+      font-size: 0.76rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .badge-pass {
+      background: rgba(59, 111, 118, 0.14);
+      color: #1f4b4f;
+    }
+
+    .badge-fail {
+      background: rgba(157, 55, 55, 0.14);
+      color: #7a2626;
+    }
+
+    .badge-pending {
+      background: rgba(157, 107, 55, 0.16);
+      color: #6b4a20;
+    }
+
+    .empty-state {
+      padding: 20px;
+      border-radius: var(--radius-md);
+      text-align: center;
+      color: var(--ink-soft);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .empty-state strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--accent);
+      font-size: 0.84rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    ul,
+    ol {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    p:last-child,
+    li:last-child {
+      margin-bottom: 0;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      color: rgba(95, 86, 76, 0.74);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      text-align: right;
+    }
+
+    @media (max-width: 920px) {
+      .hero-grid,
+      .summary-grid,
+      .dual-grid,
+      .phase-grid,
+      .stat-grid,
+      .appendix-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .title {
+        max-width: none;
+      }
+
+    }
+
+    @media (max-width: 640px) {
+      .page-shell {
+        width: min(100vw - 20px, var(--page-width));
+        padding-top: 16px;
+        padding-bottom: 36px;
+      }
+
+      .hero,
+      .section {
+        padding: 18px;
+        border-radius: 20px;
+      }
+
+      .title {
+        font-size: clamp(2.1rem, 12vw, 3.2rem);
+      }
+
+    }
+
+    @media print {
+      :root {
+        --paper: #ffffff;
+        --paper-strong: #ffffff;
+        --ink: #111111;
+        --ink-soft: #444444;
+        --line: #d6d1c8;
+      }
+
+      @page {
+        size: A4;
+        margin: 14mm;
+      }
+
+      body {
+        background: #ffffff;
+      }
+
+      .page-shell {
+        width: 100%;
+        max-width: none;
+        padding: 0;
+      }
+
+      .hero,
+      .meta-card,
+      .section,
+      .subcard,
+      .narrative,
+      .chart-frame,
+      .technical-frame,
+      .diagram-frame,
+      .viz-frame,
+      .empty-state,
+      .stat {
+        background: #ffffff;
+        box-shadow: none;
+      }
+
+      .hero,
+      .section {
+        margin-top: 0;
+        margin-bottom: 10mm;
+      }
+
+      .diagram-frame {
+        overflow: visible;
+        max-height: none;
+      }
+
+      .diagram-frame.compact-diagram .mermaid {
+        min-width: 0;
+      }
+
+      .section-header,
+      .takeaway {
+        break-after: avoid;
+        page-break-after: avoid;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero" id="title-hero">
+      <div class="hero-grid">
+        <div>
+          <p class="eyebrow">Final Report / Shareable Analysis Artifact</p>
+          <h1 class="title">Wave 1 Consistency — Phases 1–2 of 6</h1>
+          <p class="lede">
+            Invariant Detector &amp; Provenance Fidelity: the first two phases of the Wave 1 plan, executed and verified against the live repository.
+          </p>
+          <div class="takeaway">The platform can now detect its own cross-artifact contradictions on command — and one of the three defects it found on day one (a client deliverable silently carrying the wrong bank's name) is already fixed. Two remain, scoped to Phases 3–4.</div>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-card">
+            <div class="meta-label">Project</div>
+            <div class="meta-chip">PACTA + TRISK Vietnam</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Repository</div>
+            <div class="meta-chip">pacta-trisk</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Date</div>
+            <div class="meta-chip">2026-07-25</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="executive-summary">
+      <div class="section-header">
+        <div>
+          <div class="section-index">01 / Executive Summary</div>
+          <h2 class="section-title">Executive Summary</h2>
+        </div>
+      </div>
+      <div class="summary-grid">
+        <div class="subcard">
+          <h3>What Was Delivered</h3>
+          <p>Two phases of the six-phase Wave 1 "Consistency" plan landed and were verified this session. Phase 1 built <code>tools/verify_refactor.R --invariants</code>, a new acceptance mode that checks whether committed artifacts <em>agree with each other</em> — a question the existing byte-identity tool cannot ask, because it only compares a run against itself. Phase 2 used that detector to find and fix its first three real defects: a hardcoded data-source literal leaking into every engagement's client deliverable, a sector-prioritization function that silently ignored its own config, and an engagement config that could not reproduce its own documented run.</p>
+        </div>
+        <div class="subcard">
+          <h3>Verified State After Phase 2</h3>
+          <p>Full R suite: <strong>229 pass / 0 fail</strong> (203 inherited + 21 new invariant tests + 5 new config tests). Python dashboard suite: <strong>58 pass / 0 fail</strong>. <code>tools/verify_refactor.R --invariants</code> now reports <span class="badge badge-pass">PASS</span> on INV-003, INV-004, INV-005, and <span class="badge badge-fail">FAIL</span> on INV-001 and INV-002 — exactly the split Phase 3–4 exist to close. The Saigon Delta Bank engagement was re-run end-to-end through <code>run_engagement.R</code> (all 12 steps <code>ok</code>) to prove the fix in production, not just in unit tests.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="background-objective">
+      <div class="section-header">
+        <div>
+          <div class="section-index">02 / Background &amp; Objective</div>
+          <h2 class="section-title">Background &amp; Objective</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p>PACTA + TRISK Vietnam is a synthetic-data platform demonstrating how a fictional Vietnamese bank could measure loanbook climate alignment (PACTA) and transition-risk stress (TRISK). Wave 0 (five commits, completed prior to this session) delivered a config-driven engagement runway: <code>scripts/run_engagement.R</code> can run the full delivery flow — intake through disclosure pack — for any bank, and <code>tools/verify_refactor.R</code> made the refactor acceptance bar ("does a change leave every CSV byte-identical?") a one-command check.</p>
+        <p>A same-day research pass (<code>research/2026-07-25-post-wave0-platform-hardening-brainstorm.md</code>) found that Wave 0's acceptance discipline had a precise blind spot: it verifies that <em>run N+1 matches run N</em> (reproducibility), but never that <em>artifact A agrees with artifact B</em> (consistency). Six defects live in exactly that blind spot — most visibly, the precomputed TRISK scenario grid powering the dashboard's Scenario Builder had gone stale three months earlier and now contradicts the base TRISK run on the same borrower under identical parameters.</p>
+        <p>Wave 1's objective is to close that blind spot structurally — build the detector, then use it to drive every fix — rather than patching the six defects ad hoc. This report covers the first two of six planned phases: building the detector (Phase 1) and using it to fix the three provenance/config-fidelity defects it found immediately (Phase 2).</p>
+      </div>
+    </section>
+
+    <section class="section" id="inputs-scope">
+      <div class="section-header">
+        <div>
+          <div class="section-index">03 / Inputs &amp; Scope</div>
+          <h2 class="section-title">Inputs &amp; Scope</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Inputs</h3>
+          <ul>
+            <li>Plan: <code>plans/2026-07-25-wave1-consistency-and-orchestrator-convergence-plan.md</code> (6 phases, written and saved this session)</li>
+            <li>Research: <code>research/2026-07-25-post-wave0-platform-hardening-brainstorm.md</code></li>
+            <li>Prior state: Wave 0 (<code>plans/2026-07-20-wave0-orchestrator-sdb-closers-plan.md</code>), fully executed and verified clean at session start</li>
+            <li>Live artifacts: MCB's committed pipeline outputs and the Saigon Delta Bank (SDB) rehearsal fixture</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Scope Boundaries</h3>
+          <p><strong>In scope (this report):</strong> Phase 1 — the invariant detector (INV-001..005) and its unit tests. Phase 2 — fixing INV-003 (provenance), plus the config-fidelity defects (C3, C4) that surfaced while implementing it.</p>
+          <p><strong>Out of scope (not yet executed):</strong> Phase 3 (scenario vintage + ABCD single source), Phase 4 (grid input fingerprinting and regeneration — the fix for the stale-grid defect, INV-001), Phase 5 (converging the two pipeline orchestrators), Phase 6 (real SDB CI job, golden refreeze, docs). See <a href="#implementation-path">Implementation Path</a>.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="assumptions-constraints">
+      <div class="section-header">
+        <div>
+          <div class="section-index">04 / Assumptions &amp; Constraints</div>
+          <h2 class="section-title">Assumptions &amp; Constraints</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Binding Assumptions Applied</h3>
+          <ul>
+            <li><strong>ASM-002 (evidence measured, not assumed):</strong> Holding four of the Scenario Builder's five levers fixed, the 243-cell grid contains only 27 distinct outcomes — <code>risk_free_rate</code> and <code>carbon_price_family</code> are currently inert. Deferred to Phase 4; not touched in Phases 1–2.</li>
+            <li><strong>ASM-003 (batched refreeze):</strong> No golden literal is updated before Phase 6. Phases 2–5 are code commits verified by unit tests and invariants, not by byte-identity — the tree is expected to show real data drift (e.g. <code>data_source</code> column values) between now and the single Phase 6 refreeze.</li>
+            <li><strong>ASM-004 (explicit opt-in):</strong> The public-snapshot guard rail moved from a <code>bank_slug == "mcb-demo"</code> string comparison to an explicit <code>public_snapshot_allowed</code> config key, defaulting <code>FALSE</code>.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Constraints Honored</h3>
+          <ul>
+            <li><strong>CON-001:</strong> No new pipeline dependency introduced — the invariant checks use only packages already pinned in <code>renv.lock</code> (<code>arrow</code>, <code>jsonlite</code>, base R).</li>
+            <li><strong>Repo law #5 (byte-identity):</strong> MCB's default 3-sector <code>sector_priority_ranking.csv</code> was regenerated and its md5 confirmed unchanged after the Phase 2 code edits.</li>
+            <li><strong>A newly discovered constraint, fixed in-flight:</strong> <code>jsonlite::toJSON()</code> serializes a <code>NULL</code> list element as <code>{}</code>, which round-trips back as an empty named list, not <code>NULL</code>. The config validator was hardened to treat both shapes as "not configured" so a written-then-reread resolved config never breaks.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="methodology">
+      <div class="section-header">
+        <div>
+          <div class="section-index">05 / Methodology</div>
+          <h2 class="section-title">Methodology</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p>The plan's own Decision Rule (DEC-001) required the detector to be built <em>and proven to fail</em> before any fix landed — mirroring the sequencing that worked in Wave 0, where the verification tool always preceded the refactor it would grade. Phase 1 was accepted only once <code>tools/verify_refactor.R --invariants</code> exited non-zero on the untouched tree, naming exactly the violations Phase 2 (and later phases) would fix. This turns "we believe the fix worked" into "the same command that found the defect now reports it gone."</p>
+        <p>Each of the five invariants was written as a pure, testable function taking a repo root (never the live tree implicitly) and returning a structured pass/fail result with human-readable detail. Every invariant is unit-tested against <code>tempdir()</code>-built fixtures — not the live repository — so the test suite stays green through every later phase regardless of what the live tree's data says at that moment. Only one invariant (INV-004, sector-list agreement) is additionally exercised against the live repo, because it is expected to already pass and exists purely to guard against future drift.</p>
+        <p>Phase 2 changes were verified at three levels: unit tests (<code>testthat</code>), a live subprocess run of the actual orchestrator (<code>run_engagement.R</code> executed end-to-end for SDB, not mocked), and a byte-for-byte diff of every changed CSV column to confirm the fix touched only the intended <code>data_source</code> column and nothing else.</p>
+      </div>
+      <div class="stat-grid">
+        <div class="stat">
+          <div class="stat-label">Orientation</div>
+          <div class="stat-value">multi-phase</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Audience</div>
+          <div class="stat-value">stakeholder-safe</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Evidence Rule</div>
+          <div class="stat-value">no invented data</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="phase-analysis">
+      <div class="section-header">
+        <div>
+          <div class="section-index">06 / Phase-by-Phase Analysis</div>
+          <h2 class="section-title">Phase-by-Phase Analysis</h2>
+        </div>
+      </div>
+      <div class="phase-grid">
+        <div class="subcard">
+          <h3>Phase 1 — Cross-Artifact Invariant Detector</h3>
+          <p><strong>Deliverable:</strong> <code>tools/verify_refactor.R --invariants</code>, <code>tests/testthat/test_verify_invariants.R</code> (21 tests).</p>
+          <p>Added five pure invariant functions (<code>INV-001</code>..<code>INV-005</code>) and a dispatcher that prints a <code>[PASS]</code>/<code>[FAIL]</code> line with detail per check, never touching <code>classify_path()</code>, <code>run_refresh()</code>, or the existing byte-identity flow.</p>
+          <p><strong>Proved on the untouched tree:</strong> exit 1, with <code>INV-001</code> (grid vs. base run), <code>INV-002</code> (duplicate scenario files), and <code>INV-003</code> (provenance) all <span class="badge badge-fail">FAIL</span>, and <code>INV-004</code> / <code>INV-005</code> (sector-list and manifest agreement) <span class="badge badge-pass">PASS</span>. The <code>INV-001</code> detail block named the exact borrower and delta the brainstorm had measured by hand: <em>Dung Quat LNG Power Consortium, grid −0.432056 vs. base −0.374884</em>.</p>
+        </div>
+        <div class="subcard">
+          <h3>Phase 2 — Provenance &amp; Config Fidelity</h3>
+          <p><strong>Deliverable:</strong> fixes to <code>scripts/engagement_scoring.R</code>, <code>R/prioritization_core.R</code>, <code>R/engagement_config.R</code>, <code>scripts/run_engagement.R</code>, <code>scripts/new_engagement.R</code>, plus two engagement configs.</p>
+          <p>Three defects fixed: <strong>C2</strong> — <code>data_source</code> was hardcoded <code>"MCB_synthetic"</code> regardless of which bank ran the engagement; now derived from <code>cfg$bank_slug</code>. <strong>C4</strong> — <code>prioritize_sectors()</code> hardcoded a 3-sector list and ignored <code>cfg$trisk_sectors</code> entirely, so a single-sector engagement was silently scored against two phantom out-of-scope sectors; now correctly scoped. <strong>C3</strong> — engagement configs gained <code>inputs.raw_loanbook_csv</code> and <code>public_snapshot_allowed</code>, so SDB's config can reproduce its own documented run without an out-of-band CLI flag, and the public-snapshot guard rail is an explicit opt-in rather than a string comparison.</p>
+          <p><strong>Proved live:</strong> re-ran the full SDB engagement through <code>run_engagement.R</code> (12/12 steps <code>ok</code>); <code>data_source</code> in its committed <code>engagement_priority.csv</code> changed from <code>MCB_synthetic</code> to <code>sdb-rehearsal</code>, with every numeric column byte-identical before and after (confirmed by diff). MCB's default 3-sector <code>sector_priority_ranking.csv</code> is unchanged (md5 verified) — the fix only changes behavior for configs that actually differ from the default.</p>
+        </div>
+      </div>
+      <div class="diagram-frame compact-diagram">
+        <pre class="mermaid">
+flowchart LR
+  A["Wave 0 complete<br/>5 commits, tree clean"] --> B["Brainstorm:<br/>6 cross-artifact defects found"]
+  B --> C["Wave 1 plan<br/>6 phases"]
+  C --> D["Phase 1<br/>Invariant detector"]
+  D -->|"INV-001/002/003 FAIL<br/>INV-004/005 PASS"| E["Phase 2<br/>Provenance + config fixes"]
+  E -->|"INV-003 now PASS"| F["Phase 3<br/>Scenario + ABCD source"]
+  F --> G["Phase 4<br/>Grid fingerprinting"]
+  G --> H["Phase 5<br/>Orchestrator convergence"]
+  H --> I["Phase 6<br/>CI guard + refreeze"]
+  style A fill:#efe4d0,stroke:#3b6f76
+  style B fill:#efe4d0,stroke:#3b6f76
+  style C fill:#efe4d0,stroke:#3b6f76
+  style D fill:#dff0ee,stroke:#3b6f76
+  style E fill:#dff0ee,stroke:#3b6f76
+  style F fill:#f3ead9,stroke:#9d6b37,stroke-dasharray: 5 5
+  style G fill:#f3ead9,stroke:#9d6b37,stroke-dasharray: 5 5
+  style H fill:#f3ead9,stroke:#9d6b37,stroke-dasharray: 5 5
+  style I fill:#f3ead9,stroke:#9d6b37,stroke-dasharray: 5 5
+        </pre>
+      </div>
+    </section>
+
+    <section class="section" id="findings-recommendation">
+      <div class="section-header">
+        <div>
+          <div class="section-index">07 / Findings &amp; Recommendation</div>
+          <h2 class="section-title">Findings &amp; Recommendation</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p><strong>Finding 1 — the detector generalizes correctly.</strong> INV-004 and INV-005 passed on the very first run against the live tree, confirming the detector does not produce false positives on a healthy repository. This matters because a detector that cries wolf gets ignored; this one only flags what is actually wrong.</p>
+        <p><strong>Finding 2 — provenance bugs are cheap to fix once found, expensive to find by hand.</strong> C2 (hardcoded <code>data_source</code>) was a one-line fix, but it had shipped silently in every non-MCB engagement's client-facing deliverable since the config-driven runway was built in Wave 0. Nothing in the byte-identity acceptance bar could have caught it, because MCB's own output never exercised the bug (its <code>bank_slug</code> happened to differ from the hardcoded literal only in casing/format, not in a way byte-identity checks against).</p>
+        <p><strong>Finding 3 — fixing C4 surfaced a second, related defect not on the original list.</strong> Scoping <code>prioritize_sectors()</code> to <code>cfg$trisk_sectors</code> required tracing <code>alignment_raw</code>'s min-max normalization, which was <em>not</em> scoped to configured sectors even though <code>stress_raw</code> and <code>exposure_share_vec</code> already were — an inconsistency within the same function. This is exactly the class of defect Wave 1 exists to find: not a crash, not a test failure, a value that's silently wrong only in configurations nobody had exercised yet.</p>
+        <p><strong>Recommendation:</strong> proceed to Phase 3 next. It is a prerequisite for Phase 4 (per the plan's dependency graph — the ABCD regeneration must land before the grid is fingerprinted against final inputs) and has zero code dependency on anything Phase 2 touched, so it can start immediately.</p>
+      </div>
+      <div class="viz-frame">
+        <canvas id="invariant-chart" role="img" aria-label="Invariant pass/fail status after Phase 1 versus after Phase 2"></canvas>
+      </div>
+    </section>
+
+    <section class="section" id="implementation-path">
+      <div class="section-header">
+        <div>
+          <div class="section-index">08 / Implementation Path</div>
+          <h2 class="section-title">Implementation Path</h2>
+        </div>
+      </div>
+      <div class="phase-grid">
+        <div class="subcard">
+          <h3>Phase 3 — Scenario Vintage &amp; ABCD Single Source <span class="badge badge-pending">next</span></h3>
+          <p>Retires the byte-identical duplicate scenario files (fixes INV-002) and adds the two missing provenance columns to the demo's ABCD data plus a <code>validate_abcd_schema()</code> gate. No dependency on Phase 2's changes beyond the detector itself.</p>
+        </div>
+        <div class="subcard">
+          <h3>Phase 4 — Grid Correctness</h3>
+          <p>Fingerprints the scenario grid's inputs so a stale cache can never silently persist again (fixes INV-001 — the headline defect: the Scenario Builder currently disagrees with the TRISK Risk page for the same borrower). Also resolves whether the <code>risk_free_rate</code> lever is genuinely inert or a plumbing bug. Depends on Phase 3 completing first.</p>
+        </div>
+        <div class="subcard">
+          <h3>Phase 5 — Orchestrator Convergence</h3>
+          <p>Makes <code>scripts/run_engagement.R</code> the single orchestrator; <code>scripts/pipeline_refresh.R</code> becomes a thin wrapper. Today the public MCB demo and every client engagement run through two different step lists — this is the highest-leverage remaining refactor, because it is what makes the Phase 6 CI guard cover MCB too.</p>
+        </div>
+        <div class="subcard">
+          <h3>Phase 6 — CI Guard, Refreeze, Docs</h3>
+          <p>Adds the SDB CI job that Wave 0's final report claimed existed but does not (verified this session: no reference to <code>run_engagement</code> or <code>sdb</code> anywhere in <code>.github/workflows/</code>). Wires invariants into both CI workflows. Closes with the single golden refreeze the whole wave has been deferring (ASM-003).</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="risks-open-questions">
+      <div class="section-header">
+        <div>
+          <div class="section-index">09 / Risks / Open Questions</div>
+          <h2 class="section-title">Risks / Open Questions</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Open Risks Carried Into Phase 3+</h3>
+          <ul>
+            <li><strong>RISK-001 (plan):</strong> the wave touches provenance, inputs, the grid, and the orchestrator before one refreeze — an unexplained numeric movement at Phase 6 would have several candidate causes. Mitigated by each phase's exit criteria isolating its own effect (already demonstrated in Phase 2: the diff touched only the <code>data_source</code> column).</li>
+            <li><strong>RISK-002 (plan):</strong> the weekly <code>refresh.yml</code> auto-commit is not yet gated by invariants — a violated invariant does not block publishing until Phase 6 wires it in. Not a regression (it was never gated), but it means Phase 1's detector is currently informational-only in CI.</li>
+            <li>Phase 2 discovered a real <code>jsonlite</code> round-trip hazard (NULL → <code>{}</code> → empty list) that could recur anywhere a config is written and reread. Fixed for <code>raw_loanbook_csv</code> specifically; worth a grep for other optional config keys before Phase 5's orchestrator work adds more.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Questions Phase 3–4 Must Resolve</h3>
+          <ul>
+            <li>Is <code>risk_free_rate</code>'s inertness a genuine <code>trisk.model</code> limitation or a parameter-plumbing bug in this repo? The plan's Specification S3 gives a measurement procedure and a binding default (remove the lever and bump the grid contract version) if it is confirmed inert — this has not yet been run.</li>
+            <li>Phase 4's grid regeneration is the wave's longest single operation (historically ~5 minutes per sector for 243 scenarios) — worth scheduling as its own session rather than folding into a mixed-task run.</li>
+            <li>Not yet answered: whether any other script beyond <code>prioritize_sectors()</code> silently ignores <code>cfg$trisk_sectors</code>. Not audited this session; a reasonable Phase 3 side-task.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="appendices-evidence">
+      <div class="section-header">
+        <div>
+          <div class="section-index">10 / Appendices / Evidence Notes</div>
+          <h2 class="section-title">Appendices / Evidence Notes</h2>
+        </div>
+      </div>
+      <div class="appendix-grid">
+        <div class="technical-frame">
+          <table>
+            <thead>
+              <tr><th>Commit</th><th>Summary</th><th>R suite</th><th>Python suite</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>a629593</code></td><td>phase-01: invariant detector</td><td>224 pass / 0 fail</td><td>—</td></tr>
+              <tr><td><code>fb56221</code></td><td>phase-02: provenance + config fidelity</td><td>229 pass / 0 fail</td><td>58 pass / 0 fail</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="technical-frame">
+          <table>
+            <thead>
+              <tr><th>Invariant</th><th>Checks</th><th>After Phase 1</th><th>After Phase 2</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>INV-001</td><td>Grid base cell = base TRISK run</td><td><span class="badge badge-fail">FAIL</span></td><td><span class="badge badge-fail">FAIL</span> (Phase 4)</td></tr>
+              <tr><td>INV-002</td><td>No duplicate scenario files</td><td><span class="badge badge-fail">FAIL</span></td><td><span class="badge badge-fail">FAIL</span> (Phase 3)</td></tr>
+              <tr><td>INV-003</td><td>Engagement data_source = bank_slug</td><td><span class="badge badge-fail">FAIL</span></td><td><span class="badge badge-pass">PASS</span></td></tr>
+              <tr><td>INV-004</td><td>Sector-list literals agree</td><td><span class="badge badge-pass">PASS</span></td><td><span class="badge badge-pass">PASS</span></td></tr>
+              <tr><td>INV-005</td><td>Manifest sectors ⊆ registry</td><td><span class="badge badge-pass">PASS</span></td><td><span class="badge badge-pass">PASS</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="footer-note">designed for html first, printable without reconstruction</div>
+    </section>
+  </main>
+  <script>
+    (function() {
+      const chartCanvases = document.querySelectorAll('canvas');
+      chartCanvases.forEach((canvas) => {
+        canvas.classList.add('report-chart');
+        const parent = canvas.parentElement;
+        if (parent && parent.classList.contains('technical-frame') && !parent.classList.contains('chart-frame')) {
+          parent.classList.add('chart-frame');
+        }
+      });
+    })();
+
+    if (window.Chart) {
+      Chart.defaults.devicePixelRatio = 1;
+      Chart.defaults.animation = false;
+      Chart.defaults.resizeDelay = 150;
+      Chart.defaults.normalized = true;
+      Chart.defaults.maintainAspectRatio = false;
+      Chart.defaults.responsive = true;
+      window.__REPORT_CHART_DEFAULTS__ = {
+        animation: false,
+        resizeDelay: 150,
+        normalized: true,
+        maintainAspectRatio: false,
+        responsive: true
+      };
+    }
+
+    (function () {
+      const el = document.getElementById('invariant-chart');
+      if (!el || !window.Chart) return;
+      new Chart(el, {
+        type: 'bar',
+        data: {
+          labels: ['INV-001\nGrid vs base run', 'INV-002\nScenario dup.', 'INV-003\nProvenance', 'INV-004\nSector lists', 'INV-005\nManifest sectors'],
+          datasets: [
+            {
+              label: 'After Phase 1',
+              data: [0, 0, 0, 1, 1],
+              backgroundColor: 'rgba(157, 55, 55, 0.55)',
+              borderColor: 'rgba(157, 55, 55, 0.9)',
+              borderWidth: 1
+            },
+            {
+              label: 'After Phase 2',
+              data: [0, 0, 1, 1, 1],
+              backgroundColor: 'rgba(59, 111, 118, 0.55)',
+              borderColor: 'rgba(59, 111, 118, 0.9)',
+              borderWidth: 1
+            }
+          ]
+        },
+        options: {
+          animation: false,
+          resizeDelay: 150,
+          normalized: true,
+          maintainAspectRatio: false,
+          responsive: true,
+          scales: {
+            y: {
+              min: 0,
+              max: 1,
+              ticks: {
+                stepSize: 1,
+                callback: (v) => (v === 1 ? 'PASS' : 'FAIL')
+              }
+            }
+          },
+          plugins: {
+            legend: { position: 'bottom' },
+            title: { display: true, text: 'Invariant status: after Phase 1 vs. after Phase 2' }
+          }
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
