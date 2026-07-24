@@ -34,6 +34,10 @@
 # Magnitudes are NOT strictly comparable across those two families; the
 # composite is a demo prioritisation aid, not a calibrated risk number.
 #
+# Provenance: the output's data_source column is cfg$bank_slug — every
+# engagement's engagement_priority.csv is stamped with its own bank_slug,
+# never a hardcoded literal (Wave 1 PHASE-02, C2).
+#
 # Usage:
 #   Rscript scripts/engagement_scoring.R [--w_align 0.5] [--w_trisk 0.5]
 # =============================================================================
@@ -76,7 +80,7 @@ output_dir <- file.path(base_dir, cfg$paths$engagement_output_dir)
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
 trisk_sectors <- cfg$trisk_sectors
-data_source   <- "MCB_synthetic"
+data_source   <- cfg$bank_slug
 
 cat(sprintf("Engagement Scoring — weights: alignment=%.2f, trisk=%.2f (target year %d)\n",
             w_align, w_trisk, target_year))

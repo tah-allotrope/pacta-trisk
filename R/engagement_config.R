@@ -29,7 +29,13 @@ suppressPackageStartupMessages({
       abcd_csv = "data/vietnam_abcd.csv",
       scenario_ms_csv = "data/scenarios/pdp8-2023/vietnam_scenario_ms.csv",
       scenario_co2_csv = "data/scenarios/pdp8-2023/vietnam_scenario_co2.csv",
-      region_isos_csv = "data/vietnam_region_isos.csv"
+      region_isos_csv = "data/vietnam_region_isos.csv",
+      # Optional: path to a raw (not-yet-normalized) loanbook. When set, and
+      # no --raw-loanbook CLI flag is given, scripts/run_engagement.R uses
+      # this as the intake source, so an engagement config can reproduce its
+      # own run without an out-of-band flag. NULL means "no raw loanbook
+      # configured" — omitted from the "every input must exist" validation.
+      raw_loanbook_csv = NULL
     ),
     trisk_sectors = c("power", "cement", "steel"),
     run_grid = TRUE,
@@ -44,7 +50,12 @@ suppressPackageStartupMessages({
       disclosure_output_dir = "output/disclosure",
       prioritization_output_dir = "synthesis_output/prioritization"
     ),
-    anonymize = FALSE
+    anonymize = FALSE,
+    # Only mcb-demo's engagement_config.json sets this TRUE. The orchestrator
+    # refuses to run any engagement whose snapshot_dir resolves to the public
+    # dashboard/data unless this is explicitly TRUE, replacing the previous
+    # bank_slug-string-comparison guard rail.
+    public_snapshot_allowed = FALSE
   )
 }
 
@@ -84,6 +95,15 @@ suppressPackageStartupMessages({
   missing_inputs <- character(0)
   for (name in names(cfg$inputs)) {
     path <- cfg$inputs[[name]]
+    # raw_loanbook_csv is optional — "not configured" means NULL when the
+    # config came from R defaults, but jsonlite::toJSON() serializes a NULL
+    # list element as {} and it comes back as an empty named list() on the
+    # next read_json() roundtrip (e.g. run_engagement.R's resolved-config
+    # write). Treat either shape as "not configured", not "missing". A
+    # non-empty value is still validated for existence below.
+    if (identical(name, "raw_loanbook_csv") && length(path) == 0) {
+      next
+    }
     if (is.null(path) || !file.exists(path)) {
       missing_inputs <- c(missing_inputs, path)
     }
@@ -103,6 +123,12 @@ suppressPackageStartupMessages({
       paste(unsupported, collapse = ", "),
       paste(supported_sectors, collapse = ", ")
     ))
+  }
+
+  if (!is.logical(cfg$public_snapshot_allowed) ||
+      length(cfg$public_snapshot_allowed) != 1 ||
+      is.na(cfg$public_snapshot_allowed)) {
+    problems <- c(problems, "public_snapshot_allowed must be a single TRUE/FALSE value")
   }
 
   if (length(problems) > 0) {

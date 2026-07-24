@@ -12,17 +12,19 @@
 #
 # --raw-loanbook <path>: runs intake_validate_and_map.R against <path> first,
 #   then all later steps use a resolved config whose inputs$loanbook_csv
-#   points at the normalized output. Omit to run the pipeline against the
+#   points at the normalized output. Omit to fall back to the config's
+#   inputs$raw_loanbook_csv (if set), or to run the pipeline against the
 #   loanbook already named in the engagement config.
-# --skip-intake: even with --raw-loanbook given, skip the intake + validation
-#   report steps (useful for re-running downstream stages only).
+# --skip-intake: even with a raw loanbook resolved (flag or config), skip the
+#   intake + validation report steps (useful for re-running downstream
+#   stages only).
 # --top-n <int>: forwarded to generate_engagement_letters.R as --top_n.
 # --dry-run: print the resolved step list (one "name: script args" line per
 #   step) and exit 0 without executing or writing anything.
 #
 # Guard rail: refuses to run when the config's snapshot_dir is the public
-# dashboard/data unless bank_slug is "mcb-demo" (prevents an engagement from
-# overwriting the public snapshot).
+# dashboard/data unless the config sets public_snapshot_allowed: true
+# (prevents an engagement from overwriting the public snapshot).
 # =============================================================================
 
 suppressPackageStartupMessages({
@@ -48,17 +50,21 @@ if (is.null(config_path)) {
   ), call. = FALSE)
 }
 
-raw_loanbook <- get_flag_value(args, "--raw-loanbook")
 skip_intake  <- "--skip-intake" %in% args
 top_n        <- get_flag_value(args, "--top-n")
 dry_run      <- "--dry-run" %in% args
 
 cfg <- load_engagement_config(config_path)
 
-# --- Guard rail: never let a non-MCB engagement publish into the public
-# snapshot directory. -------------------------------------------------------
-if (identical(cfg$paths$snapshot_dir, "dashboard/data") && !identical(cfg$bank_slug, "mcb-demo")) {
-  stop("Engagement snapshot_dir must not be the public dashboard/data", call. = FALSE)
+# A CLI --raw-loanbook flag wins; otherwise fall back to the config's own
+# inputs$raw_loanbook_csv so an engagement config can reproduce its own run
+# without an out-of-band flag (Wave 1 PHASE-02, C3). %||% is base R (>= 4.4.0).
+raw_loanbook <- get_flag_value(args, "--raw-loanbook") %||% cfg$inputs$raw_loanbook_csv
+
+# --- Guard rail: never let an engagement publish into the public snapshot
+# directory unless its config explicitly allows it. -------------------------
+if (identical(cfg$paths$snapshot_dir, "dashboard/data") && !isTRUE(cfg$public_snapshot_allowed)) {
+  stop("Engagement snapshot_dir must not be the public dashboard/data unless public_snapshot_allowed is true", call. = FALSE)
 }
 
 run_intake <- !is.null(raw_loanbook) && !skip_intake

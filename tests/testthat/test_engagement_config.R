@@ -77,6 +77,47 @@ test_that("invalid bank_slug fails validation", {
   expect_error(load_engagement_config(tmp))
 })
 
+test_that("public_snapshot_allowed defaults to FALSE and mcb-demo opts in explicitly", {
+  withr_wd <- setwd(root)
+  on.exit(setwd(withr_wd))
+
+  expect_false(load_engagement_config(NULL)$public_snapshot_allowed)
+  expect_true(load_engagement_config("engagements/mcb-demo/engagement_config.json")$public_snapshot_allowed)
+})
+
+test_that("sdb-rehearsal config carries its own raw_loanbook_csv for self-describing reruns", {
+  withr_wd <- setwd(root)
+  on.exit(setwd(withr_wd))
+
+  cfg <- load_engagement_config("engagements/sdb-rehearsal/engagement_config.json")
+  expect_equal(cfg$inputs$raw_loanbook_csv, "data/fixtures/unseen_bank_loanbook.csv")
+})
+
+test_that("a non-existent raw_loanbook_csv fails validation with the offending path named", {
+  withr_wd <- setwd(root)
+  on.exit(setwd(withr_wd))
+
+  tmp <- tempfile(fileext = ".json")
+  writeLines(
+    '{"bank_name":"T","bank_slug":"t","inputs":{"raw_loanbook_csv":"does/not/exist.csv"}}',
+    tmp
+  )
+  on.exit(unlink(tmp), add = TRUE)
+
+  expect_error(load_engagement_config(tmp), "does/not/exist.csv")
+})
+
+test_that("a non-logical public_snapshot_allowed fails validation", {
+  withr_wd <- setwd(root)
+  on.exit(setwd(withr_wd))
+
+  tmp <- tempfile(fileext = ".json")
+  writeLines('{"public_snapshot_allowed":"yes"}', tmp)
+  on.exit(unlink(tmp), add = TRUE)
+
+  expect_error(load_engagement_config(tmp), "public_snapshot_allowed")
+})
+
 test_that("get_config_arg extracts the --config value or returns NULL", {
   expect_equal(get_config_arg(c("--config", "a.json")), "a.json")
   expect_null(get_config_arg(character(0)))

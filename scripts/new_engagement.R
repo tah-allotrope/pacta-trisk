@@ -83,7 +83,10 @@ cfg <- list(
     disclosure_output_dir = file.path(root, "output", "disclosure"),
     prioritization_output_dir = file.path(root, "output", "prioritization")
   ),
-  anonymize = anonymize
+  anonymize = anonymize,
+  # Explicit and FALSE: a scaffolded engagement must never publish into the
+  # public dashboard/data snapshot without a deliberate, hand-edited opt-in.
+  public_snapshot_allowed = FALSE
 )
 
 dir.create(engagement_dir, recursive = TRUE, showWarnings = FALSE)

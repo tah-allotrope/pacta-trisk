@@ -21,5 +21,6 @@
     "disclosure_output_dir": "output/disclosure",
     "prioritization_output_dir": "synthesis_output/prioritization"
   },
-  "anonymize": false
+  "anonymize": false,
+  "public_snapshot_allowed": true
 }

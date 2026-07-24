@@ -26,6 +26,15 @@ suppressPackageStartupMessages({
   library(ggplot2)
 })
 
+# ISIC industry code -> Decision 263 sector, for classifying loanbook exposure.
+# Module-level so it has one definition; prioritize_sectors() subsets it to
+# the engagement's configured sectors before use.
+.d263_isic_map <- c(
+  "3511" = "power",
+  "2394" = "cement",
+  "2410" = "steel"
+)
+
 #' Classify a composite priority score into a band.
 #'
 #' @param score numeric — composite score in [0, 1].
@@ -65,7 +74,7 @@ prioritize_sectors <- function(cfg, weights = NULL) {
 
   dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
-  sectors <- c("power", "cement", "steel")
+  sectors <- cfg$trisk_sectors
   data_source <- cfg$bank_slug
 
   cat(sprintf("Sector Prioritization — weights: alignment=%.2f, stress=%.2f, exposure=%.2f\n",
@@ -113,15 +122,28 @@ prioritize_sectors <- function(cfg, weights = NULL) {
     numeric(0)
   }
 
-  alignment_raw <- c(
+  alignment_raw_all <- c(
     power  = as.numeric(if (length(power_gap) > 0) power_gap[1] else 0),
     cement = as.numeric(if (length(cement_gap) > 0) cement_gap[1] else 0),
     steel  = as.numeric(if (length(steel_gap) > 0) steel_gap[1] else 0)
   )
+  # Scope to the engagement's configured sectors before any min-max
+  # normalization, so a subset config (e.g. power-only) is not scored
+  # against out-of-scope sectors' raw values (Wave 1 PHASE-02, C4).
+  alignment_raw <- alignment_raw_all[sectors]
 
-  cat(sprintf("  Power alignment gap:  %.2f pp (coalcap max positive)\n", alignment_raw["power"]))
-  cat(sprintf("  Cement alignment gap: %.1f%% (SDA intensity)\n", alignment_raw["cement"]))
-  cat(sprintf("  Steel alignment gap:  %.1f%% (SDA intensity)\n", alignment_raw["steel"]))
+  # Preserves the three sector-specific console formats verbatim (power in
+  # pp at 2 decimals; cement/steel as % at 1 decimal), only skipping a line
+  # entirely when that sector is not in this engagement's scope.
+  if ("power" %in% sectors) {
+    cat(sprintf("  Power alignment gap:  %.2f pp (coalcap max positive)\n", alignment_raw[["power"]]))
+  }
+  if ("cement" %in% sectors) {
+    cat(sprintf("  Cement alignment gap: %.1f%% (SDA intensity)\n", alignment_raw[["cement"]]))
+  }
+  if ("steel" %in% sectors) {
+    cat(sprintf("  Steel alignment gap:  %.1f%% (SDA intensity)\n", alignment_raw[["steel"]]))
+  }
 
   # --- Load TRISK data ---------------------------------------------------------
 
@@ -146,11 +168,10 @@ prioritize_sectors <- function(cfg, weights = NULL) {
 
   loanbook <- readr::read_csv(loanbook_file, show_col_types = FALSE)
 
-  isic_to_d263 <- c(
-    "3511" = "power",
-    "2394" = "cement",
-    "2410" = "steel"
-  )
+  # Filtered to this engagement's configured sectors: a borrower whose ISIC
+  # code maps to a sector outside cfg$trisk_sectors gets no d263_sector match
+  # and is dropped by the filter(!is.na(d263_sector)) below (Wave 1 PHASE-02, C4).
+  isic_to_d263 <- .d263_isic_map[.d263_isic_map %in% sectors]
 
   loanbook <- loanbook |>
     dplyr::mutate(

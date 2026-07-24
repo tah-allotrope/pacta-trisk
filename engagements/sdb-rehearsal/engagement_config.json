@@ -6,7 +6,8 @@
     "abcd_csv": "data/vietnam_abcd.csv",
     "scenario_ms_csv": "data/vietnam_scenario_ms.csv",
     "scenario_co2_csv": "data/vietnam_scenario_co2.csv",
-    "region_isos_csv": "data/vietnam_region_isos.csv"
+    "region_isos_csv": "data/vietnam_region_isos.csv",
+    "raw_loanbook_csv": "data/fixtures/unseen_bank_loanbook.csv"
   },
   "trisk_sectors": ["power", "cement", "steel"],
   "run_grid": false,
