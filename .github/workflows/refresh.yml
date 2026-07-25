@@ -38,6 +38,9 @@ jobs:
       - name: Regression-test refreshed outputs
         run: Rscript -e "testthat::test_dir('tests/testthat')"
 
+      - name: Cross-artifact invariants
+        run: Rscript tools/verify_refactor.R --invariants
+
       - name: Commit refreshed snapshot
         run: |
           git config user.name "github-actions[bot]"

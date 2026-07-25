@@ -52,3 +52,42 @@ jobs:
 
       - name: Run R tests
         run: Rscript -e "testthat::test_dir('tests/testthat')"
+
+      - name: Cross-artifact invariants
+        run: Rscript tools/verify_refactor.R --invariants
+
+  sdb-engagement:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: "4.5"
+          use-public-rspm: true
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev
+
+      - name: Restore R dependencies via renv
+        uses: r-lib/actions/setup-renv@v2
+        with:
+          cache-version: 1
+
+      - name: Run SDB engagement end-to-end
+        run: Rscript scripts/run_engagement.R --config engagements/sdb-rehearsal/engagement_config.json
+
+      - name: SDB golden tests
+        run: RUN_SDB_ENGAGEMENT=1 Rscript -e "testthat::test_file('tests/testthat/test_sdb_engagement.R')"
+
+      - name: Assert no cross-contamination
+        run: |
+          if [ -n "$(git status --porcelain synthesis_output output dashboard/data reports)" ]; then
+            echo "SDB engagement run left uncommitted changes outside engagements/sdb-rehearsal/:"
+            git status --porcelain synthesis_output output dashboard/data reports
+            exit 1
+          fi

@@ -1,6 +1,6 @@
 Package: pactatrisk
 Title: PACTA Vietnam TRISK Pipeline
-Version: 0.2.0
+Version: 0.3.0
 Description: PACTA alignment and TRISK transition risk analysis for Vietnamese bank loanbooks.
 License: Proprietary
 Encoding: UTF-8

@@ -91,11 +91,33 @@ Rscript tools/verify_refactor.R
 
 This reruns `scripts/pipeline_refresh.R` and classifies every tracked file
 `git diff` reports as changed into expected churn (timestamps/manifests),
-known-volatile noise (a short, named list of TRISK CSVs with a regenerated
-run-id column), or genuine drift. It prints `BYTE-IDENTITY PASS` and exits 0
-only when no genuine drift is found. Pass `--full` to check against a
+known-volatile noise (a named list of TRISK CSVs with a regenerated run-id
+column — currently empty, since PHASE-04 made every run-id deterministic),
+or genuine drift. It prints `BYTE-IDENTITY PASS` and exits 0 only when no
+genuine drift is found. Pass `--full` to check against a
 `pipeline_refresh.R --full` run, or `--skip-refresh` to classify the current
 working tree without rerunning the pipeline.
+
+Byte-identity answers "does run N+1 match run N?" — it is structurally
+blind to a cache that never regenerates, or two committed artifacts that
+silently disagree with each other. A second, independent mode answers that
+question instead:
+
+```powershell
+$env:Path += ";C:\Program Files\R\R-4.5.2\bin"
+Rscript tools/verify_refactor.R --invariants
+```
+
+This checks five cross-artifact consistency rules against the current tree
+without running anything: the TRISK scenario grid's base-parameter cell
+must equal the base (non-grid) TRISK run; no scenario vintage may exist at
+two paths; every engagement's `data_source` column must equal its own
+`bank_slug`; the supported-sector literal must agree across every file
+that hardcodes it; every published TRISK manifest sector must be a known
+registry sector. It prints `INVARIANTS PASS` and exits 0 only when every
+invariant holds. Both `.github/workflows/ci.yml` and
+`.github/workflows/refresh.yml` run this on every push and every weekly
+refresh.
 
 ## Running a client engagement
 

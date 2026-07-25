@@ -1,7 +1,7 @@
 # tests/testthat/test_sdb_engagement.R
 # Frozen golden assertions for the synthetic Saigon Delta Bank (SDB) rehearsal.
 # These literals are taken from the committed artifacts under
-# engagements/sdb-rehearsal/ after the PHASE-04 refreeze.
+# engagements/sdb-rehearsal/ after the Wave 1 PHASE-06 refreeze.
 
 context("SDB engagement golden fixtures")
 
@@ -9,6 +9,33 @@ sdb_dir <- file.path(project_root(), "engagements", "sdb-rehearsal")
 normalized_loanbook_path <- file.path(sdb_dir, "intake", "normalized_loanbook.csv")
 engagement_priority_path <- file.path(sdb_dir, "output", "engagement", "engagement_priority.csv")
 manifest_path <- file.path(sdb_dir, "pipeline_manifest.json")
+
+# Wave 1 PHASE-06 (C3-CI): the three test_that() blocks below read committed
+# artifacts and therefore guard the ARTIFACTS, not the CODE that produces
+# them -- a regression in run_engagement.R could go undetected forever if
+# nobody happened to regenerate engagements/sdb-rehearsal/ by hand. This
+# block closes that gap by actually executing the orchestrator end to end.
+# Skipped by default (it takes several minutes) -- set RUN_SDB_ENGAGEMENT=1
+# to run it locally or in CI. When it runs and succeeds, it overwrites the
+# very artifacts the tests below read, so a real regression fails loudly
+# right here instead of silently validating stale output.
+test_that("run_engagement.R executes the full SDB engagement end to end", {
+  skip_if_not(identical(Sys.getenv("RUN_SDB_ENGAGEMENT"), "1"),
+              "set RUN_SDB_ENGAGEMENT=1 to run the full SDB engagement (takes several minutes)")
+
+  root <- project_root()
+  withr_wd <- setwd(root)
+  on.exit(setwd(withr_wd))
+
+  rscript <- Sys.which("Rscript")
+  if (!nzchar(rscript)) rscript <- "C:/Program Files/R/R-4.5.2/bin/Rscript.exe"
+
+  status <- system2(
+    rscript,
+    args = c("scripts/run_engagement.R", "--config", "engagements/sdb-rehearsal/engagement_config.json")
+  )
+  expect_equal(status, 0L)
+})
 
 test_that("SDB normalized loanbook has expected shape and currency", {
   skip_if_not(file.exists(normalized_loanbook_path),

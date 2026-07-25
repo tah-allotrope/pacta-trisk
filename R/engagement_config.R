@@ -148,7 +148,11 @@ suppressPackageStartupMessages({
     }
   }
 
-  if (!is.character(cfg$row_count_files)) {
+  # Same jsonlite round-trip hazard as raw_loanbook_csv (Wave 1 PHASE-02):
+  # an empty character vector serializes as `[]` and comes back as an empty
+  # list(), not character(0), on the next read_json(). Accept either empty
+  # shape; a non-empty value must be a genuine character vector.
+  if (!(length(cfg$row_count_files) == 0 || is.character(cfg$row_count_files))) {
     problems <- c(problems, "row_count_files must be a character vector (may be empty)")
   }
 

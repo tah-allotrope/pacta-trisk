@@ -11,7 +11,10 @@ See `README.md` for the full architecture and `AGENTS.md` for a quick map.
 - **Single R test file:** `Rscript -e "testthat::test_file('tests/testthat/test_golden_numbers.R')"`
 - **Python test suite:** `python -m pytest dashboard/tests`
 - **Regenerate PACTA outputs:** `Rscript scripts/pacta_vietnam_scenario.R`
-- **Full pipeline refresh:** `Rscript scripts/pipeline_refresh.R`
+- **Full pipeline refresh (delegates to `run_engagement.R` for mcb-demo):** `Rscript scripts/pipeline_refresh.R`
+- **Run any engagement:** `Rscript scripts/run_engagement.R --config engagements/<slug>/engagement_config.json`
+- **Byte-identity acceptance check:** `Rscript tools/verify_refactor.R`
+- **Cross-artifact consistency check:** `Rscript tools/verify_refactor.R --invariants`
 - **Run the dashboard:** `python -m streamlit run dashboard/app.py`
 
 Windows: prepend `& "C:\Program Files\R\R-4.5.2\bin\Rscript.exe"` or add it to
@@ -32,11 +35,19 @@ Windows: prepend `& "C:\Program Files\R\R-4.5.2\bin\Rscript.exe"` or add it to
    pins exact values (e.g. `engagement_priority.csv` rank-1 `name_abcd` ==
    `"Nghi Son Power LLC"`, `composite_score[1]` == 1.0). A green run of the
    full suite is the primary proof that a refactor changed nothing observable.
-5. **Refactor acceptance bar: byte-identical MCB CSV outputs.** Any change
-   touching `scripts/` or `R/` must leave every `synthesis_output/vietnam/*.csv`
-   byte-identical to its pre-change hash (verify with `tools::md5sum`). PNGs
-   are compared visually only (compression is nondeterministic); HTML reports
-   may differ only in the generated-timestamp text.
+5. **Refactor acceptance bar: byte-identical MCB CSV outputs, plus
+   cross-artifact consistency.** Any change touching `scripts/` or `R/` must
+   leave every `synthesis_output/vietnam/*.csv` byte-identical to its
+   pre-change content — verify with `Rscript tools/verify_refactor.R`, not
+   raw `md5sum` (git's `core.autocrlf` normalization means a
+   byte-identical-after-normalization file can have a different raw digest
+   across Windows/Linux). PNGs are compared visually only (compression is
+   nondeterministic); HTML reports may differ only in the generated-timestamp
+   text. Separately, `Rscript tools/verify_refactor.R --invariants` checks
+   that committed artifacts agree with each other (e.g. the TRISK scenario
+   grid matches the base TRISK run) — a class of defect byte-identity alone
+   cannot catch, since a stale cache that never regenerates trivially
+   reproduces itself forever. Both checks run in CI on every push.
 6. **The engagement-config convention.** Scripts source `R/engagement_config.R`
    and call `cfg <- load_engagement_config(get_config_arg())`. No `--config`
    flag → MCB defaults, reproducing today's hardcoded paths exactly. Do not

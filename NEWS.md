@@ -1,3 +1,69 @@
+# pactatrisk 0.3.0
+
+Wave 1 "Consistency": the platform's acceptance discipline previously only
+verified that a run reproduced itself (byte-identity); this release closes
+the sibling question it could not ask — does one committed artifact agree
+with another — and fixes every defect that gap let through.
+
+- `tools/verify_refactor.R --invariants`: a new acceptance mode alongside
+  the existing byte-identity check, running five cross-artifact consistency
+  rules (`INV-001`..`INV-005`) against the current tree without executing
+  anything: the TRISK scenario grid's base-parameter cell must equal the
+  base (non-grid) TRISK run; no scenario vintage may exist at two paths;
+  every engagement's `data_source` column must equal its own `bank_slug`;
+  the supported-sector literal must agree across every file that hardcodes
+  it; every published TRISK manifest sector must be a known registry
+  sector. Wired into both CI workflows.
+- **Grid staleness fixed (the headline defect):** the precomputed TRISK
+  scenario grid was keyed only on lever values, with no dependency on the
+  underlying input data, and had silently gone stale for three months.
+  `grid_input_fingerprint()` + `grid_cache_is_valid()` now discard and
+  regenerate the entire cached grid whenever the sector's input files,
+  `trisk.model` version, or `grid_contract_version` no longer match.
+  A second, deeper defect surfaced only after fixing the first: the grid's
+  shared input package extended every scenario's data to the grid-wide max
+  `shock_year + 2`, which measurably changed NPV/PD even for scenarios at
+  the base parameters. `build_scenario_input_dir()` now truncates each
+  scenario's inputs to its own horizon before running it. All three sector
+  grids regenerated (`grid_contract_version` `v1` -> `v2`); the base grid
+  cell now reproduces the base TRISK run to floating-point noise.
+- **Two of the Scenario Builder's five levers were inert; both fixed.**
+  `carbon_price_family` aliased all three choices to one backing curve —
+  `.trisk_build_carbon_price()` now emits three genuinely distinct curves
+  per sector. `risk_free_rate` turned out to be live, not inert — it moves
+  `pd_change_pct` (up to 2.8 points of PD) but never `npv_change_pct`
+  (a Merton-model credit-risk input, not a firm-value one); the original
+  "inert" finding had only checked `npv_change`. No plumbing bug, no lever
+  removed.
+- **Provenance and config fixes:** `data_source` in engagement deliverables
+  is now always `cfg$bank_slug`, never a hardcoded literal; sector-level
+  prioritization now derives its sector list and exposure map from
+  `cfg$trisk_sectors` instead of a fixed three-sector list; engagement
+  configs gained `raw_loanbook_csv` and `public_snapshot_allowed` so a
+  config can reproduce its own documented run and the public-snapshot
+  guard rail is an explicit opt-in rather than a `bank_slug` string
+  comparison.
+- **Single source of truth for scenario vintages and ABCD provenance:**
+  the byte-identical duplicate `data/vietnam_scenario_*.csv` files were
+  retired in favor of `data/scenarios/pdp8-2023/`; the demo's own
+  `data/vietnam_abcd.csv` now carries the `data_source`/`as_of_year`
+  provenance columns its own documented schema requires, and
+  `validate_abcd_schema()` enforces the full 14-column contract at
+  pipeline entry.
+- **Orchestrator convergence:** `scripts/run_engagement.R` is now the
+  single orchestrator for the public MCB demo and every client engagement.
+  `scripts/pipeline_refresh.R` is a thin wrapper forwarding its flags
+  (`--full`, `--dry-run`) unchanged. `scripts/trisk_power_demo.R` retired
+  (`scripts/trisk_sector_demo.R power` already did the same thing).
+  Four new config keys (`run_data_generation`, `run_refresh_audit`,
+  `run_outputs`, `row_count_files`) let one step list serve both callers.
+- **Multi-bank CI guard:** a weekly-and-per-push `sdb-engagement` CI job
+  now actually executes `scripts/run_engagement.R` for the Saigon Delta
+  Bank rehearsal end to end and asserts no cross-contamination outside its
+  own engagement directory — closing a gap where the second golden fixture
+  validated only committed artifacts, never the orchestrator that produces
+  them.
+
 # pactatrisk 0.2.0
 
 - TRISK core: `R/trisk_core.R` and `R/prioritization_core.R` expose the TRISK
