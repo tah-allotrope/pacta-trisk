@@ -40,6 +40,90 @@ suppressPackageStartupMessages(library(trisk.model))
 # SECTION A: TRISK INPUT PREPARATION (from trisk_prepare_inputs.R)
 # ==============================================================================
 
+#' Validate that an ABCD data frame satisfies the intake/SCHEMA.md ABCD
+#' contract (Wave 1 PHASE-03, C6 -- the demo's own ABCD previously failed
+#' its own documented schema).
+#'
+#' @param abcd data.frame — asset-based company data to validate.
+#' @param source_label character — label used in the error message to
+#'   identify which ABCD source failed, default "ABCD".
+#' @return invisible(TRUE) when the frame satisfies the contract; otherwise
+#'   stop()s with every problem found, one per line.
+#' @export
+validate_abcd_schema <- function(abcd, source_label = "ABCD") {
+  problems <- character(0)
+
+  required_cols <- c(
+    "company_id", "name_company", "lei", "sector", "technology",
+    "production_unit", "year", "production", "emission_factor",
+    "plant_location", "is_ultimate_owner", "emission_factor_unit",
+    "data_source", "as_of_year"
+  )
+  missing_cols <- setdiff(required_cols, names(abcd))
+  if (length(missing_cols) > 0) {
+    problems <- c(problems, sprintf(
+      "missing required column(s): %s", paste(missing_cols, collapse = ", ")
+    ))
+  }
+
+  # Every remaining check needs its own column to exist -- skip a check
+  # whose column is missing rather than erroring out of the validator.
+  has_col <- function(col) col %in% names(abcd)
+
+  if (has_col("year")) {
+    year_int <- suppressWarnings(as.integer(abcd$year))
+    if (any(is.na(year_int) & !is.na(abcd$year))) {
+      problems <- c(problems, "year contains value(s) not coercible to integer")
+    }
+  }
+  if (has_col("as_of_year")) {
+    as_of_year_int <- suppressWarnings(as.integer(abcd$as_of_year))
+    if (any(is.na(as_of_year_int) & !is.na(abcd$as_of_year))) {
+      problems <- c(problems, "as_of_year contains value(s) not coercible to integer")
+    }
+  }
+
+  if (has_col("production")) {
+    production_num <- suppressWarnings(as.numeric(abcd$production))
+    if (any(is.na(production_num) & !is.na(abcd$production))) {
+      problems <- c(problems, "production contains value(s) not coercible to numeric")
+    } else if (any(production_num < 0, na.rm = TRUE)) {
+      problems <- c(problems, "production contains negative value(s)")
+    }
+  }
+
+  if (has_col("company_id") &&
+      any(is.na(abcd$company_id) | !nzchar(trimws(as.character(abcd$company_id))))) {
+    problems <- c(problems, "company_id has empty or NA value(s)")
+  }
+  if (has_col("name_company") &&
+      any(is.na(abcd$name_company) | !nzchar(trimws(as.character(abcd$name_company))))) {
+    problems <- c(problems, "name_company has empty or NA value(s)")
+  }
+
+  if (has_col("is_ultimate_owner") && !is.logical(abcd$is_ultimate_owner)) {
+    owner_chr <- toupper(trimws(as.character(abcd$is_ultimate_owner)))
+    invalid <- !is.na(abcd$is_ultimate_owner) & !(owner_chr %in% c("TRUE", "FALSE"))
+    if (any(invalid)) {
+      problems <- c(problems, "is_ultimate_owner contains value(s) not logical or TRUE/FALSE")
+    }
+  }
+
+  if (has_col("data_source") &&
+      any(is.na(abcd$data_source) | !nzchar(trimws(as.character(abcd$data_source))))) {
+    problems <- c(problems, "data_source has empty or NA value(s)")
+  }
+
+  if (length(problems) > 0) {
+    stop(sprintf(
+      "%s failed schema validation:\n- %s",
+      source_label, paste(problems, collapse = "\n- ")
+    ), call. = FALSE)
+  }
+
+  invisible(TRUE)
+}
+
 .trisk_input_sector_specs <- list(
   power = list(
     sector_local = "power",
@@ -415,6 +499,7 @@ trisk_prepare_sector_inputs <- function(cfg, sectors = cfg$trisk_sectors) {
   dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 
   vietnam_abcd <- read_csv(cfg$inputs$abcd_csv, show_col_types = FALSE)
+  validate_abcd_schema(vietnam_abcd, source_label = cfg$inputs$abcd_csv)
   vietnam_scenario_ms <- read_csv(cfg$inputs$scenario_ms_csv, show_col_types = FALSE)
   vietnam_scenario_co2 <- read_csv(cfg$inputs$scenario_co2_csv, show_col_types = FALSE)
 

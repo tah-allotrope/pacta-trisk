@@ -73,11 +73,11 @@ This table maps each Decision 263 sector to the corresponding PACTA sector, TRIS
 
 | Decision 263 Sector | Facility Type | PACTA Sector | PACTA Technologies | TRISK Sector | TRISK Technologies | Repo Data Files |
 |---|---|---|---|---|---|---|
-| **Thermal power** | Coal plants | `power` | `coalcap` | `Power` | `CoalCap` | `data/vietnam_abcd.csv`, `data/vietnam_scenario_ms.csv`, `data/vietnam_scenario_co2.csv` |
-| **Thermal power** | Gas plants | `power` | `gascap` | `Power` | `GasCap` | `data/vietnam_abcd.csv`, `data/vietnam_scenario_ms.csv` |
-| **Steel** | BF/BOF mills | `steel` | `open_hearth` | `Steel` | `OpenHearth` | `data/vietnam_abcd.csv`, `data/vietnam_scenario_co2.csv` |
-| **Steel** | EAF mills | `steel` | `electric` | `Steel` | `ElectricArc` | `data/vietnam_abcd.csv`, `data/vietnam_scenario_co2.csv` |
-| **Cement** | Integrated plants | `cement` | `integrated facility` | `Cement` | `IntegratedFacility` | `data/vietnam_abcd.csv`, `data/vietnam_scenario_co2.csv` |
+| **Thermal power** | Coal plants | `power` | `coalcap` | `Power` | `CoalCap` | `data/vietnam_abcd.csv`, `data/scenarios/pdp8-2023/vietnam_scenario_ms.csv`, `data/scenarios/pdp8-2023/vietnam_scenario_co2.csv` |
+| **Thermal power** | Gas plants | `power` | `gascap` | `Power` | `GasCap` | `data/vietnam_abcd.csv`, `data/scenarios/pdp8-2023/vietnam_scenario_ms.csv` |
+| **Steel** | BF/BOF mills | `steel` | `open_hearth` | `Steel` | `OpenHearth` | `data/vietnam_abcd.csv`, `data/scenarios/pdp8-2023/vietnam_scenario_co2.csv` |
+| **Steel** | EAF mills | `steel` | `electric` | `Steel` | `ElectricArc` | `data/vietnam_abcd.csv`, `data/scenarios/pdp8-2023/vietnam_scenario_co2.csv` |
+| **Cement** | Integrated plants | `cement` | `integrated facility` | `Cement` | `IntegratedFacility` | `data/vietnam_abcd.csv`, `data/scenarios/pdp8-2023/vietnam_scenario_co2.csv` |
 
 ### Mapping Consistency
 

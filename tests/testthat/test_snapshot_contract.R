@@ -36,14 +36,14 @@ test_that("TRISK snapshot contains all required sector files", {
   }
 })
 
-test_that("scenario vintage copies are byte-identical to legacy data/ files", {
+test_that("scenario vintages have exactly one authoritative path", {
+  # Wave 1 PHASE-03 (C5): the flat data/vietnam_scenario_*.csv copies were
+  # retired -- data/scenarios/<vintage>/ is now the only source of truth.
+  # This intentionally replaces the prior test, which asserted the
+  # now-removed duplication existed.
   root <- project_root()
-  expect_identical(
-    unname(tools::md5sum(file.path(root, "data", "vietnam_scenario_ms.csv"))),
-    unname(tools::md5sum(file.path(root, "data", "scenarios", "pdp8-2023", "vietnam_scenario_ms.csv")))
-  )
-  expect_identical(
-    unname(tools::md5sum(file.path(root, "data", "vietnam_scenario_co2.csv"))),
-    unname(tools::md5sum(file.path(root, "data", "scenarios", "pdp8-2023", "vietnam_scenario_co2.csv")))
-  )
+  expect_false(file.exists(file.path(root, "data", "vietnam_scenario_ms.csv")))
+  expect_false(file.exists(file.path(root, "data", "vietnam_scenario_co2.csv")))
+  expect_true(file.exists(file.path(root, "data", "scenarios", "pdp8-2023", "vietnam_scenario_ms.csv")))
+  expect_true(file.exists(file.path(root, "data", "scenarios", "pdp8-2023", "vietnam_scenario_co2.csv")))
 })

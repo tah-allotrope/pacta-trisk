@@ -80,6 +80,14 @@ The ABCD choice affects:
 
 All ABCD data in this repository is synthetic and illustrative. The `data/vietnam_abcd.csv` file demonstrates the **shape** of the data a real engagement needs (columns, units, sector/technology mapping), but it is not a real asset database. The intake schema in `intake/SCHEMA.md` and the template in `intake/templates/abcd_template.csv` define the contract a real ABCD file must satisfy.
 
+As of Wave 1 (2026-07-25), `data/vietnam_abcd.csv` carries the two provenance
+columns the schema requires (`data_source`, `as_of_year`) and every ABCD file
+loaded by the pipeline — synthetic or real — is validated against the full
+14-column contract by `validate_abcd_schema()` (`R/trisk_core.R`), called at
+the top of `trisk_prepare_sector_inputs()`. A schema violation fails the run
+immediately with every problem listed, rather than surfacing later as a
+silent NA or a cryptic downstream error.
+
 ---
 
 *Decision owner: engagement lead / data lead. Review date: before any real-data phase kickoff.*

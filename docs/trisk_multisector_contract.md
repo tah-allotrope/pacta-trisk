@@ -29,7 +29,7 @@ Each runnable input folder contains the same four files expected by the current 
 
 - Local sector: `power`
 - TRISK sector: `Power`
-- Scenario source: `data/vietnam_scenario_ms.csv`
+- Scenario source: `data/scenarios/pdp8-2023/vietnam_scenario_ms.csv`
 - Technologies:
   - `coalcap` -> `CoalCap`
   - `gascap` -> `GasCap`
@@ -41,7 +41,7 @@ Each runnable input folder contains the same four files expected by the current 
 
 - Local sector: `cement`
 - TRISK sector: `Cement`
-- Scenario source: `data/vietnam_scenario_co2.csv`
+- Scenario source: `data/scenarios/pdp8-2023/vietnam_scenario_co2.csv`
 - Technology:
   - `integrated facility` -> `IntegratedFacility`
 - Units: `tonnes`, `USD/unit-equivalent`
@@ -50,7 +50,7 @@ Each runnable input folder contains the same four files expected by the current 
 
 - Local sector: `steel`
 - TRISK sector: `Steel`
-- Scenario source: `data/vietnam_scenario_co2.csv`
+- Scenario source: `data/scenarios/pdp8-2023/vietnam_scenario_co2.csv`
 - Technologies:
   - `open_hearth` -> `OpenHearth`
   - `electric` -> `ElectricArc`
@@ -65,13 +65,13 @@ That context must be labeled as sector-level, not borrower-specific alignment.
 
 ### Power
 
-Power continues to use market-share scenario inputs from `data/vietnam_scenario_ms.csv`.
+Power continues to use market-share scenario inputs from `data/scenarios/pdp8-2023/vietnam_scenario_ms.csv`.
 `scenario_pathway` is derived from baseline production multiplied by the sector technology share shock.
 `scenario_price` and `scenario_capacity_factor` continue to use technology-specific synthetic demo curves.
 
 ### Cement and Steel
 
-`cement` and `steel` use SDA emission-intensity pathways from `data/vietnam_scenario_co2.csv`.
+`cement` and `steel` use SDA emission-intensity pathways from `data/scenarios/pdp8-2023/vietnam_scenario_co2.csv`.
 The TRISK `scenarios.csv` translation is:
 
 - `scenario_price`: a synthetic unit-price path anchored by sector and year, then increased as the pathway requires more intensity reduction versus the sector baseline.

@@ -141,8 +141,8 @@ test_that("run_engagement.R guard rail blocks a non-MCB config pointing at dashb
     inputs = list(
       loanbook_csv = "data/vietnam_loanbook.csv",
       abcd_csv = "data/vietnam_abcd.csv",
-      scenario_ms_csv = "data/vietnam_scenario_ms.csv",
-      scenario_co2_csv = "data/vietnam_scenario_co2.csv",
+      scenario_ms_csv = "data/scenarios/pdp8-2023/vietnam_scenario_ms.csv",
+      scenario_co2_csv = "data/scenarios/pdp8-2023/vietnam_scenario_co2.csv",
       region_isos_csv = "data/vietnam_region_isos.csv"
     )
   ), auto_unbox = TRUE), tmp_config)

@@ -3,11 +3,17 @@
 # Generates all synthetic Vietnam PACTA input data for Mekong Commercial Bank
 #
 # Outputs (written to data/):
-#   vietnam_loanbook.csv       - 43-loan synthetic MCB loanbook
-#   vietnam_abcd.csv           - Asset-based company data (~192 rows)
-#   vietnam_scenario_ms.csv    - Market share scenario (power + automotive)
-#   vietnam_scenario_co2.csv   - CO2 intensity scenario (cement + steel)
-#   vietnam_region_isos.csv    - VN country-region mapping
+#   vietnam_loanbook.csv                        - 43-loan synthetic MCB loanbook
+#   vietnam_abcd.csv                            - Asset-based company data (~192 rows)
+#   scenarios/pdp8-2023/vietnam_scenario_ms.csv  - Market share scenario (power + automotive)
+#   scenarios/pdp8-2023/vietnam_scenario_co2.csv - CO2 intensity scenario (cement + steel)
+#   vietnam_region_isos.csv                     - VN country-region mapping
+#
+# NOTE: the scenario CSVs are written ONLY under data/scenarios/pdp8-2023/ --
+# no flat data/vietnam_scenario_*.csv copy. A prior version wrote both paths;
+# that duplication was retired in Wave 1 PHASE-03 (C5) because it left two
+# byte-identical sources of truth with no owner. Every engagement config
+# points at the versioned path.
 #
 # Run from project root:
 #   "C:\Program Files\R\R-4.5.2\bin\Rscript.exe" scripts/generate_vietnam_data.R
@@ -195,12 +201,17 @@ cat("  Saved: data/vietnam_loanbook.csv\n\n")
 # SECTION B: ABCD (Asset-Based Company Data)
 # company_id, name_company, lei, sector, technology, production_unit,
 # year, production, emission_factor, plant_location, is_ultimate_owner,
-# emission_factor_unit
+# emission_factor_unit, data_source, as_of_year
 #
 # name_company = name_ultimate_parent in loanbook (enables matching at UP level)
 # All power companies: is_ultimate_owner = TRUE
 # BOT coal (Nghi Son, Int'l Power Mong Duong): flat capacity through 2035 lock-in
 # Production units: power=MW, automotive=vehicles, cement/steel/coal=tonnes
+#
+# data_source / as_of_year: provenance columns required by intake/SCHEMA.md's
+# ABCD contract and matching intake/templates/abcd_template.csv's column
+# order (added Wave 1 PHASE-03, C6 -- the demo's own ABCD previously failed
+# its own documented schema).
 # ==============================================================================
 
 cat("--- B: Building ABCD ---\n")
@@ -223,7 +234,9 @@ make_abcd <- function(company_id, name_company, sector, technology, production_u
     emission_factor      = emission_factors,
     plant_location       = plant_location,
     is_ultimate_owner    = is_ultimate_owner,
-    emission_factor_unit = emission_factor_unit
+    emission_factor_unit = emission_factor_unit,
+    data_source          = "synthetic_demo",
+    as_of_year           = 2025L
   )
 }
 
@@ -594,11 +607,9 @@ vietnam_scenario_ms <- bind_rows(
 cat(sprintf("  Market share scenario: %d rows | Scenarios: %s\n",
             nrow(vietnam_scenario_ms),
             paste(unique(vietnam_scenario_ms$scenario), collapse = ", ")))
-write_csv(vietnam_scenario_ms, "data/vietnam_scenario_ms.csv")
-cat("  Saved: data/vietnam_scenario_ms.csv\n")
 
-# Scenario vintages: keep the legacy data/ paths and a versioned copy in sync.
-# The engagement config now points at data/scenarios/pdp8-2023/.
+# data/scenarios/<vintage>/ is the single authoritative path (Wave 1
+# PHASE-03, C5) -- no flat data/vietnam_scenario_ms.csv copy.
 dir.create("data/scenarios/pdp8-2023", recursive = TRUE, showWarnings = FALSE)
 write_csv(vietnam_scenario_ms, "data/scenarios/pdp8-2023/vietnam_scenario_ms.csv")
 cat("  Saved: data/scenarios/pdp8-2023/vietnam_scenario_ms.csv\n\n")
@@ -655,8 +666,8 @@ vietnam_scenario_co2 <- bind_rows(
 cat(sprintf("  CO2 intensity scenario: %d rows | Scenarios: %s\n",
             nrow(vietnam_scenario_co2),
             paste(unique(vietnam_scenario_co2$scenario), collapse = ", ")))
-write_csv(vietnam_scenario_co2, "data/vietnam_scenario_co2.csv")
-cat("  Saved: data/vietnam_scenario_co2.csv\n")
+
+# Single authoritative path -- see the Section C note above.
 write_csv(vietnam_scenario_co2, "data/scenarios/pdp8-2023/vietnam_scenario_co2.csv")
 cat("  Saved: data/scenarios/pdp8-2023/vietnam_scenario_co2.csv\n\n")
 

@@ -157,3 +157,65 @@ test_that("classify_band matches the documented thresholds", {
   expect_equal(classify_band(0.70), "Critical")
   expect_equal(classify_band(1.0), "Critical")
 })
+
+# --- validate_abcd_schema() (Wave 1 PHASE-03, C6) -----------------------------
+
+.valid_abcd_row <- function(overrides = list()) {
+  row <- list(
+    company_id = "VN_ABCD_001",
+    name_company = "Test Co",
+    lei = NA_character_,
+    sector = "power",
+    technology = "coalcap",
+    production_unit = "MW",
+    year = 2025L,
+    production = 100,
+    emission_factor = NA_real_,
+    plant_location = "VN",
+    is_ultimate_owner = TRUE,
+    emission_factor_unit = NA_character_,
+    data_source = "synthetic_demo",
+    as_of_year = 2025L
+  )
+  row[names(overrides)] <- overrides
+  as.data.frame(row, stringsAsFactors = FALSE)
+}
+
+test_that("validate_abcd_schema passes on the regenerated data/vietnam_abcd.csv", {
+  withr_wd <- setwd(root)
+  on.exit(setwd(withr_wd))
+  skip_if_not(file.exists("data/vietnam_abcd.csv"), "data/vietnam_abcd.csv not generated")
+
+  abcd <- readr::read_csv("data/vietnam_abcd.csv", show_col_types = FALSE)
+  expect_true(isTRUE(validate_abcd_schema(abcd)))
+})
+
+test_that("validate_abcd_schema reports every missing required column", {
+  err <- tryCatch(
+    validate_abcd_schema(data.frame(company_id = "X")),
+    error = function(e) e
+  )
+  expect_true(inherits(err, "error"))
+  expect_true(grepl("name_company", conditionMessage(err)))
+  expect_true(grepl("as_of_year", conditionMessage(err)))
+})
+
+test_that("validate_abcd_schema rejects negative production", {
+  df <- .valid_abcd_row(list(production = -5))
+  expect_error(validate_abcd_schema(df), "production")
+})
+
+test_that("validate_abcd_schema rejects a non-integer year", {
+  df <- .valid_abcd_row(list(year = "not-a-year"))
+  expect_error(validate_abcd_schema(df), "year")
+})
+
+test_that("validate_abcd_schema rejects an empty data_source", {
+  df <- .valid_abcd_row(list(data_source = ""))
+  expect_error(validate_abcd_schema(df), "data_source")
+})
+
+test_that("validate_abcd_schema permits NA emission_factor and emission_factor_unit", {
+  df <- .valid_abcd_row(list(emission_factor = NA_real_, emission_factor_unit = NA_character_))
+  expect_true(isTRUE(validate_abcd_schema(df)))
+})
