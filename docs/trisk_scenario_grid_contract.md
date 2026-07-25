@@ -39,22 +39,31 @@ This yields `3 x 3 x 3 x 3 x 3 = 243` scenarios per sector.
 
 ## Carbon-Price Family Mapping
 
-Phase 01 uses stable banker-facing labels while reusing the existing curve strings already wired into the repo.
+**Updated in Wave 1 PHASE-04.** Phase 01 originally aliased all three
+`carbon_price_family` values onto the same backing curve per sector, so the
+"strict / moderate / mild" choice had no effect on any output — confirmed
+empirically (C7 in `research/2026-07-25-post-wave0-platform-hardening-brainstorm.md`).
+Each family now maps to its own derived curve: `NGFS_NetZero2050` keeps the
+original curve and values unchanged (so the base, non-grid TRISK run is
+unaffected); `NGFS_Below2C` and `NGFS_Delayed` scale that curve's
+`carbon_tax` path to 60% and 30% respectively, rounded to 2 decimals
+(`R/trisk_core.R:.trisk_build_carbon_price()`).
 
 | Sector | `carbon_price_family` | Backing `carbon_price_model` | Notes |
 |---|---|---|---|
-| `power` | `NGFS_NetZero2050` | `increasing_carbon_tax_50` | Strictest available in-repo power curve |
-| `power` | `NGFS_Below2C` | `increasing_carbon_tax_50` | Same backing curve for v1 aliasing |
-| `power` | `NGFS_Delayed` | `increasing_carbon_tax_50` | Same backing curve for v1 aliasing |
-| `cement` | `NGFS_NetZero2050` | `cement_intensity_transition` | Sector-specific existing curve |
-| `cement` | `NGFS_Below2C` | `cement_intensity_transition` | Same backing curve for v1 aliasing |
-| `cement` | `NGFS_Delayed` | `cement_intensity_transition` | Same backing curve for v1 aliasing |
-| `steel` | `NGFS_NetZero2050` | `steel_intensity_transition` | Sector-specific existing curve |
-| `steel` | `NGFS_Below2C` | `steel_intensity_transition` | Same backing curve for v1 aliasing |
-| `steel` | `NGFS_Delayed` | `steel_intensity_transition` | Same backing curve for v1 aliasing |
+| `power` | `NGFS_NetZero2050` | `increasing_carbon_tax_50` | Unchanged original curve |
+| `power` | `NGFS_Below2C` | `increasing_carbon_tax_50_below2c` | 60% of the NetZero2050 carbon_tax path |
+| `power` | `NGFS_Delayed` | `increasing_carbon_tax_50_delayed` | 30% of the NetZero2050 carbon_tax path |
+| `cement` | `NGFS_NetZero2050` | `cement_intensity_transition` | Unchanged original curve |
+| `cement` | `NGFS_Below2C` | `cement_intensity_transition_below2c` | 60% of the NetZero2050 carbon_tax path |
+| `cement` | `NGFS_Delayed` | `cement_intensity_transition_delayed` | 30% of the NetZero2050 carbon_tax path |
+| `steel` | `NGFS_NetZero2050` | `steel_intensity_transition` | Unchanged original curve |
+| `steel` | `NGFS_Below2C` | `steel_intensity_transition_below2c` | 60% of the NetZero2050 carbon_tax path |
+| `steel` | `NGFS_Delayed` | `steel_intensity_transition_delayed` | 30% of the NetZero2050 carbon_tax path |
 
-The aliasing is intentionally illustrative for v1.
-Methodology copy must describe these as demo families mapped onto existing repo curves, not as newly ingested NGFS Phase V data.
+The scaling is intentionally illustrative, not sourced from actual NGFS
+Phase V carbon-price data. Methodology copy must describe these as demo
+families derived from existing repo curves, not as newly ingested NGFS data.
 
 ## Scenario Identifier
 
@@ -170,6 +179,60 @@ Required keys:
 | `runtime_seconds` | numeric | Total runtime for the sector grid |
 | `trisk_model_version` | string | Package version used for generation |
 | `grid_contract_version` | string | Version tag for this contract, starting at `v1` |
+| `input_fingerprint` | string | **Added Wave 1 PHASE-04.** md5 of the sector's four TRISK input files (`assets.csv`, `financial_features.csv`, `ngfs_carbon_price.csv`, `scenarios.csv`), computed by `grid_input_fingerprint()`. `trisk_run_grid()` discards the entire cached grid and regenerates all `scenario_count` scenarios whenever this, `trisk_model_version`, or `grid_contract_version` no longer matches the current environment (`grid_cache_is_valid()`, Specification S2) — this is the fix for the grid staleness defect (C1/INV-001): before PHASE-04, the cache was keyed on `scenario_id` alone with no dependency on the underlying input data. |
+
+## Lever Sensitivity (measured, Wave 1 PHASE-04)
+
+Every lever was confirmed to move at least one output metric before being
+kept in the grid:
+
+| Lever | Affects `npv_change_pct`? | Affects `pd_change_pct`? | Evidence |
+|---|---|---|---|
+| `shock_year` | Yes | Yes | 3 distinct `npv_change_pct` sums when holding other levers fixed |
+| `discount_rate` | Yes | Yes | 3 distinct `npv_change_pct` sums when holding other levers fixed |
+| `market_passthrough` | Yes | Yes | 3 distinct `npv_change_pct` sums when holding other levers fixed |
+| `risk_free_rate` | **No** | **Yes** | Two ad-hoc power runs differing only in `risk_free_rate` (0.02 vs 0.04) produced identical `npv_change` (max diff `0.0`) but `pd_change` differed by up to `0.028` (2.8 percentage points of PD) per borrower. `risk_free_rate` is a Merton-model credit-risk input (drives distance-to-default / PD), not a firm-value input (drives NPV) — this is expected model behavior, not a plumbing bug. An earlier pass mistakenly read this as the lever being fully inert because it compared only `npv_change` sums. |
+| `carbon_price_family` | Yes (after this phase) | Yes (after this phase) | Previously a true no-op — all three families aliased to one backing curve (see Carbon-Price Family Mapping above). Fixed this phase. |
+
+**Specification S3 outcome:** `risk_free_rate` is live (confirmed empirically,
+not a plumbing bug) — kept in `grid_levers`, `trisk_sensitivity_specs`,
+`build_scenario_id()`, and `build_grid_label()` unchanged. The grid remains
+the full `3^5 = 243`-scenario cartesian product.
+
+## Per-Scenario Input Horizon (`grid_contract_version` v2, Wave 1 PHASE-04 follow-up)
+
+`build_grid_input_dir()` builds ONE shared input package per sector,
+extending `scenarios.csv` and `ngfs_carbon_price.csv` to
+`max(grid_levers$shock_year) + 2` (2032) so all 243 scenarios can reuse it
+without re-extending per run. This is correct for scenarios whose own
+`shock_year` equals the grid-wide max (2030), but WRONG for every other
+scenario: `trisk.model` sums NPV over every year present in the scenario
+data, so a `shock_year = 2026` cell still carrying 2031-2032 rows produces a
+different (and wrong) result than a standalone run at `shock_year = 2026`
+would.
+
+This was discovered empirically after PHASE-04's initial input-fingerprinting
+fix: a **fully fresh** grid regeneration (fixed staleness, C1) still
+disagreed with the base run at identical parameters. Isolating the cause
+showed the shared package's extended horizon was the culprit, not staleness.
+
+**Fix:** `build_scenario_input_dir()` builds a per-scenario copy of the
+shared package, truncating `scenarios.csv`/`ngfs_carbon_price.csv` to
+`max(shock_year + 2, assets.csv's own max year)` before each `execute_trisk_run()`
+call. The floor term matters: naively truncating to `shock_year + 2` alone
+crashed `trisk.model:::extend_to_full_analysis_timeframe()` for
+`shock_year = 2026` (horizon 2028), because `assets.csv` is never truncated
+and still spans the full 2025-2030 base window — the floor keeps
+scenarios/carbon-price truncation from ever going narrower than that.
+
+Verified: truncating a `shock_year = 2028` cell to its own horizon (2030)
+reproduced the base run's `company_summary.csv` to floating-point noise
+(max abs diff `1.1e-16`, previously `1.1e-16` after the fix vs. `0.01`-`0.14`
+before it). This changes every grid cell's numeric output for the same
+nominal parameters (nothing about the shared input package's own bytes
+changed, so `input_fingerprint` alone could not have detected it) — hence
+the `grid_contract_version` bump to `v2` to force every existing cache to
+discard and regenerate.
 
 ## Manifest Extension
 

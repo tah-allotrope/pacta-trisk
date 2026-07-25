@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pandas as pd
@@ -63,4 +64,18 @@ def test_trisk_grid_loader_returns_correct_schema() -> None:
 def test_trisk_grid_scenario_count() -> None:
     grid = load_trisk_grid("power")
     n_scenarios = len(grid["scenarios"])
-    assert n_scenarios == 243, f"Expected 243 scenarios, got {n_scenarios}"
+
+    grid_meta = json.loads((TRISK_DIR / "grid" / "power" / "grid_meta.json").read_text())
+    assert n_scenarios == grid_meta["scenario_count"], (
+        f"Loaded grid has {n_scenarios} scenarios but grid_meta.json records "
+        f"scenario_count={grid_meta['scenario_count']}"
+    )
+
+    # Wave 1 PHASE-04 (Specification S3): all five levers (shock_year,
+    # discount_rate, risk_free_rate, market_passthrough, carbon_price_family)
+    # were measured and confirmed to each independently affect at least one
+    # output metric, so all five were kept at cardinality 3. grid_meta.json
+    # does not itself store a per-lever cardinality breakdown, so this
+    # asserts against the documented product (see
+    # docs/trisk_scenario_grid_contract.md) rather than a bare magic number.
+    assert grid_meta["scenario_count"] == 3 ** 5

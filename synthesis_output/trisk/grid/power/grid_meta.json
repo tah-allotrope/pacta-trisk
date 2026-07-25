@@ -1,10 +1,11 @@
 {
   "sector": "power",
   "scenario_count": 243,
-  "generated_at": "2026-05-02T03:49:18Z",
-  "runtime_seconds": 280.259,
+  "generated_at": "2026-07-25T04:08:02Z",
+  "runtime_seconds": 597.144,
   "trisk_model_version": "2.6.1",
-  "grid_contract_version": "v1",
+  "grid_contract_version": "v2",
   "cached_scenarios": 0,
-  "generated_scenarios": 243
+  "generated_scenarios": 243,
+  "input_fingerprint": "57600f19091de0077cb6a904d68e6c12"
 }

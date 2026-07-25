@@ -121,6 +121,28 @@ The pilot uses the package's `increasing_carbon_tax_50` pattern as the active ca
 
 This is a synthetic stress device for the demo.
 
+### Scenario Lever Sensitivity (Wave 1 PHASE-04)
+
+The Scenario Builder exposes five levers: `shock_year`, `discount_rate`,
+`risk_free_rate`, `market_passthrough`, `carbon_price_family`. Measured
+against the power sector this wave:
+
+- `shock_year`, `discount_rate`, and `market_passthrough` each move
+  `npv_change_pct` and `pd_change_pct`.
+- `risk_free_rate` moves `pd_change_pct` (up to 2.8 percentage points of PD
+  between the 0.02 and 0.04 ends of its range) but does **not** move
+  `npv_change_pct` at all (confirmed to the 9th decimal place). This is
+  expected: `risk_free_rate` is a Merton-model credit-risk input driving
+  distance-to-default, not a firm-value input. It is correctly forwarded end
+  to end — no plumbing bug.
+- `carbon_price_family` previously had **no effect on anything**: all three
+  choices (`NGFS_NetZero2050`, `NGFS_Below2C`, `NGFS_Delayed`) silently
+  aliased to the same backing price curve per sector. Fixed this wave — see
+  `docs/trisk_scenario_grid_contract.md`'s "Carbon-Price Family Mapping" for
+  the corrected per-family curves.
+
+Every lever now measurably affects at least one output metric.
+
 ## Interpretation Guardrails
 
 The TRISK pilot should be read as:

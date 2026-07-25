@@ -28,23 +28,10 @@ suppressPackageStartupMessages({
 source("R/sector_registry.R")
 source("R/trisk_core.R")
 
-carbon_price_model_map <- list(
-  power = c(
-    NGFS_NetZero2050 = "increasing_carbon_tax_50",
-    NGFS_Below2C = "increasing_carbon_tax_50",
-    NGFS_Delayed = "increasing_carbon_tax_50"
-  ),
-  cement = c(
-    NGFS_NetZero2050 = "cement_intensity_transition",
-    NGFS_Below2C = "cement_intensity_transition",
-    NGFS_Delayed = "cement_intensity_transition"
-  ),
-  steel = c(
-    NGFS_NetZero2050 = "steel_intensity_transition",
-    NGFS_Below2C = "steel_intensity_transition",
-    NGFS_Delayed = "steel_intensity_transition"
-  )
-)
+# carbon_price_model_map comes from R/trisk_core.R (sourced above). This
+# script previously redefined its own copy here, which shadowed the shared
+# one and would have gone stale the moment trisk_core.R's map changed --
+# fixed as part of Wave 1 PHASE-04's carbon-price lever work (C7).
 
 parse_arg <- function(args, name, default = NULL) {
   prefix <- paste0("--", name, "=")

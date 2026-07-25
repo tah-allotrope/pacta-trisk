@@ -1,10 +1,11 @@
 {
   "sector": "cement",
   "scenario_count": 243,
-  "generated_at": "2026-05-02T03:59:00Z",
-  "runtime_seconds": 529.625,
+  "generated_at": "2026-07-25T04:16:41Z",
+  "runtime_seconds": 499.898,
   "trisk_model_version": "2.6.1",
-  "grid_contract_version": "v1",
+  "grid_contract_version": "v2",
   "cached_scenarios": 0,
-  "generated_scenarios": 243
+  "generated_scenarios": 243,
+  "input_fingerprint": "6c744d00165977305d4ed9a668271d90"
 }

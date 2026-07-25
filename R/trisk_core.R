@@ -429,38 +429,49 @@ backfill_zero_baseline <- function(assets, value_col, year_col = "year") {
     )
 }
 
+#' Build the three-scenario carbon-price path for a sector.
+#'
+#' Three scenarios per sector -- the existing scenario name/values unchanged
+#' as the "NetZero2050" (strict) variant, plus two new derived paths at 60%
+#' and 30% of its carbon_tax, rounded to 2 decimals -- so the dashboard's
+#' "Net Zero 2050 (strict) / Below 2C (moderate) / Delayed transition (mild)"
+#' carbon-price family selector finally reflects distinct data (Wave 1
+#' PHASE-04, C7/ASM-005). The base (non-grid) TRISK run always reads the
+#' unchanged first scenario by name via sector_meta()$carbon_price_model, so
+#' its numbers are unaffected by this change.
+#'
+#' @param spec list — one sector's entry from .trisk_input_sector_specs.
+#' @return tbl — 18 rows (3 scenarios x 6 years) in the trisk.model carbon
+#'   price schema.
 .trisk_build_carbon_price <- function(spec) {
   if (spec$sector_local == "power") {
-    tibble(
-      year = 2025:2030,
-      model = "synthetic_vietnam_demo",
-      scenario = "increasing_carbon_tax_50",
-      scenario_geography = spec$geography,
-      variable = "Price|Carbon",
-      unit = "USD/t CO2",
-      carbon_tax = c(0, 0, 0, 50, 52, 54.08)
-    )
+    base_name <- "increasing_carbon_tax_50"
+    base_tax <- c(0, 0, 0, 50, 52, 54.08)
   } else if (spec$sector_local == "cement") {
-    tibble(
-      year = 2025:2030,
-      model = "synthetic_vietnam_demo",
-      scenario = "cement_intensity_transition",
-      scenario_geography = spec$geography,
-      variable = "Price|Carbon",
-      unit = "USD/t CO2",
-      carbon_tax = c(12, 18, 26, 34, 42, 50)
-    )
+    base_name <- "cement_intensity_transition"
+    base_tax <- c(12, 18, 26, 34, 42, 50)
   } else {
+    base_name <- "steel_intensity_transition"
+    base_tax <- c(10, 16, 24, 33, 42, 52)
+  }
+
+  build_price_block <- function(scenario_name, carbon_tax) {
     tibble(
       year = 2025:2030,
       model = "synthetic_vietnam_demo",
-      scenario = "steel_intensity_transition",
+      scenario = scenario_name,
       scenario_geography = spec$geography,
       variable = "Price|Carbon",
       unit = "USD/t CO2",
-      carbon_tax = c(10, 16, 24, 33, 42, 52)
+      carbon_tax = carbon_tax
     )
   }
+
+  dplyr::bind_rows(
+    build_price_block(base_name, base_tax),
+    build_price_block(paste0(base_name, "_below2c"), round(base_tax * 0.60, 2)),
+    build_price_block(paste0(base_name, "_delayed"), round(base_tax * 0.30, 2))
+  )
 }
 
 #' Prepare TRISK-ready input files for the given engagement's sectors.
@@ -1156,7 +1167,15 @@ trisk_run_sector <- function(cfg, sector) {
 # SECTION C: TRISK SCENARIO GRID (from trisk_scenario_grid.R)
 # ==============================================================================
 
-grid_contract_version <- "v1"
+# v2 (Wave 1 PHASE-04 follow-up): each grid cell's inputs are now truncated
+# to its own shock_year + 2 horizon (build_scenario_input_dir()) instead of
+# always using the shared package extended to the grid-wide max shock_year.
+# This changes every cell's numeric output for the same nominal parameters
+# (it is the fix for the base-cell-vs-base-run divergence, C1/INV-001), so
+# the version bump is required to force existing caches to discard and
+# regenerate -- grid_input_fingerprint() alone would not detect this change,
+# since the shared input package's own bytes are unchanged.
+grid_contract_version <- "v2"
 
 grid_levers <- list(
   shock_year = c(2026L, 2028L, 2030L),
@@ -1166,21 +1185,23 @@ grid_levers <- list(
   carbon_price_family = c("NGFS_NetZero2050", "NGFS_Below2C", "NGFS_Delayed")
 )
 
+# Each NGFS_* family now maps to its own distinct scenario name -- see
+# .trisk_build_carbon_price() (Wave 1 PHASE-04, C7/ASM-005).
 carbon_price_model_map <- list(
   power = c(
     NGFS_NetZero2050 = "increasing_carbon_tax_50",
-    NGFS_Below2C = "increasing_carbon_tax_50",
-    NGFS_Delayed = "increasing_carbon_tax_50"
+    NGFS_Below2C = "increasing_carbon_tax_50_below2c",
+    NGFS_Delayed = "increasing_carbon_tax_50_delayed"
   ),
   cement = c(
     NGFS_NetZero2050 = "cement_intensity_transition",
-    NGFS_Below2C = "cement_intensity_transition",
-    NGFS_Delayed = "cement_intensity_transition"
+    NGFS_Below2C = "cement_intensity_transition_below2c",
+    NGFS_Delayed = "cement_intensity_transition_delayed"
   ),
   steel = c(
     NGFS_NetZero2050 = "steel_intensity_transition",
-    NGFS_Below2C = "steel_intensity_transition",
-    NGFS_Delayed = "steel_intensity_transition"
+    NGFS_Below2C = "steel_intensity_transition_below2c",
+    NGFS_Delayed = "steel_intensity_transition_delayed"
   )
 )
 
@@ -1348,6 +1369,134 @@ build_grid_input_dir <- function(sector, source_input_dir, grid_dir) {
   grid_input_dir
 }
 
+#' Truncate the shared grid input package to one scenario's own horizon.
+#'
+#' build_grid_input_dir() extends scenarios.csv and ngfs_carbon_price.csv to
+#' `max(grid_levers$shock_year) + 2` ONE TIME so every scenario in the grid
+#' can share a single pre-built input package. That is correct only for
+#' scenarios whose own shock_year equals the grid-wide max: a scenario with
+#' an earlier shock_year still receives the full extended (2031-2032)
+#' trailing rows, and trisk.model's NPV sums over every year present in the
+#' scenario data — so those extra rows measurably change the result even
+#' though the years within the run's own horizon are byte-identical.
+#' Discovered empirically (Wave 1 PHASE-04 follow-up, still C1/INV-001):
+#' after fixing the stale-cache defect, a fully fresh grid regeneration
+#' still disagreed with the base (non-grid) run at identical parameters;
+#' truncating to shock_year + 2 made the disagreement disappear to floating-
+#' point noise (verified max abs diff 1.1e-16).
+#'
+#' The horizon is never truncated below assets.csv's own max year:
+#' assets.csv is copied verbatim by build_grid_input_dir() (never extended),
+#' so it always spans the base run's original window. Truncating
+#' scenarios/carbon_price BELOW that window while assets.csv stays at its
+#' full range creates an asset/scenario year mismatch that crashes inside
+#' trisk.model:::extend_to_full_analysis_timeframe() (confirmed empirically
+#' for an early shock_year truncated naively to shock_year + 2 alone). The
+#' horizon is therefore `max(shock_year + 2, assets.csv's own max year)`.
+#'
+#' @param grid_input_dir character — the shared, already-extended grid input
+#'   directory (from build_grid_input_dir()).
+#' @param shock_year integer — this scenario's own shock_year.
+#' @param scratch_dir character — directory to write the truncated copy to;
+#'   created if it does not exist.
+#' @return character — scratch_dir, ready to pass as execute_trisk_run()'s
+#'   input_dir.
+build_scenario_input_dir <- function(grid_input_dir, shock_year, scratch_dir) {
+  dir.create(scratch_dir, recursive = TRUE, showWarnings = FALSE)
+
+  file.copy(file.path(grid_input_dir, "assets.csv"), file.path(scratch_dir, "assets.csv"), overwrite = TRUE)
+  file.copy(file.path(grid_input_dir, "financial_features.csv"), file.path(scratch_dir, "financial_features.csv"), overwrite = TRUE)
+
+  assets <- read_csv(file.path(scratch_dir, "assets.csv"), show_col_types = FALSE)
+  base_max_year <- max(assets$production_year, na.rm = TRUE)
+  horizon <- max(as.integer(shock_year) + 2L, base_max_year)
+
+  scenarios <- read_csv(file.path(grid_input_dir, "scenarios.csv"), show_col_types = FALSE) %>%
+    filter(scenario_year <= horizon)
+  write_csv(scenarios, file.path(scratch_dir, "scenarios.csv"))
+
+  carbon_price <- read_csv(file.path(grid_input_dir, "ngfs_carbon_price.csv"), show_col_types = FALSE) %>%
+    filter(year <= horizon)
+  write_csv(carbon_price, file.path(scratch_dir, "ngfs_carbon_price.csv"))
+
+  scratch_dir
+}
+
+#' md5 fingerprint of a grid sector's live input package.
+#'
+#' Hashes the four TRISK input files a grid depends on, in sorted-filename
+#' order, so the digest is stable across platforms. Must be called AFTER
+#' build_grid_input_dir() has refreshed grid_input_dir from the sector's
+#' current input package -- computing it earlier fingerprints the previous
+#' run's inputs (Wave 1 PHASE-04, Specification S2).
+#'
+#' @param grid_input_dir character — the grid's `input/` directory, as
+#'   returned by build_grid_input_dir().
+#' @return character(1) — a 32-character lowercase md5 hex digest over the
+#'   four input files' own md5 digests concatenated in sorted-filename order
+#'   (assets.csv, financial_features.csv, ngfs_carbon_price.csv,
+#'   scenarios.csv); NA_character_ if any of the four is missing.
+grid_input_fingerprint <- function(grid_input_dir) {
+  filenames <- sort(c("assets.csv", "financial_features.csv", "ngfs_carbon_price.csv", "scenarios.csv"))
+  paths <- file.path(grid_input_dir, filenames)
+  if (!all(file.exists(paths))) {
+    return(NA_character_)
+  }
+  # base R only (CON-001: no new pipeline dependency) -- md5 the four file
+  # digests' concatenation by writing them to a scratch file and md5-summing
+  # that, rather than pulling in the digest package for a single string hash.
+  digests <- unname(tools::md5sum(paths))
+  concat_path <- tempfile()
+  on.exit(unlink(concat_path), add = TRUE)
+  writeChar(paste(digests, collapse = ""), concat_path, eos = NULL)
+  unname(tools::md5sum(concat_path))
+}
+
+#' Decide whether a grid's cached results may be reused.
+#'
+#' Cache reuse requires the recorded input fingerprint, trisk.model version,
+#' and grid contract version to all match the current environment (Wave 1
+#' PHASE-04, Specification S2). Any mismatch — or a missing/unreadable
+#' grid_meta.json — invalidates the entire cache, not just the changed part.
+#'
+#' @param grid_dir character — the grid's output directory (holds
+#'   grid_meta.json).
+#' @param grid_input_dir character — the grid's `input/` directory.
+#' @param contract_version character — the in-code grid_contract_version.
+#' @param model_version character — the currently installed trisk.model
+#'   version, typically `as.character(utils::packageVersion("trisk.model"))`.
+#' @return list(valid = logical(1), reason = character(1)) — reason is one
+#'   of "ok", "no grid_meta.json", "no input_fingerprint recorded",
+#'   "input fingerprint changed", "trisk.model version changed",
+#'   "grid contract version changed".
+grid_cache_is_valid <- function(grid_dir, grid_input_dir, contract_version, model_version) {
+  meta_path <- file.path(grid_dir, "grid_meta.json")
+  if (!file.exists(meta_path)) {
+    return(list(valid = FALSE, reason = "no grid_meta.json"))
+  }
+
+  meta <- tryCatch(
+    jsonlite::read_json(meta_path, simplifyVector = TRUE),
+    error = function(e) NULL
+  )
+  if (is.null(meta) || is.null(meta$input_fingerprint)) {
+    return(list(valid = FALSE, reason = "no input_fingerprint recorded"))
+  }
+
+  current_fingerprint <- grid_input_fingerprint(grid_input_dir)
+  if (!identical(meta$input_fingerprint, current_fingerprint)) {
+    return(list(valid = FALSE, reason = "input fingerprint changed"))
+  }
+  if (!identical(meta$trisk_model_version, model_version)) {
+    return(list(valid = FALSE, reason = "trisk.model version changed"))
+  }
+  if (!identical(meta$grid_contract_version, contract_version)) {
+    return(list(valid = FALSE, reason = "grid contract version changed"))
+  }
+
+  list(valid = TRUE, reason = "ok")
+}
+
 find_cached_run_path <- function(run_output_dir) {
   if (!dir.exists(run_output_dir)) {
     return(NULL)
@@ -1448,9 +1597,26 @@ trisk_run_grid <- function(cfg, sector) {
   runs_dir <- file.path(grid_dir, "runs")
   dir.create(runs_dir, recursive = TRUE, showWarnings = FALSE)
   grid_input_dir <- build_grid_input_dir(sector, input_dir, grid_dir)
-
-  existing <- read_existing_grid(grid_dir)
   sector_grid <- build_sector_grid(sector)
+
+  model_version <- as.character(utils::packageVersion("trisk.model"))
+  cache_check <- grid_cache_is_valid(grid_dir, grid_input_dir, grid_contract_version, model_version)
+
+  if (cache_check$valid) {
+    existing <- read_existing_grid(grid_dir)
+  } else {
+    cat(sprintf(
+      "[%s] grid cache invalidated: %s — regenerating all %d scenarios\n",
+      sector, cache_check$reason, nrow(sector_grid)
+    ))
+    # The cache is fully discarded, not merged: find_cached_run_path() would
+    # otherwise resurrect stale per-scenario runs/ directories one cell at a
+    # time (Wave 1 PHASE-04, Specification S2).
+    unlink(runs_dir, recursive = TRUE, force = TRUE)
+    dir.create(runs_dir, recursive = TRUE, showWarnings = FALSE)
+    existing <- list(scenarios = tibble(), borrower_results = tibble())
+  }
+
   completed_ids <- if ("scenario_id" %in% names(existing$borrower_results)) {
     unique(existing$borrower_results$scenario_id)
   } else {
@@ -1491,6 +1657,13 @@ trisk_run_grid <- function(cfg, sector) {
 
     cat(sprintf("  [%s] running %s\n", sector, scenario_id))
 
+    # Truncate the shared, pre-extended grid_input_dir to THIS scenario's own
+    # shock_year + 2 horizon, so its inputs match what a standalone run at
+    # the same shock_year would see (see build_scenario_input_dir()).
+    scenario_input_dir <- build_scenario_input_dir(
+      grid_input_dir, shock_year, file.path(run_output_dir, "input")
+    )
+
     result <- execute_trisk_run(
       sector = sector,
       run_label = scenario_id,
@@ -1503,7 +1676,7 @@ trisk_run_grid <- function(cfg, sector) {
         carbon_price_model = carbon_price_model
       ),
       meta = modifyList(meta, list(carbon_price_model = carbon_price_model)),
-      input_dir = grid_input_dir,
+      input_dir = scenario_input_dir,
       alignment_company = alignment_company,
       pacta_output_dir = cfg$paths$pacta_output_dir
     )
@@ -1545,10 +1718,11 @@ trisk_run_grid <- function(cfg, sector) {
     scenario_count = nrow(sector_grid),
     generated_at = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC"),
     runtime_seconds = round(runtime_seconds, 3),
-    trisk_model_version = as.character(utils::packageVersion("trisk.model", lib.loc = lib)),
+    trisk_model_version = model_version,
     grid_contract_version = grid_contract_version,
     cached_scenarios = length(completed_ids),
-    generated_scenarios = nrow(pending_grid)
+    generated_scenarios = nrow(pending_grid),
+    input_fingerprint = grid_input_fingerprint(grid_input_dir)
   )
 
   write_json(grid_meta, meta_path, auto_unbox = TRUE, pretty = TRUE)
