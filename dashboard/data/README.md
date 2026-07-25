@@ -1,6 +1,6 @@
 # Dashboard Data Artifacts
 
-> **Provenance:** PACTA files are snapshots from `scripts/pacta_vietnam_scenario.R`. TRISK files are snapshots from `scripts/trisk_prepare_inputs.R`, `scripts/trisk_power_demo.R`, and `scripts/trisk_sector_demo.R`. Regenerate with `scripts/refresh_dashboard_data.R`.
+> **Provenance:** PACTA files are snapshots from `scripts/pacta_vietnam_scenario.R`. TRISK files are snapshots from `scripts/trisk_prepare_inputs.R` and `scripts/trisk_sector_demo.R` (run per sector, e.g. `scripts/trisk_sector_demo.R power`). Regenerate with `scripts/refresh_dashboard_data.R`, or run the whole chain via `scripts/pipeline_refresh.R`.
 
 ## `pacta/` — PACTA Alignment Outputs (Vietnam MCB)
 

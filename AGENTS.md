@@ -6,7 +6,9 @@ deliverables.
 
 High-level map:
 - `scripts/`: R pipeline stages (PACTA, TRISK, prioritization, engagement
-  scoring, letters, disclosure) and the `pipeline_refresh.R` orchestrator
+  scoring, letters, disclosure) and `run_engagement.R`, the single
+  orchestrator for every engagement including the public MCB demo;
+  `pipeline_refresh.R` is a thin wrapper that delegates to it
 - `R/`: shared R modules sourced by `scripts/*.R` (engagement config loader,
   sector registry, report toolkit, matching helpers)
 - `data/` and `synthesis_output/`: synthetic inputs and generated pipeline

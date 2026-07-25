@@ -41,7 +41,7 @@ Run these commands from the repo root before pushing a refreshed dashboard snaps
 
 ```bash
 & "C:\Program Files\R\R-4.5.2\bin\Rscript.exe" scripts/trisk_prepare_inputs.R
-& "C:\Program Files\R\R-4.5.2\bin\Rscript.exe" scripts/trisk_power_demo.R
+& "C:\Program Files\R\R-4.5.2\bin\Rscript.exe" scripts/trisk_sector_demo.R power
 & "C:\Program Files\R\R-4.5.2\bin\Rscript.exe" scripts/trisk_sector_demo.R cement
 & "C:\Program Files\R\R-4.5.2\bin\Rscript.exe" scripts/trisk_sector_demo.R steel
 & "C:\Program Files\R\R-4.5.2\bin\Rscript.exe" scripts/refresh_dashboard_data.R

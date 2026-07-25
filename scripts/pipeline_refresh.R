@@ -1,75 +1,41 @@
 #!/usr/bin/env Rscript
 # pipeline_refresh.R
-# One-command orchestrator: reruns the TRISK chain end to end and republishes
-# the dashboard data snapshot, writing a manifest so the dashboard can show
-# a "Data as of" badge instead of the copy being a silent hand-edit.
+# Compatibility wrapper (Wave 1 PHASE-05, orchestrator convergence).
+#
+# scripts/run_engagement.R is now the single orchestrator serving both the
+# public MCB demo and every client engagement. This script delegates to it
+# with engagements/mcb-demo/engagement_config.json, preserving the historical
+# entry point and its default-mode byte-identical output -- required because
+# .github/workflows/refresh.yml, tools/verify_refactor.R, README.md,
+# CLAUDE.md, and AGENTS.md all invoke it by name (ASM-007).
 #
 # Usage: Rscript scripts/pipeline_refresh.R [--full]
 #
-# Default (no flag): runs the 7-step TRISK refresh chain.
-# With --full: prepends data generation + PACTA, appends engagement scoring (10 steps).
+# Default (no flag): the full 12-step mcb-demo engagement chain -- PACTA,
+# TRISK prepare, all three sectors, scenario grid, prioritization, snapshot,
+# engagement scoring, letters, disclosure, refresh audit. This is a superset
+# of the prior 8-step default chain: PACTA, engagement scoring, letters, and
+# disclosure previously ran only in --full mode (or not at all -- the public
+# MCB refresh never exercised letters/disclosure before this convergence).
+# Running them every refresh, not just --full, is intentional: it is the fix
+# for A1 (the public demo previously never traveled the engagement code
+# path run_engagement.R gives every other bank).
+# With --full: additionally prepends data generation -- 13 steps total.
 #
-# Fails fast: if any step errors, later steps do not run and the manifest
-# records which step failed.
-
-suppressPackageStartupMessages({
-  library(jsonlite)
-})
-
-source("R/step_runner.R")
+# Every flag this script receives (--full, --dry-run, or both) is forwarded
+# unchanged to run_engagement.R -- true pass-through, not a reimplementation
+# of run_engagement.R's flag parsing.
+#
+# system2("Rscript", ...) needs Rscript resolvable on PATH even when this
+# script itself was invoked with a full path.
 
 args <- commandArgs(trailingOnly = TRUE)
-full_mode <- "--full" %in% args
 
-steps <- list(
-  list(name = "trisk_prepare_inputs", script = "scripts/trisk_prepare_inputs.R", args = character()),
-  list(name = "trisk_power_demo", script = "scripts/trisk_power_demo.R", args = character()),
-  list(name = "trisk_sector_demo_cement", script = "scripts/trisk_sector_demo.R", args = "cement"),
-  list(name = "trisk_sector_demo_steel", script = "scripts/trisk_sector_demo.R", args = "steel"),
-  list(name = "trisk_scenario_grid", script = "scripts/trisk_scenario_grid.R", args = character()),
-  list(name = "sector_prioritization", script = "scripts/sector_prioritization.R", args = character()),
-  list(name = "refresh_dashboard_data", script = "scripts/refresh_dashboard_data.R", args = character())
+run_args <- c(
+  "scripts/run_engagement.R",
+  "--config", "engagements/mcb-demo/engagement_config.json",
+  args
 )
 
-if (full_mode) {
-  steps <- c(
-    list(
-      list(name = "generate_vietnam_data", script = "scripts/generate_vietnam_data.R", args = character()),
-      list(name = "pacta_vietnam_scenario", script = "scripts/pacta_vietnam_scenario.R", args = character())
-    ),
-    steps,
-    list(
-      list(name = "engagement_scoring", script = "scripts/engagement_scoring.R", args = character()),
-      list(name = "refresh_audit", script = "scripts/generate_refresh_audit.R", args = character())
-    )
-  )
-} else {
-  steps <- c(
-    steps,
-    list(
-      list(name = "refresh_audit", script = "scripts/generate_refresh_audit.R", args = character())
-    )
-  )
-}
-
-step_results <- run_steps(steps)
-
-snapshot_files <- c(
-  "dashboard/data/trisk/power/company_trajectories_latest.csv",
-  "dashboard/data/trisk/cement/company_trajectories_latest.csv",
-  "dashboard/data/trisk/steel/company_trajectories_latest.csv",
-  "dashboard/data/trisk/power/npv_results_latest.csv",
-  "dashboard/data/trisk/cement/npv_results_latest.csv",
-  "dashboard/data/trisk/steel/npv_results_latest.csv"
-)
-
-manifest_path <- "dashboard/data/pipeline_manifest.json"
-write_pipeline_manifest(step_results, manifest_path, row_count_files = snapshot_files)
-cat(sprintf("\n[OK] Manifest written: %s\n", manifest_path))
-
-manifest_status <- if (all(vapply(step_results, function(s) s$status == "ok", logical(1)))) "ok" else "failed"
-if (!identical(manifest_status, "ok")) {
-  quit(status = 1)
-}
-
-cat("\nPipeline refresh complete.\n")
+status <- system2("Rscript", args = run_args)
+quit(status = status)

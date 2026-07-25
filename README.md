@@ -15,8 +15,15 @@ deliverables aligned with Decision 263/QĐ-TTg, TCFD, and ISSB.
 
 ## Architecture
 
+`scripts/run_engagement.R` is the single orchestrator for every engagement,
+including the public MCB demo. `scripts/pipeline_refresh.R` is a thin
+compatibility wrapper that delegates to it with
+`engagements/mcb-demo/engagement_config.json` (run weekly by
+`.github/workflows/refresh.yml`); every flag it receives (`--full`,
+`--dry-run`) passes straight through.
+
 ```
-scripts/generate_vietnam_data.R       synthetic inputs (loanbook, ABCD, scenarios)
+scripts/generate_vietnam_data.R       synthetic inputs (loanbook, ABCD, scenarios)  [--full only]
         │
         ▼
 scripts/pacta_vietnam_scenario.R      PACTA alignment vs PDP8 / NDC / NZE
@@ -29,15 +36,22 @@ scripts/trisk_scenario_grid.R         243-scenario sensitivity grid per sector
         ▼
 scripts/sector_prioritization.R       sector ranking (alignment × stress × exposure)
 scripts/refresh_dashboard_data.R      publish frozen snapshot → dashboard/data/
-        │                             (orchestrated by scripts/pipeline_refresh.R,
-        ▼                              run weekly by .github/workflows/refresh.yml)
+        │
+        ▼
 dashboard/                            Streamlit app (7 pages; 3 operator-gated)
         │
         ▼
 scripts/engagement_scoring.R          borrower engagement priority
 scripts/generate_engagement_letters.R per-borrower letters
 scripts/generate_disclosure_pack.R    TCFD / ISSB / Decision 263 pack
+        │
+        ▼
+scripts/generate_refresh_audit.R      refresh audit report                          [mcb-demo only]
 ```
+
+The whole chain, in order, is orchestrated by
+`R/step_runner.R`'s `run_steps()`, invoked from `scripts/run_engagement.R`'s
+config-driven step list (see "Running a client engagement" below).
 
 ## Quick start
 

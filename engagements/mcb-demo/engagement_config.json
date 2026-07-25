@@ -22,5 +22,14 @@
     "prioritization_output_dir": "synthesis_output/prioritization"
   },
   "anonymize": false,
-  "public_snapshot_allowed": true
+  "public_snapshot_allowed": true,
+  "run_refresh_audit": true,
+  "row_count_files": [
+    "dashboard/data/trisk/power/company_trajectories_latest.csv",
+    "dashboard/data/trisk/cement/company_trajectories_latest.csv",
+    "dashboard/data/trisk/steel/company_trajectories_latest.csv",
+    "dashboard/data/trisk/power/npv_results_latest.csv",
+    "dashboard/data/trisk/cement/npv_results_latest.csv",
+    "dashboard/data/trisk/steel/npv_results_latest.csv"
+  ]
 }

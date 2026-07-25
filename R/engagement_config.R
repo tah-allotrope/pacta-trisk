@@ -55,7 +55,17 @@ suppressPackageStartupMessages({
     # refuses to run any engagement whose snapshot_dir resolves to the public
     # dashboard/data unless this is explicitly TRUE, replacing the previous
     # bank_slug-string-comparison guard rail.
-    public_snapshot_allowed = FALSE
+    public_snapshot_allowed = FALSE,
+    # Wave 1 PHASE-05 (orchestrator convergence): these four keys let
+    # scripts/run_engagement.R's single step list serve both the public MCB
+    # refresh and every client engagement, replacing the second, divergent
+    # scripts/pipeline_refresh.R step list. All default to today's
+    # non-MCB engagement behavior (no data generation, no refresh audit,
+    # letters/disclosure included); only mcb-demo's config overrides them.
+    run_data_generation = FALSE,
+    run_refresh_audit = FALSE,
+    run_outputs = TRUE,
+    row_count_files = character(0)
   )
 }
 
@@ -129,6 +139,17 @@ suppressPackageStartupMessages({
       length(cfg$public_snapshot_allowed) != 1 ||
       is.na(cfg$public_snapshot_allowed)) {
     problems <- c(problems, "public_snapshot_allowed must be a single TRUE/FALSE value")
+  }
+
+  for (flag_name in c("run_data_generation", "run_refresh_audit", "run_outputs")) {
+    value <- cfg[[flag_name]]
+    if (!is.logical(value) || length(value) != 1 || is.na(value)) {
+      problems <- c(problems, sprintf("%s must be a single TRUE/FALSE value", flag_name))
+    }
+  }
+
+  if (!is.character(cfg$row_count_files)) {
+    problems <- c(problems, "row_count_files must be a character vector (may be empty)")
   }
 
   if (length(problems) > 0) {

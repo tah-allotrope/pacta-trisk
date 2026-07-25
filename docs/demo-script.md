@@ -9,7 +9,7 @@ Walk a bank client through the dashboard in under 8 minutes.
 1. Open the live Streamlit URL 2 minutes before the meeting to avoid cold-start lag.
 2. Keep `reports/2026-04-16-final-vietnam-bank-trisk-demo.html` open in a spare tab as backup.
 3. If the cloud app is unavailable, run `streamlit run dashboard/app.py` locally and screen-share.
-4. For a multisector demo refresh, rerun `scripts/trisk_prepare_inputs.R`, `scripts/trisk_power_demo.R`, `scripts/trisk_sector_demo.R cement`, `scripts/trisk_sector_demo.R steel`, and `scripts/refresh_dashboard_data.R` before the meeting.
+4. For a multisector demo refresh, rerun `scripts/pipeline_refresh.R` before the meeting (one command: PACTA, TRISK prepare, all three sectors, scenario grid, prioritization, snapshot, scoring, letters, disclosure).
 
 ## 8-minute walkthrough (with Scenario Builder)
 
