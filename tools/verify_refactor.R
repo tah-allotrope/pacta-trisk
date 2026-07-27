@@ -315,6 +315,53 @@ inv_snapshot_manifest_sectors <- function(root, snapshot_dir = "dashboard/data")
   list(id = "INV-005", ok = TRUE, detail = character(0))
 }
 
+#' INV-006: every engagement's declared-VND loanbook must have a plausible
+#' magnitude for whole VND, not thousands or millions of VND. Catches a data
+#' generator that forgot to apply its own currency's scale (Wave 2 PHASE-02,
+#' U1) — a corporate loan denominated in true VND is never a few hundred
+#' thousand units, but a loanbook denominated in millions-of-VND while
+#' labeled "VND" produces exactly that.
+#' @param root character — repo root.
+#' @param threshold numeric — minimum plausible median
+#'   `loan_size_outstanding` for a VND-denominated loanbook, default 1e8
+#'   (100 million VND, roughly USD 3,800 — comfortably below any real
+#'   corporate loan floor but far above the 1e5-1e6 range a
+#'   millions-denominated book produces).
+#' @return list(id = "INV-006", ok, detail).
+inv_loanbook_currency_scale <- function(root, threshold = 1e8) {
+  detail <- character(0)
+  config_paths <- Sys.glob(file.path(root, "engagements", "*", "engagement_config.json"))
+
+  for (config_path in config_paths) {
+    cfg <- tryCatch(jsonlite::fromJSON(config_path, simplifyVector = TRUE), error = function(e) NULL)
+    if (is.null(cfg) || is.null(cfg$inputs) || length(cfg$inputs$loanbook_csv) == 0) {
+      next
+    }
+    loanbook_path <- file.path(root, cfg$inputs$loanbook_csv)
+    if (!file.exists(loanbook_path)) next
+
+    lb <- tryCatch(utils::read.csv(loanbook_path, stringsAsFactors = FALSE), error = function(e) NULL)
+    if (is.null(lb) || !all(c("loan_size_outstanding", "loan_size_outstanding_currency") %in% names(lb))) {
+      next
+    }
+
+    vnd_rows <- lb[lb$loan_size_outstanding_currency == "VND", , drop = FALSE]
+    if (nrow(vnd_rows) == 0) next
+
+    med <- stats::median(vnd_rows$loan_size_outstanding, na.rm = TRUE)
+    if (!is.na(med) && med < threshold) {
+      detail <- c(detail, sprintf(
+        "%s: median VND-currency loan_size_outstanding = %s, below plausible threshold %s",
+        config_path,
+        format(med, big.mark = ",", scientific = FALSE),
+        format(threshold, big.mark = ",", scientific = FALSE)
+      ))
+    }
+  }
+
+  list(id = "INV-006", ok = length(detail) == 0, detail = detail)
+}
+
 #' Run every cross-artifact invariant and print a [PASS]/[FAIL] report.
 #' @param root character — repo root.
 #' @param snapshot_dir character — snapshot directory relative to root,
@@ -326,7 +373,8 @@ run_invariants <- function(root, snapshot_dir = "dashboard/data") {
     inv_scenario_vintage_single_source(root),
     inv_engagement_data_source(root),
     inv_sector_lists_agree(root),
-    inv_snapshot_manifest_sectors(root, snapshot_dir)
+    inv_snapshot_manifest_sectors(root, snapshot_dir),
+    inv_loanbook_currency_scale(root)
   )
 
   for (r in results) {

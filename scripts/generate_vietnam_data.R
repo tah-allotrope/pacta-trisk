@@ -32,6 +32,8 @@ library(dplyr)
 library(readr)
 library(tidyr)
 
+source("R/format_money.R")
+
 dir.create("data", showWarnings = FALSE)
 
 cat("==============================================\n")
@@ -40,11 +42,18 @@ cat("==============================================\n\n")
 
 # ==============================================================================
 # SECTION A: LOANBOOK (43 loans for Mekong Commercial Bank)
-# All loan_size values in VND millions.
-# 25,000 bn VND total = 25,000,000 mn VND portfolio.
+# Call-site loan_size literals below are in VND MILLIONS (~25,000 bn VND total
+# = 25,000,000 mn VND portfolio) -- make_loan() multiplies by VND_PER_MILLION
+# so the emitted loan_size_outstanding / loan_size_credit_limit CSV columns
+# are true whole VND, matching the loan_size_outstanding_currency = "VND"
+# label and the Saigon Delta Bank fixture's scale (Wave 2 PHASE-02, U1).
+# Previously this multiplication was missing: the CSV columns held millions
+# of VND while claiming to be VND outright (a 1e6x understatement).
 # credit_limit = outstanding * 1.2 (synthetic).
 # sector_classification_system = "ISIC" (VSIC 2018 is structurally ISIC Rev.4).
 # ==============================================================================
+
+VND_PER_MILLION <- 1e6
 
 cat("--- A: Building loanbook ---\n")
 
@@ -61,7 +70,7 @@ isic_cement     <- "C2394"   # manufacture of cement
 isic_steel      <- "C2410"   # manufacture of basic iron and steel
 isic_coal       <- "B0510"   # mining of hard coal
 
-make_loan <- function(id_loan, id_dt, name_dt, id_up, name_up, outstanding, isic_code,
+make_loan <- function(id_loan, id_dt, name_dt, id_up, name_up, outstanding_mn_vnd, isic_code,
                       lei = NA_character_, isin = NA_character_) {
   tibble(
     id_loan                              = id_loan,
@@ -69,9 +78,9 @@ make_loan <- function(id_loan, id_dt, name_dt, id_up, name_up, outstanding, isic
     name_direct_loantaker                = name_dt,
     id_ultimate_parent                   = id_up,
     name_ultimate_parent                 = name_up,
-    loan_size_outstanding                = outstanding,
+    loan_size_outstanding                = outstanding_mn_vnd * VND_PER_MILLION,
     loan_size_outstanding_currency       = "VND",
-    loan_size_credit_limit               = round(outstanding * 1.2),
+    loan_size_credit_limit               = round(outstanding_mn_vnd * VND_PER_MILLION * 1.2),
     loan_size_credit_limit_currency      = "VND",
     sector_classification_system         = "ISIC",
     sector_classification_direct_loantaker = as.character(isic_code),
@@ -191,9 +200,9 @@ vietnam_loanbook <- bind_rows(
             "VN_UP025","Dong Bac Corporation",400000,isic_coal)
 )
 
-cat(sprintf("  Loanbook: %d rows | Total: %s bn VND\n",
+cat(sprintf("  Loanbook: %d rows | Total: %s\n",
             nrow(vietnam_loanbook),
-            format(sum(vietnam_loanbook$loan_size_outstanding) / 1000, big.mark = ",")))
+            format_vnd_bn(sum(vietnam_loanbook$loan_size_outstanding))))
 write_csv(vietnam_loanbook, "data/vietnam_loanbook.csv")
 cat("  Saved: data/vietnam_loanbook.csv\n\n")
 
@@ -712,7 +721,7 @@ loan_summary <- vietnam_loanbook %>%
   group_by(pacta_sector) %>%
   summarise(
     n_loans        = n(),
-    total_bn_vnd   = sum(loan_size_outstanding) / 1000,
+    total_bn_vnd   = vnd_to_billion(sum(loan_size_outstanding)),
     pct_portfolio  = round(sum(loan_size_outstanding) / sum(vietnam_loanbook$loan_size_outstanding) * 100, 1),
     .groups = "drop"
   ) %>%

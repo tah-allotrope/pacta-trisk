@@ -1,6 +1,6 @@
 sector,dimension,raw_value,normalized_score,weight,weighted_contribution,source_file,data_source
 power,alignment,14.39,1,0.35,0.35,06_vn_ms_alignment_2030.csv,mcb-demo
-power,stress,456.713782870946,1,0.35,0.35,power/top_borrowers_alignment_trisk.csv,mcb-demo
+power,stress,456.71378287094603,1,0.35,0.35,power/top_borrowers_alignment_trisk.csv,mcb-demo
 power,exposure,0.8183705241307733,1,0.3,0.3,vietnam_loanbook.csv,mcb-demo
 cement,alignment,2.1,0,0.35,0,06_vn_sda_alignment_2030.csv,mcb-demo
 cement,stress,100,0,0.35,0,cement/top_borrowers_alignment_trisk.csv,mcb-demo

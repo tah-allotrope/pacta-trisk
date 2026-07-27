@@ -1,66 +1,66 @@
 {
-  "generated_at": "2026-07-25T11:51:54+0700",
-  "git_sha": "ccb6cb110ee5be0da52790bb73f9f5fa234d31ec",
+  "generated_at": "2026-07-28T00:12:21+0700",
+  "git_sha": "994a1af8828a54602d07cb951aaff408a9c1c7ae",
   "steps": [
     {
       "name": "intake",
       "status": "ok",
-      "seconds": 2.5
+      "seconds": 1.7
     },
     {
       "name": "validation_report",
       "status": "ok",
-      "seconds": 1.5
+      "seconds": 1.1
     },
     {
       "name": "pacta_vietnam_scenario",
       "status": "ok",
-      "seconds": 17
+      "seconds": 11.5
     },
     {
       "name": "trisk_prepare_inputs",
       "status": "ok",
-      "seconds": 4.6
+      "seconds": 3.1
     },
     {
       "name": "trisk_sector_demo_power",
       "status": "ok",
-      "seconds": 24.8
+      "seconds": 16
     },
     {
       "name": "trisk_sector_demo_cement",
       "status": "ok",
-      "seconds": 16.3
+      "seconds": 12
     },
     {
       "name": "trisk_sector_demo_steel",
       "status": "ok",
-      "seconds": 15.2
+      "seconds": 12.7
     },
     {
       "name": "sector_prioritization",
       "status": "ok",
-      "seconds": 3.3
+      "seconds": 2.8
     },
     {
       "name": "refresh_dashboard_data",
       "status": "ok",
-      "seconds": 1.9
+      "seconds": 1.6
     },
     {
       "name": "engagement_scoring",
       "status": "ok",
-      "seconds": 1.9
+      "seconds": 1.7
     },
     {
       "name": "generate_engagement_letters",
       "status": "ok",
-      "seconds": 1.7
+      "seconds": 1.6
     },
     {
       "name": "generate_disclosure_pack",
       "status": "ok",
-      "seconds": 1.8
+      "seconds": 1.5
     }
   ],
   "status": "ok",

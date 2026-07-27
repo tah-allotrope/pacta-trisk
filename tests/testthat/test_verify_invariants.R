@@ -214,3 +214,87 @@ test_that("inv_sector_lists_agree passes on the live repo", {
 test_that(".md5_of returns NA for a nonexistent file", {
   expect_true(is.na(.md5_of(file.path(tempdir(), "definitely_does_not_exist_12345.csv"))))
 })
+
+# --- INV-006: loanbook currency/scale plausibility ----------------------------
+
+.write_loanbook_currency_fixture <- function(root, slug, loanbook_rel_path, outstanding, currency) {
+  dir.create(file.path(root, "engagements", slug), recursive = TRUE, showWarnings = FALSE)
+  cfg <- list(
+    bank_name = "Test Bank",
+    bank_slug = slug,
+    inputs = list(loanbook_csv = loanbook_rel_path)
+  )
+  writeLines(
+    jsonlite::toJSON(cfg, auto_unbox = TRUE, pretty = TRUE),
+    file.path(root, "engagements", slug, "engagement_config.json")
+  )
+  loanbook_path <- file.path(root, loanbook_rel_path)
+  dir.create(dirname(loanbook_path), recursive = TRUE, showWarnings = FALSE)
+  utils::write.csv(
+    data.frame(
+      loan_size_outstanding = outstanding,
+      loan_size_outstanding_currency = currency,
+      stringsAsFactors = FALSE
+    ),
+    loanbook_path,
+    row.names = FALSE
+  )
+}
+
+test_that("inv_loanbook_currency_scale fails when a VND loanbook's median is implausibly small", {
+  fixture_root <- .new_fixture_root()
+  on.exit(unlink(fixture_root, recursive = TRUE, force = TRUE))
+  .write_loanbook_currency_fixture(
+    fixture_root, "acme", "data/loanbook.csv",
+    outstanding = c(800000, 650000), currency = c("VND", "VND")
+  )
+
+  result <- inv_loanbook_currency_scale(fixture_root)
+  expect_false(result$ok)
+  expect_equal(length(result$detail), 1)
+  expect_true(grepl("median", result$detail[1]))
+  expect_true(grepl("1e\\+08|100,000,000|100000000", result$detail[1]))
+})
+
+test_that("inv_loanbook_currency_scale passes when a VND loanbook's median is plausible", {
+  fixture_root <- .new_fixture_root()
+  on.exit(unlink(fixture_root, recursive = TRUE, force = TRUE))
+  .write_loanbook_currency_fixture(
+    fixture_root, "acme", "data/loanbook.csv",
+    outstanding = c(8e11, 6.5e11), currency = c("VND", "VND")
+  )
+
+  result <- inv_loanbook_currency_scale(fixture_root)
+  expect_true(result$ok)
+  expect_equal(length(result$detail), 0)
+})
+
+test_that("inv_loanbook_currency_scale skips an engagement whose loanbook path does not exist", {
+  fixture_root <- .new_fixture_root()
+  on.exit(unlink(fixture_root, recursive = TRUE, force = TRUE))
+  dir.create(file.path(fixture_root, "engagements", "acme"), recursive = TRUE)
+  cfg <- list(
+    bank_name = "Test Bank",
+    bank_slug = "acme",
+    inputs = list(loanbook_csv = "data/does_not_exist.csv")
+  )
+  writeLines(
+    jsonlite::toJSON(cfg, auto_unbox = TRUE, pretty = TRUE),
+    file.path(fixture_root, "engagements", "acme", "engagement_config.json")
+  )
+
+  result <- inv_loanbook_currency_scale(fixture_root)
+  expect_true(result$ok)
+})
+
+test_that("inv_loanbook_currency_scale ignores non-VND currency rows", {
+  fixture_root <- .new_fixture_root()
+  on.exit(unlink(fixture_root, recursive = TRUE, force = TRUE))
+  .write_loanbook_currency_fixture(
+    fixture_root, "acme", "data/loanbook.csv",
+    outstanding = c(800000, 8e11), currency = c("USD", "VND")
+  )
+
+  result <- inv_loanbook_currency_scale(fixture_root)
+  expect_true(result$ok)
+})

@@ -22,6 +22,7 @@ suppressWarnings(suppressMessages({
 }))
 
 source("R/engagement_config.R")
+source("R/format_money.R")
 
 # --- Section 1: Args ---------------------------------------------------------
 
@@ -124,7 +125,6 @@ extract_section <- function(md_text, header_pat, next_pat = NULL) {
   paste(lines[start:end], collapse = "\n")
 }
 
-fmt_vnd <- function(x) ifelse(is.na(x), "n/a", paste0(formatC(x, format = "d", big.mark = ","), " VND"))
 fmt_npv <- function(x) ifelse(is.na(x), "n/a", sprintf("%+.1f%%", x * 100))
 fmt_pd  <- function(x) ifelse(is.na(x), "n/a", sprintf("%+.1f pp", x * 100))
 synthetic_note <- "<div class=\"callout callout-warning\"><strong>Synthetic data — illustrative.</strong> Figures are model outputs on a synthetic portfolio and are not a regulatory filing or credit decision.</div>"
@@ -210,7 +210,7 @@ if (!is.null(priority)) {
     name <- if (anonymize) pseudonyms[[r$name_abcd]] else r$name_abcd
     sec  <- paste0(toupper(substring(r$sector, 1, 1)), substring(r$sector, 2))
     sprintf("<tr><td>%d</td><td>%s</td><td>%s</td><td>%s</td><td>%.1f</td><td>%s</td><td>%s</td><td>%.3f</td></tr>",
-            i, name, sec, fmt_vnd(r$exposure_vnd), r$alignment_gap,
+            i, name, sec, format_vnd_full(r$exposure_vnd), r$alignment_gap,
             fmt_npv(r$npv_change), fmt_pd(r$pd_change), r$composite_score)
   }, character(1))
   borrowers_html <- paste0(

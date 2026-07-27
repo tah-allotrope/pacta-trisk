@@ -341,7 +341,7 @@ def build():
     clear_table(table_shape)
     set_table_cells(table_shape, [
         ["Metric", "Value"],
-        ["Portfolio", "43 loans, ~$1B USD synthetic"],
+        ["Portfolio", "43 loans, ~$950M USD synthetic"],
         ["Power Mix", "Coal 28%, Gas 12%, Hydro 10%, Solar 8%, Wind 5%"],
         ["PDP8 Target", "Coal phase-down, renewables 3x by 2030"],
         ["Gap", "Coal +28% above target; renewables -15% below"],

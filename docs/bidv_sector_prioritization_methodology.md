@@ -219,7 +219,7 @@ Horizontal stacked bar chart with:
 
 ## 9. MCB Demonstration Results Appendix
 
-The script was executed against the MCB synthetic portfolio (43 loans, 19.3 billion VND Decision 263 exposure) with default weights (0.35/0.35/0.30). Results:
+The script was executed against the MCB synthetic portfolio (43 loans, 19.3 trillion VND Decision 263 exposure) with default weights (0.35/0.35/0.30). Results:
 
 | Sector | Alignment Score | Stress Score | Exposure Score | Composite | Band |
 |---|---|---|---|---|---|

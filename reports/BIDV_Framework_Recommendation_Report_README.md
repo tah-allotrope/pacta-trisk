@@ -10,7 +10,7 @@ Prepared by **GTB Advisory** (with Allotrope VC technical support) for BIDV Seni
 
 ## What Data It Uses
 
-All analytical results in this report are based on a **synthetic MCB portfolio** (43 loans, ~19.3 billion VND Decision 263 exposure across thermal power, cement, and steel sectors). This is an illustrative demonstration — BIDV-specific results will be produced upon data onboarding.
+All analytical results in this report are based on a **synthetic MCB portfolio** (43 loans, ~19.3 trillion VND Decision 263 exposure across thermal power, cement, and steel sectors). This is an illustrative demonstration — BIDV-specific results will be produced upon data onboarding.
 
 ## Report Structure (10 Sections)
 

@@ -16,12 +16,23 @@ outputs (Decision 263 / TCFD-aligned). The column list below is the minimum
 the pipeline's intake validator (`scripts/intake_validate_and_map.R`)
 requires; everything maps directly to the fields used in the demo dashboard.
 
+## Units
+
+`exposure_vnd` and `credit_limit_vnd` must be **whole VND** — not thousands
+of VND ("nghìn đồng") and not millions of VND ("triệu đồng"), which are
+common denominations in Vietnamese bank MIS/treasury extracts. A 1 billion
+VND loan is `1000000000`, not `1000000`. If your extract is denominated in
+millions of VND, multiply every exposure and credit-limit value by
+1,000,000 before submitting it. Every result the pipeline produces — sector
+rankings, engagement priority scores, disclosure-pack figures — is
+computed and displayed on this same whole-VND scale.
+
 ## Required columns
 
 | Column | Type | Description | Feeds |
 |---|---|---|---|
 | `counterparty_name` | text | Borrower/company name | Report labeling, disclosure pack |
-| `exposure_vnd` | numeric, ≥ 0 | Outstanding loan exposure (VND) | Portfolio weighting, NPV stress magnitude |
+| `exposure_vnd` | numeric, ≥ 0 | Outstanding loan exposure, in whole VND (see Units above) | Portfolio weighting, NPV stress magnitude |
 | `sector_code` | text | Industry classification code | Sector mapping (see below) |
 | `sector_code_system` | `VSIC` or `ISIC` | Which classification system `sector_code` uses | Sector mapping |
 | `credit_limit_vnd` | numeric, ≥ 0 | Approved credit limit (VND) | Exposure-at-default context |

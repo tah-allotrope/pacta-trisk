@@ -29,6 +29,7 @@ suppressWarnings(suppressMessages({
 }))
 
 source("R/engagement_config.R")
+source("R/format_money.R")
 
 # --- Section 1: Configuration & pre-flight (TASK-02-06) ----------------------
 
@@ -138,10 +139,6 @@ format_pd <- function(x) {
   if (is.na(x)) return("Not assessed — sector not in the TRISK transition-risk pilot")
   sprintf("%+.1f pp (probability of default)", x * 100)
 }
-format_vnd <- function(x) {
-  if (is.na(x)) return("Not available")
-  sprintf("%s VND (synthetic units)", formatC(x, format = "d", big.mark = ","))
-}
 
 # Single-pass token substitution with a complete map (fixed-string, no regex).
 subst <- function(text, map) {
@@ -180,7 +177,7 @@ for (i in seq_len(nrow(top))) {
     alignment_gap = format_gap(sector, r$alignment_gap, r$alignment_basis),
     npv_change    = format_npv(r$npv_change),
     pd_change     = format_pd(r$pd_change),
-    exposure_vnd  = format_vnd(r$exposure_vnd),
+    exposure_vnd  = format_vnd_full(r$exposure_vnd),
     trisk_status  = r$trisk_status,
     generated_at  = generated_at
   )

@@ -201,11 +201,11 @@ prioritize_sectors <- function(cfg, weights = NULL) {
       dplyr::mutate(exposure_share = 0)
   }
 
-  cat(sprintf("  Total Decision 263 exposure: %s VND\n", formatC(total_d263_exposure, format = "f", big.mark = ",")))
+  cat(sprintf("  Total Decision 263 exposure: %s\n", format_vnd_full(total_d263_exposure)))
   for (row in seq_len(nrow(exposure_by_sector))) {
-    cat(sprintf("  %s: %s VND (%.1f%%)\n",
+    cat(sprintf("  %s: %s (%.1f%%)\n",
                 exposure_by_sector$d263_sector[row],
-                formatC(exposure_by_sector$exposure_vnd[row], format = "f", big.mark = ","),
+                format_vnd_full(exposure_by_sector$exposure_vnd[row]),
                 exposure_by_sector$exposure_share[row] * 100))
   }
 

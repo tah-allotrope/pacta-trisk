@@ -11,7 +11,7 @@
 PACTA (Paris Agreement Capital Transition Assessment) climate transition analysis for a Vietnamese banking context. The project uses the `r2dii.*` / `pacta.loanbook` R package stack to assess how a synthetic mid-size Vietnamese commercial bank's loan portfolio aligns with Vietnam's national climate commitments and global Paris-aligned scenarios.
 
 **Fictional bank:** Mekong Commercial Bank (MCB)
-**Portfolio modelled:** 43 loans, ~25 trillion VND (~$1B USD), across 5 PACTA sectors
+**Portfolio modelled:** 43 loans, ~25 trillion VND (~$950M USD), across 5 PACTA sectors
 **Primary scenario:** Vietnam Power Development Plan 8 (PDP8, 2023)
 **Comparison benchmarks:** IEA NZE (global), Vietnam NDC 2022 (conditional 43.5% target)
 **Base year / horizon:** 2025 → 2030

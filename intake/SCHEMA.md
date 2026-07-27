@@ -1,5 +1,18 @@
 # Intake Schema Contract
 
+## Units
+
+`exposure_vnd` and `credit_limit_vnd` are **whole VND** — not thousands of
+VND ("nghìn đồng") and not millions of VND ("triệu đồng"), which are common
+denominations in Vietnamese bank MIS reports. A 1 billion VND loan is
+`1000000000`, not `1000` and not `1000000`.
+
+Every downstream money figure in this pipeline (loan exposure, credit
+limits, sector rankings, engagement priority scores) is computed and
+displayed on this same whole-VND scale. If your loanbook extract is
+denominated in millions of VND, multiply every exposure and credit-limit
+value by 1,000,000 before submitting it.
+
 ## Input Schema (Bank Provides)
 
 ### Required Columns
