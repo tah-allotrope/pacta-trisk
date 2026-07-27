@@ -1,7 +1,13 @@
 name: Refresh pipeline data
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      allow_drift:
+        description: "Skip the byte-identity drift gate (use only for an intentional, reviewed refreeze)"
+        required: false
+        default: "false"
+        type: boolean
   schedule:
     # Every Monday 02:00 UTC.
     - cron: "0 2 * * 1"
@@ -40,6 +46,16 @@ jobs:
 
       - name: Cross-artifact invariants
         run: Rscript tools/verify_refactor.R --invariants
+
+      # Byte-identity drift gate: fails the run if the refresh produced any
+      # genuine numeric drift, so the weekly auto-commit below can never
+      # silently republish a regression. A scheduled run always enforces this
+      # gate because github.event.inputs is empty for the `schedule` trigger,
+      # not just for the default `false`. To land an intentional, reviewed
+      # refreeze, re-run this workflow manually with allow_drift: true.
+      - name: Byte-identity drift gate
+        if: github.event.inputs.allow_drift != 'true'
+        run: Rscript tools/verify_refactor.R --skip-refresh
 
       - name: Commit refreshed snapshot
         run: |

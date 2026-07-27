@@ -47,7 +47,12 @@ Windows: prepend `& "C:\Program Files\R\R-4.5.2\bin\Rscript.exe"` or add it to
    that committed artifacts agree with each other (e.g. the TRISK scenario
    grid matches the base TRISK run) — a class of defect byte-identity alone
    cannot catch, since a stale cache that never regenerates trivially
-   reproduces itself forever. Both checks run in CI on every push.
+   reproduces itself forever. Byte-identity runs in `ci.yml`'s
+   `byte-identity` job on every push, and gates `refresh.yml`'s weekly
+   auto-commit (as `Rscript tools/verify_refactor.R --skip-refresh`,
+   overridable only via a manual `allow_drift: true` dispatch for an
+   intentional, reviewed refreeze). The invariants check runs in both
+   `ci.yml` and `refresh.yml`.
 6. **The engagement-config convention.** Scripts source `R/engagement_config.R`
    and call `cfg <- load_engagement_config(get_config_arg())`. No `--config`
    flag → MCB defaults, reproducing today's hardcoded paths exactly. Do not

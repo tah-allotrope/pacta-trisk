@@ -119,6 +119,16 @@ invariant holds. Both `.github/workflows/ci.yml` and
 `.github/workflows/refresh.yml` run this on every push and every weekly
 refresh.
 
+**Where each check runs.** `ci.yml` runs both modes on every push and pull
+request: a `byte-identity` job runs the default (non-`--full`) byte-identity
+check, and the `r-tests` job runs `--invariants`. `refresh.yml` runs
+`--invariants` after every weekly refresh, then runs byte-identity in
+`--skip-refresh` mode as a gate immediately before the auto-commit step —
+any genuine drift stops the workflow before `dashboard/data` and
+`synthesis_output` are pushed. To land an intentional, reviewed refreeze,
+re-run `refresh.yml` manually via `workflow_dispatch` with `allow_drift: true`,
+which skips only that gate step.
+
 ## Running a client engagement
 
 `scripts/run_engagement.R` runs the full delivery flow — intake, validation
