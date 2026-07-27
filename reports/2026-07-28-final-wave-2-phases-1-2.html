@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Final Report :: Wave 2 — Contracts, Units &amp; Guard Rails: Phases 1–2</title>
+  <meta name="color-scheme" content="dark light">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+    async function initMermaid() {
+      const blocks = document.querySelectorAll('.mermaid');
+      if (!blocks.length) {
+        return;
+      }
+
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'base',
+        securityLevel: 'loose',
+        themeVariables: {
+          primaryColor: '#f3ead9',
+          primaryTextColor: '#1f1912',
+          primaryBorderColor: '#9d6b37',
+          lineColor: '#3b6f76',
+          secondaryColor: '#efe4d0',
+          tertiaryColor: '#ffffff',
+          background: '#fbf7f1',
+          mainBkg: '#fbf7f1',
+          nodeBorder: '#9d6b37',
+          clusterBkg: '#f7efdf',
+          clusterBorder: '#3b6f76',
+          edgeLabelBackground: '#fbf7f1'
+        }
+      });
+
+      await mermaid.run({ nodes: blocks });
+    }
+
+    const run = () => initMermaid().catch((error) => console.error('Mermaid render failed', error));
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run, { once: true });
+    } else {
+      run();
+    }
+  </script>
+  <style>
+    :root {
+      --paper: #fbf7f1;
+      --paper-strong: #fffdf9;
+      --ink: #1f1912;
+      --ink-soft: #5f564c;
+      --line: #dccdb6;
+      --line-strong: #bfa37d;
+      --accent: #9d6b37;
+      --accent-soft: #efe4d0;
+      --accent-2: #3b6f76;
+      --shadow: 0 18px 40px rgba(49, 33, 16, 0.08);
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+      --page-width: 1040px;
+      --display-font: Georgia, "Times New Roman", serif;
+      --body-font: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --mono-font: "Cascadia Code", Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(157, 107, 55, 0.09), transparent 26%),
+        radial-gradient(circle at 88% 10%, rgba(59, 111, 118, 0.08), transparent 22%),
+        linear-gradient(180deg, #f7f1e7 0%, #fbf7f1 28%, #f6efe5 100%);
+      font-family: var(--body-font);
+      line-height: 1.65;
+      letter-spacing: 0.01em;
+    }
+
+    a {
+      color: var(--accent-2);
+    }
+
+    code,
+    pre,
+    .technical,
+    .meta-chip,
+    .section-index,
+    .eyebrow,
+    .stat-label,
+    .stat-value,
+    .mermaid {
+      font-family: var(--mono-font);
+    }
+
+    .page-shell {
+      width: min(var(--page-width), calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 28px 0 56px;
+    }
+
+    .hero {
+      padding: 34px;
+      border: 1px solid rgba(159, 123, 79, 0.28);
+      border-radius: 30px;
+      background:
+        linear-gradient(135deg, rgba(157, 107, 55, 0.1), transparent 34%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.86)),
+        var(--paper-strong);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.85fr);
+      gap: 24px;
+      align-items: end;
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .title {
+      margin: 0;
+      max-width: 15ch;
+      font-family: var(--display-font);
+      font-size: clamp(2.4rem, 4.4vw, 4rem);
+      line-height: 1.02;
+      letter-spacing: -0.03em;
+      text-wrap: balance;
+    }
+
+    .lede {
+      margin: 18px 0 0;
+      max-width: 60ch;
+      color: var(--ink-soft);
+      font-size: 1rem;
+    }
+
+    .takeaway {
+      margin-top: 22px;
+      padding: 18px 20px;
+      border-left: 4px solid var(--accent-2);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      background: rgba(59, 111, 118, 0.08);
+      color: #20373a;
+      font-size: 1.02rem;
+    }
+
+    .meta-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .meta-card,
+    .section,
+    .subcard,
+    .empty-state {
+      border: 1px solid rgba(95, 72, 46, 0.12);
+      background: rgba(255, 253, 249, 0.88);
+      box-shadow: var(--shadow);
+    }
+
+    .meta-card {
+      padding: 16px 18px;
+      border-radius: var(--radius-md);
+    }
+
+    .meta-label {
+      color: var(--ink-soft);
+      font-size: 0.76rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .meta-chip {
+      margin-top: 8px;
+      color: var(--accent);
+      font-size: 1rem;
+      font-weight: 700;
+      word-break: break-word;
+    }
+
+    .section {
+      margin-top: 22px;
+      padding: 24px;
+      border-radius: var(--radius-lg);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px 18px;
+      align-items: end;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-index {
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .section-title {
+      margin: 0;
+      font-family: var(--display-font);
+      font-size: clamp(1.45rem, 2vw, 2rem);
+      line-height: 1.05;
+    }
+
+    .status-pill {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    .status-done {
+      background: rgba(59, 111, 118, 0.14);
+      color: #1f4a4e;
+    }
+
+    .status-pending {
+      background: rgba(159, 123, 79, 0.14);
+      color: #6b4a1f;
+    }
+
+    .summary-grid,
+    .dual-grid,
+    .phase-grid,
+    .stat-grid,
+    .appendix-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .summary-grid,
+    .dual-grid,
+    .phase-grid,
+    .appendix-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .subcard {
+      padding: 18px;
+      border-radius: var(--radius-md);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .subcard h3,
+    .subcard h4 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+      line-height: 1.2;
+    }
+
+    .subcard p:first-child,
+    .subcard ul:first-child,
+    .subcard ol:first-child {
+      margin-top: 0;
+    }
+
+    .stat-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin-top: 16px;
+    }
+
+    .stat {
+      padding: 14px 16px;
+      border: 1px solid rgba(59, 111, 118, 0.16);
+      border-radius: var(--radius-sm);
+      background: rgba(59, 111, 118, 0.06);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .stat-label {
+      color: var(--ink-soft);
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .stat-value {
+      margin-top: 8px;
+      color: var(--accent-2);
+      font-size: 1.18rem;
+      font-weight: 700;
+    }
+
+    .narrative,
+    .chart-frame,
+    .technical-frame,
+    .diagram-frame,
+    .viz-frame {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.54);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .narrative p + p {
+      margin-top: 12px;
+    }
+
+    .diagram-frame {
+      overflow-x: auto;
+      overflow-y: auto;
+      overscroll-behavior-x: contain;
+      overscroll-behavior-y: contain;
+      max-height: min(70vh, 720px);
+      margin-top: 16px;
+    }
+
+    .chart-frame,
+    .viz-frame {
+      overflow: hidden;
+    }
+
+    .mermaid {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      color: var(--ink);
+    }
+
+    .mermaid svg {
+      display: block;
+      width: auto !important;
+      min-width: 100%;
+      max-width: none !important;
+      height: auto !important;
+    }
+
+    .diagram-frame.compact-diagram {
+      padding: 12px;
+      max-height: min(62vh, 560px);
+    }
+
+    .diagram-frame.compact-diagram .mermaid {
+      min-width: 900px;
+    }
+
+    .chart-frame canvas,
+    .technical-frame > canvas,
+    .viz-frame canvas,
+    canvas.report-chart {
+      display: block;
+      width: 100% !important;
+      max-width: 100%;
+      height: 300px !important;
+      min-height: 300px;
+      max-height: 300px;
+    }
+
+    .charts-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .technical-frame table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+    }
+
+    .technical-frame th,
+    .technical-frame td {
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      text-align: left;
+    }
+
+    .technical-frame th {
+      color: var(--accent);
+      font-size: 0.76rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .empty-state {
+      padding: 20px;
+      border-radius: var(--radius-md);
+      text-align: center;
+      color: var(--ink-soft);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .empty-state strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--accent);
+      font-size: 0.84rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    ul,
+    ol {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    p:last-child,
+    li:last-child {
+      margin-bottom: 0;
+    }
+
+    code.inline {
+      padding: 1px 6px;
+      border-radius: 6px;
+      background: rgba(95, 72, 46, 0.1);
+      font-size: 0.88em;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      color: rgba(95, 86, 76, 0.74);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      text-align: right;
+    }
+
+    @media (max-width: 920px) {
+      .hero-grid,
+      .summary-grid,
+      .dual-grid,
+      .phase-grid,
+      .stat-grid,
+      .appendix-grid,
+      .charts-row {
+        grid-template-columns: 1fr;
+      }
+
+      .title {
+        max-width: none;
+      }
+
+    }
+
+    @media (max-width: 640px) {
+      .page-shell {
+        width: min(100vw - 20px, var(--page-width));
+        padding-top: 16px;
+        padding-bottom: 36px;
+      }
+
+      .hero,
+      .section {
+        padding: 18px;
+        border-radius: 20px;
+      }
+
+      .title {
+        font-size: clamp(2.1rem, 12vw, 3.2rem);
+      }
+
+    }
+
+    @media print {
+      :root {
+        --paper: #ffffff;
+        --paper-strong: #ffffff;
+        --ink: #111111;
+        --ink-soft: #444444;
+        --line: #d6d1c8;
+      }
+
+      @page {
+        size: A4;
+        margin: 14mm;
+      }
+
+      body {
+        background: #ffffff;
+      }
+
+      .page-shell {
+        width: 100%;
+        max-width: none;
+        padding: 0;
+      }
+
+      .hero,
+      .meta-card,
+      .section,
+      .subcard,
+      .narrative,
+      .chart-frame,
+      .technical-frame,
+      .diagram-frame,
+      .viz-frame,
+      .empty-state,
+      .stat {
+        background: #ffffff;
+        box-shadow: none;
+      }
+
+      .hero,
+      .section {
+        margin-top: 0;
+        margin-bottom: 10mm;
+      }
+
+      .diagram-frame {
+        overflow: visible;
+        max-height: none;
+      }
+
+      .diagram-frame.compact-diagram .mermaid {
+        min-width: 0;
+      }
+
+      .section-header,
+      .takeaway {
+        break-after: avoid;
+        page-break-after: avoid;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero" id="title-hero">
+      <div class="hero-grid">
+        <div>
+          <p class="eyebrow">Final Report / Shareable Analysis Artifact</p>
+          <h1 class="title">Wave 2 — Contracts, Units &amp; Guard Rails: Phases 1–2</h1>
+          <p class="lede">
+            A presentation-ready synthesis of a multi-phase analysis, written for readers who need context, judgment, and a clear path forward.
+          </p>
+          <div class="takeaway">The public demo's loanbook was silently understated by 1,000,000× — every downstream number was correct arithmetic on the wrong scale. Phases 1–2 fixed the scale, added the CI gate that will catch this defect class forever, and left the repo green end to end (294 R tests / 58 Python tests passing, 6/6 cross-artifact invariants passing).</div>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-card">
+            <div class="meta-label">Project</div>
+            <div class="meta-chip">PACTA + TRISK Vietnam</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Repository</div>
+            <div class="meta-chip">pacta-trisk</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Date</div>
+            <div class="meta-chip">2026-07-28</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="executive-summary">
+      <div class="section-header">
+        <div>
+          <div class="section-index">01 / Executive Summary</div>
+          <h2 class="section-title">Executive Summary</h2>
+        </div>
+      </div>
+      <div class="summary-grid">
+        <div class="subcard">
+          <h3>The defect</h3>
+          <p>The synthetic Mekong Commercial Bank (MCB) loanbook that powers the public demo was denominated in <strong>millions of VND</strong> while its own <code class="inline">loan_size_outstanding_currency</code> column claimed <code class="inline">"VND"</code> outright — the generator's own source comment already said so ("All loan_size values in VND millions"), but the conversion was never applied. The portfolio totaled 25,020,000 raw units (≈ USD 950 at face value) instead of the ~USD 950 million the platform's own pitch deck and progress notes always claimed. Every borrower exposure, sector ranking, engagement letter, and disclosure figure computed from it was correct arithmetic on a scale that was wrong by exactly 1,000,000×.</p>
+        </div>
+        <div class="subcard">
+          <h3>What shipped</h3>
+          <p>Two of a planned six phases are complete, tested, and pushed to <code class="inline">main</code>: a byte-identity CI gate that now runs on every push and blocks the weekly auto-publish job from ever committing a silent regression (Phase 1), and the units fix itself — the loanbook rescale, one shared money formatter replacing three ad-hoc copies, a new automated invariant (<code class="inline">INV-006</code>) that will catch this exact defect class if it recurs, and corrected documentation (Phase 2).</p>
+        </div>
+        <div class="subcard">
+          <h3>Verification, not assertion</h3>
+          <p>Every claim in this report was independently re-verified this session, not carried forward from planning. The full pipeline was rerun end to end; the PACTA alignment outputs and TRISK dashboard snapshot were proven byte-identical before and after the rescale (confirming the fix touched only money columns, never ratios); all six cross-artifact invariants pass; and the second bank's engagement (Saigon Delta Bank) was rerun end to end to confirm the shared code paths — letters, disclosure packs, sector prioritization — are unaffected.</p>
+        </div>
+        <div class="subcard">
+          <h3>What's next</h3>
+          <p>Four phases remain and none are started: replacing rank-relative priority scores with absolute anchored severity bands (Phase 3), a single golden refreeze consolidating that change (Phase 4), fixing the intake validator so it honors its own published schema instead of silently dropping real bank data (Phase 5), and a money-denominated coverage &amp; reconciliation report per engagement (Phase 6). Phase 3 and Phase 5 have no unmet dependency and can start immediately.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="background-objective">
+      <div class="section-header">
+        <div>
+          <div class="section-index">02 / Background &amp; Objective</div>
+          <h2 class="section-title">Background &amp; Objective</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p>PACTA + TRISK Vietnam is a synthetic-data demonstration platform showing how a fictional Vietnamese bank ("Mekong Commercial Bank") could measure loanbook climate alignment (PACTA) and transition-risk stress (TRISK), feeding a public Streamlit dashboard and a full client-engagement delivery pipeline (intake, scoring, engagement letters, disclosure packs). Two prior hardening waves (Wave 0 "runway", Wave 1 "consistency") had already established a config-driven engagement orchestrator and a cross-artifact invariant checker that catches committed artifacts silently disagreeing with each other.</p>
+        <p>A fresh, from-scratch codebase review on 2026-07-27 — deliberately re-verifying every claim against the live repository rather than trusting prior session memory — found a defect class one layer removed from what Wave 1 checked: whether committed artifacts agree not just with <em>each other</em>, but with their own <strong>stated contracts</strong> (documentation, currency labels, CI claims). That review produced <code class="inline">research/2026-07-27-post-wave1-contracts-units-and-guardrails-brainstorm.md</code>, which was turned into a six-phase execution plan, <code class="inline">plans/2026-07-27-contracts-units-and-guardrails-plan.md</code>. This report covers the first two phases of that plan, executed and verified in this session.</p>
+      </div>
+    </section>
+
+    <section class="section" id="inputs-scope">
+      <div class="section-header">
+        <div>
+          <div class="section-index">03 / Inputs &amp; Scope</div>
+          <h2 class="section-title">Inputs &amp; Scope</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Inputs</h3>
+          <ul>
+            <li><code class="inline">plans/2026-07-27-contracts-units-and-guardrails-plan.md</code> — the six-phase execution plan this report tracks.</li>
+            <li><code class="inline">research/2026-07-27-post-wave1-contracts-units-and-guardrails-brainstorm.md</code> — the codebase review that grounded every defect claim in a reproducible command or committed file.</li>
+            <li><code class="inline">lessons.md</code> — repo-specific hard-won rules (notably: verify byte-identity via <code class="inline">git diff</code>, never raw digests, because <code class="inline">core.autocrlf</code> can flag a byte-identical file as "modified" in <code class="inline">git status</code>).</li>
+            <li>The live repository at commit <code class="inline">42b4406</code> (Wave 1 complete) as the starting baseline.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Scope of this report</h3>
+          <ul>
+            <li><strong>In scope:</strong> Phase 1 (byte-identity CI gate) and Phase 2 (units fix) — fully implemented, tested, and committed.</li>
+            <li><strong>Explicitly out of scope for the whole plan</strong> (carried from the plan document): real bank data, new TRISK sectors, making the Streamlit dashboard engagement-aware, the multi-scenario traffic-light matrix, an executive-summary generator, dead-script retirement, <code class="inline">R CMD check</code> cleanup, and any change to the scenario grid's lever ranges or package pins.</li>
+            <li><strong>Not yet started</strong> (tracked, not executed): Phases 3–6 — see Implementation Path below.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="assumptions-constraints">
+      <div class="section-header">
+        <div>
+          <div class="section-index">04 / Assumptions &amp; Constraints</div>
+          <h2 class="section-title">Assumptions &amp; Constraints</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Assumptions applied</h3>
+          <ul>
+            <li><strong>ASM-001 (loan literals are millions):</strong> the 43 call-site loan-size literals in the generator are correct at "millions of VND" scale; the defect was the missing ×1,000,000 conversion, not the literals themselves. Confirmed by the generator's own pre-existing source comment.</li>
+            <li><strong>ASM-002 (rescale is ratio-neutral):</strong> multiplying every loan by the same constant should not change any PACTA alignment result, since PACTA market share and SDA intensity are ratio-based. This was <strong>tested, not assumed</strong> — see Findings.</li>
+            <li><strong>DEC-001 (detector before fix):</strong> Phase 1 had to be green on the unmodified tree before any numeric change, so a later red result would be unambiguously caused by the change under test.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Constraints and one disclosed deviation</h3>
+          <ul>
+            <li><strong>CON-001:</strong> every default-mode MCB CSV output must stay byte-identical to its pre-change content except where a phase explicitly refreezes it.</li>
+            <li><strong>CON-002:</strong> no new package dependency — everything shipped uses base R plus packages already pinned in <code class="inline">renv.lock</code>.</li>
+            <li><strong>Deviation from the plan's original batching intent, disclosed:</strong> the plan's <code class="inline">DEC-002</code> called for Phase 2's and Phase 3's committed-artifact changes to land together in a single Phase 4 refreeze. Because this session executed only Phases 1–2, leaving Phase 2's code committed <em>without</em> refreezing the loanbook would have broken the very invariant (<code class="inline">INV-006</code>) Phase 2 introduces on the next CI run. Phase 2's commit therefore includes a money-only golden refreeze of the MCB artifacts, scoped strictly to money columns (verified — see Findings). Phase 4's refreeze, when it happens, now only needs to cover Phase 3's scoring changes.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="methodology">
+      <div class="section-header">
+        <div>
+          <div class="section-index">05 / Methodology</div>
+          <h2 class="section-title">Methodology</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p>Both phases followed the same detector-first discipline the two prior hardening waves established: build and prove the automated check before making the change it exists to catch, so the fix's correctness rests on a machine-checkable gate rather than a read-through. Phase 1's byte-identity CI job was proven capable of failing — via a deliberate negative control that appended a byte to a tracked CSV, confirmed the classifier reported it as drift and exited non-zero, then restored the file — before Phase 2 touched a single number.</p>
+        <p>Every quantitative claim in this report was re-derived from a live command run in this session, not carried forward from the plan document. Ratio-invariance (the claim that PACTA's alignment outputs are untouched by the money rescale) was checked with <code class="inline">git diff --name-only</code> scoped to the exact ratio-bearing files, per the repo's own documented lesson that <code class="inline">git status</code> alone can produce false positives across CRLF-normalized files. The scenario grid's non-regeneration was confirmed by comparing its recorded input fingerprint (<code class="inline">57600f19091de0077cb6a904d68e6c12</code>) before and after the change, not merely by assuming it. A latent integer-overflow bug in the money formatters being replaced was caught by writing and running unit tests against trillion-scale figures before those formatters were wired into the pipeline, not discovered later in production output.</p>
+      </div>
+      <div class="stat-grid">
+        <div class="stat">
+          <div class="stat-label">Orientation</div>
+          <div class="stat-value">multi-phase</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Audience</div>
+          <div class="stat-value">stakeholder-safe</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Evidence Rule</div>
+          <div class="stat-value">no invented data</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="phase-analysis">
+      <div class="section-header">
+        <div>
+          <div class="section-index">06 / Phase-by-Phase Analysis</div>
+          <h2 class="section-title">Phase-by-Phase Analysis</h2>
+        </div>
+      </div>
+      <div class="phase-grid">
+        <div class="subcard">
+          <h3>Phase 1 — CI Guard Rails <span class="status-pill status-done">Done</span></h3>
+          <p>Added a <code class="inline">byte-identity</code> job to <code class="inline">.github/workflows/ci.yml</code> that runs the pipeline's byte-identity acceptance check on every push and pull request — a check that existed as a local-only developer tool since Wave 0 but had never run in CI, despite <code class="inline">CLAUDE.md</code> claiming it did. Added a matching drift gate to the weekly <code class="inline">refresh.yml</code> auto-publish job, positioned immediately before the auto-commit step, with a <code class="inline">workflow_dispatch</code> escape hatch (<code class="inline">allow_drift: true</code>) for an intentional, reviewed refreeze. Corrected the two documents (<code class="inline">CLAUDE.md</code>, <code class="inline">README.md</code>) that had been describing CI behavior that didn't exist.</p>
+          <p>No analysis code changed in this phase — commit <code class="inline">994a1af</code>, 6 files.</p>
+        </div>
+        <div class="subcard">
+          <h3>Phase 2 — Units Fix <span class="status-pill status-done">Done</span></h3>
+          <p>Fixed the missing ×1,000,000 conversion at its single source (<code class="inline">make_loan()</code> in the data generator), consolidated three independent, ad-hoc VND formatters into one shared module (<code class="inline">R/format_money.R</code>), added <code class="inline">INV-006</code> to the invariant checker to catch this defect class automatically going forward, and corrected five documents that had propagated the wrong scale into prose (three of them — the report README, the methodology doc, and the interpretation notes — had a <em>second</em>, independent 1,000× documentation error calling the exposure figure "billion" when even the flawed pre-fix data was "million"; this was fixed to "trillion" alongside the units fix).</p>
+          <p>A latent bug was found and fixed while building the shared formatter: the two formatters being replaced used <code class="inline">formatC(x, format = "d")</code>, which silently overflows via <code class="inline">as.integer()</code> coercion for any value past roughly 2.1 billion — exactly the range true-VND totals now reach. Caught by a unit test before it could have produced garbled figures in a real engagement letter. Commit <code class="inline">cf2adeb</code>, 47 files.</p>
+        </div>
+        <div class="subcard">
+          <h3>Phase 3 — Absolute Severity Scoring <span class="status-pill status-pending">Not started</span></h3>
+          <p>Would replace every min-max-normalized priority score (which makes the top-ranked sector or borrower <em>always</em> exactly 1.0, regardless of how bad it actually is) with severity computed against fixed, documented anchor tables. No dependency beyond Phase 1 — unblocked, can start immediately.</p>
+        </div>
+        <div class="subcard">
+          <h3>Phase 4 — Golden Refreeze <span class="status-pill status-pending">Not started</span></h3>
+          <p>Would regenerate every committed artifact affected by Phase 3's scoring change and re-pin the golden tests to values that are no longer tautologies. Depends on Phase 3; Phase 2's share of this work already landed (see the disclosed deviation in Assumptions &amp; Constraints).</p>
+        </div>
+        <div class="subcard">
+          <h3>Phase 5 — Intake Contract <span class="status-pill status-pending">Not started</span></h3>
+          <p>Would make the loanbook intake validator honor its own published schema — it currently silently deletes rows using real-world ISIC power-sector codes and rejects USD-denominated exposure the schema explicitly says is accepted. No dependency beyond Phase 1 — unblocked, can run in parallel with Phases 2–4.</p>
+        </div>
+        <div class="subcard">
+          <h3>Phase 6 — Coverage &amp; Reconciliation Report <span class="status-pill status-pending">Not started</span></h3>
+          <p>Would add a tracked, money-denominated report per engagement showing what a client submitted versus what the pipeline could process, and why. Depends on Phase 5.</p>
+        </div>
+      </div>
+      <div class="diagram-frame compact-diagram">
+        <div class="mermaid">
+flowchart LR
+  P01["PHASE-01\nCI byte-identity gate\nDONE"]:::done --> P02["PHASE-02\nUnits fix\nDONE"]:::done
+  P01 --> P03["PHASE-03\nAbsolute scoring\nnot started"]:::pending
+  P02 --> P04["PHASE-04\nGolden refreeze\nnot started"]:::pending
+  P03 --> P04
+  P01 --> P05["PHASE-05\nIntake contract\nnot started"]:::pending
+  P05 --> P06["PHASE-06\nCoverage report\nnot started"]:::pending
+
+  classDef done fill:#e7f0ee,stroke:#3b6f76,color:#1f4a4e,stroke-width:2px;
+  classDef pending fill:#f7efdf,stroke:#9d6b37,color:#6b4a1f,stroke-width:2px,stroke-dasharray: 4 3;
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="findings-recommendation">
+      <div class="section-header">
+        <div>
+          <div class="section-index">07 / Findings &amp; Recommendation</div>
+          <h2 class="section-title">Findings &amp; Recommendation</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p><strong>Finding 1 — the scale fix is exact and confirmed ratio-neutral.</strong> Before the fix, the MCB loanbook summed to 25,020,000 raw units under a currency column that said "VND" — a portfolio literally smaller than one loan's rounding error at true scale. After the fix, it sums to exactly 25,020,000,000,000 VND (≈ USD 950 million), landing in the same order of magnitude as the platform's second synthetic bank, Saigon Delta Bank, which was always denominated correctly. The chart below shows this on a logarithmic scale because the pre-fix and post-fix values differ by six orders of magnitude — a linear chart would render the "before" bar invisibly small.</p>
+        <p><strong>Finding 2 — the fix did not leak into anything it shouldn't have.</strong> This was the primary risk of a rescale this large: PACTA's alignment and TRISK's stress-test outputs must depend only on the <em>ratios</em> between loan sizes, never their absolute value, or the rescale would silently distort every alignment gap and NPV figure in the platform. This was tested directly, not assumed: after a full pipeline rerun, every PACTA ratio-based output file (market-share alignment, SDA alignment, portfolio composition) and the entire TRISK dashboard snapshot came back byte-identical to their pre-fix content. Only files that legitimately contain a raw money column changed.</p>
+        <p><strong>Finding 3 — an independent, older documentation error was found and fixed alongside it.</strong> Three prose documents described MCB's Decision-263 exposure as "19.3 billion VND" — but even under the <em>old, flawed</em> data this figure was 19.3 <em>million</em>, an unrelated 1,000× documentation slip that existed before this session and was masked by the larger units bug. Post-fix, the true figure is 19.3 trillion, and all three documents now say so.</p>
+        <p><strong>Recommendation.</strong> Proceed to Phase 3 next. It is fully unblocked, and it closes the remaining gap this session's fixes did not touch: two golden-test assertions (<code class="inline">composite_score[1] == 1.0</code>) still hold today for <em>any</em> input, because Phase 2 deliberately left scoring logic untouched to keep this session's refreeze scoped to money columns only. Phase 5 (intake contract) is equally unblocked and could run in parallel by a second engineer, per the plan's own sequencing note.</p>
+      </div>
+      <div class="charts-row">
+        <div class="chart-frame">
+          <h4 style="margin:0 0 10px;">MCB loanbook total — before vs. after (log scale, VND)</h4>
+          <canvas id="moneyChart" role="img" aria-label="Bar chart comparing MCB loanbook total before and after the fix, against the Saigon Delta Bank total, on a logarithmic scale"></canvas>
+        </div>
+        <div class="chart-frame">
+          <h4 style="margin:0 0 10px;">Test suite pass counts by checkpoint</h4>
+          <canvas id="testChart" role="img" aria-label="Grouped bar chart of R and Python test pass counts at baseline, after Phase 1, and after Phase 2"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="implementation-path">
+      <div class="section-header">
+        <div>
+          <div class="section-index">08 / Implementation Path</div>
+          <h2 class="section-title">Implementation Path</h2>
+        </div>
+      </div>
+      <div class="phase-grid">
+        <div class="subcard">
+          <h3>Immediate — Phase 3</h3>
+          <p>Absolute severity scoring. Dependency: Phase 1 only (satisfied). Suggested owner: whoever continues this execution plan next; no dependency on Phase 5 or vice versa, so it can proceed independently.</p>
+        </div>
+        <div class="subcard">
+          <h3>Can run in parallel — Phase 5</h3>
+          <p>Intake contract fixes (sector-code mapping widened, USD/FX handling, warn-not-drop for out-of-scope codes). Dependency: Phase 1 only (satisfied). The plan explicitly notes this may be run by a second engineer alongside Phases 2–4.</p>
+        </div>
+        <div class="subcard">
+          <h3>Blocked until Phase 3 lands — Phase 4</h3>
+          <p>Golden refreeze of Phase 3's scoring changes (the money-only portion already shipped in Phase 2's commit). Re-pin <code class="inline">test_golden_numbers.R</code> and <code class="inline">test_sdb_engagement.R</code> to non-tautological values as part of this phase.</p>
+        </div>
+        <div class="subcard">
+          <h3>Blocked until Phase 5 lands — Phase 6</h3>
+          <p>Coverage &amp; reconciliation report. Consumes Phase 5's new <code class="inline">validation_warnings.csv</code> output and Phase 2's <code class="inline">R/format_money.R</code> for every money figure it renders.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="risks-open-questions">
+      <div class="section-header">
+        <div>
+          <div class="section-index">09 / Risks / Open Questions</div>
+          <h2 class="section-title">Risks / Open Questions</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Disclosed risks</h3>
+          <ul>
+            <li><strong>Two golden assertions remain tautological until Phase 3.</strong> <code class="inline">test_golden_numbers.R</code> and <code class="inline">test_sdb_engagement.R</code> both assert a top composite score of exactly <code class="inline">1.0</code>, which is true today for any input under the still-unchanged min-max scoring. This is a known, disclosed gap that Phase 3 closes — it is not a regression introduced by this session's work.</li>
+            <li><strong><code class="inline">man/</code> gained four new documentation pages as a side effect.</strong> Regenerating package documentation for the three new exported functions in <code class="inline">R/format_money.R</code> also surfaced four pre-existing, previously-undocumented internal functions in <code class="inline">R/trisk_core.R</code> that were never touched this session. Confirmed benign — no existing documentation file was modified, only new files added — but worth a human glance in code review.</li>
+            <li><strong>Phase 2's refreeze narrows Phase 4's future scope.</strong> The plan's original design had Phases 2 and 3 sharing one combined refreeze commit in Phase 4. Because Phase 2 already committed its money-only refreeze (necessary to keep <code class="inline">INV-006</code> passing in CI after this session — see Assumptions &amp; Constraints), Phase 4 will now be a smaller, scoring-only refreeze. This is a disclosed, deliberate adaptation to the plan, not a silent deviation.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Open questions</h3>
+          <ul>
+            <li>None blocking. Phase 3 and Phase 5 are both immediately actionable per the dependency graph above.</li>
+            <li>The plan's Assumption ASM-002 (units fix does not conflict with the repo's "VND is never rescaled" law) was adopted as written in the plan; if a future reviewer reads that law differently, the plan's own <code class="inline">RISK-004</code>/<code class="inline">ALT-001</code> entries document the fallback (correct the deck and progress notes downward instead of rescaling the generator).</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="appendices-evidence">
+      <div class="section-header">
+        <div>
+          <div class="section-index">10 / Appendices / Evidence Notes</div>
+          <h2 class="section-title">Appendices / Evidence Notes</h2>
+        </div>
+      </div>
+      <div class="appendix-grid">
+        <div class="subcard technical-frame">
+          <h4>Commits this session</h4>
+          <table>
+            <thead><tr><th>Commit</th><th>Phase</th><th>Files</th><th>Summary</th></tr></thead>
+            <tbody>
+              <tr><td><code class="inline">994a1af</code></td><td>1</td><td>6</td><td>Byte-identity CI gate + refresh drift gate + doc corrections</td></tr>
+              <tr><td><code class="inline">cf2adeb</code></td><td>2</td><td>47</td><td>Units fix, shared formatter, INV-006, doc corrections, money-only refreeze</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="subcard technical-frame">
+          <h4>Verification commands run this session</h4>
+          <table>
+            <thead><tr><th>Command</th><th>Result</th></tr></thead>
+            <tbody>
+              <tr><td><code class="inline">testthat::test_dir('tests/testthat')</code></td><td>294 pass / 0 fail (was 276/0)</td></tr>
+              <tr><td><code class="inline">pytest dashboard/tests</code></td><td>58 pass / 0 fail (unchanged)</td></tr>
+              <tr><td><code class="inline">tools/verify_refactor.R --invariants</code></td><td>6/6 pass (INV-001…INV-006)</td></tr>
+              <tr><td><code class="inline">tools/verify_refactor.R --skip-refresh</code></td><td>BYTE-IDENTITY PASS (post-commit)</td></tr>
+              <tr><td>Negative control (append byte, classify, restore)</td><td>Drift correctly detected, exit 1; tree restored clean</td></tr>
+              <tr><td>SDB engagement end-to-end rerun</td><td>Exit 0; 12/12 golden assertions pass</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="subcard">
+          <h4>Source documents</h4>
+          <ul>
+            <li><code class="inline">plans/2026-07-27-contracts-units-and-guardrails-plan.md</code></li>
+            <li><code class="inline">research/2026-07-27-post-wave1-contracts-units-and-guardrails-brainstorm.md</code></li>
+            <li><code class="inline">lessons.md</code> (repo-specific verification rules applied throughout)</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h4>Glossary</h4>
+          <ul>
+            <li><strong>PACTA</strong> — Paris Agreement Capital Transition Assessment; measures loanbook alignment with climate scenarios.</li>
+            <li><strong>TRISK</strong> — a firm-level transition-risk stress test producing NPV/PD deltas under a shock scenario.</li>
+            <li><strong>Invariant (<code class="inline">INV-00N</code>)</strong> — an automated check that a committed artifact agrees with another committed artifact or with its own stated contract, run without executing the pipeline.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-note">designed for html first, printable without reconstruction</div>
+    </section>
+  </main>
+  <script>
+    (function() {
+      const chartCanvases = document.querySelectorAll('canvas');
+      chartCanvases.forEach((canvas) => {
+        canvas.classList.add('report-chart');
+        const parent = canvas.parentElement;
+        if (parent && parent.classList.contains('technical-frame') && !parent.classList.contains('chart-frame')) {
+          parent.classList.add('chart-frame');
+        }
+      });
+    })();
+
+    if (window.Chart) {
+      Chart.defaults.devicePixelRatio = 1;
+      Chart.defaults.animation = false;
+      Chart.defaults.resizeDelay = 150;
+      Chart.defaults.normalized = true;
+      Chart.defaults.maintainAspectRatio = false;
+      Chart.defaults.responsive = true;
+      window.__REPORT_CHART_DEFAULTS__ = {
+        animation: false,
+        resizeDelay: 150,
+        normalized: true,
+        maintainAspectRatio: false,
+        responsive: true
+      };
+    }
+
+    (function initCharts() {
+      if (!window.Chart) return;
+
+      const moneyCanvas = document.getElementById('moneyChart');
+      if (moneyCanvas) {
+        new Chart(moneyCanvas.getContext('2d'), {
+          type: 'bar',
+          data: {
+            labels: ['MCB (pre-fix)', 'MCB (post-fix)', 'SDB (always correct)'],
+            datasets: [{
+              label: 'Loanbook total (VND)',
+              data: [25020000, 25020000000000, 22375000000000],
+              backgroundColor: ['#c0392b', '#3b6f76', '#9d6b37'],
+              borderRadius: 6
+            }]
+          },
+          options: {
+            animation: false,
+            resizeDelay: 150,
+            normalized: true,
+            maintainAspectRatio: false,
+            responsive: true,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: (ctx) => 'VND ' + Number(ctx.raw).toLocaleString('en-US')
+                }
+              }
+            },
+            scales: {
+              y: {
+                type: 'logarithmic',
+                title: { display: true, text: 'VND (log scale)' }
+              }
+            }
+          }
+        });
+      }
+
+      const testCanvas = document.getElementById('testChart');
+      if (testCanvas) {
+        new Chart(testCanvas.getContext('2d'), {
+          type: 'bar',
+          data: {
+            labels: ['Baseline', 'After Phase 1', 'After Phase 2'],
+            datasets: [
+              {
+                label: 'R tests passing',
+                data: [276, 276, 294],
+                backgroundColor: '#3b6f76',
+                borderRadius: 6
+              },
+              {
+                label: 'Python tests passing',
+                data: [58, 58, 58],
+                backgroundColor: '#9d6b37',
+                borderRadius: 6
+              }
+            ]
+          },
+          options: {
+            animation: false,
+            resizeDelay: 150,
+            normalized: true,
+            maintainAspectRatio: false,
+            responsive: true,
+            plugins: {
+              legend: { position: 'bottom' }
+            },
+            scales: {
+              y: { beginAtZero: true, title: { display: true, text: 'Tests passing' } }
+            }
+          }
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
