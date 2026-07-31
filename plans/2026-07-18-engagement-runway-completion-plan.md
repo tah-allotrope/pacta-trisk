@@ -1,7 +1,7 @@
 ---
 title: "Engagement Runway Completion: TRISK Core, One-Command Orchestrator, SDB Rehearsal, Data Closers"
 date: "2026-07-18"
-status: "draft"
+status: "complete — bulk-corrected 2026-07-31 per directive: plan predates 2026-07-20 and is presumed fully implemented (NOT individually verified against git/code evidence)"
 request: "Complete the client-engagement runway on the package foundation (Wave 0 of research/2026-07-18-runway-completion-and-credibility-brainstorm.md): merged TRISK parameterize+decompose into R/trisk_core.R, downstream generator parameterization, run_engagement.R orchestrator, SDB end-to-end run with second golden fixture, and PHASE-06 closers (ABCD sourcing brief, ABCD intake schema, scenario versioning, NA bug fixes)"
 plan_type: "multi-phase"
 research_inputs:

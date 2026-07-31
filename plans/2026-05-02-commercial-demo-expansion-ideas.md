@@ -1,3 +1,7 @@
+---
+status: "complete — bulk-corrected 2026-07-31 per directive: plan predates 2026-07-20 and is presumed fully implemented (NOT individually verified against git/code evidence)"
+---
+
 # Commercial Demo / Deployment — Three Expansion Ideas
 
 > Date: 2026-05-02
