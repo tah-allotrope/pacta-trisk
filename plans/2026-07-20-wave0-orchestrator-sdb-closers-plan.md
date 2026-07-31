@@ -1,7 +1,7 @@
 ---
 title: "Wave 0 Completion: Verify Tool, Engagement Orchestrator, SDB Rehearsal + CI/Scaffolding, Data Closers with Deterministic Run IDs"
 date: "2026-07-20"
-status: "draft"
+status: "complete — all four phases are in the tree and verified (tools/verify_refactor.R with VOLATILE_BASENAMES emptied, R/step_runner.R + scripts/run_engagement.R at package 0.2.0+, engagements/sdb-rehearsal run end-to-end with its own golden test and CI job, and the data closers: ABCD brief + intake contract, data/scenarios/pdp8-2023/, wired backfill_zero_baseline(), deterministic run_id/run_path); only TASK-03-05's pilot/rehearsal_log.md write-up was never done"
 request: "Wave 0 execution from research/2026-07-20-runway-final-phases-and-beyond-brainstorm.md: N1 verification tool, runway PHASE-03 orchestrator, PHASE-04 SDB rehearsal (+N3 CI, N4 scaffolding), PHASE-05 data closers with N2 deterministic run IDs folded into the golden refreeze"
 plan_type: "multi-phase"
 research_inputs:
@@ -316,17 +316,17 @@ Turn the hand-rolled acceptance check used by the two completed refactor phases 
 one-command tool that every later phase (and every future refactor) runs.
 
 **Tasks**
-- [ ] TASK-01-01: Create `tools/verify_refactor.R` implementing the Specification's
+- [x] TASK-01-01: Create `tools/verify_refactor.R` implementing the Specification's
   decision logic. Top of file: a commented `VOLATILE_BASENAMES <- c(...)` vector
   containing the five known-volatile basenames, with a comment stating the cause
   (per-invocation `run_id`/`run_path` UUID from `trisk.model::run_trisk()`) and that
   PHASE-04 empties this vector.
-- [ ] TASK-01-02: Prove the tool on the untouched tree: from a clean checkout run
+- [x] TASK-01-02: Prove the tool on the untouched tree: from a clean checkout run
   `Rscript tools/verify_refactor.R` (this runs the default 7-step refresh, ~tens of
   minutes) and confirm it prints `BYTE-IDENTITY PASS` with the five volatile files
   listed under known-volatile and the HTML/manifest churn under expected churn. Then
   `git checkout -- .` to discard the churn.
-- [ ] TASK-01-03: Documentation: add a short "Refactor acceptance check" paragraph to
+- [x] TASK-01-03: Documentation: add a short "Refactor acceptance check" paragraph to
   `README.md` (the one command + what PASS means); add `trisk_baseline_run*.txt` to
   `.gitignore` if not already present (legacy baseline files from earlier phases).
 
@@ -379,7 +379,7 @@ engagement-scoped manifest — reusing (not duplicating) `pipeline_refresh.R`'s 
 logic — and the package exports the new functions at version 0.2.0.
 
 **Tasks**
-- [ ] TASK-02-01: Create `R/step_runner.R` by extracting from
+- [x] TASK-02-01: Create `R/step_runner.R` by extracting from
   `scripts/pipeline_refresh.R` (lines ≈62–108: `count_rows`, `run_step`, the step
   loop, and manifest assembly — verify exact lines at execution time): `run_steps()`
   executes a list of `list(name, script, args)` via
@@ -388,13 +388,13 @@ logic — and the package exports the new functions at version 0.2.0.
   formatted `%Y-%m-%dT%H:%M:%S%z`, `git_sha`, `steps[{name,status,seconds}]`,
   `status`, `row_counts`) plus optional extra top-level fields. Keep top-of-file
   `library(jsonlite)` guard; roxygen `#' @export` on both functions.
-- [ ] TASK-02-02: Refactor `scripts/pipeline_refresh.R` to source `R/step_runner.R`
+- [x] TASK-02-02: Refactor `scripts/pipeline_refresh.R` to source `R/step_runner.R`
   and call `run_steps()`/`write_pipeline_manifest()`. Step lists, `--full` flag,
   manifest path `dashboard/data/pipeline_manifest.json`, the six-file
   `snapshot_files` row-count list, and exit behavior stay byte-for-byte compatible
   (CON-002): same JSON keys, same step names/order/counts (7 + audit default; 10 +
   audit `--full`).
-- [ ] TASK-02-03: Create `scripts/run_engagement.R` — CLI:
+- [x] TASK-02-03: Create `scripts/run_engagement.R` — CLI:
   `Rscript scripts/run_engagement.R --config engagements/<slug>/engagement_config.json [--raw-loanbook <path>] [--skip-intake] [--top-n <int>] [--dry-run]`.
   Step list in the Specification's fixed order, each pipeline step invoked with
   `--config <effective-config-path>`:
@@ -421,22 +421,22 @@ logic — and the package exports the new functions at version 0.2.0.
   `write_pipeline_manifest(..., extra = list(bank_slug = cfg$bank_slug, config_path = <effective path>))`.
   `--dry-run` prints one `name: script args` line per resolved step and exits 0
   without executing or writing anything.
-- [ ] TASK-02-04: Guard rail in `run_engagement.R`, checked before any step: if
+- [x] TASK-02-04: Guard rail in `run_engagement.R`, checked before any step: if
   `cfg$paths$snapshot_dir == "dashboard/data"` and `cfg$bank_slug != "mcb-demo"`,
   stop with message `Engagement snapshot_dir must not be the public dashboard/data`.
   Print a banner with the effective config path and effective loanbook path before
   step 1.
-- [ ] TASK-02-05: Package refresh (ASM-011): regenerate `NAMESPACE`
+- [x] TASK-02-05: Package refresh (ASM-011): regenerate `NAMESPACE`
   (`Rscript -e "roxygen2::roxygenise()"`), bump `DESCRIPTION` to `Version: 0.2.0`,
   create `NEWS.md` with a 0.2.0 entry (TRISK core, prioritization core, engagement
   orchestrator + step runner, verification tool). Verify
   `Rscript -e "devtools::load_all('.'); stopifnot(is.function(run_steps), is.function(write_pipeline_manifest))"`.
-- [ ] TASK-02-06: Create `tests/testthat/test_step_runner.R` (Test Specs below) and
+- [x] TASK-02-06: Create `tests/testthat/test_step_runner.R` (Test Specs below) and
   add a "Running a client engagement" subsection to `README.md` with the exact
   command, the `--dry-run` tip, and the Windows PATH note
   (`$env:Path += ";C:\Program Files\R\R-4.5.2\bin"` — `system2("Rscript", ...)`
   needs `Rscript` on PATH even when the outer call used a full path).
-- [ ] TASK-02-07: Acceptance: `Rscript tools/verify_refactor.R` → `BYTE-IDENTITY
+- [x] TASK-02-07: Acceptance: `Rscript tools/verify_refactor.R` → `BYTE-IDENTITY
   PASS` (the step-runner extraction changed nothing observable in default mode).
 
 **File Changes**
@@ -508,7 +508,7 @@ engagement-config creation mechanical, and put the SDB run into weekly CI so "wo
 only for MCB" can never silently return.
 
 **Tasks**
-- [ ] TASK-03-01: Create `scripts/new_engagement.R` (N4, ASM-006). CLI:
+- [x] TASK-03-01: Create `scripts/new_engagement.R` (N4, ASM-006). CLI:
   `Rscript scripts/new_engagement.R --slug <slug> --name "<Bank Name>" [--sectors power,cement,steel] [--grid] [--anonymize]`.
   Validates the slug against `^[a-z0-9-]+$`; exits non-zero with a clear message if
   `engagements/<slug>/` exists; writes `engagements/<slug>/engagement_config.json`
@@ -520,11 +520,11 @@ only for MCB" can never silently return.
   `disclosure_output_dir`, `prioritization_output_dir`) rooted under
   `engagements/<slug>/` (e.g. `engagements/<slug>/output/pacta`,
   `engagements/<slug>/snapshot`, `engagements/<slug>/reports`, ...).
-- [ ] TASK-03-02: Generate the SDB config with the scaffolder:
+- [x] TASK-03-02: Generate the SDB config with the scaffolder:
   `Rscript scripts/new_engagement.R --slug sdb-rehearsal --name "Saigon Delta Bank"`
   (grid off, anonymize off) — this both creates the config and smoke-tests N4.
   Add the ASM-007 `.gitignore` patterns.
-- [ ] TASK-03-03: Execute from a clean tree:
+- [x] TASK-03-03: Execute from a clean tree:
   `Rscript scripts/run_engagement.R --config engagements/sdb-rehearsal/engagement_config.json --raw-loanbook data/fixtures/unseen_bank_loanbook.csv`.
   Expect failures of the class: PACTA sectors with zero matched SDB loans crashing
   chart/summary code (guard: skip the chart, emit a
@@ -534,7 +534,7 @@ only for MCB" can never silently return.
   index note). Every guard sits behind an emptiness check the MCB path never enters;
   after each fix, `Rscript tools/verify_refactor.R --skip-refresh` (or the full run
   at phase end) must stay clean and the full default-mode suite green.
-- [ ] TASK-03-04: Cross-contamination check immediately after the successful run:
+- [x] TASK-03-04: Cross-contamination check immediately after the successful run:
   `git status --porcelain synthesis_output output dashboard/data reports` → empty
   (the SDB run wrote nothing outside `engagements/sdb-rehearsal/`).
 - [ ] TASK-03-05: Append the "Downstream run (2026-07)" section to
@@ -542,7 +542,7 @@ only for MCB" can never silently return.
   `engagements/sdb-rehearsal/pipeline_manifest.json`; every friction point fixed in
   TASK-03-03 with file/line; a verdict sentence replacing the old "remaining gap is
   the full PACTA/TRISK downstream run" statement.
-- [ ] TASK-03-06: Commit the SDB artifacts per ASM-007 and create
+- [x] TASK-03-06: Commit the SDB artifacts per ASM-007 and create
   `tests/testthat/test_sdb_engagement.R`. Freeze literals FROM THE COMMITTED FILES at
   authoring time (never invent values): assert
   `engagements/sdb-rehearsal/intake/normalized_loanbook.csv` has exactly 13 columns
@@ -551,7 +551,7 @@ only for MCB" can never silently return.
   and its rank-1 borrower name equals the observed literal (tolerance ±0.005 on any
   frozen score); `pipeline_manifest.json` has `status == "ok"` and
   `bank_slug == "sdb-rehearsal"`.
-- [ ] TASK-03-07: N3 CI guard: add a second job `sdb-engagement` to
+- [x] TASK-03-07: N3 CI guard: add a second job `sdb-engagement` to
   `.github/workflows/refresh.yml` (ASM-005), mirroring the `refresh` job's R setup
   steps (checkout, setup-r 4.5 with public RSPM, apt system deps, setup-renv), then:
   `Rscript scripts/run_engagement.R --config engagements/sdb-rehearsal/engagement_config.json --raw-loanbook data/fixtures/unseen_bank_loanbook.csv`,
@@ -629,7 +629,7 @@ the two known NA-producing bugs, make the five volatile TRISK CSVs deterministic
 then refreeze goldens exactly once for all of it.
 
 **Tasks**
-- [ ] TASK-04-01: Write `docs/abcd_sourcing_decision.md` (~2–3 pages): the problem (a
+- [x] TASK-04-01: Write `docs/abcd_sourcing_decision.md` (~2–3 pages): the problem (a
   real loanbook must match against real asset-based company data;
   `data/vietnam_abcd.csv` is synthetic and MCB-shaped); Option A — Asset Impact
   license (per-sector Vietnam coverage: power/automotive strong, cement/steel
@@ -641,7 +641,7 @@ then refreeze goldens exactly once for all of it.
   power-only), and the trigger point ("decide before signing the data-phase start
   date in any real proposal"). **No code dependency — may be written at any point
   during this plan, including in parallel with PHASE-01.**
-- [ ] TASK-04-02: ABCD intake contract: append an "ABCD (asset-based company data)
+- [x] TASK-04-02: ABCD intake contract: append an "ABCD (asset-based company data)
   table" section to `intake/SCHEMA.md` mirroring the loanbook contract's style —
   required columns matching `data/vietnam_abcd.csv`'s actual header (open the file
   and document each column's type and units) plus provenance columns `data_source`
@@ -649,7 +649,7 @@ then refreeze goldens exactly once for all of it.
   `intake/templates/abcd_template.csv` (header + 3 illustrative synthetic rows) and
   add one line naming it to the templates README (`ls intake/templates/` to find the
   README that exists there and edit that one).
-- [ ] TASK-04-03: Scenario versioning: create `data/scenarios/pdp8-2023/` containing
+- [x] TASK-04-03: Scenario versioning: create `data/scenarios/pdp8-2023/` containing
   copies of `data/vietnam_scenario_ms.csv` and `data/vietnam_scenario_co2.csv`;
   change `R/engagement_config.R` defaults `inputs$scenario_ms_csv` /
   `inputs$scenario_co2_csv` to the versioned paths; update
@@ -662,7 +662,7 @@ then refreeze goldens exactly once for all of it.
   (directory convention `data/scenarios/<source>-<year>/`) to `README.md`. Add to
   `tests/testthat/test_snapshot_contract.R`:
   `expect_identical(unname(tools::md5sum("data/vietnam_scenario_ms.csv")), unname(tools::md5sum("data/scenarios/pdp8-2023/vietnam_scenario_ms.csv")))`.
-- [ ] TASK-04-04: Dung Quat zero-baseline fix: wire the existing, already-unit-tested
+- [x] TASK-04-04: Dung Quat zero-baseline fix: wire the existing, already-unit-tested
   `backfill_zero_baseline()` (in `R/trisk_core.R`) into the TRISK input-prep path
   where per-asset production/capacity trajectories are assembled
   (`trisk_prepare_sector_inputs`), so an asset whose baseline-year value is 0
@@ -671,11 +671,11 @@ then refreeze goldens exactly once for all of it.
   `baseline_note = "backfilled_first_operating_year"` column; assets with all-zero
   trajectories are excluded with a printed `[NOTE]` line. After rerun, the power
   TRISK sensitivity CSV must contain no NA numeric values for that company.
-- [ ] TASK-04-05: Power-2025 NA fix in `scripts/generate_vietnam_data.R` per
+- [x] TASK-04-05: Power-2025 NA fix in `scripts/generate_vietnam_data.R` per
   ASM-010: backfill the NA 2025 projected power values using the interpolation
   already used for scenario anchors; regenerate and confirm the PACTA power techmix
   outputs have no NA 2025 rows.
-- [ ] TASK-04-06: Deterministic run IDs (N2, ASM-003): in
+- [x] TASK-04-06: Deterministic run IDs (N2, ASM-003): in
   `write_trisk_demo_outputs()` (`R/trisk_core.R` ≈ lines 770–841), rewrite `run_id`
   in every written CSV that carries it and `run_path` in `run_catalog.csv` per the
   Specification. First run
@@ -684,7 +684,7 @@ then refreeze goldens exactly once for all of it.
   self-consistent after the rewrite because every file gets the same
   `sector_runlabel` string); if a consumer does depend on UUID values, adapt it in
   the same commit.
-- [ ] TASK-04-07: Single golden refreeze: run
+- [x] TASK-04-07: Single golden refreeze: run
   `Rscript scripts/pipeline_refresh.R --full` to green; run
   `Rscript tools/verify_refactor.R --skip-refresh` and inspect the classification —
   expected DRIFT is exactly the intended fix surface (scenario paths, power-2025
@@ -696,7 +696,7 @@ then refreeze goldens exactly once for all of it.
   `test_sdb_engagement.R` + recommit the ASM-007 SDB artifacts if values moved.
   Set `VOLATILE_BASENAMES <- character(0)` in `tools/verify_refactor.R` (ASM-004).
   Commit everything as ONE commit whose message names the refreeze and each cause.
-- [ ] TASK-04-08: Post-refreeze determinism proof: run
+- [x] TASK-04-08: Post-refreeze determinism proof: run
   `Rscript scripts/pipeline_refresh.R` once more, then
   `Rscript tools/verify_refactor.R --skip-refresh` → `BYTE-IDENTITY PASS` with an
   empty volatile section (the five formerly volatile CSVs are now byte-stable).

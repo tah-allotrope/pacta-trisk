@@ -1,7 +1,7 @@
 ---
 title: "Wave 1 — Consistency: Invariant Detector, Cross-Artifact Correctness, and Orchestrator Convergence"
 date: "2026-07-25"
-status: "draft"
+status: "complete — all six phases landed (commits a629593, fb56221, ab9729b, 9e530dd, ccb6cb1, d169901): INV-001..005 in tools/verify_refactor.R and both CI workflows, data_source provenance and self-describing configs, flat scenario copies retired plus validate_abcd_schema() on a 14-column ABCD, grid input fingerprinting with a live carbon-price lever at grid_contract_version v2, pipeline_refresh.R reduced to a delegating wrapper with trisk_power_demo.R deleted, and the 0.3.0 refreeze with lessons.md"
 request: "Wave 1 'Consistency' for pacta-trisk — invariants detector, cross-artifact correctness fixes (C1-C6), orchestrator convergence (A1), SDB CI guard, single golden refreeze"
 plan_type: "multi-phase"
 research_inputs:
@@ -222,15 +222,15 @@ through PHASE-04 will fix. No production behavior changes in this phase.
 
 **Tasks**
 
-- [ ] TASK-01-01: Add `INVARIANTS` implementation to `tools/verify_refactor.R`. Implement each check as a standalone pure-ish function taking a repo root and returning a `list(id, ok, detail)` record. Keep the existing `classify_path()` / `run_refresh()` / `main()` code untouched apart from arg parsing and dispatch.
-- [ ] TASK-01-02: Implement `inv_grid_matches_base_run(root, snapshot_dir, tolerance)` per Specification S1.
-- [ ] TASK-01-03: Implement `inv_scenario_vintage_single_source(root)` — fails when any file under `data/scenarios/<vintage>/` has a byte-identical twin directly under `data/`, reporting each duplicate pair. (Expected to FAIL now; fixed in PHASE-03.)
-- [ ] TASK-01-04: Implement `inv_engagement_data_source(root)` — for every `engagements/*/engagement_config.json`, if `<engagement_output_dir>/engagement_priority.csv` exists, assert every value in its `data_source` column equals that config's `bank_slug`. (Expected to FAIL now for `sdb-rehearsal`; fixed in PHASE-02.)
-- [ ] TASK-01-05: Implement `inv_sector_lists_agree(root)` — assert the sector sets in `R/sector_registry.R`'s `sector_registry()$sector`, `R/engagement_config.R`'s `supported_sectors` literal, `R/trisk_core.R`'s `trisk_supported_sectors`, and `scripts/new_engagement.R`'s `supported` literal are all identical as sets. Extract the three literal vectors by sourcing `R/sector_registry.R` and `R/trisk_core.R` and by regex-scanning `R/engagement_config.R` and `scripts/new_engagement.R` for `c("power", ...)` on the line following the `supported`/`supported_sectors` assignment. (Expected to PASS now; guards future drift.)
-- [ ] TASK-01-06: Implement `inv_snapshot_manifest_sectors(root, snapshot_dir)` — assert every `sector` in `<snapshot_dir>/trisk/manifest.csv` is present in `sector_registry()$sector`. (Expected to PASS now.)
-- [ ] TASK-01-07: Wire `--invariants` into `main()`. When present, run only the invariant checks (never the refresh) unless `--skip-refresh` is absent AND `--invariants` is combined with a normal run — see File Changes for exact dispatch. Print one `[PASS]`/`[FAIL]` line per invariant plus a detail block per failure. Exit `1` if any invariant failed, else `0`, printing `INVARIANTS PASS`.
-- [ ] TASK-01-08: Create `tests/testthat/test_verify_invariants.R` with unit tests over the pure helpers using `tempdir()`-built fixtures — never over the live repo tree, so the tests stay green through PHASE-02…05.
-- [ ] TASK-01-09: Run the detector on the untouched tree and capture its output verbatim into the phase's commit message.
+- [x] TASK-01-01: Add `INVARIANTS` implementation to `tools/verify_refactor.R`. Implement each check as a standalone pure-ish function taking a repo root and returning a `list(id, ok, detail)` record. Keep the existing `classify_path()` / `run_refresh()` / `main()` code untouched apart from arg parsing and dispatch.
+- [x] TASK-01-02: Implement `inv_grid_matches_base_run(root, snapshot_dir, tolerance)` per Specification S1.
+- [x] TASK-01-03: Implement `inv_scenario_vintage_single_source(root)` — fails when any file under `data/scenarios/<vintage>/` has a byte-identical twin directly under `data/`, reporting each duplicate pair. (Expected to FAIL now; fixed in PHASE-03.)
+- [x] TASK-01-04: Implement `inv_engagement_data_source(root)` — for every `engagements/*/engagement_config.json`, if `<engagement_output_dir>/engagement_priority.csv` exists, assert every value in its `data_source` column equals that config's `bank_slug`. (Expected to FAIL now for `sdb-rehearsal`; fixed in PHASE-02.)
+- [x] TASK-01-05: Implement `inv_sector_lists_agree(root)` — assert the sector sets in `R/sector_registry.R`'s `sector_registry()$sector`, `R/engagement_config.R`'s `supported_sectors` literal, `R/trisk_core.R`'s `trisk_supported_sectors`, and `scripts/new_engagement.R`'s `supported` literal are all identical as sets. Extract the three literal vectors by sourcing `R/sector_registry.R` and `R/trisk_core.R` and by regex-scanning `R/engagement_config.R` and `scripts/new_engagement.R` for `c("power", ...)` on the line following the `supported`/`supported_sectors` assignment. (Expected to PASS now; guards future drift.)
+- [x] TASK-01-06: Implement `inv_snapshot_manifest_sectors(root, snapshot_dir)` — assert every `sector` in `<snapshot_dir>/trisk/manifest.csv` is present in `sector_registry()$sector`. (Expected to PASS now.)
+- [x] TASK-01-07: Wire `--invariants` into `main()`. When present, run only the invariant checks (never the refresh) unless `--skip-refresh` is absent AND `--invariants` is combined with a normal run — see File Changes for exact dispatch. Print one `[PASS]`/`[FAIL]` line per invariant plus a detail block per failure. Exit `1` if any invariant failed, else `0`, printing `INVARIANTS PASS`.
+- [x] TASK-01-08: Create `tests/testthat/test_verify_invariants.R` with unit tests over the pure helpers using `tempdir()`-built fixtures — never over the live repo tree, so the tests stay green through PHASE-02…05.
+- [x] TASK-01-09: Run the detector on the untouched tree and capture its output verbatim into the phase's commit message.
 
 **File Changes**
 
@@ -290,13 +290,13 @@ engagement configs that cannot reproduce their own run.
 
 **Tasks**
 
-- [ ] TASK-02-01: Replace the hardcoded `data_source` in `scripts/engagement_scoring.R` with `cfg$bank_slug`.
-- [ ] TASK-02-02: Make `prioritize_sectors()` derive its sector list from `cfg$trisk_sectors` instead of a hardcoded vector.
-- [ ] TASK-02-03: Promote the ISIC→Decision-263 sector map in `prioritize_sectors()` to a module-level named vector so it has one definition, and filter it to the configured sectors.
-- [ ] TASK-02-04: Add an optional `inputs.raw_loanbook_csv` key to the engagement-config schema; when present and no `--raw-loanbook` CLI flag is given, `scripts/run_engagement.R` uses it as the intake source.
-- [ ] TASK-02-05: Set `inputs.raw_loanbook_csv` to `data/fixtures/unseen_bank_loanbook.csv` in `engagements/sdb-rehearsal/engagement_config.json` so the config reproduces its own documented run.
-- [ ] TASK-02-06: Add `public_snapshot_allowed` to the config defaults (`FALSE`) and to `engagements/mcb-demo/engagement_config.json` (`true`); rewrite the orchestrator guard rail to use it (ASM-004).
-- [ ] TASK-02-07: Extend `tests/testthat/test_engagement_config.R` with cases for the two new keys.
+- [x] TASK-02-01: Replace the hardcoded `data_source` in `scripts/engagement_scoring.R` with `cfg$bank_slug`.
+- [x] TASK-02-02: Make `prioritize_sectors()` derive its sector list from `cfg$trisk_sectors` instead of a hardcoded vector.
+- [x] TASK-02-03: Promote the ISIC→Decision-263 sector map in `prioritize_sectors()` to a module-level named vector so it has one definition, and filter it to the configured sectors.
+- [x] TASK-02-04: Add an optional `inputs.raw_loanbook_csv` key to the engagement-config schema; when present and no `--raw-loanbook` CLI flag is given, `scripts/run_engagement.R` uses it as the intake source.
+- [x] TASK-02-05: Set `inputs.raw_loanbook_csv` to `data/fixtures/unseen_bank_loanbook.csv` in `engagements/sdb-rehearsal/engagement_config.json` so the config reproduces its own documented run.
+- [x] TASK-02-06: Add `public_snapshot_allowed` to the config defaults (`FALSE`) and to `engagements/mcb-demo/engagement_config.json` (`true`); rewrite the orchestrator guard rail to use it (ASM-004).
+- [x] TASK-02-07: Extend `tests/testthat/test_engagement_config.R` with cases for the two new keys.
 
 **File Changes**
 
@@ -354,13 +354,13 @@ documented schema.
 
 **Tasks**
 
-- [ ] TASK-03-01: Make `scripts/generate_vietnam_data.R` write the scenario CSVs to `data/scenarios/pdp8-2023/` only, and delete the flat `data/vietnam_scenario_ms.csv` and `data/vietnam_scenario_co2.csv`.
-- [ ] TASK-03-02: Point `engagements/sdb-rehearsal/engagement_config.json` at the versioned scenario paths.
-- [ ] TASK-03-03: Replace the `test_snapshot_contract.R` test that *asserts the duplicates are byte-identical* with one that asserts the flat paths no longer exist.
-- [ ] TASK-03-04: Add `data_source` and `as_of_year` columns to the generated ABCD in `scripts/generate_vietnam_data.R`, with values `"synthetic_demo"` and `2025` on every row — matching `intake/templates/abcd_template.csv` exactly.
-- [ ] TASK-03-05: Add `validate_abcd_schema()` to `R/trisk_core.R` and call it at the top of `trisk_prepare_sector_inputs()` immediately after the ABCD is read, failing the run on a schema violation.
-- [ ] TASK-03-06: Add unit tests for `validate_abcd_schema()`.
-- [ ] TASK-03-07: Grep the repo for remaining references to the flat scenario paths and update every one.
+- [x] TASK-03-01: Make `scripts/generate_vietnam_data.R` write the scenario CSVs to `data/scenarios/pdp8-2023/` only, and delete the flat `data/vietnam_scenario_ms.csv` and `data/vietnam_scenario_co2.csv`.
+- [x] TASK-03-02: Point `engagements/sdb-rehearsal/engagement_config.json` at the versioned scenario paths.
+- [x] TASK-03-03: Replace the `test_snapshot_contract.R` test that *asserts the duplicates are byte-identical* with one that asserts the flat paths no longer exist.
+- [x] TASK-03-04: Add `data_source` and `as_of_year` columns to the generated ABCD in `scripts/generate_vietnam_data.R`, with values `"synthetic_demo"` and `2025` on every row — matching `intake/templates/abcd_template.csv` exactly.
+- [x] TASK-03-05: Add `validate_abcd_schema()` to `R/trisk_core.R` and call it at the top of `trisk_prepare_sector_inputs()` immediately after the ABCD is read, failing the run on a schema violation.
+- [x] TASK-03-06: Add unit tests for `validate_abcd_schema()`.
+- [x] TASK-03-07: Grep the repo for remaining references to the flat scenario paths and update every one.
 
 **File Changes**
 
@@ -418,12 +418,12 @@ Builder's five levers all actually do something.
 
 **Tasks**
 
-- [ ] TASK-04-01: Implement `grid_input_fingerprint()` and cache validation per Specification S2 in `R/trisk_core.R`.
-- [ ] TASK-04-02: Resolve the `risk_free_rate` no-op per Specification S3, using `scripts/trisk_run_adhoc.R` for the two probe runs.
-- [ ] TASK-04-03: Make the `carbon_price_family` lever live: emit three distinct carbon-price scenarios per sector from `.trisk_build_carbon_price()` and map each `NGFS_*` family to its own scenario name in `carbon_price_model_map`.
-- [ ] TASK-04-04: Regenerate all three sector grids from scratch and confirm INV-001 passes.
-- [ ] TASK-04-05: Add an R unit test for the fingerprint helpers and a Python test asserting the grid scenario count is derived from `grid_meta.json` rather than hardcoded.
-- [ ] TASK-04-06: Document the lever findings and the carbon-price paths in `docs/TRISK_Demo_Assumptions.md` and `docs/trisk_scenario_grid_contract.md`.
+- [x] TASK-04-01: Implement `grid_input_fingerprint()` and cache validation per Specification S2 in `R/trisk_core.R`.
+- [x] TASK-04-02: Resolve the `risk_free_rate` no-op per Specification S3, using `scripts/trisk_run_adhoc.R` for the two probe runs.
+- [x] TASK-04-03: Make the `carbon_price_family` lever live: emit three distinct carbon-price scenarios per sector from `.trisk_build_carbon_price()` and map each `NGFS_*` family to its own scenario name in `carbon_price_model_map`.
+- [x] TASK-04-04: Regenerate all three sector grids from scratch and confirm INV-001 passes.
+- [x] TASK-04-05: Add an R unit test for the fingerprint helpers and a Python test asserting the grid scenario count is derived from `grid_meta.json` rather than hardcoded.
+- [x] TASK-04-06: Document the lever findings and the carbon-price paths in `docs/TRISK_Demo_Assumptions.md` and `docs/trisk_scenario_grid_contract.md`.
 
 **File Changes**
 
@@ -491,12 +491,12 @@ client engagement travel one code path.
 
 **Tasks**
 
-- [ ] TASK-05-01: Add three optional boolean config keys that let one step list serve both callers: `run_data_generation`, `run_refresh_audit`, `run_outputs`.
-- [ ] TASK-05-02: Extend `build_step_list()` in `scripts/run_engagement.R` to honour those keys.
-- [ ] TASK-05-03: Add a `row_count_files` config key so the engagement manifest can record the same row counts the MCB manifest records today.
-- [ ] TASK-05-04: Make `pipeline_refresh.R` delegate to `run_engagement.R` with the MCB config, preserving its `--full` flag semantics.
-- [ ] TASK-05-05: Delete `scripts/trisk_power_demo.R` and remove its references.
-- [ ] TASK-05-06: Add subprocess smoke tests for both orchestrators' `--dry-run` output.
+- [x] TASK-05-01: Add three optional boolean config keys that let one step list serve both callers: `run_data_generation`, `run_refresh_audit`, `run_outputs`.
+- [x] TASK-05-02: Extend `build_step_list()` in `scripts/run_engagement.R` to honour those keys.
+- [x] TASK-05-03: Add a `row_count_files` config key so the engagement manifest can record the same row counts the MCB manifest records today.
+- [x] TASK-05-04: Make `pipeline_refresh.R` delegate to `run_engagement.R` with the MCB config, preserving its `--full` flag semantics.
+- [x] TASK-05-05: Delete `scripts/trisk_power_demo.R` and remove its references.
+- [x] TASK-05-06: Add subprocess smoke tests for both orchestrators' `--dry-run` output.
 
 **File Changes**
 
@@ -552,14 +552,14 @@ and package metadata.
 
 **Tasks**
 
-- [ ] TASK-06-01: Convert `tests/testthat/test_sdb_engagement.R` from a fixture-content test into a genuine regression test that executes the SDB engagement.
-- [ ] TASK-06-02: Add an `sdb-engagement` job to `.github/workflows/ci.yml`.
-- [ ] TASK-06-03: Add an invariants step to both workflows.
-- [ ] TASK-06-04: Run the full pipeline for MCB and the full engagement for SDB, then refreeze every golden literal from the regenerated committed artifacts.
-- [ ] TASK-06-05: Update `NEWS.md` and bump `DESCRIPTION` to 0.3.0.
-- [ ] TASK-06-06: Create `lessons.md` at the repo root with the four lessons this wave and Wave 0 established.
-- [ ] TASK-06-07: Update `README.md` and `CLAUDE.md` with the invariants command and the single-orchestrator model.
-- [ ] TASK-06-08: Commit everything as one refreeze commit.
+- [x] TASK-06-01: Convert `tests/testthat/test_sdb_engagement.R` from a fixture-content test into a genuine regression test that executes the SDB engagement.
+- [x] TASK-06-02: Add an `sdb-engagement` job to `.github/workflows/ci.yml`.
+- [x] TASK-06-03: Add an invariants step to both workflows.
+- [x] TASK-06-04: Run the full pipeline for MCB and the full engagement for SDB, then refreeze every golden literal from the regenerated committed artifacts.
+- [x] TASK-06-05: Update `NEWS.md` and bump `DESCRIPTION` to 0.3.0.
+- [x] TASK-06-06: Create `lessons.md` at the repo root with the four lessons this wave and Wave 0 established.
+- [x] TASK-06-07: Update `README.md` and `CLAUDE.md` with the invariants command and the single-orchestrator model.
+- [x] TASK-06-08: Commit everything as one refreeze commit.
 
 **File Changes**
 
