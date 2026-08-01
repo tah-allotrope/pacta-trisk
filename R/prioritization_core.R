@@ -7,7 +7,13 @@
 #
 # Code was moved verbatim (ASM-002 of that plan): the only edits are hardcoded
 # path literals promoted to cfg-derived parameters whose defaults equal
-# today's literals. No scoring logic changed.
+# today's literals.
+#
+# Wave 2 PHASE-03 (plans/2026-07-27-contracts-units-and-guardrails-plan.md)
+# replaced the three min-max normalization blocks with absolute severities
+# from R/severity_scoring.R's anchor tables (docs/scoring_anchors.md) -- the
+# only scoring-logic change since the move. classify_band(), the three
+# weights, and the output column names are unchanged.
 #
 # NOTE (Gotcha, carried from the original script): `trisk_dir` reads from the
 # PUBLISHED SNAPSHOT (cfg$paths$snapshot_dir/trisk/...), not from
@@ -122,15 +128,29 @@ prioritize_sectors <- function(cfg, weights = NULL) {
     numeric(0)
   }
 
-  alignment_raw_all <- c(
+  # Wave 2 PHASE-03 (TASK-03-06): a lookup, not a fixed vector blindly
+  # subset by `sectors` -- a configured sector absent from this list now
+  # errors explicitly instead of silently propagating NA through every
+  # downstream dimension score.
+  alignment_raw_sources <- list(
     power  = as.numeric(if (length(power_gap) > 0) power_gap[1] else 0),
     cement = as.numeric(if (length(cement_gap) > 0) cement_gap[1] else 0),
     steel  = as.numeric(if (length(steel_gap) > 0) steel_gap[1] else 0)
   )
-  # Scope to the engagement's configured sectors before any min-max
-  # normalization, so a subset config (e.g. power-only) is not scored
-  # against out-of-scope sectors' raw values (Wave 1 PHASE-02, C4).
-  alignment_raw <- alignment_raw_all[sectors]
+  missing_alignment_sources <- setdiff(sectors, names(alignment_raw_sources))
+  if (length(missing_alignment_sources) > 0) {
+    stop(sprintf(
+      "prioritize_sectors: no alignment source configured for sector(s): %s",
+      paste(missing_alignment_sources, collapse = ", ")
+    ))
+  }
+  # Scope to the engagement's configured sectors, so a subset config (e.g.
+  # power-only) is not scored against out-of-scope sectors' raw values
+  # (Wave 1 PHASE-02, C4).
+  alignment_raw <- setNames(
+    vapply(sectors, function(s) alignment_raw_sources[[s]], numeric(1)),
+    sectors
+  )
 
   # Preserves the three sector-specific console formats verbatim (power in
   # pp at 2 decimals; cement/steel as % at 1 decimal), only skipping a line
@@ -213,23 +233,27 @@ prioritize_sectors <- function(cfg, weights = NULL) {
 
   cat("\n[4/6] Computing dimension scores...\n")
 
-  align_min <- min(alignment_raw)
-  align_max <- max(alignment_raw)
-  align_range <- align_max - align_min
+  # Wave 2 PHASE-03: absolute severity from the anchor tables in
+  # docs/scoring_anchors.md, not min-max normalized against whatever other
+  # sectors happen to be in scope this refresh (R/severity_scoring.R).
+  alignment_score <- setNames(
+    vapply(sectors, function(s) {
+      severity_alignment(alignment_raw[[s]], alignment_basis_for_sector(s))
+    }, numeric(1)),
+    sectors
+  )
 
-  if (align_range > 0) {
-    alignment_score <- (alignment_raw - align_min) / align_range
-  } else {
-    alignment_score <- rep(0.5, length(alignment_raw))
-    names(alignment_score) <- names(alignment_raw)
-  }
-
-  cat("  Alignment scores (normalized):\n")
+  cat("  Alignment severities (absolute, Table A1/A2):\n")
   for (s in sectors) {
     cat(sprintf("    %s: %.4f (raw: %s)\n", s, alignment_score[s],
                 if (s == "power") sprintf("%.2f pp", alignment_raw[s]) else sprintf("%.1f%%", alignment_raw[s])))
   }
 
+  # stress_raw is now the sector's exposure-weighted mean *loss*
+  # (max(0, -npv_change)), not a weighted mean of stress_priority_score
+  # (which is itself scales::rescale-based against the sector's own range
+  # and therefore already rank-relative -- see the Gotchas section of the
+  # Wave 2 plan).
   stress_raw <- numeric(length(sectors))
   names(stress_raw) <- sectors
 
@@ -243,28 +267,27 @@ prioritize_sectors <- function(cfg, weights = NULL) {
 
       n_borrowers <- nrow(trisk_df)
       per_borrower_exposure <- sector_exposure / n_borrowers
+      loss <- pmax(0, -trisk_df$npv_change)
 
-      stress_raw[sector] <- sum(trisk_df$stress_priority_score * per_borrower_exposure) /
+      stress_raw[sector] <- sum(loss * per_borrower_exposure) /
         sum(per_borrower_exposure)
     } else {
       stress_raw[sector] <- 0
     }
   }
 
-  stress_min <- min(stress_raw)
-  stress_max <- max(stress_raw)
-  stress_range <- stress_max - stress_min
+  # Table B anchors (docs/scoring_anchors.md), applied directly to the
+  # already-computed loss fraction -- not severity_trisk(), which expects a
+  # raw npv_change and would re-apply max(0, -x) to an already-nonnegative
+  # loss value.
+  stress_score <- setNames(
+    severity_from_anchors(stress_raw, c(0.00, 0.05, 0.15, 0.30, 0.60)),
+    sectors
+  )
 
-  if (stress_range > 0) {
-    stress_score <- (stress_raw - stress_min) / stress_range
-  } else {
-    stress_score <- rep(0.5, length(stress_raw))
-    names(stress_score) <- names(stress_raw)
-  }
-
-  cat("  Stress scores (normalized):\n")
+  cat("  Stress severities (absolute, Table B):\n")
   for (s in sectors) {
-    cat(sprintf("    %s: %.4f (raw: %.2f)\n", s, stress_score[s], stress_raw[s]))
+    cat(sprintf("    %s: %.4f (raw loss: %.4f)\n", s, stress_score[s], stress_raw[s]))
   }
 
   exposure_share_vec <- setNames(
@@ -278,18 +301,9 @@ prioritize_sectors <- function(cfg, weights = NULL) {
   }
   exposure_share_vec <- exposure_share_vec[sectors]
 
-  exp_min <- min(exposure_share_vec)
-  exp_max <- max(exposure_share_vec)
-  exp_range <- exp_max - exp_min
+  exposure_score <- setNames(severity_exposure(exposure_share_vec), sectors)
 
-  if (exp_range > 0) {
-    exposure_score <- (exposure_share_vec - exp_min) / exp_range
-  } else {
-    exposure_score <- rep(0.5, length(exposure_share_vec))
-    names(exposure_score) <- names(exposure_share_vec)
-  }
-
-  cat("  Exposure scores (normalized):\n")
+  cat("  Exposure severities (absolute, Table C):\n")
   for (s in sectors) {
     cat(sprintf("    %s: %.4f (share: %.1f%%)\n", s, exposure_score[s], exposure_share_vec[s] * 100))
   }

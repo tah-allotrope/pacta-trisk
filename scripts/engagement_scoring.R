@@ -8,11 +8,13 @@
 # downstream generators (engagement letters, disclosure pack) consume, so
 # borrower numbers are computed once and never hardcoded.
 #
-# Composite score (DEC-002, Q-004 = fixed 50/50):
-#   composite = (w_align * norm_align_gap + w_trisk * norm_trisk_priority)
+# Composite score (DEC-002, Q-004 = fixed 50/50), rewritten in Wave 2
+# PHASE-03 to use absolute severity anchors instead of min-max normalization
+# (docs/scoring_anchors.md is the source of truth for the anchor tables):
+#   composite = (w_align * severity_alignment + w_trisk * severity_trisk)
 #               / (sum of weights actually available for the row)
 # Borrowers with PACTA alignment but no TRISK coverage (automotive) renormalise
-# to the alignment component only (==> composite = norm_align_gap) and are
+# to the alignment component only (==> composite = severity_alignment) and are
 # flagged composite_partial = TRUE rather than dropped (TASK-01-04).
 #
 # Confirmed input schema (TASK-01-01, verified 2026-05-31):
@@ -31,8 +33,10 @@
 #
 # Cross-sector caveat: power/automotive alignment gaps are market-share
 # percentage-points; cement/steel gaps are SDA emission-intensity gap_pct.
-# Magnitudes are NOT strictly comparable across those two families; the
-# composite is a demo prioritisation aid, not a calibrated risk number.
+# These are NOT comparable magnitudes on a shared scale, which is exactly
+# why severity_alignment() (R/severity_scoring.R) uses two separate anchor
+# tables (Table A1 for market-share sectors, Table A2 for SDA sectors) keyed
+# by alignment_basis_for_sector(), rather than one shared scale.
 #
 # Provenance: the output's data_source column is cfg$bank_slug — every
 # engagement's engagement_priority.csv is stamped with its own bank_slug,
@@ -49,6 +53,7 @@ suppressWarnings(suppressMessages({
 }))
 
 source("R/engagement_config.R")
+source("R/severity_scoring.R")
 
 # --- Section 1: Configuration ------------------------------------------------
 
@@ -84,20 +89,6 @@ data_source   <- cfg$bank_slug
 
 cat(sprintf("Engagement Scoring — weights: alignment=%.2f, trisk=%.2f (target year %d)\n",
             w_align, w_trisk, target_year))
-
-# Min-max normaliser with a zero-range guard (mirrors sector_prioritization.R)
-normalise_01 <- function(x) {
-  ok <- !is.na(x)
-  if (sum(ok) == 0) return(x)
-  rng <- range(x[ok])
-  if (diff(rng) > 0) {
-    (x - rng[1]) / diff(rng)
-  } else {
-    out <- x
-    out[ok] <- 0.5
-    out
-  }
-}
 
 # --- Section 2: TRISK borrower results (power, cement, steel) ----------------
 
@@ -203,8 +194,9 @@ if (nrow(borrowers) == 0) {
     trisk_status = character(),
     composite_score = numeric(),
     composite_partial = logical(),
-    norm_alignment = numeric(),
-    norm_trisk_priority = numeric(),
+    severity_alignment = numeric(),
+    severity_trisk = numeric(),
+    composite_rank_pct = numeric(),
     alignment_basis = character(),
     data_source = character()
   )
@@ -217,31 +209,42 @@ if (nrow(borrowers) == 0) {
 }
 
 borrowers <- borrowers |>
-  dplyr::mutate(
-    norm_alignment       = normalise_01(alignment_gap),
-    norm_trisk_priority  = normalise_01(trisk_priority_score),
-    composite_partial    = is.na(trisk_priority_score)
-  ) |>
   dplyr::rowwise() |>
   dplyr::mutate(
+    # Named .sev_* to avoid a same-name column shadowing the
+    # severity_alignment()/severity_trisk() functions being called in the
+    # same mutate() chain; renamed to their public names below.
+    .sev_align = severity_alignment(alignment_gap, alignment_basis_for_sector(sector)),
+    .sev_trisk = severity_trisk(npv_change),
+    composite_partial = is.na(.sev_trisk)
+  ) |>
+  dplyr::mutate(
     composite_score = {
-      a_term <- w_align * norm_alignment
-      if (is.na(norm_trisk_priority)) {
+      a_term <- w_align * .sev_align
+      if (is.na(.sev_trisk)) {
         # renormalise to the available weight -> alignment component only
         a_term / w_align
       } else {
-        (a_term + w_trisk * norm_trisk_priority) / (w_align + w_trisk)
+        (a_term + w_trisk * .sev_trisk) / (w_align + w_trisk)
       }
     }
   ) |>
   dplyr::ungroup() |>
+  dplyr::mutate(
+    # Percentile rank within this engagement: an explicit, separately-named
+    # relative view that survives now that composite_score itself is
+    # absolute (Wave 2 PHASE-03). rank()/n so the top borrower reads 1.0.
+    composite_rank_pct = rank(composite_score, ties.method = "average") / dplyr::n(),
+    severity_alignment = .sev_align,
+    severity_trisk = .sev_trisk
+  ) |>
   dplyr::arrange(dplyr::desc(composite_score))
 
 priority <- borrowers |>
   dplyr::select(
     name_abcd, sector, exposure_vnd, alignment_gap, npv_change, pd_change,
     trisk_priority_score, trisk_status, composite_score, composite_partial,
-    norm_alignment, norm_trisk_priority, alignment_basis
+    severity_alignment, severity_trisk, composite_rank_pct, alignment_basis
   ) |>
   dplyr::mutate(data_source = data_source)
 
@@ -274,6 +277,10 @@ n_partial <- sum(priority$composite_partial)
 cat(sprintf("\nCoverage caveat: %d/%d borrowers are TRISK-covered; %d automotive borrower(s) are\n",
             sum(!priority$composite_partial), nrow(priority), n_partial))
 cat("scored on PACTA alignment only (composite_partial = TRUE) and renormalised to the\n")
-cat("alignment component. Cross-sector gap magnitudes (market-share pp vs SDA gap_pct) are\n")
-cat("not strictly comparable — treat the composite as a demo prioritisation aid.\n")
+cat("alignment component. composite_score is an absolute severity in [0, 1] from the\n")
+cat("documented anchor tables in docs/scoring_anchors.md (Wave 2 PHASE-03) -- not a\n")
+cat("rank within this run. composite_rank_pct carries the relative (percentile) view\n")
+cat("separately. Power/automotive alignment gaps are market-share pp; cement/steel gaps\n")
+cat("are SDA gap_pct -- not the same scale, which is why severity_alignment() uses two\n")
+cat("separate anchor tables keyed by sector.\n")
 cat(sprintf("\nOutputs in: %s\n", output_dir))

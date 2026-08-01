@@ -24,6 +24,7 @@ suppressPackageStartupMessages(library(trisk.model))
 
 source("R/engagement_config.R")
 source("R/sector_registry.R")
+source("R/severity_scoring.R")
 source("R/trisk_core.R")
 
 if (sys.nframe() == 0) {

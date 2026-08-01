@@ -26,6 +26,7 @@ suppressPackageStartupMessages({
 })
 
 source("R/sector_registry.R")
+source("R/severity_scoring.R")
 source("R/trisk_core.R")
 
 # carbon_price_model_map comes from R/trisk_core.R (sourced above). This

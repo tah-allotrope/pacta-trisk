@@ -18,6 +18,7 @@ suppressPackageStartupMessages({
 
 source("R/engagement_config.R")
 source("R/format_money.R")
+source("R/severity_scoring.R")
 source("R/prioritization_core.R")
 
 args <- commandArgs(trailingOnly = TRUE)

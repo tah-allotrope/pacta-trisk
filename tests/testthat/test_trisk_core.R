@@ -3,6 +3,8 @@ library(testthat)
 root <- project_root()
 source(file.path(root, "R", "engagement_config.R"))
 source(file.path(root, "R", "sector_registry.R"))
+source(file.path(root, "R", "format_money.R"))
+source(file.path(root, "R", "severity_scoring.R"))
 source(file.path(root, "R", "trisk_core.R"))
 source(file.path(root, "R", "prioritization_core.R"))
 

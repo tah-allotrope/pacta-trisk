@@ -826,9 +826,17 @@ summarize_trisk_run <- function(npv_results, pd_results, alignment_company) {
 
   prioritization <- prioritization %>%
     mutate(
+      # stress_priority_score: rank-relative (rescale()'d to the sector's own
+      # range every time), legitimate ONLY as a dashboard sort key (ASM-004).
+      # Left unchanged here -- do not feed it into a composite score.
       stress_priority_score = rescale(-npv_change, to = c(0, 100), from = npv_range) * 0.7 +
         rescale(pd_change, to = c(0, 100), from = pd_range) * 0.2 +
-        rescale(mean_abs_alignment_gap_pp, to = c(0, 100), from = gap_range) * 0.1
+        rescale(mean_abs_alignment_gap_pp, to = c(0, 100), from = gap_range) * 0.1,
+      # stress_severity_score: absolute severity in [0, 1] from the Table B
+      # anchor table (docs/scoring_anchors.md), computed directly from
+      # npv_change -- not derived from stress_priority_score. This is the
+      # column composite scores (Wave 2 PHASE-03) must read.
+      stress_severity_score = severity_trisk(npv_change)
     ) %>%
     arrange(desc(stress_priority_score))
 
@@ -955,7 +963,8 @@ write_trisk_demo_outputs <- function(sector, output_root, meta, run_results) {
         mean_abs_alignment_gap_pp,
         worst_alignment_gap_pp,
         alignment_context,
-        stress_priority_score
+        stress_priority_score,
+        stress_severity_score
       )
   })
 

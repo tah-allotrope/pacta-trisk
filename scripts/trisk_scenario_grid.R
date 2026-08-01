@@ -21,6 +21,7 @@ suppressPackageStartupMessages({
 
 source("R/engagement_config.R")
 source("R/sector_registry.R")
+source("R/severity_scoring.R")
 source("R/trisk_core.R")
 
 args <- commandArgs(trailingOnly = TRUE)
