@@ -60,7 +60,22 @@ test_that("SDB engagement priority has a rank-1 power borrower", {
   expect_gt(nrow(ep), 0L)
   expect_equal(ep$name_abcd[1], "Nghi Son Power LLC")
   expect_equal(ep$sector[1], "power")
-  expect_equal(ep$composite_score[1], 1.0, tolerance = 0.005)
+  # Wave 2 PHASE-03/04: composite_score is now an absolute severity from
+  # docs/scoring_anchors.md, not a min-max rescale -- this value is
+  # falsifiable (it does NOT hold "for any input" the way the pre-PHASE-03
+  # tautological 1.0 did).
+  expect_equal(ep$composite_score[1], 0.9113849765258216, tolerance = 1e-4)
+
+  # Wave 2 PHASE-04, TASK-04-06: regression guard against a min-max
+  # normalization being reintroduced anywhere upstream -- under min-max the
+  # top score is always exactly 1.0 regardless of input. Unlike the MCB
+  # fixture, a handful of SDB borrowers legitimately score exactly 0.0: they
+  # carry alignment_basis == "No alignment context available" (R/trisk_core.R
+  # replace_na(alignment_context, ...)), a documented pre-existing
+  # zero-baseline edge case (see reports/2026-05-31-phase-01-engagement-scoring.html)
+  # for borrowers with no PACTA alignment match, not an artifact of min-max
+  # rescaling. The guard therefore checks the top score only.
+  expect_lt(max(ep$composite_score), 1)
 })
 
 test_that("SDB engagement manifest reports success", {

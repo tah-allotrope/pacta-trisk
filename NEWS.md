@@ -1,3 +1,45 @@
+# pactatrisk 0.4.0
+
+Wave 2 "Contracts, Units, and Guard Rails": fixes the two client-facing
+correctness defects that made the platform's output wrong rather than merely
+incomplete — money units and rank-relative scores — gated by a byte-identity
+CI check that previously ran nowhere. The third known defect (the intake
+validator dropping rows its own published schema promises to accept) is
+scheduled for the follow-up wave.
+
+- **Byte-identity now runs in CI** (`ci.yml`'s `byte-identity` job, every
+  push) and **gates** the weekly public-snapshot auto-publish
+  (`refresh.yml`, via `tools/verify_refactor.R --skip-refresh`, overridable
+  only through a manual `allow_drift: true` dispatch for an intentional,
+  reviewed refreeze). `CLAUDE.md` law 5 corrected to match.
+- **Money is true VND everywhere.** The synthetic MCB loanbook was
+  denominated in *millions* of VND while every column and label said `VND`
+  — the public demo portfolio read as ~USD 950 instead of the ~USD 950M its
+  own pitch deck claims (MCB's book is 25.02 trillion VND, ~USD 950M at
+  26,300 VND/USD). Fixed at the source (`make_loan()` in
+  `scripts/generate_vietnam_data.R`); every money renderer now goes through
+  one shared `R/format_money.R`; a new cross-artifact invariant (`INV-006`)
+  fails if any engagement's VND-declared loanbook is implausibly small.
+- **Priority scores are now absolute, not rank-relative.** Every score that
+  fed a composite was min-max normalized — in two cases, three times over
+  the same quantity — so the top-ranked sector or borrower was *always
+  exactly 1.0* for any input, and two structurally different banks produced
+  identical score patterns. `R/severity_scoring.R` replaces every min-max
+  block with clamped piecewise-linear interpolation over four documented
+  anchor tables (`docs/scoring_anchors.md`): a score of 0.61 now means the
+  same thing for every bank, every sector, every refresh. The former
+  tautological golden assertions (`composite_score[1] == 1.0`, true for any
+  input) are re-pinned to real, falsifiable values, plus a non-degeneracy
+  regression guard (`composite_score` strictly between 0 and 1).
+  `stress_priority_score` (the dashboard's rank-relative sort key) is
+  unchanged; a new `stress_severity_score` column carries the absolute view.
+- **Golden refreeze.** One commit regenerates every artifact PHASE-02's
+  rescale and PHASE-03's rescoring affect (`data/vietnam_loanbook.csv`,
+  `sector_priority_ranking.csv`, `engagement_priority.csv`,
+  `top_borrowers_alignment_trisk.csv`, and their SDB-rehearsal
+  counterparts); the TRISK scenario grid parquet is untouched
+  (`grid_contract_version` stays `"v2"`).
+
 # pactatrisk 0.3.0
 
 Wave 1 "Consistency": the platform's acceptance discipline previously only

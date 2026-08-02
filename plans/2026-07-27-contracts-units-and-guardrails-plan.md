@@ -1,7 +1,7 @@
 ---
 title: "Wave 2 — Contracts, Units, and Guard Rails"
 date: "2026-07-27"
-status: "open — PHASE-01 (byte-identity CI gate + refresh drift gate) and PHASE-02 (true VND, R/format_money.R, INV-006) landed in commits 994a1af and cf2adeb; PHASE-03 (absolute severity scoring, R/severity_scoring.R, docs/scoring_anchors.md, stress_severity_score) landed in this run; PHASE-04 to PHASE-06 (golden refreeze to 0.4.0, intake contract fixes, coverage report) are not started"
+status: "open — PHASE-01 (byte-identity CI gate + refresh drift gate) landed in 994a1af, PHASE-02 (true VND, R/format_money.R, INV-006) in cf2adeb, PHASE-03 (absolute severity scoring, R/severity_scoring.R, docs/scoring_anchors.md, stress_severity_score) in b712a2d, and PHASE-04 (single golden refreeze to 0.4.0, re-pinned golden tests, non-degeneracy guards, roxygen metadata) landed in this commit; PHASE-05 (intake contract fixes) and PHASE-06 (coverage and reconciliation report) are not started"
 request: "Wave 2 'Contracts & Units' — byte-identity CI gate, loanbook units rescale, anchored absolute scores, golden refreeze, intake contract fixes, coverage & reconciliation report"
 plan_type: "multi-phase"
 research_inputs:
@@ -503,16 +503,16 @@ the golden tests to values that are no longer tautologies, and land it all as
 one reviewable refreeze commit whose diff is fully explained.
 
 **Tasks**
-- [ ] TASK-04-01: Regenerate MCB from a clean tree with data generation enabled, so the rescaled loanbook is actually rewritten: `Rscript scripts/pipeline_refresh.R --full`.
-- [ ] TASK-04-02: Regenerate the Saigon Delta Bank engagement: `Rscript scripts/run_engagement.R --config engagements/sdb-rehearsal/engagement_config.json`. SDB's loanbook is already in true VND so its `exposure_vnd` values must **not** change; only its score columns should move.
-- [ ] TASK-04-03: Classify the full diff before committing anything: `Rscript tools/verify_refactor.R --skip-refresh`. Capture the DRIFT list verbatim into the commit message body. Every drifting file must be attributable to PHASE-02's rescale or PHASE-03's rescoring; anything else is a bug to fix before committing.
-- [ ] TASK-04-04: Re-pin `tests/testthat/test_golden_numbers.R`. Keep the row count and the three borrower-name assertions. Replace the three `composite_score` assertions with the newly computed values at `tolerance = 1e-4`, and add a comment recording that these are now absolute severity composites from `docs/scoring_anchors.md` and are therefore falsifiable — the previous `1.0` held for any input.
-- [ ] TASK-04-05: Add a non-degeneracy assertion to `tests/testthat/test_golden_numbers.R`: `expect_true(all(ep$composite_score > 0 & ep$composite_score < 1))`, with a comment explaining that this is the regression guard against a min-max normalization being reintroduced anywhere upstream.
-- [ ] TASK-04-06: Re-pin `tests/testthat/test_sdb_engagement.R` line 63 the same way, and add the same non-degeneracy assertion for the SDB fixture.
-- [ ] TASK-04-07: Add a golden assertion that the two banks' top composite scores now **differ**: assert `abs(mcb_top - sdb_top) > 0.01`, with a comment that under min-max both were exactly 1.0. Place it in `tests/testthat/test_golden_numbers.R`, guarded by `skip_if_not(file.exists(...))` for the SDB path in the same style the existing tests use.
-- [ ] TASK-04-08: Update `NEWS.md` with a `# pactatrisk 0.4.0` section describing the units fix, the absolute scoring change, the CI gate, and the intake contract work. Bump `Version:` in `DESCRIPTION` to `0.4.0`.
-- [ ] TASK-04-09: Regenerate the roxygen-derived package metadata so the new exports are declared: `Rscript -e "roxygen2::roxygenise()"`. Confirm `NAMESPACE` gains `format_vnd_full`, `format_vnd_bn`, `vnd_to_billion`, `severity_from_anchors`, `severity_alignment`, `severity_trisk`, `severity_exposure`, and `alignment_basis_for_sector`.
-- [ ] TASK-04-10: Commit everything as one commit whose message names both causes and includes the DRIFT list from TASK-04-03.
+- [x] TASK-04-01: Regenerate MCB from a clean tree with data generation enabled, so the rescaled loanbook is actually rewritten: `Rscript scripts/pipeline_refresh.R --full`.
+- [x] TASK-04-02: Regenerate the Saigon Delta Bank engagement: `Rscript scripts/run_engagement.R --config engagements/sdb-rehearsal/engagement_config.json`. SDB's loanbook is already in true VND so its `exposure_vnd` values must **not** change; only its score columns should move.
+- [x] TASK-04-03: Classify the full diff before committing anything: `Rscript tools/verify_refactor.R --skip-refresh`. Capture the DRIFT list verbatim into the commit message body. Every drifting file must be attributable to PHASE-02's rescale or PHASE-03's rescoring; anything else is a bug to fix before committing.
+- [x] TASK-04-04: Re-pin `tests/testthat/test_golden_numbers.R`. Keep the row count and the three borrower-name assertions. Replace the three `composite_score` assertions with the newly computed values at `tolerance = 1e-4`, and add a comment recording that these are now absolute severity composites from `docs/scoring_anchors.md` and are therefore falsifiable — the previous `1.0` held for any input.
+- [x] TASK-04-05: Add a non-degeneracy assertion to `tests/testthat/test_golden_numbers.R`: `expect_true(all(ep$composite_score > 0 & ep$composite_score < 1))`, with a comment explaining that this is the regression guard against a min-max normalization being reintroduced anywhere upstream.
+- [x] TASK-04-06: Re-pin `tests/testthat/test_sdb_engagement.R` line 63 the same way, and add the same non-degeneracy assertion for the SDB fixture.
+- [x] TASK-04-07: Add a golden assertion that the two banks' top composite scores now **differ**: assert `abs(mcb_top - sdb_top) > 0.01`, with a comment that under min-max both were exactly 1.0. Place it in `tests/testthat/test_golden_numbers.R`, guarded by `skip_if_not(file.exists(...))` for the SDB path in the same style the existing tests use.
+- [x] TASK-04-08: Update `NEWS.md` with a `# pactatrisk 0.4.0` section describing the units fix, the absolute scoring change, the CI gate, and the intake contract work. Bump `Version:` in `DESCRIPTION` to `0.4.0`.
+- [x] TASK-04-09: Regenerate the roxygen-derived package metadata so the new exports are declared: `Rscript -e "roxygen2::roxygenise()"`. Confirm `NAMESPACE` gains `format_vnd_full`, `format_vnd_bn`, `vnd_to_billion`, `severity_from_anchors`, `severity_alignment`, `severity_trisk`, `severity_exposure`, and `alignment_basis_for_sector`.
+- [x] TASK-04-10: Commit everything as one commit whose message names both causes and includes the DRIFT list from TASK-04-03.
 
 **File Changes**
 - `data/vietnam_loanbook.csv`, `synthesis_output/vietnam/02_vn_matched_prioritized.csv`, `synthesis_output/prioritization/sector_priority_ranking.csv`, `synthesis_output/prioritization/sector_priority_detail.csv`, `output/engagement/engagement_priority.csv`, `dashboard/data/pacta/02_vn_matched_prioritized.csv`, `dashboard/data/trisk/*/top_borrowers_alignment_trisk.csv`, `synthesis_output/trisk/*_demo/top_borrowers_alignment_trisk.csv`, `engagements/sdb-rehearsal/output/engagement/engagement_priority.csv`, `engagements/sdb-rehearsal/output/prioritization/sector_priority_ranking.csv` (modify, all regenerated — never hand-edited).
@@ -536,13 +536,13 @@ None — no code interfaces change in this phase.
 - PHASE-02 and PHASE-03 both complete.
 
 **Exit Criteria**
-- [ ] `git status --porcelain` is empty after the refreeze commit.
-- [ ] `Rscript tools/verify_refactor.R` prints `BYTE-IDENTITY PASS` on the committed tree.
-- [ ] `Rscript tools/verify_refactor.R --invariants` prints `INVARIANTS PASS` including `[PASS] INV-006`.
-- [ ] Full R suite `FAIL 0`; full Python suite `58 passed`.
-- [ ] `DESCRIPTION` reads `Version: 0.4.0` and `NEWS.md` has a `0.4.0` section.
-- [ ] `dashboard/data/trisk/grid/*/borrower_results.parquet` are unmodified: `git diff --name-only -- dashboard/data/trisk/grid` returns empty output.
-- [ ] The commit message lists every drifting file with its cause.
+- [x] `git status --porcelain` is empty after the refreeze commit.
+- [x] `Rscript tools/verify_refactor.R` prints `BYTE-IDENTITY PASS` on the committed tree.
+- [x] `Rscript tools/verify_refactor.R --invariants` prints `INVARIANTS PASS` including `[PASS] INV-006`.
+- [x] Full R suite `FAIL 0`; full Python suite `58 passed`.
+- [x] `DESCRIPTION` reads `Version: 0.4.0` and `NEWS.md` has a `0.4.0` section.
+- [x] `dashboard/data/trisk/grid/*/borrower_results.parquet` are unmodified: `git diff --name-only -- dashboard/data/trisk/grid` returns empty output.
+- [x] The commit message lists every drifting file with its cause.
 
 **Phase Risks**
 - **RISK-04-01:** `--full` reruns `scripts/generate_vietnam_data.R`, which also regenerates the ABCD, scenarios, and TRISK input CSVs under `data/`. If any of those change, `grid_input_fingerprint()` changes and the whole 243-cell grid regenerates for all three sectors (roughly 30 minutes) and would then need committing. Mitigation: before running `--full`, confirm that PHASE-02 touched only `make_loan()` and the two display expressions. After the run, immediately check `git diff --name-only -- data/` and confirm only `vietnam_loanbook.csv` appears. If a TRISK input file changed, revert and find the leak.
@@ -745,9 +745,9 @@ tell you your coverage" a concrete offer.
 
 ## Suggested Next Step
 
-Execute PHASE-01. It changes no analysis code, is independently valuable, and
-establishes the gate that makes every subsequent phase's numeric change provable.
-Confirm its exit criteria — in particular the negative control, which must
-produce `exit=1` and then leave `git status --porcelain` empty — before starting
-PHASE-02. PHASE-05 has no dependency on PHASE-02 through PHASE-04 and may be run
-in parallel by a second engineer if desired, though PHASE-06 must follow it.
+Execute PHASE-05. The PHASE-04 refreeze has landed, so the intake contract
+work can proceed on top of a stable, byte-identity-gated tree. PHASE-05 has
+no dependency on PHASE-02 through PHASE-04 in code; its expected downstream
+churn is a second, smaller refreeze scoped to `engagements/sdb-rehearsal/`
+(see RISK-05-01), followed by PHASE-06's coverage report which consumes its
+new `validation_warnings.csv`.
