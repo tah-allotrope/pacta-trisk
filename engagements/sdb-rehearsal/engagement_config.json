@@ -7,7 +7,8 @@
     "scenario_ms_csv": "data/scenarios/pdp8-2023/vietnam_scenario_ms.csv",
     "scenario_co2_csv": "data/scenarios/pdp8-2023/vietnam_scenario_co2.csv",
     "region_isos_csv": "data/vietnam_region_isos.csv",
-    "raw_loanbook_csv": "data/fixtures/unseen_bank_loanbook.csv"
+    "raw_loanbook_csv": "data/fixtures/unseen_bank_loanbook.csv",
+    "fx_rate_usd_vnd": 26300
   },
   "trisk_sectors": ["power", "cement", "steel"],
   "run_grid": false,

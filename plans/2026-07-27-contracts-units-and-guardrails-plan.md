@@ -1,7 +1,7 @@
----
+﻿---
 title: "Wave 2 — Contracts, Units, and Guard Rails"
 date: "2026-07-27"
-status: "open — PHASE-01 (byte-identity CI gate + refresh drift gate) landed in 994a1af, PHASE-02 (true VND, R/format_money.R, INV-006) in cf2adeb, PHASE-03 (absolute severity scoring, R/severity_scoring.R, docs/scoring_anchors.md, stress_severity_score) in b712a2d, and PHASE-04 (single golden refreeze to 0.4.0, re-pinned golden tests, non-degeneracy guards, roxygen metadata) in e1825be; PHASE-05 (intake contract fixes) and PHASE-06 (coverage and reconciliation report) are not started — verified 2026-08-07: scripts/generate_coverage_report.R absent and scripts/intake_validate_and_map.R has no add_warning/convert_to_vnd/map_sector_code/fx_rate_usd_vnd"
+status: "complete — PHASE-01 (byte-identity CI gate + refresh drift gate) landed in 994a1af, PHASE-02 (true VND, R/format_money.R, INV-006) in cf2adeb, PHASE-03 (absolute severity scoring, R/severity_scoring.R, docs/scoring_anchors.md, stress_severity_score) in b712a2d, PHASE-04 (single golden refreeze to 0.4.0, re-pinned golden tests, non-degeneracy guards, roxygen metadata) in e1825be, PHASE-05 (intake contract fixes: two-tier error/warning model, widened sector map incl. D3510->power, FX-at-intake, validation_warnings.csv) and PHASE-06 (scripts/generate_coverage_report.R, coverage_report orchestrator step, tracked coverage_metrics.json + validation_warnings.csv, SDB second small refreeze) landed in the wave-completion commit — verified 2026-08-08: scripts/generate_coverage_report.R exists, scripts/intake_validate_and_map.R has add_warning/convert_to_vnd/map_sector_code/fx_rate_usd_vnd, SDB intake produces 34 normalized rows (up from 24), full R suite FAIL 0 / PASS 404"
 request: "Wave 2 'Contracts & Units' — byte-identity CI gate, loanbook units rescale, anchored absolute scores, golden refreeze, intake contract fixes, coverage & reconciliation report"
 plan_type: "multi-phase"
 research_inputs:
@@ -557,14 +557,14 @@ Make `scripts/intake_validate_and_map.R` accept the sector codes and currencies
 client's loanbook without that removal being visible and quantified.
 
 **Tasks**
-- [ ] TASK-05-01: Introduce a two-tier outcome model in `scripts/intake_validate_and_map.R`. Keep the existing `add_error()` for genuine schema violations that make a row unusable (missing counterparty name, non-numeric exposure, duplicate row). Add `add_warning(row, column, message, classification)` for conditions that leave the row usable but reduced in scope. **Errors drop the row; warnings never do.**
-- [ ] TASK-05-02: Reclassify the out-of-scope sector-code condition (currently line ~146) from error to warning with classification `"sector_out_of_scope"`. The row is retained in `normalized_loanbook.csv` with `sector_classification_direct_loantaker` set to the normalized code and PACTA sector `"not in scope"`, so downstream exposure accounting can see it. This matches `intake/SCHEMA.md` line 51, which already says such codes are "classified as not in scope".
-- [ ] TASK-05-03: Widen the sector mapping. Replace the six-entry `known_isic` vector (line ~137) and the six-row `vsic_to_pacta` tribble (line ~185) with a single source of truth containing, at minimum: `3510`, `35101`, `35102`, `35103`, `3511` → `power`; `2910`, `29101`, `29102` → `automotive`; `2394`, `23941`, `23942` → `cement`; `2410`, `24101`, `24102` → `steel`; `0510`, `05101` → `coal`; `0610`, `0620`, `06101` → `oil and gas`. Derive `known_isic` from that table rather than maintaining two lists. Zero-padding must not corrupt 5-digit VSIC codes — pad to 4 only when the code has fewer than 4 digits.
-- [ ] TASK-05-04: Handle non-VND currency. Add an optional `inputs.fx_rate_usd_vnd` key to `.default_engagement_config()` in `R/engagement_config.R` (default `NULL`) and to `.validate_engagement_config()` (when present, must be a single positive finite number; when empty in any of the `NULL` / `character(0)` / `list()` shapes, treat as not configured — the same round-trip hazard the existing `raw_loanbook_csv` and `row_count_files` checks already guard against). Add a `--fx-rate-usd-vnd <number>` CLI flag to `scripts/intake_validate_and_map.R` and pass it through from `scripts/run_engagement.R`'s intake step when the config sets it.
-- [ ] TASK-05-05: Implement the conversion. When a row's `currency` is `USD` and a rate is available, set `loan_size_outstanding = exposure_vnd * fx_rate_usd_vnd`, set `loan_size_outstanding_currency = "VND"`, and record a warning with classification `"fx_converted"`. When the currency is neither `VND` nor `USD`, record a warning with classification `"unsupported_currency"`, retain the row, and set exposure to `NA` so it is visibly excluded from money totals rather than silently counted at the wrong scale. When any non-VND row exists and no rate is configured, print a message naming `inputs.fx_rate_usd_vnd` and exit non-zero **after** writing all output files, so the operator gets the full diagnostic rather than a bare failure.
-- [ ] TASK-05-06: Write `validation_warnings.csv` alongside the existing `validation_errors.csv`, with columns `row`, `column`, `classification`, `message`. Extend `validation_summary.txt` to report both counts and to break warnings down by classification.
-- [ ] TASK-05-07: Reconcile `intake/SCHEMA.md` with the implementation in both directions. Document the two-tier error/warning model and the exact list of conditions in each tier; list every accepted sector code from TASK-05-03; state that USD is accepted only when `inputs.fx_rate_usd_vnd` is configured, and that conversion happens once at intake; and keep the "Units" subsection added in PHASE-02.
-- [ ] TASK-05-08: Extend `tests/testthat/test_intake_fixture.R` with the cases below.
+- [x] TASK-05-01: Introduce a two-tier outcome model in `scripts/intake_validate_and_map.R`. Keep the existing `add_error()` for genuine schema violations that make a row unusable (missing counterparty name, non-numeric exposure, duplicate row). Add `add_warning(row, column, message, classification)` for conditions that leave the row usable but reduced in scope. **Errors drop the row; warnings never do.**
+- [x] TASK-05-02: Reclassify the out-of-scope sector-code condition (currently line ~146) from error to warning with classification `"sector_out_of_scope"`. The row is retained in `normalized_loanbook.csv` with `sector_classification_direct_loantaker` set to the normalized code and PACTA sector `"not in scope"`, so downstream exposure accounting can see it. This matches `intake/SCHEMA.md` line 51, which already says such codes are "classified as not in scope".
+- [x] TASK-05-03: Widen the sector mapping. Replace the six-entry `known_isic` vector (line ~137) and the six-row `vsic_to_pacta` tribble (line ~185) with a single source of truth containing, at minimum: `3510`, `35101`, `35102`, `35103`, `3511` → `power`; `2910`, `29101`, `29102` → `automotive`; `2394`, `23941`, `23942` → `cement`; `2410`, `24101`, `24102` → `steel`; `0510`, `05101` → `coal`; `0610`, `0620`, `06101` → `oil and gas`. Derive `known_isic` from that table rather than maintaining two lists. Zero-padding must not corrupt 5-digit VSIC codes — pad to 4 only when the code has fewer than 4 digits.
+- [x] TASK-05-04: Handle non-VND currency. Add an optional `inputs.fx_rate_usd_vnd` key to `.default_engagement_config()` in `R/engagement_config.R` (default `NULL`) and to `.validate_engagement_config()` (when present, must be a single positive finite number; when empty in any of the `NULL` / `character(0)` / `list()` shapes, treat as not configured — the same round-trip hazard the existing `raw_loanbook_csv` and `row_count_files` checks already guard against). Add a `--fx-rate-usd-vnd <number>` CLI flag to `scripts/intake_validate_and_map.R` and pass it through from `scripts/run_engagement.R`'s intake step when the config sets it.
+- [x] TASK-05-05: Implement the conversion. When a row's `currency` is `USD` and a rate is available, set `loan_size_outstanding = exposure_vnd * fx_rate_usd_vnd`, set `loan_size_outstanding_currency = "VND"`, and record a warning with classification `"fx_converted"`. When the currency is neither `VND` nor `USD`, record a warning with classification `"unsupported_currency"`, retain the row, and set exposure to `NA` so it is visibly excluded from money totals rather than silently counted at the wrong scale. When any non-VND row exists and no rate is configured, print a message naming `inputs.fx_rate_usd_vnd` and exit non-zero **after** writing all output files, so the operator gets the full diagnostic rather than a bare failure.
+- [x] TASK-05-06: Write `validation_warnings.csv` alongside the existing `validation_errors.csv`, with columns `row`, `column`, `classification`, `message`. Extend `validation_summary.txt` to report both counts and to break warnings down by classification.
+- [x] TASK-05-07: Reconcile `intake/SCHEMA.md` with the implementation in both directions. Document the two-tier error/warning model and the exact list of conditions in each tier; list every accepted sector code from TASK-05-03; state that USD is accepted only when `inputs.fx_rate_usd_vnd` is configured, and that conversion happens once at intake; and keep the "Units" subsection added in PHASE-02.
+- [x] TASK-05-08: Extend `tests/testthat/test_intake_fixture.R` with the cases below.
 
 **File Changes**
 - `scripts/intake_validate_and_map.R` (modify): the two-tier outcome model, the widened sector table, FX handling, the new warnings output. Leave the file-reading fallback (UTF-8 then latin1), the `--anonymize` pseudonym path, `normalize_vn_name()` usage, and the match-preview block unchanged.
@@ -601,12 +601,12 @@ client's loanbook without that removal being visible and quantified.
 - PHASE-01. Independent of PHASE-02, PHASE-03, and PHASE-04.
 
 **Exit Criteria**
-- [ ] `Rscript -e "testthat::test_file('tests/testthat/test_intake_fixture.R')"` passes with zero failures.
-- [ ] Re-running the SDB intake produces at least 30 normalized rows, up from 24, with the `D3510` rows mapped to `power`.
-- [ ] `intake/SCHEMA.md` and `scripts/intake_validate_and_map.R` agree on every accepted sector code and on the currency policy — check by listing the codes in each and diffing them.
-- [ ] `validation_warnings.csv` is written on every intake run, even when empty.
-- [ ] No condition that `intake/SCHEMA.md` describes as a classification is implemented as a row-dropping error.
-- [ ] Full R suite `FAIL 0`.
+- [x] `Rscript -e "testthat::test_file('tests/testthat/test_intake_fixture.R')"` passes with zero failures.
+- [x] Re-running the SDB intake produces at least 30 normalized rows, up from 24, with the `D3510` rows mapped to `power`.
+- [x] `intake/SCHEMA.md` and `scripts/intake_validate_and_map.R` agree on every accepted sector code and on the currency policy — check by listing the codes in each and diffing them.
+- [x] `validation_warnings.csv` is written on every intake run, even when empty.
+- [x] No condition that `intake/SCHEMA.md` describes as a classification is implemented as a row-dropping error.
+- [x] Full R suite `FAIL 0`.
 
 **Phase Risks**
 - **RISK-05-01:** Widening the sector map changes SDB's normalized loanbook, which is a tracked golden fixture asserted at `nrow == 24L` and `ncol == 13L` in `tests/testthat/test_sdb_engagement.R` lines 46-49. That test will fail. Mitigation: this is expected. Re-pin `nrow` to the new count in the same commit, keep the `ncol == 13L` assertion (the normalized schema is unchanged), and regenerate `engagements/sdb-rehearsal/intake/normalized_loanbook.csv` plus the downstream SDB artifacts. Because PHASE-04's refreeze has already landed, this is a second, separate, smaller refreeze scoped to `engagements/sdb-rehearsal/` — that is acceptable and does not violate the batching rule, which governs the MCB public snapshot.
@@ -623,14 +623,14 @@ coverage. This is the artifact that makes "send us your loanbook and we will
 tell you your coverage" a concrete offer.
 
 **Tasks**
-- [ ] TASK-06-01: Create `scripts/generate_coverage_report.R`, a CLI script following the same conventions as `scripts/generate_validation_report.R`: `source("R/engagement_config.R")`, accept `--config`, `--intake-dir`, and `--output`, and render a self-contained HTML file using `R/report_toolkit.R`'s `report_css()` and `write_html_report()`.
-- [ ] TASK-06-02: Compute the reconciliation table. Read the raw submitted loanbook (the engagement's `inputs$raw_loanbook_csv`), `<intake-dir>/normalized_loanbook.csv`, `<intake-dir>/validation_errors.csv`, and `<intake-dir>/validation_warnings.csv`. Report, in both row counts and VND: total submitted; total normalized; total dropped by hard error, broken down by error column; total retained-with-warning, broken down by classification. Every money figure must render through `format_vnd_full()` and `format_vnd_bn()` from `R/format_money.R`.
-- [ ] TASK-06-03: Compute ABCD coverage. Join the normalized loanbook's counterparty names against the engagement's `inputs$abcd_csv` using `normalize_vn_name()` from `R/matching_helpers.R`, and report the share of normalized exposure (in VND and as a percentage) whose counterparty resolves to an ABCD company, broken down by PACTA sector. Rows with no ABCD match are listed by name and exposure so an operator can see exactly which counterparties to chase.
-- [ ] TASK-06-04: Write a machine-readable sidecar `coverage_metrics.json` next to the HTML, with keys `submitted_rows`, `submitted_vnd`, `normalized_rows`, `normalized_vnd`, `dropped_rows`, `dropped_vnd`, `warned_rows`, `warned_vnd`, `abcd_covered_vnd`, `abcd_coverage_pct`, and `by_sector` (an object keyed by PACTA sector). This is what a future executive-summary generator and the pipeline manifest will consume.
-- [ ] TASK-06-05: Add the step to `scripts/run_engagement.R`'s `build_step_list()`. Insert it immediately after the existing `validation_report` step, inside the same `if (run_intake)` branch, named `coverage_report`, with args `--config <effective_config_path> --intake-dir <intake_dir> --output <reports_dir>/Coverage_Reconciliation_Report.html`.
-- [ ] TASK-06-06: Track the SDB fixture. Add `!engagements/*/intake/validation_warnings.csv` and `!engagements/*/intake/coverage_metrics.json` to the `.gitignore` allow-list next to the existing `!engagements/*/intake/normalized_loanbook.csv` line, so the reconciliation numbers become a durable regression fixture. Keep the HTML itself ignored (it carries a generated timestamp) by leaving `engagements/*/reports/` ignored.
-- [ ] TASK-06-07: Add `tests/testthat/test_coverage_report.R` asserting the arithmetic identities below against the SDB fixture.
-- [ ] TASK-06-08: Document the new artifact in `README.md`'s "Running a client engagement" section and in `docs/outputs_layer.md`.
+- [x] TASK-06-01: Create `scripts/generate_coverage_report.R`, a CLI script following the same conventions as `scripts/generate_validation_report.R`: `source("R/engagement_config.R")`, accept `--config`, `--intake-dir`, and `--output`, and render a self-contained HTML file using `R/report_toolkit.R`'s `report_css()` and `write_html_report()`.
+- [x] TASK-06-02: Compute the reconciliation table. Read the raw submitted loanbook (the engagement's `inputs$raw_loanbook_csv`), `<intake-dir>/normalized_loanbook.csv`, `<intake-dir>/validation_errors.csv`, and `<intake-dir>/validation_warnings.csv`. Report, in both row counts and VND: total submitted; total normalized; total dropped by hard error, broken down by error column; total retained-with-warning, broken down by classification. Every money figure must render through `format_vnd_full()` and `format_vnd_bn()` from `R/format_money.R`.
+- [x] TASK-06-03: Compute ABCD coverage. Join the normalized loanbook's counterparty names against the engagement's `inputs$abcd_csv` using `normalize_vn_name()` from `R/matching_helpers.R`, and report the share of normalized exposure (in VND and as a percentage) whose counterparty resolves to an ABCD company, broken down by PACTA sector. Rows with no ABCD match are listed by name and exposure so an operator can see exactly which counterparties to chase.
+- [x] TASK-06-04: Write a machine-readable sidecar `coverage_metrics.json` next to the HTML, with keys `submitted_rows`, `submitted_vnd`, `normalized_rows`, `normalized_vnd`, `dropped_rows`, `dropped_vnd`, `warned_rows`, `warned_vnd`, `abcd_covered_vnd`, `abcd_coverage_pct`, and `by_sector` (an object keyed by PACTA sector). This is what a future executive-summary generator and the pipeline manifest will consume.
+- [x] TASK-06-05: Add the step to `scripts/run_engagement.R`'s `build_step_list()`. Insert it immediately after the existing `validation_report` step, inside the same `if (run_intake)` branch, named `coverage_report`, with args `--config <effective_config_path> --intake-dir <intake_dir> --output <reports_dir>/Coverage_Reconciliation_Report.html`.
+- [x] TASK-06-06: Track the SDB fixture. Add `!engagements/*/intake/validation_warnings.csv` and `!engagements/*/intake/coverage_metrics.json` to the `.gitignore` allow-list next to the existing `!engagements/*/intake/normalized_loanbook.csv` line, so the reconciliation numbers become a durable regression fixture. Keep the HTML itself ignored (it carries a generated timestamp) by leaving `engagements/*/reports/` ignored.
+- [x] TASK-06-07: Add `tests/testthat/test_coverage_report.R` asserting the arithmetic identities below against the SDB fixture.
+- [x] TASK-06-08: Document the new artifact in `README.md`'s "Running a client engagement" section and in `docs/outputs_layer.md`.
 
 **File Changes**
 - `scripts/generate_coverage_report.R` (create).
@@ -660,12 +660,12 @@ tell you your coverage" a concrete offer.
 - PHASE-02's `R/format_money.R` for all money rendering.
 
 **Exit Criteria**
-- [ ] `Rscript -e "testthat::test_file('tests/testthat/test_coverage_report.R')"` passes with zero failures.
-- [ ] The SDB engagement produces `Coverage_Reconciliation_Report.html` and `coverage_metrics.json`, and the JSON's row and money identities hold.
-- [ ] `engagements/sdb-rehearsal/intake/coverage_metrics.json` and `validation_warnings.csv` are tracked: `git ls-files engagements/sdb-rehearsal/intake/` lists all three files.
-- [ ] `Rscript scripts/run_engagement.R --config engagements/mcb-demo/engagement_config.json --dry-run` still succeeds and does **not** include a `coverage_report` step, because `mcb-demo` does not configure a raw loanbook and therefore does not run intake.
-- [ ] Full R suite `FAIL 0`; full Python suite `58 passed`.
-- [ ] `Rscript tools/verify_refactor.R` prints `BYTE-IDENTITY PASS` — this phase must not perturb the MCB public snapshot at all.
+- [x] `Rscript -e "testthat::test_file('tests/testthat/test_coverage_report.R')"` passes with zero failures.
+- [x] The SDB engagement produces `Coverage_Reconciliation_Report.html` and `coverage_metrics.json`, and the JSON's row and money identities hold.
+- [x] `engagements/sdb-rehearsal/intake/coverage_metrics.json` and `validation_warnings.csv` are tracked: `git ls-files engagements/sdb-rehearsal/intake/` lists all three files.
+- [x] `Rscript scripts/run_engagement.R --config engagements/mcb-demo/engagement_config.json --dry-run` still succeeds and does **not** include a `coverage_report` step, because `mcb-demo` does not configure a raw loanbook and therefore does not run intake.
+- [x] Full R suite `FAIL 0`; full Python suite `58 passed`.
+- [x] `Rscript tools/verify_refactor.R` prints `BYTE-IDENTITY PASS` — this phase must not perturb the MCB public snapshot at all.
 
 **Phase Risks**
 - **RISK-06-01:** Adding a step to `run_engagement.R` changes the step list, and `tests/testthat/test_step_runner.R` line 167 asserts `expect_equal(delegated_steps, direct_steps)` — that `scripts/pipeline_refresh.R`'s delegated step list matches a direct `run_engagement.R` invocation. Mitigation: the new step sits inside the `if (run_intake)` branch and `mcb-demo` configures no raw loanbook, so neither list changes and that assertion still holds. Re-read the whole file before editing and update any assertion that does move, in the same commit. MCB's `pipeline_manifest.json` is likewise unaffected, which is what the byte-identity exit criterion confirms.
@@ -745,9 +745,10 @@ tell you your coverage" a concrete offer.
 
 ## Suggested Next Step
 
-Execute PHASE-05. The PHASE-04 refreeze has landed, so the intake contract
-work can proceed on top of a stable, byte-identity-gated tree. PHASE-05 has
-no dependency on PHASE-02 through PHASE-04 in code; its expected downstream
-churn is a second, smaller refreeze scoped to `engagements/sdb-rehearsal/`
-(see RISK-05-01), followed by PHASE-06's coverage report which consumes its
-new `validation_warnings.csv`.
+This wave is complete: PHASE-05 (intake honors its published contract) and
+PHASE-06 (coverage & reconciliation report) both landed. The wave's single
+remaining thread is the dashboard-facing follow-up captured in the plan's
+out-of-scope list (intake wizard surfacing of `validation_warnings.csv` and
+`coverage_metrics.json`, and the executive-summary generator that PHASE-06's
+`coverage_metrics.json` was designed to feed), which belongs to a new plan
+rather than to this one.

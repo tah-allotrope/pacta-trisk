@@ -15,6 +15,7 @@ It reads only the existing committed snapshot — **no PACTA/TRISK model re-run 
 
 | File | Role |
 |---|---|
+| `scripts/generate_coverage_report.R` | PHASE-06 (Wave 2) — per-engagement coverage & reconciliation report. |
 | `scripts/engagement_scoring.R` | PHASE-01 — builds the canonical borrower priority table. |
 | `scripts/generate_engagement_letters.R` | PHASE-02 — renders per-borrower engagement letters. |
 | `scripts/generate_disclosure_pack.R` | PHASE-03 — renders the disclosure pack. |
@@ -23,6 +24,32 @@ It reads only the existing committed snapshot — **no PACTA/TRISK model re-run 
 | `templates/disclosure/disclosure_sections.md` | Editable TCFD/ISSB/Decision 263 narrative. |
 | `dashboard/lib/outputs.py` | Operator gating + R subprocess wrappers. |
 | `dashboard/pages/7_Outputs.py` | Operator-only dashboard page. |
+
+## Coverage & Reconciliation Report
+
+Every engagement that runs intake produces `scripts/generate_coverage_report.R`'s
+output: a **Coverage & Reconciliation Report** HTML plus a machine-readable
+sidecar `engagements/<slug>/intake/coverage_metrics.json` (tracked — it carries
+no timestamp, so it is byte-stable across runs). It answers, in both row counts
+and VND:
+
+- **Submitted vs normalized vs dropped** — the arithmetic identities
+  `submitted == normalized + dropped` hold for both rows and VND, so nothing
+  silently disappears from a client's loanbook.
+- **Dropped by hard error column** — which schema violations removed which
+  exposure.
+- **Retained-with-warning by classification** — out-of-scope sector codes
+  (`sector_out_of_scope`), USD rows converted at intake (`fx_converted`),
+  USD rows retained with NA exposure for want of a rate (`fx_rate_missing`),
+  and unsupported currencies (`unsupported_currency`). Warnings never drop a
+  row.
+- **ABCD asset-level coverage** — the share of normalized exposure whose
+  counterparty resolves to an ABCD company after diacritic normalization,
+  broken down by PACTA sector, with the unmatched counterparties listed by
+  name and exposure so an operator knows exactly who to chase.
+
+This is the artifact that makes "send us your loanbook and we will tell you
+your coverage" a concrete offer.
 
 ## Data flow
 

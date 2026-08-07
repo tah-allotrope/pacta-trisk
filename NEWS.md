@@ -1,3 +1,44 @@
+# pactatrisk 0.4.1
+
+Wave 2 "Contracts, Units, and Guard Rails" — completion: PHASE-05 (the intake
+validator now honors its own published contract) and PHASE-06 (a durable,
+money-denominated coverage & reconciliation report per engagement).
+
+- **Intake never silently deletes exposure.** `scripts/intake_validate_and_map.R`
+  now uses a two-tier outcome model: hard errors (missing name, non-numeric or
+  negative money, unparseable sector code, duplicates) still drop a row, but
+  every condition `intake/SCHEMA.md` describes as a classification is a
+  **warning that retains the row** and is written to `validation_warnings.csv`
+  (always written, even when empty; tracked for the SDB fixture). Out-of-scope
+  but well-formed sector codes are retained with PACTA sector `"not in scope"`
+  instead of being deleted.
+- **Widened sector map.** The six exact ISIC codes that previously rejected
+  `D3510` — the standard 4-digit class for electricity generation — are now
+  one table of 20 accepted codes covering both the ISIC Rev.4 parents and the
+  VSIC 2018 5-digit sub-classes (`3510`/`35101`-`35103` → power, etc.).
+  Zero-padding only ever pads codes shorter than 4 digits, so 5-digit VSIC
+  codes survive intact. Re-running the SDB fixture now yields **34** normalized
+  rows, up from 24, with the seven previously-dropped `D3510` power rows
+  retained.
+- **USD handled once, at intake.** A new optional `inputs.fx_rate_usd_vnd`
+  config key converts USD rows to VND at intake (`fx_converted` warning). When
+  no rate is configured, USD (and any other non-VND) rows are retained with
+  exposure set to `NA` — never silently dropped, never converted at a guessed
+  rate — and the intake exits non-zero naming the missing key after writing
+  every output.
+- **Coverage & reconciliation report.** `scripts/generate_coverage_report.R`
+  produces a self-contained HTML report plus a machine-readable, tracked
+  `coverage_metrics.json` per engagement that answers, in both row counts and
+  VND: submitted vs normalized vs dropped (with the identities
+  `submitted == normalized + dropped` holding for rows and money), dropped
+  exposure by error column, retained-with-warning by classification, and the
+  share of normalized exposure with ABCD asset-level coverage — broken down by
+  sector with unmatched counterparties listed by name and exposure.
+
+Verified: full R suite FAIL 0 / PASS 404, invariants INV-001..006 all PASS,
+SDB engagement exits 0 with `coverage_report` in its step list, MCB public
+snapshot byte-identity intact.
+
 # pactatrisk 0.4.0
 
 Wave 2 "Contracts, Units, and Guard Rails": fixes the two client-facing

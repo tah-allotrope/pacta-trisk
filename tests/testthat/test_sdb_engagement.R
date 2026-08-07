@@ -45,10 +45,17 @@ test_that("SDB normalized loanbook has expected shape and currency", {
 
   expect_equal(ncol(nb), 13L,
                info = "normalized loanbook must carry the same 13 columns as MCB")
-  expect_equal(nrow(nb), 24L,
-               info = "SDB fixture yielded 24 clean intake rows")
+  # Wave 2 PHASE-05 (RISK-05-01): widening the sector map retained the seven
+  # previously-rejected D3510 power rows and the two USD rows (now converted at
+  # fx_rate_usd_vnd 26300), so the clean row count rose from 24 to 34.
+  expect_equal(nrow(nb), 34L,
+               info = "SDB fixture yields 34 clean intake rows after the PHASE-05 widening")
   expect_true(all(nb$loan_size_outstanding_currency == "VND"),
               info = "all SDB loanbook money must stay raw VND")
+  # PHASE-05: the D3510 rows must survive intake and be mapped to power.
+  expect_true("3510" %in% nb$sector_classification_direct_loantaker,
+              info = "D3510 rows are retained with normalized code 3510")
+  expect_gt(sum(nb$sector_classification_direct_loantaker == "3510"), 0L)
 })
 
 test_that("SDB engagement priority has a rank-1 power borrower", {

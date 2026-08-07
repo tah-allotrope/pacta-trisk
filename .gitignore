@@ -57,9 +57,13 @@ engagements/*/output/disclosure/
 engagements/*/output/trisk/*/runs/
 engagements/*/output/trisk_inputs/
 
-# Per-engagement intake intermediates (only normalized_loanbook.csv is tracked).
+# Per-engagement intake intermediates (only the durable regression fixtures are
+# tracked: normalized_loanbook.csv, validation_warnings.csv, and
+# coverage_metrics.json -- Wave 2 PHASE-05/06).
 engagements/*/intake/*
 !engagements/*/intake/normalized_loanbook.csv
+!engagements/*/intake/validation_warnings.csv
+!engagements/*/intake/coverage_metrics.json
 
 # Per-engagement effective config copy.
 engagements/*/engagement_config.resolved.json

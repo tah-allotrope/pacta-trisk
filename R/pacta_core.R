@@ -31,7 +31,11 @@ pacta_load_inputs <- function(cfg) {
   # Check that the engagement's input CSVs exist (load_engagement_config()
   # already validated this, but keep the explicit check + message for anyone
   # running the analysis logic standalone with a hand-built cfg list).
+  # fx_rate_usd_vnd is a NUMBER, not a path (Wave 2 PHASE-05, ASM-006) -- it
+  # is a non-path value and must be skipped, or every config that sets a rate
+  # fails here with "Missing: 26300".
   required_files <- unlist(cfg$inputs, use.names = FALSE)
+  required_files <- required_files[!grepl("^[0-9.+-]+$", as.character(required_files))]
 
   missing <- required_files[!file.exists(required_files)]
   if (length(missing) > 0) {

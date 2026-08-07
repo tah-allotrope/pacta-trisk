@@ -107,6 +107,72 @@ test_that("a non-existent raw_loanbook_csv fails validation with the offending p
   expect_error(load_engagement_config(tmp), "does/not/exist.csv")
 })
 
+test_that("fx_rate_usd_vnd is accepted as a number and is not treated as a missing input file", {
+  # Wave 2 PHASE-05 (ASM-006): a number under `inputs` must be skipped by the
+  # "every input must exist" loop or every config that sets a rate fails with
+  # a confusing "input file(s) not found: 26300".
+  withr_wd <- setwd(root)
+  on.exit(setwd(withr_wd))
+
+  tmp <- tempfile(fileext = ".json")
+  writeLines(
+    '{"bank_name":"T","bank_slug":"t","inputs":{"fx_rate_usd_vnd":26300}}',
+    tmp
+  )
+  on.exit(unlink(tmp), add = TRUE)
+
+  cfg <- load_engagement_config(tmp)
+  expect_equal(cfg$inputs$fx_rate_usd_vnd, 26300)
+})
+
+test_that("a non-positive fx_rate_usd_vnd fails validation naming the key", {
+  withr_wd <- setwd(root)
+  on.exit(setwd(withr_wd))
+
+  tmp <- tempfile(fileext = ".json")
+  writeLines(
+    '{"bank_name":"T","bank_slug":"t","inputs":{"fx_rate_usd_vnd":-5}}',
+    tmp
+  )
+  on.exit(unlink(tmp), add = TRUE)
+
+  expect_error(load_engagement_config(tmp), "fx_rate_usd_vnd")
+})
+
+test_that("fx_rate_usd_vnd survives the jsonlite toJSON/read_json round-trip in every empty shape", {
+  # Wave 2 PHASE-05 Gotcha: NULL serializes to {}, character(0) to [] and both
+  # come back as an empty list() -- a validation that checks is.null() alone
+  # would fail on the *second* generation of a config. None of the empty shapes
+  # may error.
+  withr_wd <- setwd(root)
+  on.exit(setwd(withr_wd))
+
+  for (empty_shape in list(
+    NULL,
+    character(0),
+    list()
+  )) {
+    cfg <- .default_engagement_config()
+    cfg$bank_name <- "T"
+    cfg$bank_slug <- "t"
+    cfg$inputs$fx_rate_usd_vnd <- empty_shape
+    tmp <- tempfile(fileext = ".json")
+    writeLines(jsonlite::toJSON(cfg, auto_unbox = TRUE), tmp)
+    roundtripped <- jsonlite::read_json(tmp, simplifyVector = TRUE)
+    on.exit(unlink(tmp), add = TRUE)
+
+    expect_silent(.validate_engagement_config(roundtripped))
+  }
+})
+
+test_that("sdb-rehearsal config carries an fx rate for its USD fixture rows", {
+  withr_wd <- setwd(root)
+  on.exit(setwd(withr_wd))
+
+  cfg <- load_engagement_config("engagements/sdb-rehearsal/engagement_config.json")
+  expect_equal(cfg$inputs$fx_rate_usd_vnd, 26300)
+})
+
 test_that("a non-logical public_snapshot_allowed fails validation", {
   withr_wd <- setwd(root)
   on.exit(setwd(withr_wd))

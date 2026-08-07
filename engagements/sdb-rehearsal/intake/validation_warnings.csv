@@ -1,0 +1,4 @@
+row,column,classification,message
+31,sector_code,sector_out_of_scope,sector_code 'Z9999' (normalized 9999) is not in PACTA scope
+34,currency,fx_converted,exposure and credit limit converted from USD to VND at rate 26300
+35,currency,fx_converted,exposure and credit limit converted from USD to VND at rate 26300

@@ -35,7 +35,14 @@ suppressPackageStartupMessages({
       # this as the intake source, so an engagement config can reproduce its
       # own run without an out-of-band flag. NULL means "no raw loanbook
       # configured" — omitted from the "every input must exist" validation.
-      raw_loanbook_csv = NULL
+      raw_loanbook_csv = NULL,
+      # Optional: VND per 1 USD, for intake rows whose currency is USD
+      # (Wave 2 PHASE-05, ASM-006). NULL means "not configured" -- a USD row
+      # is then retained with exposure/credit limit set to NA and
+      # scripts/intake_validate_and_map.R exits non-zero naming this key.
+      # A number, not a path, so it is explicitly skipped (not file.exists()'d)
+      # in the "every input must exist" validation below.
+      fx_rate_usd_vnd = NULL
     ),
     trisk_sectors = c("power", "cement", "steel"),
     run_grid = TRUE,
@@ -114,6 +121,13 @@ suppressPackageStartupMessages({
     if (identical(name, "raw_loanbook_csv") && length(path) == 0) {
       next
     }
+    # fx_rate_usd_vnd is a NUMBER, not a path -- it must never reach
+    # file.exists() below (Wave 2 PHASE-05 Gotcha: without this skip branch
+    # every config that sets a rate fails validation with a confusing
+    # "input file(s) not found: 26300"). Validated for shape separately below.
+    if (identical(name, "fx_rate_usd_vnd")) {
+      next
+    }
     if (is.null(path) || !file.exists(path)) {
       missing_inputs <- c(missing_inputs, path)
     }
@@ -123,6 +137,20 @@ suppressPackageStartupMessages({
       "input file(s) not found:\n  %s",
       paste(missing_inputs, collapse = "\n  ")
     ))
+  }
+
+  # fx_rate_usd_vnd: optional; same jsonlite empty-value round-trip hazard as
+  # raw_loanbook_csv above (NULL / character(0) / list() all mean "not set").
+  # When present, must be a single positive finite number.
+  fx_rate <- cfg$inputs$fx_rate_usd_vnd
+  if (length(fx_rate) > 0) {
+    fx_rate_num <- suppressWarnings(as.numeric(fx_rate))
+    if (length(fx_rate_num) != 1 || is.na(fx_rate_num) || !is.finite(fx_rate_num) || fx_rate_num <= 0) {
+      problems <- c(problems, sprintf(
+        "inputs.fx_rate_usd_vnd must be a single positive number, got: %s",
+        paste(fx_rate, collapse = ", ")
+      ))
+    }
   }
 
   supported_sectors <- c("power", "cement", "steel")

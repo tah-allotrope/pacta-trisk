@@ -1,0 +1,39 @@
+{
+  "submitted_rows": 40,
+  "submitted_vnd": 3309750000000000,
+  "normalized_rows": 34,
+  "normalized_vnd": 3304070000000000,
+  "dropped_rows": 6,
+  "dropped_vnd": 5680000000000,
+  "warned_rows": 3,
+  "warned_vnd": 3287650000000000,
+  "abcd_covered_vnd": 14420000000000,
+  "abcd_coverage_pct": 0.4364,
+  "by_sector": {
+    "automotive": {
+      "exposure_vnd": 1974680000000000,
+      "covered_vnd": 1980000000000,
+      "coverage_pct": 0.1003
+    },
+    "power": {
+      "exposure_vnd": 1325530000000000,
+      "covered_vnd": 9810000000000,
+      "coverage_pct": 0.7401
+    },
+    "steel": {
+      "exposure_vnd": 2050000000000,
+      "covered_vnd": 1300000000000,
+      "coverage_pct": 63.4146
+    },
+    "cement": {
+      "exposure_vnd": 960000000000,
+      "covered_vnd": 630000000000,
+      "coverage_pct": 65.625
+    },
+    "not in scope": {
+      "exposure_vnd": 850000000000,
+      "covered_vnd": 700000000000,
+      "coverage_pct": 82.3529
+    }
+  }
+}

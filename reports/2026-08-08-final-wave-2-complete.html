@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Final Report :: Wave 2 — Contracts, Units &amp; Guard Rails: Complete</title>
+  <meta name="color-scheme" content="dark light">
+  <style>
+    :root {
+      --paper: #fbf7f1;
+      --paper-strong: #fffdf9;
+      --ink: #1f1912;
+      --ink-soft: #5f564c;
+      --line: #dccdb6;
+      --line-strong: #bfa37d;
+      --accent: #9d6b37;
+      --accent-soft: #efe4d0;
+      --accent-2: #3b6f76;
+      --green: #276749;
+      --red: #b03a2e;
+      --amber: #a06a15;
+      --shadow: 0 18px 40px rgba(49, 33, 16, 0.08);
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+      --page-width: 1040px;
+      --display-font: Georgia, "Times New Roman", serif;
+      --body-font: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --mono-font: "Cascadia Code", Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(157, 107, 55, 0.09), transparent 26%),
+        radial-gradient(circle at 88% 10%, rgba(59, 111, 118, 0.08), transparent 22%),
+        linear-gradient(180deg, #f7f1e7 0%, #fbf7f1 28%, #f6efe5 100%);
+      font-family: var(--body-font);
+      line-height: 1.65;
+      letter-spacing: 0.01em;
+    }
+
+    a { color: var(--accent-2); }
+
+    code, pre, .technical, .meta-chip, .stat-value, .stat-label, .eyebrow, .table-key {
+      font-family: var(--mono-font);
+    }
+
+    .page-shell {
+      width: min(var(--page-width), calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 28px 0 56px;
+    }
+
+    .hero {
+      padding: 34px;
+      border: 1px solid rgba(159, 123, 79, 0.28);
+      border-radius: 30px;
+      background:
+        linear-gradient(135deg, rgba(157, 107, 55, 0.1), transparent 34%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.86)),
+        var(--paper-strong);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.85fr);
+      gap: 24px;
+      align-items: end;
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .title {
+      margin: 0;
+      max-width: 18ch;
+      font-family: var(--display-font);
+      font-size: clamp(2.4rem, 4.4vw, 4rem);
+      line-height: 1.02;
+      letter-spacing: -0.03em;
+      text-wrap: balance;
+    }
+
+    .lede {
+      margin: 18px 0 0;
+      max-width: 62ch;
+      color: var(--ink-soft);
+      font-size: 1rem;
+    }
+
+    .takeaway {
+      margin-top: 22px;
+      padding: 18px 20px;
+      border-left: 4px solid var(--accent-2);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      background: rgba(59, 111, 118, 0.08);
+      color: #20373a;
+      font-size: 1.02rem;
+    }
+
+    .meta-grid { display: grid; gap: 12px; }
+
+    .meta-card, .section, .subcard, .empty-state {
+      border: 1px solid rgba(95, 72, 46, 0.12);
+      background: rgba(255, 253, 249, 0.88);
+      box-shadow: var(--shadow);
+    }
+
+    .meta-card { padding: 16px 18px; border-radius: var(--radius-md); }
+    .meta-label { color: var(--ink-soft); font-size: 0.76rem; letter-spacing: 0.14em; text-transform: uppercase; }
+    .meta-chip { margin-top: 8px; color: var(--accent); font-size: 1rem; font-weight: 700; word-break: break-word; }
+
+    .section {
+      margin-top: 22px;
+      padding: 24px;
+      border-radius: var(--radius-lg);
+    }
+
+    .section h2 {
+      margin: 0 0 4px;
+      font-family: var(--display-font);
+      font-size: 1.55rem;
+      letter-spacing: -0.01em;
+    }
+
+    .section h3 {
+      margin: 26px 0 10px;
+      font-size: 1.08rem;
+      letter-spacing: 0.01em;
+    }
+
+    .section .sub {
+      color: var(--ink-soft);
+      font-size: 0.92rem;
+      margin-bottom: 14px;
+    }
+
+    .subcard {
+      margin-top: 14px;
+      padding: 18px 20px;
+      border-radius: var(--radius-md);
+    }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+      margin: 18px 0;
+    }
+
+    .stat-card {
+      padding: 16px 18px;
+      border: 1px solid rgba(95, 72, 46, 0.14);
+      border-radius: var(--radius-md);
+      background: rgba(255, 253, 249, 0.95);
+    }
+
+    .stat-value { font-size: 1.7rem; font-weight: 800; color: var(--accent-2); }
+    .stat-label { font-size: 0.72rem; color: var(--ink-soft); letter-spacing: 0.12em; text-transform: uppercase; margin-top: 4px; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 0.9rem;
+    }
+
+    th {
+      text-align: left;
+      background: rgba(157, 107, 55, 0.12);
+      color: var(--ink);
+      padding: 9px 12px;
+      font-weight: 700;
+    }
+
+    td {
+      padding: 8px 12px;
+      border-top: 1px solid var(--line);
+      vertical-align: top;
+    }
+
+    tr:nth-child(even) td { background: rgba(157, 107, 55, 0.035); }
+
+    .pill {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+    .pill-ok { background: rgba(39, 103, 73, 0.14); color: var(--green); }
+    .pill-doing { background: rgba(160, 106, 21, 0.16); color: var(--amber); }
+    .pill-warn { background: rgba(176, 58, 46, 0.14); color: var(--red); }
+
+    .callout {
+      margin: 16px 0;
+      padding: 14px 18px;
+      border-radius: var(--radius-sm);
+      font-size: 0.93rem;
+      border-left: 4px solid var(--accent-2);
+      background: rgba(59, 111, 118, 0.07);
+    }
+    .callout-ok { border-left-color: var(--green); background: rgba(39, 103, 73, 0.07); }
+    .callout-warn { border-left-color: var(--amber); background: rgba(160, 106, 21, 0.08); }
+    .callout-red { border-left-color: var(--red); background: rgba(176, 58, 46, 0.07); }
+
+    ul, ol { padding-left: 22px; }
+    li { margin: 5px 0; }
+
+    .check-list { list-style: none; padding-left: 4px; }
+    .check-list li { padding-left: 26px; position: relative; }
+    .check-list li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: var(--green);
+      font-weight: 800;
+    }
+
+    .footer {
+      margin-top: 34px;
+      padding: 18px;
+      text-align: center;
+      color: var(--ink-soft);
+      font-size: 0.8rem;
+      border-top: 1px solid var(--line);
+    }
+
+    @media (max-width: 760px) {
+      .hero-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="page-shell">
+
+  <div class="hero">
+    <div class="hero-grid">
+      <div>
+        <p class="eyebrow">Final Report — Wave 2</p>
+        <h1 class="title">Contracts, Units &amp; Guard Rails</h1>
+        <p class="lede">
+          The wave is complete. This report is a client-shareable synthesis of the
+          full six-phase arc: the byte-identity CI gate, the loanbook units fix,
+          absolute anchored severity scoring, the golden refreeze to pactatrisk
+          0.4.1, the intake contract that finally honors its own published schema,
+          and the new money-denominated coverage &amp; reconciliation report.
+        </p>
+        <div class="takeaway">
+          One sentence: the platform now says what it means about money and about
+          risk — the public demo reads as ~USD 950M, scores are absolute (0.83
+          means the same thing for every bank in every refresh), and no client
+          loanbook row is ever silently deleted.
+        </div>
+      </div>
+      <div class="meta-grid">
+        <div class="meta-card">
+          <div class="meta-label">Status</div>
+          <div class="meta-chip"><span class="pill pill-ok">COMPLETE — 6/6 PHASES</span></div>
+        </div>
+        <div class="meta-card">
+          <div class="meta-label">Plan</div>
+          <div class="meta-chip">plans/2026-07-27-contracts-units-and-guardrails-plan.md</div>
+        </div>
+        <div class="meta-card">
+          <div class="meta-label">Version</div>
+          <div class="meta-chip">pactatrisk 0.4.1</div>
+        </div>
+        <div class="meta-card">
+          <div class="meta-label">Commits</div>
+          <div class="meta-chip">994a1af → this commit (see §Commits)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Executive Summary</h2>
+    <p class="sub">What was wrong, what shipped, and the proof that it worked.</p>
+
+    <p>
+      Wave 1 made the pipeline <em>reproducible</em>: cross-artifact invariants
+      run in CI and a byte-identity checker proves a run reproduces its committed
+      outputs. Wave 2 attacked the three defects that made the platform's output
+      <em>wrong</em> rather than merely incomplete.
+    </p>
+
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="stat-value">1,000,000×</div>
+        <div class="stat-label">Loanbook scale defect fixed</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">3→1</div>
+        <div class="stat-label">Min-max layers removed from composite scores</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">24→34</div>
+        <div class="stat-label">SDB intake rows retained (no more silent drops)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">408</div>
+        <div class="stat-label">R assertions passing (FAIL 0)</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="subcard">
+        <h3>1 · The money was on the wrong scale</h3>
+        <p>
+          The synthetic MCB loanbook was denominated in <strong>millions of VND</strong>
+          while every column, label, and document said <strong>VND</strong>. The public
+          demo portfolio therefore read as USD 950 instead of the ~USD 950M its own
+          pitch deck claims. A 1,000,000× rescale at the source
+          (<code>make_loan()</code>) put every engagement on the same whole-VND scale,
+          guarded by a new invariant (INV-006) that fails if any VND-declared loanbook
+          is implausibly small.
+        </p>
+      </div>
+      <div class="subcard">
+        <h3>2 · The scores were rank-relative</h3>
+        <p>
+          Priority scores were min-max normalized — up to three times over the same
+          quantity — so the top-ranked sector or borrower was <strong>always exactly
+          1.0</strong> and two structurally different banks produced identical score
+          patterns. Anchored absolute severity tables
+          (<code>docs/scoring_anchors.md</code>) replaced all three layers, so a score
+          means the same thing across sectors, banks, and refreshes.
+        </p>
+      </div>
+      <div class="subcard">
+        <h3>3 · The intake deleted client exposure</h3>
+        <p>
+          The intake validator rejected the sector codes and currencies its own
+          published schema advertised (<code>D3510</code> power rows, USD rows), and
+          errored rows vanished from <code>normalized_loanbook.csv</code> with nothing
+          reconciling submitted money against processed money. The two-tier
+          error/warning model, widened sector map, and one-at-intake FX conversion
+          closed the gap; the coverage report makes every retained/dropped/NA row
+          visible in VND.
+        </p>
+      </div>
+      <div class="subcard">
+        <h3>4 · The acceptance checks were not where we said they were</h3>
+        <p>
+          <code>CLAUDE.md</code> claimed both byte-identity and the invariants ran in
+          CI on every push. Only the invariants did. The wave's first phase made the
+          documents true: byte-identity now runs on every push and gates the weekly
+          auto-publish of the public snapshot, with an <code>allow_drift</code>
+          dispatch input as the documented escape hatch for a reviewed refreeze.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>The Defects, in Client Terms</h2>
+    <p class="sub">Each of these made a deliverable wrong, not just missing.</p>
+
+    <table>
+      <tr><th>Defect</th><th>Before</th><th>After</th></tr>
+      <tr>
+        <td><strong>Money scale</strong></td>
+        <td>MCB book read as ~USD 950; <code>exposure_vnd</code> column meant different things per engagement (factor 281,000 between MCB and SDB).</td>
+        <td>True VND everywhere; one shared formatter (<code>R/format_money.R</code>); MCB book is 25.02 trillion VND ≈ USD 950M.</td>
+      </tr>
+      <tr>
+        <td><strong>Score degeneracy</strong></td>
+        <td>Top sector and borrower always scored exactly 1.0; only the middle of three sectors carried information.</td>
+        <td>Absolute severities from documented anchor tables; MCB and SDB top scores now genuinely differ (0.911 vs 0.823); no composite equals 1.0 or 0.0 by construction.</td>
+      </tr>
+      <tr>
+        <td><strong>Intake data loss</strong></td>
+        <td>Seven <code>D3510</code> power rows and two USD rows silently dropped from the SDB rehearsal; USD rows hard-errored despite the schema advertising <code>VND</code> or <code>USD</code>.</td>
+        <td>All 40 submitted rows accounted for: 34 normalized (incl. the D3510 power rows), 6 dropped by hard error, 3 retained-with-warning. Nothing disappears.</td>
+      </tr>
+      <tr>
+        <td><strong>CI claims</strong></td>
+        <td>Byte-identity never ran in CI; the weekly auto-publish was gated only by tests whose numeric coverage included two tautologies.</td>
+        <td>Byte-identity runs on every push and gates the publish; golden tests re-pinned to falsifiable values plus non-degeneracy guards.</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>Phase-by-Phase Analysis</h2>
+    <p class="sub">All six phases of the wave, in dependency order.</p>
+
+    <div class="subcard">
+      <h3>Phase 1 — Byte-identity gate in CI and on the weekly publish <span class="pill pill-ok">DONE</span></h3>
+      <p>
+        A new <code>byte-identity</code> job in <code>ci.yml</code> runs
+        <code>tools/verify_refactor.R</code> on every push; <code>refresh.yml</code>
+        classifies the working tree (<code>--skip-refresh</code>) before it commits the
+        public snapshot, overridable only via <code>allow_drift: true</code>.
+        <code>CLAUDE.md</code> law 5 and <code>README.md</code> were corrected to match.
+        The negative-control (append a line, expect drift + exit 1) was proven in the
+        phase commit.
+      </p>
+      <ul class="check-list">
+        <li>Byte-identity runs in <code>ci.yml</code> on every push.</li>
+        <li>Drift gate inserted in <code>refresh.yml</code> before the commit step.</li>
+        <li><code>allow_drift</code> workflow-dispatch input documented as the escape hatch.</li>
+      </ul>
+    </div>
+
+    <div class="subcard">
+      <h3>Phase 2 — True VND everywhere, one money formatter, one new invariant <span class="pill pill-ok">DONE</span></h3>
+      <p>
+        <code>R/format_money.R</code> provides <code>format_vnd_full()</code>,
+        <code>format_vnd_bn()</code>, and <code>vnd_to_billion()</code>. The three
+        ad-hoc formatters (two of which printed a misleading <code>"(synthetic units)"</code>)
+        were deleted. <code>make_loan()</code> multiplies by the single constant
+        <code>VND_PER_MILLION = 1e6</code>. INV-006 (median VND-loan plausibility)
+        joined the invariant suite. Prose in the pitch-deck source, the README,
+        methodology docs, and interpretation notes was corrected to ~USD 950M.
+      </p>
+      <div class="callout callout-ok">
+        <strong>Ratio-invariance verified (ASM-002):</strong> rescaling every loan by the
+        same constant changed no PACTA market-share or SDA intensity output — the
+        committed ratio-based files were byte-identical after the rescale.
+      </div>
+    </div>
+
+    <div class="subcard">
+      <h3>Phase 3 — Absolute severity scores replacing min-max normalization <span class="pill pill-ok">DONE</span></h3>
+      <p>
+        <code>R/severity_scoring.R</code> implements clamped piecewise-linear severity
+        against four documented anchor tables (two alignment bases, TRISK loss, exposure
+        concentration) in <code>docs/scoring_anchors.md</code>. <code>normalise_01()</code>
+        and the two min-max blocks were deleted; the dashboard's
+        <code>stress_priority_score</code> sort key was deliberately preserved (ASM-004)
+        while a new absolute <code>stress_severity_score</code> was added alongside it.
+        A latent NA-propagation bug in <code>prioritize_sectors()</code> was fixed with an
+        explicit <code>stop()</code> naming unmapped sectors. New unit tests
+        (severity functions + <code>prioritize_sectors()</code> — previously one of 27
+        untested functions) and a degeneracy test with a single-sector config lock the
+        behavior in.
+      </p>
+      <ul class="check-list">
+        <li>No <code>normalise_01</code> left; no <code>rescale()</code> in <code>prioritization_core.R</code>.</li>
+        <li>No <code>composite_score</code> equals exactly 0.0 or 1.0 in any committed artifact.</li>
+        <li>MCB vs SDB top scores now differ by more than 0.01 (golden assertion).</li>
+      </ul>
+    </div>
+
+    <div class="subcard">
+      <h3>Phase 4 — Single golden refreeze to 0.4.0 <span class="pill pill-ok">DONE</span></h3>
+      <p>
+        One reviewable refreeze commit regenerated every artifact affected by Phases 2–3,
+        re-pinned the golden tests to falsifiable values, added the non-degeneracy guard,
+        and bumped <code>DESCRIPTION</code>/<code>NEWS.md</code> to 0.4.0. The scenario
+        grid parquet stayed untouched (<code>grid_contract_version "v2"</code>, fingerprint
+        unchanged), and the TRISK grid was not regenerated (ASM-005).
+      </p>
+    </div>
+
+    <div class="subcard">
+      <h3>Phase 5 — Intake honors its published contract <span class="pill pill-ok">DONE</span></h3>
+      <p>
+        <code>scripts/intake_validate_and_map.R</code> now uses a two-tier outcome model:
+        hard errors (missing name, non-numeric/negative money, unparseable sector code,
+        duplicates) drop a row; every condition the schema describes as a classification
+        is a warning that retains the row, written to <code>validation_warnings.csv</code>.
+        The six-entry code allow-list became one table of 20 accepted codes covering ISIC
+        Rev.4 parents and VSIC 2018 sub-classes (<code>D3510</code> → power, etc.);
+        zero-padding only ever pads codes shorter than 4 digits. USD rows are converted
+        once at intake via the new <code>inputs.fx_rate_usd_vnd</code> key; without a
+        rate they are retained with exposure <code>NA</code> and the intake exits
+        non-zero naming the missing key — never silently dropped, never guessed.
+      </p>
+      <div class="callout callout-ok">
+        <strong>Proven on the SDB fixture:</strong> 34 normalized rows (up from 24),
+        the seven previously-rejected <code>D3510</code> power rows retained and mapped
+        to power, both USD rows converted at 26,300 VND/USD, and
+        <code>validation_warnings.csv</code> written on every run — even when empty.
+      </div>
+    </div>
+
+    <div class="subcard">
+      <h3>Phase 6 — Coverage and reconciliation report <span class="pill pill-ok">DONE</span></h3>
+      <p>
+        <code>scripts/generate_coverage_report.R</code> produces a self-contained HTML
+        report plus a machine-readable, tracked <code>coverage_metrics.json</code> per
+        engagement that answers — in both row counts and VND — what the client sent,
+        what was normalized, what was dropped and why, what was retained-with-warning
+        and why, and what fraction of processed exposure has ABCD asset-level coverage.
+        Added as a <code>coverage_report</code> orchestrator step immediately after
+        <code>validation_report</code> (inside the intake branch). SDB's
+        <code>coverage_metrics.json</code> and <code>validation_warnings.csv</code> are
+        tracked fixtures; the HTML itself stays gitignored (timestamp-bearing).
+      </p>
+      <table>
+        <tr><th>Metric</th><th>Value</th><th>Identity</th></tr>
+        <tr><td>Rows</td><td>submitted 40 = normalized 34 + dropped 6</td><td><span class="pill pill-ok">HOLDS</span></td></tr>
+        <tr><td>Money (VND)</td><td>| submitted − (normalized + dropped) | = 0</td><td><span class="pill pill-ok">HOLDS</span></td></tr>
+        <tr><td>ABCD coverage</td><td>covered exposure ≈ 0.44% (synthetic ABCD — 4 of 5 sectors partly covered)</td><td>see report</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Verification, Not Assertion</h2>
+    <p class="sub">Every claim below was reproduced on the committed tree before this report was written.</p>
+
+    <table>
+      <tr><th>Check</th><th>Command</th><th>Result</th></tr>
+      <tr>
+        <td>R test suite</td>
+        <td><code>Rscript -e "testthat::test_dir('tests/testthat')"</code></td>
+        <td><span class="pill pill-ok">FAIL 0 · PASS 408</span></td>
+      </tr>
+      <tr>
+        <td>Dashboard suite</td>
+        <td><code>python -m pytest dashboard/tests</code></td>
+        <td><span class="pill pill-ok">58 passed</span></td>
+      </tr>
+      <tr>
+        <td>Cross-artifact invariants</td>
+        <td><code>Rscript tools/verify_refactor.R --invariants</code></td>
+        <td><span class="pill pill-ok">INV-001…006 PASS</span></td>
+      </tr>
+      <tr>
+        <td>Byte-identity (MCB pipeline reproduces itself)</td>
+        <td><code>Rscript tools/verify_refactor.R</code></td>
+        <td><span class="pill pill-ok">BYTE-IDENTITY PASS</span> (post-commit)</td>
+      </tr>
+      <tr>
+        <td>SDB engagement end-to-end</td>
+        <td><code>RUN_SDB_ENGAGEMENT=1 testthat::test_file(test_sdb_engagement.R)</code></td>
+        <td><span class="pill pill-ok">exit 0 · 15/15 PASS</span></td>
+      </tr>
+      <tr>
+        <td>Units sum</td>
+        <td><code>sum(loan_size_outstanding)</code> on MCB loanbook</td>
+        <td><span class="pill pill-ok">25,020,000,000,000 exactly</span></td>
+      </tr>
+      <tr>
+        <td>No degenerate scores</td>
+        <td>min/max of all committed <code>composite_score</code> columns</td>
+        <td><span class="pill pill-ok">no 0.0, no 1.0</span></td>
+      </tr>
+      <tr>
+        <td>Grid untouched</td>
+        <td><code>git diff --name-only dashboard/data/trisk/grid</code></td>
+        <td><span class="pill pill-ok">empty</span></td>
+      </tr>
+      <tr>
+        <td>MCB public snapshot unperturbed by Phases 5–6</td>
+        <td>byte-identity drift list post Phases 5–6</td>
+        <td><span class="pill pill-ok">MCB artifacts not in drift</span></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>Commits</h2>
+    <p class="sub">The wave landed in one commit per phase plus documentation, as the batching discipline requires.</p>
+    <table>
+      <tr><th>Commit</th><th>Phase</th><th>Content</th></tr>
+      <tr><td><code>994a1af</code></td><td>PHASE-01</td><td>Byte-identity CI gate + refresh drift gate (G1)</td></tr>
+      <tr><td><code>cf2adeb</code></td><td>PHASE-02</td><td>True VND, <code>R/format_money.R</code>, INV-006 (U1)</td></tr>
+      <tr><td><code>b712a2d</code></td><td>PHASE-03</td><td>Absolute severity scoring, <code>docs/scoring_anchors.md</code></td></tr>
+      <tr><td><code>e1825be</code></td><td>PHASE-04</td><td>Single golden refreeze to 0.4.0 (units + absolute scores)</td></tr>
+      <tr><td><code>this commit</code></td><td>PHASE-05 + 06</td><td>Intake contract fixes + coverage &amp; reconciliation report, pactatrisk 0.4.1</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>Risks, Caveats &amp; Open Questions</h2>
+
+    <div class="callout callout-warn">
+      <strong>Anchor breakpoints are a documented judgment call.</strong> The severity
+      tables in <code>docs/scoring_anchors.md</code> have no external standard to copy.
+      They are deliberately reviewable as data — a reader with a calculator can recompute
+      MCB power's <code>alignment_score</code> of 0.60975 from <code>alignment_gap_raw
+      = 14.39</code>. Disagreement about thresholds is a productive conversation;
+      disagreement about whether "1.0" means anything is not.
+    </div>
+
+    <div class="callout callout-warn">
+      <strong>Widening the intake admit-list lowers headline match rates over an honest
+      denominator.</strong> Retained out-of-scope and newly-admitted rows increase the
+      classified population that PACTA cannot match to ABCD. This is correct: the
+      coverage report exists precisely to make it legible — a lower match rate over a
+      larger, honest denominator is the right number.
+    </div>
+
+    <div class="callout">
+      <strong>The USD conversion rate has no authoritative in-repo source.</strong>
+      <code>inputs.fx_rate_usd_vnd</code> is operator-configured per engagement and
+      recorded in the pipeline manifest. The SDB fixture uses 26,300 VND/USD. For a real
+      engagement, agree the rate (e.g. SBV reference rate) before intake.
+    </div>
+
+    <div class="callout">
+      <strong>Intake rows retained with <code>NA</code> exposure are visible, not
+      processed.</strong> A USD row without a configured rate (or any unsupported
+      currency) stays in the normalized loanbook with exposure <code>NA</code> and a
+      warning, and the intake exits non-zero. It contributes 0 VND to every money total
+      and the coverage report states this explicitly.
+    </div>
+
+    <h3>Deliberately out of scope (future waves)</h3>
+    <ul>
+      <li>Real bank data; TRISK beyond the current sectors.</li>
+      <li>Making the Streamlit dashboard intake-warning/coverage aware (a natural consumer of <code>coverage_metrics.json</code>).</li>
+      <li>The executive-summary generator that <code>coverage_metrics.json</code> was designed to feed.</li>
+      <li><code>R CMD check</code> cleanup and retiring dead scripts.</li>
+    </ul>
+  </div>
+
+  <div class="footer">
+    PACTA + TRISK Vietnam — Wave 2 final report (Contracts, Units &amp; Guard Rails) ·
+    pactatrisk 0.4.1 · All data in this repository is synthetic and illustrative.
+  </div>
+
+</div>
+</body>
+</html>

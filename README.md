@@ -132,8 +132,9 @@ which skips only that gate step.
 ## Running a client engagement
 
 `scripts/run_engagement.R` runs the full delivery flow — intake, validation
-report, PACTA, TRISK, prioritization, snapshot, scoring, letters, disclosure
-— for any engagement config in one command:
+report, coverage & reconciliation report, PACTA, TRISK, prioritization,
+snapshot, scoring, letters, disclosure — for any engagement config in one
+command:
 
 ```powershell
 $env:Path += ";C:\Program Files\R\R-4.5.2\bin"
@@ -151,6 +152,17 @@ intake and re-run only the downstream stages. `mcb-demo` is the only
 engagement allowed to publish into the public `dashboard/data` snapshot; any
 other engagement's `snapshot_dir` must point elsewhere, or the run refuses
 to start.
+
+Every engagement that runs intake produces a **Coverage & Reconciliation
+Report** (`engagements/<slug>/reports/Coverage_Reconciliation_Report.html`)
+plus a machine-readable sidecar `engagements/<slug>/intake/coverage_metrics.json`
+(Wave 2 PHASE-06). Together they answer, in both row counts and VND, what the
+client submitted, what was normalized, what was dropped and why, what was
+retained-with-warning and why, and what fraction of processed exposure has
+asset-level (ABCD) coverage. USD rows are converted once at intake using the
+engagement config's `inputs.fx_rate_usd_vnd`; without a configured rate they
+are retained with exposure set to `NA` and the intake exits non-zero naming
+the missing key — never silently dropped.
 
 ## Repository map
 

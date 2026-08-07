@@ -104,6 +104,12 @@ build_step_list <- function(cfg, effective_config_path, run_intake, raw_loanbook
   if (run_intake) {
     intake_args <- c("--input", raw_loanbook, "--output-dir", intake_dir)
     if (isTRUE(cfg$anonymize)) intake_args <- c(intake_args, "--anonymize")
+    # Wave 2 PHASE-05 (ASM-006): forward the configured FX rate so USD rows
+    # are converted once at intake instead of being retained as NA. Empty
+    # shapes (NULL / list() / character(0)) round-trip as "not configured".
+    if (length(cfg$inputs$fx_rate_usd_vnd) > 0) {
+      intake_args <- c(intake_args, "--fx-rate-usd-vnd", as.character(cfg$inputs$fx_rate_usd_vnd))
+    }
     steps <- c(steps, list(list(
       name = "intake", script = "scripts/intake_validate_and_map.R", args = intake_args
     )))
@@ -114,6 +120,19 @@ build_step_list <- function(cfg, effective_config_path, run_intake, raw_loanbook
         "--intake-dir", intake_dir,
         "--output", file.path(cfg$paths$reports_dir, "Intake_Validation_Report.html"),
         "--bank-name", cfg$bank_name
+      )
+    )))
+    # Wave 2 PHASE-06 (coverage & reconciliation): money-denominated report of
+    # submitted vs processed vs dropped exposure and ABCD asset-level coverage.
+    # Sits inside the same if (run_intake) branch -- engagements with no raw
+    # loanbook (mcb-demo) never run intake and so never run this step.
+    steps <- c(steps, list(list(
+      name = "coverage_report",
+      script = "scripts/generate_coverage_report.R",
+      args = c(
+        "--config", effective_config_path,
+        "--intake-dir", intake_dir,
+        "--output", file.path(cfg$paths$reports_dir, "Coverage_Reconciliation_Report.html")
       )
     )))
   }
