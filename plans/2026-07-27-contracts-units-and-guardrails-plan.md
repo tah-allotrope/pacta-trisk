@@ -1,7 +1,7 @@
 ---
 title: "Wave 2 — Contracts, Units, and Guard Rails"
 date: "2026-07-27"
-status: "open — PHASE-01 (byte-identity CI gate + refresh drift gate) landed in 994a1af, PHASE-02 (true VND, R/format_money.R, INV-006) in cf2adeb, PHASE-03 (absolute severity scoring, R/severity_scoring.R, docs/scoring_anchors.md, stress_severity_score) in b712a2d, and PHASE-04 (single golden refreeze to 0.4.0, re-pinned golden tests, non-degeneracy guards, roxygen metadata) landed in this commit; PHASE-05 (intake contract fixes) and PHASE-06 (coverage and reconciliation report) are not started"
+status: "open — PHASE-01 (byte-identity CI gate + refresh drift gate) landed in 994a1af, PHASE-02 (true VND, R/format_money.R, INV-006) in cf2adeb, PHASE-03 (absolute severity scoring, R/severity_scoring.R, docs/scoring_anchors.md, stress_severity_score) in b712a2d, and PHASE-04 (single golden refreeze to 0.4.0, re-pinned golden tests, non-degeneracy guards, roxygen metadata) in e1825be; PHASE-05 (intake contract fixes) and PHASE-06 (coverage and reconciliation report) are not started — verified 2026-08-07: scripts/generate_coverage_report.R absent and scripts/intake_validate_and_map.R has no add_warning/convert_to_vnd/map_sector_code/fx_rate_usd_vnd"
 request: "Wave 2 'Contracts & Units' — byte-identity CI gate, loanbook units rescale, anchored absolute scores, golden refreeze, intake contract fixes, coverage & reconciliation report"
 plan_type: "multi-phase"
 research_inputs:
