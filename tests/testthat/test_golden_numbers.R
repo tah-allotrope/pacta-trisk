@@ -10,22 +10,34 @@ test_that("engagement priority has expected golden numbers", {
   expect_equal(nrow(ep), 23, info = "engagement_priority.csv should have 23 rows")
 
   expect_equal(ep$name_abcd[1], "Nghi Son Power LLC")
-  # Wave 2 PHASE-03/04: composite_score is now an absolute severity from
-  # docs/scoring_anchors.md, not a min-max rescale -- this value is
-  # falsifiable (it does NOT hold "for any input" the way the pre-PHASE-03
-  # tautological 1.0 did).
-  expect_equal(ep$composite_score[1], 0.9113849765258216, tolerance = 1e-4)
+  # Wave 3 PHASE-07 0.5.0 refreeze: composite_score is rounded to 10 decimals
+  # before ranking (S1) and the public MCB demo now runs on the
+  # pdp8-2025-adjusted vintage. The top three MCB borrowers still tie (they
+  # share the same absolute severity) but the value moved with the vintage:
+  # 0.9816483381 vs the old 0.9113849765 (SDB, still on pdp8-2023, stays at
+  # the old rounded value). This is falsifiable, not tautological.
+  expect_equal(ep$composite_score[1], 0.9816483381, tolerance = 1e-4)
 
   expect_equal(ep$name_abcd[2], "Vinacomin Power JSC")
-  expect_equal(ep$composite_score[2], 0.9113849765258216, tolerance = 1e-4)
+  expect_equal(ep$composite_score[2], 0.9816483381, tolerance = 1e-4)
 
   expect_equal(ep$name_abcd[3], "International Power Mong Duong")
-  expect_equal(ep$composite_score[3], 0.9113849765258216, tolerance = 1e-4)
+  expect_equal(ep$composite_score[3], 0.9816483381, tolerance = 1e-4)
 
   # Wave 2 PHASE-04, TASK-04-05: regression guard against a min-max
   # normalization being reintroduced anywhere upstream -- under min-max the
   # top score is always exactly 1.0 and the bottom always exactly 0.0.
   expect_true(all(ep$composite_score > 0 & ep$composite_score < 1))
+
+  # Wave 3 PHASE-07 S1: rounding before ranking means the published score
+  # and the published rank agree: never more distinct ranks than distinct
+  # scores. If this fails, a 1-ULP residue is again splitting borrowers.
+  expect_true(length(unique(ep$composite_rank_pct)) <= length(unique(ep$composite_score)))
+  # Every composite_score must be at most 10 decimal places (the rounding
+  # contract) — check via string representation, not via binary float.
+  expect_true(all(grepl("^-?[0-9]+(\\.[0-9]{1,10})?$", trimws(as.character(ep$composite_score)))))
+  expect_true("trisk_stress_rank_pct" %in% names(ep))
+  expect_false("trisk_priority_score" %in% names(ep))
 })
 
 test_that("MCB and SDB top sector composite scores now differ", {

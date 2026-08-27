@@ -588,6 +588,40 @@ main <- function() {
 </body>
 </html>')
 
+  # --- i18n (PHASE-07): headings, column labels, disclaimer via labels.csv ---
+  # Analyst-written narrative stays English; this block swaps only the
+  # chrome (headings, column labels, disclaimer) via report_label().
+  i18n_lang <- if (is.null(cfg$report_language) || length(cfg$report_language) == 0) "en" else cfg$report_language
+  i18n_labels <- tryCatch(
+    load_report_labels(override_csv = if (length(cfg$paths$i18n_override_csv) > 0) cfg$paths$i18n_override_csv else NULL),
+    error = function(e) NULL
+  )
+  # Headings and disclaimer use the label table when available; otherwise the
+  # English literals above remain. report_label() emits one warning per
+  # missing token per run rather than failing.
+  if (!is.null(i18n_labels) && i18n_lang %in% c("vi", "bilingual")) {
+    html <- gsub("Coverage &amp; Reconciliation Report",
+                 report_label("coverage_report_title", i18n_lang, i18n_labels), html, fixed = TRUE)
+    html <- gsub("Coverage &amp; Reconciliation Report —",
+                 paste0(report_label("coverage_report_title", i18n_lang, i18n_labels), " —"), html, fixed = TRUE)
+    # Table column labels that appear verbatim in the HTML
+    html <- gsub("<th>Exposure (VND)</th>", paste0("<th>", report_label("exposure_vnd", i18n_lang, i18n_labels), "</th>"), html, fixed = TRUE)
+    # Synthetic disclaimer — the non-negotiable per-artifact banner
+    html <- gsub("Synthetic / illustrative data\\.</strong> This report is generated from synthetic data for demonstration",
+                 paste0(report_label("synthetic_disclaimer", i18n_lang, i18n_labels), "</strong>"),
+                 html, fixed = FALSE)
+    # Bilingual note: which parts are translated
+    if (identical(i18n_lang, "bilingual")) {
+      html <- sub("<div class=\"container\">",
+                  paste0("<div class=\"container\"><div class=\"callout callout-info\">Section headings, table column labels and the synthetic-data disclaimer are shown as English / Vietnamese; analyst-written narrative remains English.</div>"),
+                  html, fixed = TRUE)
+    }
+  } else if (identical(i18n_lang, "bilingual") && is.null(i18n_labels)) {
+    html <- sub("<div class=\"container\">",
+                "<div class=\"container\"><div class=\"callout callout-info\">Section headings, table column labels and the synthetic-data disclaimer are shown as English / Vietnamese; analyst-written narrative remains English.</div>",
+                html, fixed = TRUE)
+  }
+
   write_html_report(html, output_path)
   cat(sprintf("Report saved to: %s\n", normalizePath(output_path)))
   cat(sprintf("File size: %.1f KB\n", file.info(output_path)$size / 1024))

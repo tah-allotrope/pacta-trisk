@@ -22,6 +22,7 @@ suppressWarnings(suppressMessages({
 }))
 
 source("R/engagement_config.R")
+source("R/report_toolkit.R")
 source("R/format_money.R")
 
 # --- Section 1: Args ---------------------------------------------------------
@@ -45,7 +46,14 @@ top_n     <- parse_num(args, "top_n", 10)
 anonymize <- parse_flag(args, "anonymize", FALSE)
 
 cfg <- load_engagement_config(get_config_arg(args))
-bank_short <- if (identical(cfg$bank_name, "Mekong Commercial Bank")) "MCB" else cfg$bank_name
+bank_short <- {
+  if (identical(cfg$bank_name, "Mekong Commercial Bank")) "MCB"
+  else if (identical(cfg$bank_name, "Saigon Delta Bank")) "SDB"
+  else {
+    parts <- strsplit(trimws(cfg$bank_name), "\\s+")[[1]]
+    paste0(toupper(substr(parts, 1, 1)), collapse = "")
+  }
+}
 bank_label <- if (identical(bank_short, cfg$bank_name)) cfg$bank_name else sprintf("%s (%s)", cfg$bank_name, bank_short)
 
 base_dir   <- getwd()
@@ -224,10 +232,19 @@ if (!is.null(priority)) {
   )
 }
 
-# 5d. TCFD four-pillar narrative
+# 5d. TCFD four-pillar narrative — Wave 3 PHASE-06: disclosure_sections.md now
+# carries {{bank_name}} / {{bank_short}} tokens so the narrative is client-
+# neutral; substitute before markdown conversion so headings render correctly.
 tcfd_html <- pending
 if (have("tcfd_md")) {
-  tcfd_html <- md_to_html(paste(readLines(inputs$tcfd_md, warn = FALSE, encoding = "UTF-8"), collapse = "\n"))
+  tcfd_raw <- paste(readLines(inputs$tcfd_md, warn = FALSE, encoding = "UTF-8"), collapse = "\n")
+  tcfd_raw <- gsub("{{bank_name}}", cfg$bank_name, tcfd_raw, fixed = TRUE)
+  tcfd_raw <- gsub("{{bank_short}}", bank_short, tcfd_raw, fixed = TRUE)
+  # Backwards compat: any surviving MCB/Mekong literals in older overlays still work
+  if (!identical(cfg$bank_name, "Mekong Commercial Bank")) {
+    tcfd_raw <- gsub("Mekong Commercial Bank", cfg$bank_name, tcfd_raw, fixed = TRUE)
+  }
+  tcfd_html <- md_to_html(tcfd_raw)
 }
 
 # 5e. Methodology appendix (condensed from PACTA + TRISK docs + Decision 263 extract)
@@ -303,7 +320,8 @@ mode_label <- if (anonymize) "Anonymised (external-shareable)" else "Internal bo
 body <- paste0(
 '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">',
 '<meta name="viewport" content="width=device-width, initial-scale=1">',
-'<title>MCB Climate Transition Disclosure Pack</title><style>', css, '</style></head><body>',
+sprintf('<title>%s Climate Transition Disclosure Pack</title>', cfg$bank_name),
+paste0('<style>', css, '</style></head><body>'),
 '<div class="hero"><h1>Climate Transition Disclosure Pack</h1>',
 sprintf('<div class="subtitle">%s — TCFD-aligned, with ISSB IFRS S2 cross-references &amp; Decision 263 mapping</div>', bank_label),
 '<div class="meta">Prepared ', report_date, ' · ', mode_label, '</div>',
@@ -331,6 +349,25 @@ tcfd_html, '</div>',
 sprintf('<div class="foot">%s — synthetic demonstration. PACTA + TRISK climate analytics. Not financial advice, not a credit decision, not a regulatory filing.</div>', bank_label),
 '</div></body></html>'
 )
+
+# --- i18n overlay (PHASE-07): headings/column labels/disclaimer via labels.csv ---
+i18n_lang_d <- if (is.null(cfg$report_language) || length(cfg$report_language) == 0) "en" else cfg$report_language
+i18n_labels_d <- tryCatch(
+  load_report_labels(override_csv = if (length(cfg$paths$i18n_override_csv) > 0) cfg$paths$i18n_override_csv else NULL),
+  error = function(e) NULL
+)
+if (!is.null(i18n_labels_d) && i18n_lang_d %in% c("vi", "bilingual")) {
+  # Headings
+  body <- gsub("Climate Transition Disclosure Pack", report_label("disclosure_pack_title", i18n_lang_d, i18n_labels_d), body, fixed = TRUE)
+  body <- gsub("Executive Summary", report_label("executive_summary", i18n_lang_d, i18n_labels_d), body, fixed = TRUE)
+  body <- gsub("Counterparty", report_label("borrower", i18n_lang_d, i18n_labels_d), body, fixed = TRUE)
+  body <- gsub("Synthetic data — illustrative only", report_label("synthetic_disclaimer", i18n_lang_d, i18n_labels_d), body, fixed = TRUE)
+  if (identical(i18n_lang_d, "bilingual")) {
+    body <- sub("<div class=\"container\">",
+                paste0("<div class=\"container\"><div class=\"callout callout-info\">Section headings, table column labels and the synthetic-data disclaimer are shown as English / Vietnamese; analyst-written narrative remains English.</div>"),
+                body, fixed = TRUE)
+  }
+}
 
 # --- Section 8: Anonymise across the whole body (RISK-03-01) -----------------
 # Single name list, applied longest-first with fixed-string replacement so a

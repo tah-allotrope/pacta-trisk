@@ -37,15 +37,28 @@ test_that("mcb-demo engagement_config.json matches the built-in defaults except 
   expect_equal(cfg_file$bank_name, cfg_default$bank_name)
   expect_equal(cfg_file$bank_slug, cfg_default$bank_slug)
 
+  # Wave 3 0.5.0 refreeze: mcb-demo switched to pdp8-2025-adjusted vintage
+  # (and its region_isos to the vintage-scoped file), while the bare default
+  # stays on pdp8-2023. Those three paths plus scenario_vintage and fx_rate
+  # are the deliberate, documented differences.
   inputs_file_minus_additions <- cfg_file$inputs
   inputs_file_minus_additions$fx_rate_usd_vnd <- NULL
   inputs_file_minus_additions$scenario_vintage <- NULL
+  inputs_file_minus_additions$scenario_ms_csv <- NULL
+  inputs_file_minus_additions$scenario_co2_csv <- NULL
+  inputs_file_minus_additions$region_isos_csv <- NULL
   inputs_default_minus_additions <- cfg_default$inputs
   inputs_default_minus_additions$fx_rate_usd_vnd <- NULL
   inputs_default_minus_additions$scenario_vintage <- NULL
+  inputs_default_minus_additions$scenario_ms_csv <- NULL
+  inputs_default_minus_additions$scenario_co2_csv <- NULL
+  inputs_default_minus_additions$region_isos_csv <- NULL
   expect_equal(inputs_file_minus_additions, inputs_default_minus_additions)
   expect_equal(cfg_file$inputs$fx_rate_usd_vnd, 26300)
-  expect_equal(cfg_file$inputs$scenario_vintage, "pdp8-2023")
+  expect_equal(cfg_file$inputs$scenario_vintage, "pdp8-2025-adjusted")
+  expect_equal(cfg_file$inputs$scenario_ms_csv, "data/scenarios/pdp8-2025-adjusted/vietnam_scenario_ms.csv")
+  expect_equal(cfg_file$inputs$scenario_co2_csv, "data/scenarios/pdp8-2025-adjusted/vietnam_scenario_co2.csv")
+  expect_equal(cfg_file$inputs$region_isos_csv, "data/scenarios/pdp8-2025-adjusted/vietnam_region_isos.csv")
 
   expect_equal(cfg_file$trisk_sectors, cfg_default$trisk_sectors)
   expect_equal(cfg_file$run_grid, cfg_default$run_grid)

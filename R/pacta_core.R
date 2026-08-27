@@ -371,7 +371,7 @@ pacta_coverage <- function(loanbook_classified, matched, output_dir, bank_name, 
 #'   still feed the underlying target_market_share() computation, which is
 #'   vintage-agnostic).
 pacta_market_share <- function(matched, abcd_norm, scenario, region, output_dir, bank_short,
-                                pdp8_scenario_source = "pdp8_2023") {
+                                 pdp8_scenario_source = "pdp8_2023") {
   cat("--- Section 5: Market share analysis ---\n\n")
 
   matched_for_ms <- matched %>%

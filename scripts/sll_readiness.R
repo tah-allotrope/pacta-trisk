@@ -51,12 +51,15 @@ partial_note <- if (any(readiness$readiness_partial)) {
   "<p><em>No relationship-signal overlay was configured for this engagement -- the relationship dimension was dropped and the remaining three weights renormalized (readiness_partial = TRUE for every row).</em></p>"
 } else ""
 
+i18n_lang_sll <- if (is.null(cfg$report_language) || length(cfg$report_language)==0) "en" else cfg$report_language
+i18n_labels_sll <- tryCatch(load_report_labels(override_csv = if (length(cfg$paths$i18n_override_csv)>0) cfg$paths$i18n_override_csv else NULL), error=function(e) NULL)
+html_title_sll <- report_label("sll_readiness_title", i18n_lang_sll, i18n_labels_sll)
 html <- paste0(
-  "<!DOCTYPE html><html><head><meta charset='utf-8'><title>SLL Readiness Shortlist</title>",
+  "<!DOCTYPE html><html><head><meta charset='utf-8'><title>", html_title_sll, "</title>",
   report_css(),
   "</head><body><div class='container'>",
-  sprintf("<h1>Sustainability-Linked-Loan Readiness: %s</h1>", cfg$bank_name),
-  "<p style='color:#c53030;'><strong>All figures are illustrative, synthetic-portfolio outputs.</strong> ",
+  sprintf("<h1>%s: %s</h1>", html_title_sll, cfg$bank_name),
+  "<p style='color:#c53030;'><strong>", report_label("synthetic_disclaimer", i18n_lang_sll, i18n_labels_sll), "</strong> ",
   "This tool ranks and bands a qualified pool; it does not select the final shortlist -- ",
   "the analyst records the selection rationale in the analyst_rationale column of sll_readiness.csv.</p>",
   partial_note,
@@ -65,6 +68,19 @@ html <- paste0(
   "</div></body></html>"
 )
 
+# i18n table headers + bilingual note
+if (i18n_lang_sll %in% c("vi", "bilingual") && !is.null(i18n_labels_sll)) {
+  html <- gsub("<th>Borrower</th>", paste0("<th>", report_label("borrower", i18n_lang_sll, i18n_labels_sll), "</th>"), html, fixed = TRUE)
+  html <- gsub("<th>Sector</th>", paste0("<th>", report_label("sector", i18n_lang_sll, i18n_labels_sll), "</th>"), html, fixed = TRUE)
+  html <- gsub("<th>Exposure (VND)</th>", paste0("<th>", report_label("exposure_vnd", i18n_lang_sll, i18n_labels_sll), "</th>"), html, fixed = TRUE)
+  html <- gsub("<th>Readiness</th>", paste0("<th>", report_label("readiness", i18n_lang_sll, i18n_labels_sll), "</th>"), html, fixed = TRUE)
+  html <- gsub("<th>Band</th>", paste0("<th>", report_label("readiness_band", i18n_lang_sll, i18n_labels_sll), "</th>"), html, fixed = TRUE)
+}
+if (identical(i18n_lang_sll, "bilingual")) {
+  html <- sub("<div class='container'>",
+              "<div class='container'><div class=\"callout callout-info\">Section headings, table column labels and the synthetic-data disclaimer are shown as English / Vietnamese; analyst-written narrative remains English.</div>",
+              html, fixed = TRUE)
+}
 write_html_report(html, file.path(cfg$paths$reports_dir, "SLL_Readiness_Shortlist.html"))
 cat(sprintf(
   "[OK] SLL readiness written: %s (%d qualified of %d total borrowers)\n",

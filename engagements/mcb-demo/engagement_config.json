@@ -5,10 +5,10 @@
   "inputs": {
     "loanbook_csv": "data/vietnam_loanbook.csv",
     "abcd_csv": "data/vietnam_abcd.csv",
-    "scenario_ms_csv": "data/scenarios/pdp8-2023/vietnam_scenario_ms.csv",
-    "scenario_co2_csv": "data/scenarios/pdp8-2023/vietnam_scenario_co2.csv",
-    "region_isos_csv": "data/vietnam_region_isos.csv",
-    "scenario_vintage": "pdp8-2023",
+    "scenario_ms_csv": "data/scenarios/pdp8-2025-adjusted/vietnam_scenario_ms.csv",
+    "scenario_co2_csv": "data/scenarios/pdp8-2025-adjusted/vietnam_scenario_co2.csv",
+    "region_isos_csv": "data/scenarios/pdp8-2025-adjusted/vietnam_region_isos.csv",
+    "scenario_vintage": "pdp8-2025-adjusted",
     "fx_rate_usd_vnd": 26300
   },
   "trisk_sectors": [
@@ -46,9 +46,12 @@
     "2026-04-16-trisk-power-pilot.html",
     "BIDV_Framework_Recommendation_Report.html",
     "Financed_Emissions.html",
-    "SLL_Readiness_Shortlist.html"
+    "SLL_Readiness_Shortlist.html",
+    "Sector_Target_Registry.html"
   ],
   "run_history": true,
   "run_financed_emissions": true,
-  "run_sll_readiness": true
+  "run_sll_readiness": true,
+  "run_targets": true,
+  "report_language": "bilingual"
 }

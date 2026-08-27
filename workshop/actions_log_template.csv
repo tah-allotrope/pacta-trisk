@@ -1,0 +1,7 @@
+action_id,description,owner,due_date,status,notes
+ACT-01,Provide loanbook extract in intake/templates/loanbook_template.csv (whole VND, 20-code VSIC map),,,open,Whole-VND contract per intake/SCHEMA.md
+ACT-02,Supplement ABCD for unmatched counterparties (LEI/tax ID where available),,,open,See Coverage_Reconciliation_Report.html unmatched list
+ACT-03,Sign off on report overlay content (paths.report_overlay_md) if custom narrative required,, ,open,Client-neutral methodology + per-engagement overlay
+ACT-04,Confirm fx_rate_usd_vnd for any USD-denominated rows (or confirm no USD rows),,,open,Intake exits non-zero naming this key if USD rows present and rate missing
+ACT-05,Go/no-go for first real pipeline run (Rscript scripts/run_engagement.R --config ...),,,open,Requires ACT-01/02 closed; history/ will archive this run
+ACT-06,Schedule quarterly re-run cadence + dashboard access list,, ,open,Operator-hosted private instance per docs/hosting-decision.md

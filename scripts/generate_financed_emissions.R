@@ -83,13 +83,11 @@ total_fe <- sum(fe$financed_emissions_tco2e, na.rm = TRUE)
 excluded <- fe[!is.na(fe$exclusion_reason), , drop = FALSE]
 
 html <- paste0(
-  "<!DOCTYPE html><html><head><meta charset='utf-8'><title>Financed Emissions</title>",
+  "<!DOCTYPE html><html><head><meta charset='utf-8'><title>", report_label("financed_emissions_title", cfg$report_language %||% "en", tryCatch(load_report_labels(override_csv = if (length(cfg$paths$i18n_override_csv) > 0) cfg$paths$i18n_override_csv else NULL), error=function(e) NULL)), "</title>",
   report_css(),
   "</head><body><div class='container'>",
-  sprintf("<h1>Financed Emissions (Scope 1+2): %s</h1>", cfg$bank_name),
-  "<p style='color:#c53030;'><strong>All figures are computed from synthetic activity data and ",
-  "synthetic/illustrative emission factors on a synthetic demonstration portfolio. ",
-  "This is not an emissions inventory of any real institution and must not be represented as one.</strong></p>",
+  sprintf("<h1>%s: %s</h1>", report_label("financed_emissions_title", cfg$report_language %||% "en", tryCatch(load_report_labels(override_csv = if (length(cfg$paths$i18n_override_csv) > 0) cfg$paths$i18n_override_csv else NULL), error=function(e) NULL)), cfg$bank_name),
+  "<p style='color:#c53030;'><strong>", report_label("synthetic_disclaimer", cfg$report_language %||% "en", tryCatch(load_report_labels(override_csv = if (length(cfg$paths$i18n_override_csv) > 0) cfg$paths$i18n_override_csv else NULL), error=function(e) NULL)), "</strong></p>",
   sprintf("<h2>Total Scope 1+2 financed emissions: %.1f tCO2e</h2>", total_fe),
   "<p>No total is published without its data-quality composition:</p>",
   dq_table_html,
@@ -106,6 +104,12 @@ html <- paste0(
   "</div></body></html>"
 )
 
+# --- i18n bilingual note (PHASE-07) ---
+if (identical(cfg$report_language %||% "en", "bilingual")) {
+  html <- sub("<div class='container'>",
+              paste0("<div class='container'><div class=\"callout callout-info\">Section headings, table column labels and the synthetic-data disclaimer are shown as English / Vietnamese; analyst-written narrative remains English.</div>"),
+              html, fixed = TRUE)
+}
 write_html_report(html, file.path(cfg$paths$reports_dir, "Financed_Emissions.html"))
 cat(sprintf("[OK] Financed emissions written: %s (total %.1f tCO2e across %d scored borrowers)\n",
             out_dir, total_fe, sum(!is.na(fe$financed_emissions_tco2e))))

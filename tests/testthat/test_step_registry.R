@@ -28,7 +28,7 @@ test_that("resolve_step_list for MCB (run_intake FALSE) matches the pre-registry
     "pacta_vietnam_scenario", "trisk_prepare_inputs",
     "trisk_sector_demo_power", "trisk_sector_demo_cement", "trisk_sector_demo_steel",
     "trisk_scenario_grid", "sector_prioritization", "refresh_dashboard_data",
-    "engagement_scoring", "financed_emissions", "sll_readiness", "generate_engagement_letters", "generate_disclosure_pack",
+    "engagement_scoring", "financed_emissions", "sll_readiness", "generate_targets", "generate_engagement_letters", "generate_disclosure_pack",
     "refresh_audit", "record_history"
   ))
 })

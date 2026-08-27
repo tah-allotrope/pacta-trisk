@@ -1474,42 +1474,42 @@ blocking prerequisite, done first.
 - [x] TASK-06-05: Add `inputs.relationship_overlay_csv` to the config schema,
   defaulting to `NULL`, and skip it in the "every input must exist" validation
   loop the same way `raw_loanbook_csv` is skipped when empty.
-- [ ] TASK-06-06: Create `R/target_setting.R` implementing sectoral decarbonization
+- [x] TASK-06-06: Create `R/target_setting.R` implementing sectoral decarbonization
   convergence for cement and steel from
   `synthesis_output/vietnam/05_vn_sda_portfolio.csv` and the scenario CO2 file.
   `pacta_sda()` in `R/pacta_core.R` is not modified (DEC-009).
-- [ ] TASK-06-07: Create `scripts/generate_targets.R`, writing
+- [x] TASK-06-07: Create `scripts/generate_targets.R`, writing
   `target_registry.csv` per the S6 specification and a
   `Sector_Target_Registry.html` report.
-- [ ] TASK-06-08: Document the methodological duality in
+- [x] TASK-06-08: Document the methodological duality in
   `docs/financed_emissions_methodology.md` and in the target registry report: PACTA
   alignment gaps are measured against the scenario benchmark, while targets are
   computed by convergence. One explicit sentence, in both places.
-- [ ] TASK-06-09: Parameterize `scripts/generate_bidv_report.R`. Add `--config`
+- [x] TASK-06-09: Parameterize `scripts/generate_bidv_report.R`. Add `--config`
   parsing via `get_config_arg()`, replace every hardcoded
   `"Mekong Commercial Bank"` and `"BIDV"` literal with `cfg$bank_name`, and split
   its narrative source material into client-neutral methodology plus a
   per-engagement content overlay at a new config path
   `paths.report_overlay_md`. Do not rewrite the 1,034 lines of assembly logic.
-- [ ] TASK-06-10: Strip the `"Mekong Commercial Bank"` literals from all four
+- [x] TASK-06-10: Strip the `"Mekong Commercial Bank"` literals from all four
   sector rows of `templates/engagement/engagement_prompt_templates.csv` and from
   `templates/disclosure/disclosure_sections.md`, replacing them with the
   `{{bank_name}}` token. Verify the existing residual-token guard in
   `scripts/generate_engagement_letters.R` still fails the run on any unreplaced
   token.
-- [ ] TASK-06-11: Register `sll_readiness` and `generate_targets` as registry
+- [x] TASK-06-11: Register `sll_readiness` and `generate_targets` as registry
   steps gated on new boolean keys `run_sll_readiness` and `run_targets`, both
   defaulting to `FALSE` and both set `TRUE` for `mcb-demo`. Both must run after
   `engagement_scoring` and after `refresh_dashboard_data`, because the scoring
   step reads the published snapshot rather than `synthesis_output/trisk`.
-- [ ] TASK-06-12: Create the `workshop/` directory as a facilitation kit
+- [x] TASK-06-12: Create the `workshop/` directory as a facilitation kit
   assembling existing assets: a `README.md` sequencing the session, a data-
   readiness exercise built on `intake/templates/` and the whole-VND unit contract,
   a methodology walkthrough built on `docs/scoring_anchors.md`, a live-surface
   segment pointing at the Scenario Builder page, and a worked example built on an
   anonymized disclosure pack produced with `anonymize: true`. Write facilitation
   notes and timings; write no new analytical content.
-- [ ] TASK-06-13: Add `SLL_Readiness_Shortlist.html` and
+- [x] TASK-06-13: Add `SLL_Readiness_Shortlist.html` and
   `Sector_Target_Registry.html` to `reports/report_catalog.json` as
   `client_facing`.
 
@@ -1596,20 +1596,20 @@ blocking prerequisite, done first.
   disclosure pack).
 
 **Exit Criteria**
-- [ ] `grep -rn "1\.000" docs/bidv_sector_prioritization_methodology.md` returns no
+- [x] `grep -rn "1\.000" docs/bidv_sector_prioritization_methodology.md` returns no
   match in a results context, and the sector scores quoted in that document match
   `synthesis_output/prioritization/sector_priority_ranking.csv` exactly.
-- [ ] `grep -rn "Mekong Commercial Bank" templates/` returns no match.
-- [ ] `Rscript scripts/run_engagement.R --config engagements/mcb-demo/engagement_config.json --only-step sll_readiness`
+- [x] `grep -rn "Mekong Commercial Bank" templates/` returns no match.
+- [x] `Rscript scripts/run_engagement.R --config engagements/mcb-demo/engagement_config.json --only-step sll_readiness`
   exits 0 and writes `sll_readiness.csv` with 23 rows.
-- [ ] `Rscript scripts/run_engagement.R --config engagements/mcb-demo/engagement_config.json --only-step generate_targets`
+- [x] `Rscript scripts/run_engagement.R --config engagements/mcb-demo/engagement_config.json --only-step generate_targets`
   exits 0 and writes `target_registry.csv` whose column names, in order, match S6.
-- [ ] `Rscript scripts/generate_bidv_report.R --config engagements/sdb-rehearsal/engagement_config.json`
+- [x] `Rscript scripts/generate_bidv_report.R --config engagements/sdb-rehearsal/engagement_config.json`
   exits 0 and the resulting HTML contains `Saigon Delta Bank` and does not contain
   `BIDV` outside of citations to published BIDV framework documents.
-- [ ] `Rscript tools/verify_refactor.R` prints `BYTE-IDENTITY PASS`.
-- [ ] `Rscript -e "testthat::test_dir('tests/testthat')"` reports `FAIL 0`.
-- [ ] `workshop/README.md` exists and every asset it references resolves to a real
+- [x] `Rscript tools/verify_refactor.R` prints `BYTE-IDENTITY PASS`.
+- [x] `Rscript -e "testthat::test_dir('tests/testthat')"` reports `FAIL 0`.
+- [x] `workshop/README.md` exists and every asset it references resolves to a real
   path in the repository.
 
 **Phase Risks**
@@ -1638,54 +1638,54 @@ the 2025 scenario vintage, in a single reviewed commit that bumps the package to
 0.5.0.
 
 **Tasks**
-- [ ] TASK-07-01: Create `templates/i18n/labels.csv` with columns
+- [x] TASK-07-01: Create `templates/i18n/labels.csv` with columns
   `token, en, vi`. Populate it with every section heading, table column label and
   disclaimer string used by the report generators. The synthetic-data disclaimer
   must be among the first entries translated (CON-005).
-- [ ] TASK-07-02: Add `report_label()` to `R/report_toolkit.R`, plus loading and
+- [x] TASK-07-02: Add `report_label()` to `R/report_toolkit.R`, plus loading and
   caching of the label table and any per-engagement override.
-- [ ] TASK-07-03: Add `paths.i18n_override_csv` to the config schema, defaulting
+- [x] TASK-07-03: Add `paths.i18n_override_csv` to the config schema, defaulting
   to `NULL`, skipped in the "every input must exist" validation when empty.
-- [ ] TASK-07-04: Add a `report_language` config key taking `"en"`, `"vi"` or
+- [x] TASK-07-04: Add a `report_language` config key taking `"en"`, `"vi"` or
   `"bilingual"`, defaulting to `"en"` so no existing output changes. Set it to
   `"bilingual"` for `mcb-demo` only after the byte-identity implications are
   confirmed — HTML reports are exempt from byte-identity except for timestamp
   text, but confirm this against `tools/verify_refactor.R`'s classifier before
   flipping it.
-- [ ] TASK-07-05: Retrofit the report generators to call `report_label()` for
+- [x] TASK-07-05: Retrofit the report generators to call `report_label()` for
   headings, table column labels and disclaimers:
   `scripts/generate_coverage_report.R`, `scripts/generate_validation_report.R`,
   `scripts/generate_disclosure_pack.R`, `scripts/generate_engagement_letters.R`,
   and `scripts/generate_financed_emissions.R`. Leave analyst-written narrative in
   English and add one sentence to each bilingual artifact stating which parts are
   translated.
-- [ ] TASK-07-06: Create `tools/render_pdf.R`, converting a self-contained HTML
+- [x] TASK-07-06: Create `tools/render_pdf.R`, converting a self-contained HTML
   file to PDF behind a `requireNamespace()` guard. It must print a clear,
   actionable message and exit non-zero when the renderer is unavailable, naming
   the prerequisite. It must never be invoked from `scripts/run_engagement.R` or
   appear in `R/step_registry.R`.
-- [ ] TASK-07-07: Document the PDF path in `docs/outputs_layer.md`: the command,
+- [x] TASK-07-07: Document the PDF path in `docs/outputs_layer.md`: the command,
   the prerequisite, and the statement that HTML remains the canonical generated
   artifact.
-- [ ] TASK-07-08 (refreeze): Apply S1. In `scripts/engagement_scoring.R`, round
+- [x] TASK-07-08 (refreeze): Apply S1. In `scripts/engagement_scoring.R`, round
   `composite_score` to 10 decimal places before both writing it and computing
   `composite_rank_pct`.
-- [ ] TASK-07-09 (refreeze): Apply ASM-004. Rename the `trisk_priority_score`
+- [x] TASK-07-09 (refreeze): Apply ASM-004. Rename the `trisk_priority_score`
   column of `engagement_priority.csv` to `trisk_stress_rank_pct` in
   `scripts/engagement_scoring.R`'s `dplyr::select()` block, and update every
   consumer: `scripts/generate_engagement_letters.R`,
   `scripts/generate_disclosure_pack.R`, `R/sll_readiness.R`, and any dashboard
   loader that names the column. Search with
   `grep -rn "trisk_priority_score" --include=*.R --include=*.py .` and fix every hit.
-- [ ] TASK-07-10 (refreeze): Apply ASM-009. Change
+- [x] TASK-07-10 (refreeze): Apply ASM-009. Change
   `engagements/mcb-demo/engagement_config.json`'s `inputs.scenario_vintage` to
   `"pdp8-2025-adjusted"` and both scenario paths to that directory. Leave
   `sdb-rehearsal` on `pdp8-2023` so the two-vintage comparison keeps a live
   counterpart.
-- [ ] TASK-07-11 (refreeze): Regenerate every affected artifact in one run:
+- [x] TASK-07-11 (refreeze): Regenerate every affected artifact in one run:
   `Rscript scripts/pipeline_refresh.R`, then
   `RUN_SDB_ENGAGEMENT=1 Rscript scripts/run_engagement.R --config engagements/sdb-rehearsal/engagement_config.json`.
-- [ ] TASK-07-12 (refreeze): Re-pin `tests/testthat/test_golden_numbers.R` to the
+- [x] TASK-07-12 (refreeze): Re-pin `tests/testthat/test_golden_numbers.R` to the
   new values. Read the actual regenerated `engagement_priority.csv` and pin the
   new rank-1 name and score. Keep the anti-min-max guard
   (`all(ep$composite_score > 0 & ep$composite_score < 1)`) and the MCB-versus-SDB
@@ -1693,12 +1693,12 @@ the 2025 scenario vintage, in a single reviewed commit that bumps the package to
   `length(unique(ep$composite_rank_pct)) <= length(unique(ep$composite_score))`,
   which fails if ranking ever again separates borrowers that the published score
   does not.
-- [ ] TASK-07-13 (refreeze): Re-pin `tests/testthat/test_sdb_engagement.R` if the
+- [x] TASK-07-13 (refreeze): Re-pin `tests/testthat/test_sdb_engagement.R` if the
   scenario-vintage change or the rounding moves its committed fixtures.
-- [ ] TASK-07-14 (refreeze): Bump `DESCRIPTION` `Version` to `0.5.0` and write the
+- [x] TASK-07-14 (refreeze): Bump `DESCRIPTION` `Version` to `0.5.0` and write the
   `# pactatrisk 0.5.0` section of `NEWS.md`, covering every phase of this program.
   Per TASK-01-04, do not quote a test count.
-- [ ] TASK-07-15: Land the refreeze as a single commit. Run the weekly refresh
+- [x] TASK-07-15: Land the refreeze as a single commit. Run the weekly refresh
   workflow manually with `allow_drift: true` if the automated refresh fires before
   the refreeze commit is merged; this is exactly the case that input exists for.
 
@@ -1768,22 +1768,22 @@ the 2025 scenario vintage, in a single reviewed commit that bumps the package to
   refreeze must carry every number-moving change in the program).
 
 **Exit Criteria**
-- [ ] `Rscript -e "testthat::test_dir('tests/testthat')"` reports `FAIL 0` with
+- [x] `Rscript -e "testthat::test_dir('tests/testthat')"` reports `FAIL 0` with
   the re-pinned golden values.
-- [ ] `RUN_SDB_ENGAGEMENT=1 Rscript -e "testthat::test_file('tests/testthat/test_sdb_engagement.R')"`
+- [x] `RUN_SDB_ENGAGEMENT=1 Rscript -e "testthat::test_file('tests/testthat/test_sdb_engagement.R')"`
   reports `FAIL 0`.
-- [ ] `python -m pytest dashboard/tests` passes.
-- [ ] `Rscript tools/verify_refactor.R` prints `BYTE-IDENTITY PASS` when run
+- [x] `python -m pytest dashboard/tests` passes.
+- [x] `Rscript tools/verify_refactor.R` prints `BYTE-IDENTITY PASS` when run
   against the post-refreeze committed tree — that is, the refreeze is stable and
   reproduces itself.
-- [ ] `Rscript tools/verify_refactor.R --invariants` prints `[PASS]` for every
+- [x] `Rscript tools/verify_refactor.R --invariants` prints `[PASS]` for every
   invariant, INV-001 through INV-009.
-- [ ] `grep -c "0\.4\.1" DESCRIPTION` returns `0` and `grep -c "0\.5\.0" DESCRIPTION`
+- [x] `grep -c "0\.4\.1" DESCRIPTION` returns `0` and `grep -c "0\.5\.0" DESCRIPTION`
   returns `1`.
-- [ ] `Rscript tools/render_pdf.R reports/pipeline_refresh_audit.html /tmp/out.pdf`
+- [x] `Rscript tools/render_pdf.R reports/pipeline_refresh_audit.html /tmp/out.pdf`
   either writes a non-empty PDF or exits non-zero with an actionable message; it
   never fails silently.
-- [ ] Every artifact regenerated in this phase is committed together in one
+- [x] Every artifact regenerated in this phase is committed together in one
   commit whose message names it as the 0.5.0 refreeze.
 
 **Phase Risks**

@@ -29,6 +29,7 @@ suppressWarnings(suppressMessages({
 }))
 
 source("R/engagement_config.R")
+source("R/report_toolkit.R")
 source("R/format_money.R")
 
 # --- Section 1: Configuration & pre-flight (TASK-02-06) ----------------------
@@ -42,6 +43,16 @@ parse_arg <- function(args, name, default) {
 top_n <- parse_arg(args, "top_n", 10)
 
 cfg <- load_engagement_config(get_config_arg(args))
+# Bank short code derived from bank_name initials (e.g. Mekong Commercial Bank -> MCB,
+# Saigon Delta Bank -> SDB) when slug is demo. Use slug initials for other banks.
+bank_short <- {
+  if (identical(cfg$bank_name, "Mekong Commercial Bank")) "MCB"
+  else if (identical(cfg$bank_name, "Saigon Delta Bank")) "SDB"
+  else {
+    parts <- strsplit(trimws(cfg$bank_name), "\\s+")[[1]]
+    paste0(toupper(substr(parts, 1, 1)), collapse = "")
+  }
+}
 
 base_dir      <- getwd()
 priority_file <- file.path(base_dir, cfg$paths$engagement_output_dir, "engagement_priority.csv")
@@ -166,7 +177,9 @@ for (i in seq_len(nrow(top))) {
   prow <- prow[1, ]
 
   # Borrower-level token map (scalars). Pre-substitute into prompt prose so the
-  # final template pass never encounters a nested {{token}}.
+  # final template pass never encounters a nested {{token}}. Wave 3 PHASE-06:
+  # prompt templates and letter_template.html now carry {{bank_name}} /
+  # {{bank_short}} so the letters are engagement-driven, not MCB-hardcoded.
   base_map <- list(
     borrower      = r$name_abcd,
     sector        = title_case(sector),
@@ -179,7 +192,9 @@ for (i in seq_len(nrow(top))) {
     pd_change     = format_pd(r$pd_change),
     exposure_vnd  = format_vnd_full(r$exposure_vnd),
     trisk_status  = r$trisk_status,
-    generated_at  = generated_at
+    generated_at  = generated_at,
+    bank_name     = cfg$bank_name,
+    bank_short    = bank_short
   )
 
   intro <- subst(prow$intro, base_map)
@@ -193,6 +208,28 @@ for (i in seq_len(nrow(top))) {
 
   full_map <- c(base_map, list(intro = intro, engagement_actions = actions_html))
   letter <- subst(template, full_map)
+
+  # Wave 3 PHASE-07: i18n overlay for headings/column labels/disclaimer.
+  # Analyst-written narrative (intro/actions) stays English; the chrome is
+  # localized via labels.csv when report_language is bilingual/vi.
+  i18n_lang_l <- if (is.null(cfg$report_language) || length(cfg$report_language) == 0) "en" else cfg$report_language
+  if (i18n_lang_l %in% c("vi", "bilingual")) {
+    i18n_labels_l <- tryCatch(
+      load_report_labels(override_csv = if (length(cfg$paths$i18n_override_csv) > 0) cfg$paths$i18n_override_csv else NULL),
+      error = function(e) NULL
+    )
+    if (!is.null(i18n_labels_l)) {
+      # Synthetic disclaimer banner
+      letter <- gsub("Synthetic data — illustrative only", report_label("synthetic_disclaimer", i18n_lang_l, i18n_labels_l), letter, fixed = TRUE)
+      # Table headings inside snapshot
+      letter <- gsub("Assessment snapshot", report_label("executive_summary", i18n_lang_l, i18n_labels_l), letter, fixed = TRUE)
+      if (identical(i18n_lang_l, "bilingual")) {
+        letter <- sub("<div class=\"sheet\">",
+                      paste0("<div class=\"sheet\"><div style=\"background:#ebf8ff;border-left:4px solid #2b6cb0;padding:8px 12px;margin-bottom:12px;font-size:0.82rem;\">Section headings, table column labels and the synthetic-data disclaimer are shown as English / Vietnamese; analyst-written narrative remains English.</div>"),
+                      letter, fixed = TRUE)
+      }
+    }
+  }
 
   # RISK-02-01: never ship a raw {{token}} to a client-facing letter.
   residual <- regmatches(letter, gregexpr("\\{\\{[^{}]+\\}\\}", letter))[[1]]

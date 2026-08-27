@@ -297,6 +297,30 @@ html <- paste0('<!DOCTYPE html>
 </body>
 </html>')
 
+  # --- i18n (PHASE-07) ---
+  # report_toolkit may not be sourced yet in this file; ensure functions are available.
+  if (!exists("report_label")) source("R/report_toolkit.R")
+  i18n_lang_v <- if (exists("cfg") && !is.null(cfg$report_language) && length(cfg$report_language) > 0) cfg$report_language else "en"
+  # When called without --config, cfg is not defined above — load defaults
+  if (!exists("cfg")) { source("R/engagement_config.R"); cfg <- load_engagement_config(NULL); i18n_lang_v <- cfg$report_language }
+  i18n_labels_v <- tryCatch(
+    load_report_labels(override_csv = if (!is.null(cfg$paths$i18n_override_csv) && length(cfg$paths$i18n_override_csv) > 0) cfg$paths$i18n_override_csv else NULL),
+    error = function(e) NULL
+  )
+  if (!is.null(i18n_labels_v) && i18n_lang_v %in% c("vi", "bilingual")) {
+    html <- gsub("Intake Validation Report", report_label("validation_report_title", i18n_lang_v, i18n_labels_v), html, fixed = TRUE)
+    html <- gsub("Synthetic data — illustrative only", report_label("synthetic_disclaimer", i18n_lang_v, i18n_labels_v), html, fixed = TRUE)
+    if (identical(i18n_lang_v, "bilingual")) {
+      html <- sub("<div class=\"container\">",
+                  paste0("<div class=\"container\"><div class=\"callout callout-info\">Section headings, table column labels and the synthetic-data disclaimer are shown as English / Vietnamese; analyst-written narrative remains English.</div>"),
+                  html, fixed = TRUE)
+    }
+  } else if (identical(i18n_lang_v, "bilingual")) {
+    html <- sub("<div class=\"container\">",
+                "<div class=\"container\"><div class=\"callout callout-info\">Section headings, table column labels and the synthetic-data disclaimer are shown as English / Vietnamese; analyst-written narrative remains English.</div>",
+                html, fixed = TRUE)
+  }
+
 write_html_report(html, output_path)
 cat(sprintf("Report saved to: %s\n", normalizePath(output_path)))
 cat(sprintf("File size: %.1f KB\n", file.info(output_path)$size / 1024))

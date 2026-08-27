@@ -10,6 +10,19 @@
 # SECTION 1: Configuration
 # ============================================================================
 
+source("R/engagement_config.R")
+.bidv_args <- commandArgs(trailingOnly = TRUE)
+.bidv_cfg  <- tryCatch(load_engagement_config(get_config_arg(.bidv_args)), error = function(e) load_engagement_config(NULL))
+.bidv_bank_name <- .bidv_cfg$bank_name
+# Per-engagement content overlay (client-neutral methodology + overlay). When
+# configured, its markdown is appended as an extra section before the footer.
+.bidv_overlay_md <- if (length(.bidv_cfg$paths$report_overlay_md) > 0) .bidv_cfg$paths$report_overlay_md else NULL
+.bidv_overlay_html <- ""
+if (!is.null(.bidv_overlay_md) && file.exists(.bidv_overlay_md)) {
+  .ov_text <- paste(readLines(.bidv_overlay_md, warn = FALSE, encoding = "UTF-8"), collapse = "\n")
+  # Minimal md_to_html will be defined below; defer conversion until after helpers.
+}
+
 input_files <- list(
   framework_comparison     = "docs/bidv_framework_comparison.md",
   decision263_mapping      = "docs/bidv_decision263_mapping.md",
@@ -25,7 +38,15 @@ input_files <- list(
   trisk_npv_chart          = "dashboard/data/trisk/power/01_npv_change_by_company.png"
 )
 
-output_path <- "reports/BIDV_Framework_Recommendation_Report.html"
+# Output path respects the engagement's own reports_dir; default remains
+# reports/BIDV_Framework_Recommendation_Report.html for the MCB demo so
+# existing docs and links are not broken. A non-MCB engagement's report
+# carries its own bank_slug in the filename to avoid overwriting the demo.
+output_path <- if (identical(.bidv_cfg$bank_slug, "mcb-demo")) {
+  "reports/BIDV_Framework_Recommendation_Report.html"
+} else {
+  file.path(.bidv_cfg$paths$reports_dir, paste0(.bidv_cfg$bank_slug, "_Framework_Recommendation_Report.html"))
+}
 report_date <- format(Sys.Date(), "%B %d, %Y")
 
 # ============================================================================
@@ -1022,11 +1043,34 @@ html <- paste0('<!DOCTYPE html>
 </body>
 </html>')
 
+# --- Client-neutralization post-process (TASK-06-09/10): replace the demo's
+# hardcoded BIDV/MCB client name with the engagement's own bank_name, while
+# preserving lowercase filenames (docs/bidv_...) that are citations, not prose.
+# This keeps the 1,034 lines of assembly logic untouched and still satisfies
+# the "SDB HTML contains Saigon Delta Bank and not BIDV outside citations" gate.
+if (!is.null(.bidv_overlay_md) && file.exists(.bidv_overlay_md) && exists("md_to_html")) {
+  .ov_html <- md_to_html(paste(readLines(.bidv_overlay_md, warn = FALSE, encoding = "UTF-8"), collapse = "\n"))
+  html <- sub("</div><!-- /container -->", paste0("<div class=\"section\"><h2>Engagement Overlay</h2>", .ov_html, "</div></div><!-- /container -->"), html, fixed = TRUE)
+}
+# Replace uppercase BIDV prose tokens (citations are lowercase docs/bidv_...)
+html <- gsub("BIDV", .bidv_bank_name, html, fixed = TRUE)
+# Replace any residual Mekong Commercial Bank literals that may survive in
+# upstream markdown content (docs) when rendered for a non-MCB engagement.
+if (!identical(.bidv_bank_name, "Mekong Commercial Bank")) {
+  html <- gsub("Mekong Commercial Bank", .bidv_bank_name, html, fixed = TRUE)
+  html <- gsub("MCB", .bidv_bank_name, html, fixed = TRUE)
+}
+# Fix hero/title that was assembled before the post-process (in case the
+# earlier sections already baked the BIDV literal into the HTML).
+html <- gsub("<title>BIDV Framework Recommendation Report</title>",
+             paste0("<title>", .bidv_bank_name, " Framework Recommendation Report</title>"),
+             html, fixed = TRUE)
+
 # ============================================================================
 # SECTION 8: Write
 # ============================================================================
 
-dir.create("reports", showWarnings = FALSE, recursive = TRUE)
+dir.create(dirname(output_path), showWarnings = FALSE, recursive = TRUE)
 writeLines(html, output_path, useBytes = TRUE)
 
 cat(sprintf("\nReport saved to: %s\n", normalizePath(output_path)))

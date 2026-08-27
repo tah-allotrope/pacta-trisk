@@ -10,7 +10,7 @@ numbers here — those are rendered from the data in the generator.
 
 ## Governance (Quản trị)
 
-The Board of Mekong Commercial Bank (MCB) holds ultimate oversight of climate-related risks and opportunities. The Risk Management Committee reviews transition-risk exposure across high-emitting sectors (power, cement, steel, automotive) at least semi-annually, and the Sustainable Finance & Climate Risk Office reports portfolio-alignment and transition-stress findings into the credit-risk governance cycle.
+The Board of {{bank_name}} ({{bank_short}}) holds ultimate oversight of climate-related risks and opportunities. The Risk Management Committee reviews transition-risk exposure across high-emitting sectors (power, cement, steel, automotive) at least semi-annually, and the Sustainable Finance & Climate Risk Office reports portfolio-alignment and transition-stress findings into the credit-risk governance cycle.
 
 Management responsibility for assessing and managing climate-related risks sits with the Head of Sustainable Finance & Climate Risk, who integrates PACTA alignment and TRISK transition-stress outputs into sector strategy, credit appetite, and borrower engagement.
 

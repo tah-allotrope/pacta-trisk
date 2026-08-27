@@ -167,6 +167,13 @@ composite_score_b    = severity_alignment_b
 `w_align` and `w_trisk` default to `0.5` each (CLI flags `--w_align`,
 `--w_trisk`).
 
+> **Wave 3 PHASE-07 S1 (rounding):** the raw composite is rounded to
+> **10 decimal places** (`round(composite_score, 10)`) before it is written
+> and before `composite_rank_pct = rank(composite_score, ties.method="average")/n()`
+> is computed. The published number and the published rank therefore agree,
+> and a 1-ULP floating-point residue (≈1e-14) can no longer split six
+> otherwise-identical renewables borrowers across thirteen percentile points.
+
 **Sector composite** (`R/prioritization_core.R`), for sector `s`:
 
 ```
@@ -179,6 +186,17 @@ composite_score_s = w_alignment * alignment_score_s + w_stress * stress_score_s 
 `w_alignment = 0.35`, `w_stress = 0.35`, `w_exposure = 0.30` (unchanged
 defaults). `weighted_mean_loss_s` is the exposure-weighted mean of
 `max(0, -npv_change)` across the sector's TRISK-covered borrowers.
+
+## trisk_stress_rank_pct (Wave 3 PHASE-07, ASM-004)
+
+`engagement_priority.csv`'s former `trisk_priority_score` column is renamed
+`trisk_stress_rank_pct` in the 0.5.0 refreeze. It is a **within-engagement
+percentile rank** (`rank(stress_priority_score, ties.method="average")/n()`),
+is **not comparable across banks or across refreshes**, and **must never be
+fed into a composite score** — the composite uses absolute severities
+(`severity_alignment`, `severity_trisk`) only. The column is retained
+because downstream consumers (letters, disclosure) still render it as a
+dashboard sort key, but its name now advertises its limits.
 
 ## Reviewing or changing these numbers
 

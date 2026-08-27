@@ -67,11 +67,10 @@ test_that("SDB engagement priority has a rank-1 power borrower", {
   expect_gt(nrow(ep), 0L)
   expect_equal(ep$name_abcd[1], "Nghi Son Power LLC")
   expect_equal(ep$sector[1], "power")
-  # Wave 2 PHASE-03/04: composite_score is now an absolute severity from
-  # docs/scoring_anchors.md, not a min-max rescale -- this value is
-  # falsifiable (it does NOT hold "for any input" the way the pre-PHASE-03
-  # tautological 1.0 did).
-  expect_equal(ep$composite_score[1], 0.9113849765258216, tolerance = 1e-4)
+  # Wave 3 PHASE-07 0.5.0 refreeze: SDB stays on pdp8-2023 but composite_score
+  # is now rounded to 10 decimals (S1) — 0.9113849765 vs the old
+  # 0.9113849765258216. Still falsifiable, now also rank-consistent.
+  expect_equal(ep$composite_score[1], 0.9113849765, tolerance = 1e-4)
 
   # Wave 2 PHASE-04, TASK-04-06: regression guard against a min-max
   # normalization being reintroduced anywhere upstream -- under min-max the

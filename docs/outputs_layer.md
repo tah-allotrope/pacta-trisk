@@ -145,6 +145,32 @@ The generators only substitute `{{tokens}}` (letters) and convert markdown to HT
 - **PACTA-only sector:** automotive. These borrowers are scored on the alignment gap only, flagged `composite_partial = TRUE`, and show "Not assessed — sector not in the TRISK pilot" for the stress figures.
 - Cross-sector gap magnitudes are not strictly comparable (market-share percentage-points for power/automotive vs SDA emission-intensity `gap_pct` for cement/steel). Treat the composite as a demo prioritisation aid.
 
+## PDF delivery (Wave 3 PHASE-07)
+
+HTML is the canonical generated artifact for every report. PDF is an
+operator-side convenience produced from the self-contained HTML — never from
+the pipeline, never from `R/step_registry.R`, and never required for the
+gates to pass.
+
+```sh
+# Prerequisites (any one; Chrome/Chromium must be installed for pagedown):
+Rscript -e "install.packages('pagedown')"
+# or
+Rscript -e "install.packages('chromote')"
+
+# Convert any self-contained HTML report to PDF
+Rscript tools/render_pdf.R reports/BIDV_Framework_Recommendation_Report.html /tmp/out.pdf
+Rscript tools/render_pdf.R output/disclosure/disclosure_pack.html /tmp/disclosure.pdf
+Rscript tools/render_pdf.R output/financed_emissions/Financed_Emissions.html /tmp/fe.pdf
+```
+
+When no renderer is installed, `tools/render_pdf.R` prints an actionable
+message naming the missing package and its `install.packages()` command and
+exits non-zero — it never raises an uncaught R error and never silently fails.
+HTML remains the generated artifact the pipeline commits; PDF is for hand-off
+only (open the HTML in a browser and use **Print → Save as PDF** as a
+fallback that requires no R package).
+
 ## Verification
 
 ```sh

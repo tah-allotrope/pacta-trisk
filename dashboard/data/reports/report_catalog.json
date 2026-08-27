@@ -29,6 +29,36 @@
     "summary": "Comparison of climate risk/alignment frameworks (PACTA, PCAF, TRISK, TCFD/ISSB, GFANZ/NZBA, SBTi FI, NGFS) mapped to Decision 263 and recommended for a Vietnamese bank's adoption roadmap.",
     "category": "client_facing"
   },
+  "SLL_Readiness_Shortlist.html": {
+    "title": "SLL Readiness Shortlist",
+    "date": "2026-08-27",
+    "summary": "Ranks and bands a qualified pool of borrowers for sustainability-linked-loan structuring on transition materiality, ticket size, data availability, and (when configured) relationship signals -- a different question from the transition-risk severity ranking. Does not select the final shortlist; that is an analyst decision recorded in sll_readiness.csv.",
+    "category": "client_facing"
+  },
+  "Sector_Target_Registry.html": {
+    "title": "Sector Target Registry",
+    "date": "2026-08-27",
+    "summary": "One row per sector per horizon (2030 proposed, 2035/2050 not_set) carrying baseline and SDA-convergence or market-share targets, with an explicit note that PACTA gaps are benchmark-measured while targets are convergence-computed.",
+    "category": "client_facing"
+  },
+  "Financed_Emissions.html": {
+    "title": "Financed Emissions (Scope 1+2)",
+    "date": "2026-08-27",
+    "summary": "PCAF-style Scope 1+2 financed-emissions inventory with a data-quality composition (scores 1-5) for every published total, plus carbon-cost exposure valued against the NGFS carbon-price pathway. Automotive and coal mining are excluded (Scope 3-dominant); see the report for the exclusion statement.",
+    "category": "client_facing"
+  },
+  "Run_History_Diff.html": {
+    "title": "Run History Diff",
+    "date": "2026-08-27",
+    "summary": "Compares the two most recent recorded pipeline runs, showing which sectors and borrowers' composite scores moved and by how much -- see history/<bank_slug>/ for the full append-only run archive.",
+    "category": "client_facing"
+  },
+  "Scenario_Vintage_Comparison.html": {
+    "title": "Scenario Vintage Comparison",
+    "date": "2026-08-27",
+    "summary": "Shows what changed in the portfolio's alignment gap when the benchmark scenario vintage changed (Decision 500/QD-TTg PDP8 2023 vs the Decision 768/QD-TTg Adjusted PDP8 2025), holding the loanbook fixed -- see data/scenarios/pdp8-2025-adjusted/SOURCE.md for provenance and caveats.",
+    "category": "client_facing"
+  },
   "PACTA_Alignment_Report.html": {
     "title": "PACTA Alignment Report",
     "date": "2026-03-01",

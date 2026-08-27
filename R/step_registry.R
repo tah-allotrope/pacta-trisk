@@ -105,6 +105,13 @@ step_registry <- function() {
       script = "scripts/sll_readiness.R",
       args_fn = function(cfg, ctx) c("--config", ctx$effective_config_path)
     ),
+    # Wave 3 PHASE-06: sector target registry, reads SDA/MS portfolio and the
+    # engagement's own scenario vintage; must run after engagement_scoring and
+    # refresh_dashboard_data for the same reason as sll_readiness.
+    generate_targets = list(
+      script = "scripts/generate_targets.R",
+      args_fn = function(cfg, ctx) c("--config", ctx$effective_config_path)
+    ),
     generate_engagement_letters = list(
       script = "scripts/generate_engagement_letters.R",
       args_fn = function(cfg, ctx) {
@@ -201,6 +208,7 @@ step_registry <- function() {
 
   if (isTRUE(cfg$run_financed_emissions)) add_step("financed_emissions")
   if (isTRUE(cfg$run_sll_readiness)) add_step("sll_readiness")
+  if (isTRUE(cfg$run_targets)) add_step("generate_targets")
 
   if (isTRUE(cfg$run_outputs)) {
     add_step("generate_engagement_letters")

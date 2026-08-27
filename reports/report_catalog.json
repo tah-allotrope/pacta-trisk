@@ -35,6 +35,12 @@
     "summary": "Ranks and bands a qualified pool of borrowers for sustainability-linked-loan structuring on transition materiality, ticket size, data availability, and (when configured) relationship signals -- a different question from the transition-risk severity ranking. Does not select the final shortlist; that is an analyst decision recorded in sll_readiness.csv.",
     "category": "client_facing"
   },
+  "Sector_Target_Registry.html": {
+    "title": "Sector Target Registry",
+    "date": "2026-08-27",
+    "summary": "One row per sector per horizon (2030 proposed, 2035/2050 not_set) carrying baseline and SDA-convergence or market-share targets, with an explicit note that PACTA gaps are benchmark-measured while targets are convergence-computed.",
+    "category": "client_facing"
+  },
   "Financed_Emissions.html": {
     "title": "Financed Emissions (Scope 1+2)",
     "date": "2026-08-27",

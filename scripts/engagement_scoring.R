@@ -73,7 +73,10 @@ w_align <- parse_arg(args, "w_align", 0.5)
 w_trisk <- parse_arg(args, "w_trisk", 0.5)
 
 target_year     <- 2030
-auto_scenario   <- "pdp8_2023"      # scenario_source used for the borrower gap
+# Wave 3 PHASE-03/07: derive the PDP8 scenario_source from the engagement's
+# own vintage so the new pdp8_2025_adjusted vintage is not silently ignored
+# (it would otherwise filter to zero rows and break the automotive gap).
+auto_scenario   <- gsub("-", "_", cfg$inputs$scenario_vintage)
 auto_target_met <- "target_pdp8_ndc" # PDP8 target metric in the company file
 
 base_dir   <- getwd()
@@ -108,7 +111,7 @@ for (s in trisk_sectors) {
     alignment_gap         = df$mean_abs_alignment_gap_pp,
     npv_change            = df$npv_change,
     pd_change             = df$pd_change,
-    trisk_priority_score  = df$stress_priority_score,
+    trisk_stress_rank_pct  = df$stress_priority_score,
     trisk_status          = sprintf("Covered — TRISK %s pilot", s),
     alignment_basis       = df$alignment_context
   )
@@ -125,7 +128,7 @@ pacta <- readr::read_csv(pacta_file, show_col_types = FALSE)
 auto_gap <- pacta |>
   dplyr::filter(
     sector == "automotive",
-    scenario_source == auto_scenario,
+    grepl("^pdp8", scenario_source),
     year == target_year,
     metric %in% c("projected", auto_target_met),
     !name_abcd %in% c("corporate_economy")
@@ -144,7 +147,7 @@ auto_borrowers <- auto_gap |>
     alignment_gap        = alignment_gap,
     npv_change           = NA_real_,
     pd_change            = NA_real_,
-    trisk_priority_score = NA_real_,
+    trisk_stress_rank_pct = NA_real_,
     trisk_status         = "N/A - sector not in TRISK pilot",
     alignment_basis      = sprintf("PACTA market-share gap (PDP8, %d)", target_year)
   )
@@ -190,7 +193,7 @@ if (nrow(borrowers) == 0) {
     alignment_gap = numeric(),
     npv_change = numeric(),
     pd_change = numeric(),
-    trisk_priority_score = numeric(),
+    trisk_stress_rank_pct = numeric(),
     trisk_status = character(),
     composite_score = numeric(),
     composite_partial = logical(),
@@ -229,11 +232,16 @@ borrowers <- borrowers |>
       }
     }
   ) |>
+  # Wave 3 PHASE-07 S1: round to 10 decimals before ranking and before writing,
+  # so the published number and the published rank agree and a 1-ULP floating
+  # residue no longer splits otherwise-identical borrowers.
+  dplyr::mutate(composite_score = round(composite_score, 10)) |>
   dplyr::ungroup() |>
   dplyr::mutate(
     # Percentile rank within this engagement: an explicit, separately-named
     # relative view that survives now that composite_score itself is
     # absolute (Wave 2 PHASE-03). rank()/n so the top borrower reads 1.0.
+    # Ties now genuinely tie on the rounded score (S1).
     composite_rank_pct = rank(composite_score, ties.method = "average") / dplyr::n(),
     severity_alignment = .sev_align,
     severity_trisk = .sev_trisk
@@ -243,7 +251,7 @@ borrowers <- borrowers |>
 priority <- borrowers |>
   dplyr::select(
     name_abcd, sector, exposure_vnd, alignment_gap, npv_change, pd_change,
-    trisk_priority_score, trisk_status, composite_score, composite_partial,
+    trisk_stress_rank_pct, trisk_status, composite_score, composite_partial,
     severity_alignment, severity_trisk, composite_rank_pct, alignment_basis
   ) |>
   dplyr::mutate(data_source = data_source)
@@ -263,7 +271,7 @@ for (i in seq_len(nrow(top10))) {
   r <- top10[i, ]
   cat(sprintf("  %2d. %-32s [%-10s] composite=%.3f  gap=%.2f  trisk=%s%s\n",
               i, r$name_abcd, r$sector, r$composite_score, r$alignment_gap,
-              if (is.na(r$trisk_priority_score)) "N/A" else sprintf("%.1f", r$trisk_priority_score),
+              if (is.na(r$trisk_stress_rank_pct)) "N/A" else sprintf("%.1f", r$trisk_stress_rank_pct),
               if (isTRUE(r$composite_partial)) "  (partial)" else ""))
 }
 

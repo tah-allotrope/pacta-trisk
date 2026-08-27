@@ -167,13 +167,13 @@
     </div>
 
     <header class="letterhead">
-      <div class="bank">Mekong Commercial Bank <span>· MCB</span></div>
+      <div class="bank">{{bank_name}} <span>· {{bank_short}}</span></div>
       <div class="dept">Sustainable Finance &amp; Climate Risk Office · Phòng Tài chính Bền vững &amp; Rủi ro Khí hậu</div>
     </header>
 
     <div class="meta">
       <div>Date / Ngày: {{date}}</div>
-      <div>Ref: MCB-CR-{{rank}}</div>
+      <div>Ref: {{bank_short}}-CR-{{rank}}</div>
     </div>
 
     <div class="recipient">
@@ -192,7 +192,7 @@
         <tr><th>Benchmark scenario (kịch bản)</th><td>{{scenario_name}}</td></tr>
         <tr><th>TRISK NPV change under stress</th><td>{{npv_change}}</td></tr>
         <tr><th>TRISK PD change under stress (xác suất vỡ nợ)</th><td>{{pd_change}}</td></tr>
-        <tr><th>MCB exposure (dư nợ)</th><td>{{exposure_vnd}}</td></tr>
+        <tr><th>{{bank_short}} exposure (dư nợ)</th><td>{{exposure_vnd}}</td></tr>
         <tr><th>Engagement priority</th><td>#{{rank}} of top {{top_n}} · {{trisk_status}}</td></tr>
       </table>
     </div>
@@ -202,19 +202,19 @@
 
     <p class="closing">
       We would value the opportunity to discuss this assessment and {{borrower}}'s transition plan
-      (kế hoạch chuyển dịch) with your team. Mekong Commercial Bank views this engagement as a
+      (kế hoạch chuyển dịch) with your team. {{bank_name}} views this engagement as a
       partnership to manage transition risk and to support a credible, financeable decarbonisation pathway.
     </p>
 
     <div class="signoff">
       Yours sincerely / Trân trọng,
       <div class="name">Head of Sustainable Finance &amp; Climate Risk</div>
-      <div>Mekong Commercial Bank (MCB)</div>
+      <div>{{bank_name}} ({{bank_short}})</div>
     </div>
 
     <footer class="disclaimer">
       <strong>Illustrative — based on synthetic portfolio data.</strong>
-      This letter was generated automatically from the MCB demo engagement layer (PACTA alignment +
+      This letter was generated automatically from the {{bank_name}} engagement layer (PACTA alignment +
       TRISK transition stress) on synthetic data. All figures are model outputs and do not constitute
       financial advice, a credit decision, or a regulatory filing. <strong>Requires human and legal
       review before any external use.</strong> Generated {{generated_at}}.

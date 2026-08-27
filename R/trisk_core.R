@@ -688,7 +688,7 @@ load_alignment_context <- function(sector, meta, input_dir, pacta_output_dir = "
     power_alignment <- read_csv(ms_file, show_col_types = FALSE) %>%
       filter(
         sector == "power",
-        scenario_source == "pdp8_2023",
+        grepl("^pdp8", scenario_source),
         year == 2030,
         metric %in% c("projected", "target_pdp8_ndc")
       ) %>%

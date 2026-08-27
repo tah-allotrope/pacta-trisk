@@ -144,6 +144,7 @@ test_that("committed pipeline_manifest.json still contains the mandatory default
     "pacta_vietnam_scenario", "trisk_prepare_inputs", "trisk_sector_demo_power",
     "trisk_sector_demo_cement", "trisk_sector_demo_steel", "trisk_scenario_grid",
     "sector_prioritization", "refresh_dashboard_data", "engagement_scoring",
+    "financed_emissions", "sll_readiness", "generate_targets",
     "generate_engagement_letters", "generate_disclosure_pack", "refresh_audit"
   )
   matched_idx <- match(mandatory, step_names)
@@ -177,7 +178,7 @@ test_that("run_engagement.R --full --dry-run for MCB prints the exact 16-step or
     "generate_vietnam_data", "pacta_vietnam_scenario", "trisk_prepare_inputs",
     "trisk_sector_demo_power", "trisk_sector_demo_cement", "trisk_sector_demo_steel",
     "trisk_scenario_grid", "sector_prioritization", "refresh_dashboard_data",
-    "engagement_scoring", "financed_emissions", "sll_readiness", "generate_engagement_letters", "generate_disclosure_pack",
+    "engagement_scoring", "financed_emissions", "sll_readiness", "generate_targets", "generate_engagement_letters", "generate_disclosure_pack",
     "refresh_audit", "record_history"
   ))
 })

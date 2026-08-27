@@ -18,6 +18,11 @@ suppressPackageStartupMessages({
   library(jsonlite)
 })
 
+# Fallback null-coalescing operator when rlang/purrr not loaded (e.g. direct sourcing in tests).
+if (!exists("%||%", mode = "function")) {
+  `%||%` <- function(a, b) if (is.null(a) || length(a) == 0) b else a
+}
+
 # --- Defaults (== today's hardcoded MCB paths) -------------------------------
 
 .default_engagement_config <- function() {
@@ -74,7 +79,15 @@ suppressPackageStartupMessages({
       disclosure_output_dir = "output/disclosure",
       prioritization_output_dir = "synthesis_output/prioritization",
       # Wave 3 PHASE-05.
-      financed_emissions_output_dir = "output/financed_emissions"
+      financed_emissions_output_dir = "output/financed_emissions",
+      # Wave 3 PHASE-06 (TASK-06-09): per-engagement content overlay for the
+      # BIDV framework report generator (client-neutral methodology + overlay).
+      # NULL means "no overlay configured" -- same skip pattern as
+      # raw_loanbook_csv.
+      report_overlay_md = NULL,
+      # Wave 3 PHASE-07 (TASK-07-03): per-engagement i18n override CSV.
+      # NULL means "no override" -- use templates/i18n/labels.csv only.
+      i18n_override_csv = NULL
     ),
     anonymize = FALSE,
     # Only mcb-demo's engagement_config.json sets this TRUE. The orchestrator
@@ -114,6 +127,13 @@ suppressPackageStartupMessages({
     # ordering constraint engagement_scoring itself has, per ASM-004 of
     # research/2026-08-11_gtb-middle-tier-gap-closers-brainstorm.md).
     run_sll_readiness = FALSE,
+    # Wave 3 PHASE-06 (GTB target registry, TASK-06-11): gates generate_targets.
+    # Must run after engagement_scoring and refresh_dashboard_data.
+    run_targets = FALSE,
+    # Wave 3 PHASE-07 (TASK-07-04): report language. "en" for English-only,
+    # "vi" for Vietnamese-only, "bilingual" for English / Vietnamese side-by-
+    # side. Default "en" so no existing output changes until a config opts in.
+    report_language = "en",
     # Wave 3 PHASE-06 (GTB DEC-013): borrower composite score weights,
     # reachable through the config instead of only scripts/engagement_scoring.R's
     # own --w_align/--w_trisk CLI flags. Defaults reproduce that script's own
@@ -307,10 +327,29 @@ suppressPackageStartupMessages({
     problems <- c(problems, "public_snapshot_allowed must be a single TRUE/FALSE value")
   }
 
-  for (flag_name in c("run_data_generation", "run_refresh_audit", "run_outputs", "run_vintage_comparison", "run_history", "run_financed_emissions", "run_sll_readiness")) {
+  for (flag_name in c("run_data_generation", "run_refresh_audit", "run_outputs", "run_vintage_comparison", "run_history", "run_financed_emissions", "run_sll_readiness", "run_targets")) {
     value <- cfg[[flag_name]]
     if (!is.logical(value) || length(value) != 1 || is.na(value)) {
       problems <- c(problems, sprintf("%s must be a single TRUE/FALSE value", flag_name))
+    }
+  }
+
+  # report_language (Wave 3 PHASE-07)
+  if (!is.character(cfg$report_language) || length(cfg$report_language) != 1 ||
+      !(cfg$report_language %in% c("en", "vi", "bilingual"))) {
+    problems <- c(problems, sprintf(
+      "report_language must be one of 'en', 'vi', 'bilingual', got: %s",
+      paste(cfg$report_language, collapse = ", ")
+    ))
+  }
+
+  # Optional paths: when non-empty must exist
+  for (path_name in c("report_overlay_md", "i18n_override_csv")) {
+    p <- cfg$paths[[path_name]]
+    if (length(p) > 0 && !is.null(p) && nzchar(trimws(as.character(p[[1]])))) {
+      if (!file.exists(p)) {
+        problems <- c(problems, sprintf("paths.%s file not found: %s", path_name, p))
+      }
     }
   }
 
