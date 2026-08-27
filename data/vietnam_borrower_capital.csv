@@ -1,0 +1,26 @@
+company_id,name_company,sector,borrower_capital_vnd,borrower_capital_source
+VN_ABCD_001,EVN (Electricity of Vietnam),power,9376250000000,reported
+VN_ABCD_002,Vinacomin Power JSC,power,1401891891892,reported
+VN_ABCD_003,International Power Mong Duong,power,878333333333,reported
+VN_ABCD_004,PVN Power Corporation,power,4274827586207,reported
+VN_ABCD_005,Nghi Son Power LLC,power,1477826086957,reported
+VN_ABCD_006,Dung Quat LNG Power Consortium,power,1003809523810,reported
+VN_ABCD_007,Vietnam Hydropower JSC,power,1796666666667,reported
+VN_ABCD_008,Trung Nam Group,power,1305000000000,reported
+VN_ABCD_009,BIM Group,power,603529411765,reported
+VN_ABCD_010,Thanh Thanh Cong Group,power,801081081081,reported
+VN_ABCD_011,Xuan Thien Group,power,967073170732,reported
+VN_ABCD_012,T&T Group,power,770909090909,reported
+VN_ABCD_013,Gia Lai Electricity JSC,power,550000000000,reported
+VN_ABCD_014,THACO Industries,automotive,3600000000000,sector_median
+VN_ABCD_015,Toyota Motor Corporation,automotive,2550000000000,sector_median
+VN_ABCD_016,Ford Motor Company,automotive,1950000000000,sector_median
+VN_ABCD_017,Hyundai Motor Company,automotive,1650000000000,sector_median
+VN_ABCD_018,Vingroup JSC,automotive,3000000000000,sector_median
+VN_ABCD_019,Honda Motor Co Ltd,automotive,750000000000,sector_median
+VN_ABCD_020,VICEM,cement,1831578947368,reported
+VN_ABCD_021,Holcim Group,cement,1642105263158,reported
+VN_ABCD_022,Hoa Phat Group JSC,steel,1480645161290,reported
+VN_ABCD_023,Pomina Group,steel,860869565217,reported
+VN_ABCD_024,Vietnam National Coal-Mineral Industries Group,coal,2000000000000,sector_median
+VN_ABCD_025,Dong Bac Corporation,coal,2000000000000,sector_median

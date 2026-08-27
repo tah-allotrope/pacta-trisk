@@ -6,6 +6,33 @@
 streamlit run dashboard/app.py
 ```
 
+## Dependencies
+
+`requirements.txt` declares intent (range constraints, e.g. `streamlit>=1.41,<2`)
+and is what a developer installs from day to day. `requirements.lock` is a
+full `pip freeze` pin of every exact version actually resolved and tested,
+generated from a clean virtual environment containing only
+`requirements.txt`'s packages — CI (`.github/workflows/ci.yml`) installs from
+the lock file, not the range file, so the public deployment's Python stack is
+reproducible to the same standard the R stack already has via `renv.lock`.
+Regenerate it after bumping any range in `requirements.txt`:
+
+```bash
+python -m venv /tmp/lockenv
+/tmp/lockenv/bin/pip install -r dashboard/requirements.txt
+/tmp/lockenv/bin/pip freeze > dashboard/requirements.lock
+```
+
+Run `python -m pytest dashboard/tests` against the freshly-locked environment
+before committing the regenerated file — a version inside `requirements.txt`'s
+own range constraint is not guaranteed to be behavior-compatible with the test
+suite. Concretely: `streamlit>=1.41,<2` resolved to `1.62.0` on 2026-08-27,
+which changed `AppTest.from_file()`'s relative-path resolution (now resolved
+against the calling test file rather than the working directory) and broke
+every `AppTest`-based test in this suite; `1.59.2` is the pinned, verified-
+green version. This is exactly the failure mode `requirements.lock` exists to
+prevent on the public deployment.
+
 ## What is implemented
 
 - Phase 02: Streamlit shell, loaders, chart helpers, theme, README

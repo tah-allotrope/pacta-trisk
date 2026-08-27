@@ -32,21 +32,46 @@ The composite score answers: **"Which sector should BIDV prioritize for climate 
 | **Cement** (SDA) | SDA | `gap_pct` value — percentage by which portfolio emission intensity exceeds the 2030 target. | `06_vn_sda_alignment_2030.csv` |
 | **Steel** (SDA) | SDA | `gap_pct` value — percentage by which portfolio emission intensity exceeds the 2030 target. | `06_vn_sda_alignment_2030.csv` |
 
-**Raw values (MCB synthetic portfolio):**
+**Raw values (MCB synthetic portfolio, as of Wave 2 0.4.1 / 2026-08-08):**
 
 | Sector | Raw Value | Source |
 |---|---|---|
-| Power | 13.37 pp | Max positive gap: coalcap (+13.37 pp over PDP8 target) |
+| Power | 14.39 pp | Max positive gap: coalcap (over PDP8 target) |
 | Cement | 2.1% | SDA intensity gap vs. 2030 target |
 | Steel | 7.2% | SDA intensity gap vs. 2030 target |
 
-**Normalization:** Min-max scaling to [0, 1] across the three sectors. The sector with the highest raw gap gets 1.0, the lowest gets 0.0.
+> **Corrected 2026-08-27 (Wave 3 PHASE-06, DEC-009).** This section previously
+> described min-max normalization ("the sector with the highest raw gap gets
+> 1.0, the lowest gets 0.0") and quoted values from before Wave 2 PHASE-03.
+> Wave 2 PHASE-03 (2026-08-01) replaced min-max normalization across every
+> priority score in this repository with **absolute severity from a fixed,
+> documented anchor table** — see `docs/scoring_anchors.md`, the single
+> source of truth for the tables below. Under min-max, the top-ranked sector
+> was *always* exactly 1.0 regardless of how good or bad it actually was —
+> a tautology, not a finding — and two different banks' scores could not be
+> compared. This section, and the results in §9, now describe the corrected
+> method and current numbers.
 
-```
-alignment_score = (raw_gap - min_gap) / (max_gap - min_gap)
-```
+**Normalization:** Clamped piecewise-linear interpolation over a fixed,
+documented five-breakpoint anchor table (`docs/scoring_anchors.md`) — **not**
+min-max scaling across the sectors in scope. A score of 0.61 means the same
+thing this refresh, next refresh, and for any other bank; it does not depend
+on what else happens to be in the comparison set.
 
-**Caveat:** Power and SDA gaps are in different units (percentage points vs. percent). Min-max scaling across sectors makes them comparable by ranking relative severity within the portfolio, not by absolute magnitude. This is intentional — the question is "which sector is the worst relative to the others?" not "which sector has the largest absolute number?"
+- **Power / automotive** (market-share gap, percentage points, Table A1):
+  breakpoints `0, 5, 10, 20, 40 pp -> severity 0.00, 0.25, 0.50, 0.75, 1.00`.
+- **Cement / steel** (SDA intensity gap, percent of target, Table A2):
+  breakpoints `0, 2, 5, 10, 20% -> severity 0.00, 0.25, 0.50, 0.75, 1.00`.
+
+A gap beyond the last breakpoint saturates at severity 1.00 rather than
+extrapolating — an unboundedly bad gap reads as "as bad as this scale can
+express," not as some arbitrarily large number.
+
+**Caveat:** Power and SDA gaps are in different units (percentage points vs.
+percent) and use different anchor tables (A1 vs. A2) for exactly that
+reason — a market-share gap and an emission-intensity gap of the same
+numeric size do not represent the same severity of misalignment, and are
+never combined into one min-max pool.
 
 ### 2.2 Dimension 2: Transition Stress Severity
 
@@ -68,11 +93,11 @@ sector_stress_score = Σ(borrower_stress_score × borrower_exposure) / Σ(borrow
 | Cement | 2 borrowers | 95 (VICEM), 5 (Holcim) | Calculated by script |
 | Steel | 2 borrowers | 95 (Hoa Phat), 5 (Pomina) | Calculated by script |
 
-**Normalization:** Min-max scaling to [0, 1] across the three sectors.
-
-```
-stress_score = (raw_stress - min_stress) / (max_stress - min_stress)
-```
+**Normalization:** Absolute severity from Table B (`docs/scoring_anchors.md`)
+applied to `loss = max(0, -npv_change)` (a fraction of baseline NPV) —
+**not** min-max scaling across the sectors. Breakpoints:
+`0.00, 0.05, 0.15, 0.30, 0.60 -> severity 0.00, 0.25, 0.50, 0.75, 1.00`. A
+positive `npv_change` (a value *gain* under the shock) always scores `0.00`.
 
 **Fallback:** If a sector has no TRISK output (e.g., automotive, which is out of scope for TRISK), the stress dimension is set to 0 and a warning is emitted. The sector is scored on alignment + exposure only.
 
@@ -93,11 +118,11 @@ exposure_share = sector_exposure / total_d263_exposure
 - `C2310` (glass/glass products) and `C239` (other non-metallic minerals) → cement
 - `C2410` (basic iron and steel) → steel
 
-**Normalization:** Min-max scaling to [0, 1] across the three sectors. The sector with the highest exposure share gets 1.0.
-
-```
-exposure_score = (exposure_share - min_share) / (max_share - min_share)
-```
+**Normalization:** Absolute severity from Table C (`docs/scoring_anchors.md`)
+applied to `exposure_share` as a fraction in `[0, 1]` (not a percentage —
+`severity_exposure(0.82)` is correct, `severity_exposure(82)` silently
+saturates at 1.00) — **not** min-max scaling across the sectors. Breakpoints:
+`0.00, 0.05, 0.15, 0.30, 0.50 -> severity 0.00, 0.25, 0.50, 0.75, 1.00`.
 
 ---
 
@@ -219,25 +244,42 @@ Horizontal stacked bar chart with:
 
 ## 9. MCB Demonstration Results Appendix
 
-The script was executed against the MCB synthetic portfolio (43 loans, 19.3 trillion VND Decision 263 exposure) with default weights (0.35/0.35/0.30). Results:
+> **Corrected 2026-08-27 (Wave 3 PHASE-06, DEC-009).** This section
+> previously quoted Power 1.000 / Steel 0.158 Low / Cement 0.011 Low —
+> tautological min-max values from before Wave 2 PHASE-03 (2026-08-01)
+> replaced min-max normalization with absolute anchor-table severity
+> throughout the platform. **The qualitative story inverted**: under the
+> corrected method, all three sectors read High or Critical, not two of
+> three reading Low. The numbers below are read directly from the current
+> committed `synthesis_output/prioritization/sector_priority_ranking.csv`.
+
+The script was executed against the MCB synthetic portfolio with default
+weights (0.35/0.35/0.30). Results:
 
 | Sector | Alignment Score | Stress Score | Exposure Score | Composite | Band |
 |---|---|---|---|---|---|
-| Power | 1.000 | 1.000 | 1.000 | **1.000** | Critical |
-| Steel | 0.453 | 0.000 | 0.000 | **0.158** | Low |
-| Cement | 0.000 | 0.000 | 0.035 | **0.011** | Low |
+| Power | 0.610 | 1.000 | 1.000 | **0.863** | Critical |
+| Steel | 0.610 | 0.961 | 0.320 | **0.646** | High |
+| Cement | 0.258 | 1.000 | 0.384 | **0.556** | High |
 
 **Raw values:**
 
-| Sector | Alignment Gap | Stress (weighted mean) | Exposure (VND) | Exposure Share |
-|---|---|---|---|---|
-| Power | 13.37 pp | 493.39 | 15,770,000 | 81.8% |
-| Cement | 2.1% | 100.00 | 2,000,000 | 10.4% |
-| Steel | 7.2% | 100.00 | 1,500,000 | 7.8% |
+| Sector | Alignment Gap | Exposure Share |
+|---|---|---|
+| Power | 14.39 pp | 81.8% |
+| Cement | 2.1% | 10.4% |
+| Steel | 7.2% | 7.8% |
 
-**Sensitivity check:** With weights 0.50/0.25/0.25 (alignment-heavy), steel's score increased from 0.158 to 0.226 (+43%). The ranking order (power > steel > cement) is stable across all tested weight combinations.
+Every score above is now **absolute**, per `docs/scoring_anchors.md`'s Tables
+A1/A2/B/C — a score does not depend on what else is being compared, and the
+platform's own regression suite
+(`tests/testthat/test_golden_numbers.R`) asserts every composite score is
+strictly between 0 and 1 as a guard against min-max ever being
+reintroduced.
 
-**Caveats:** Steel match coverage ~4% in the MCB portfolio; power sector NA values at 2025 for some technologies; all results are synthetic, not real BIDV data.
+**Caveats:** all results are synthetic, not real BIDV data. See
+`docs/scoring_anchors.md` for the full anchor-table specification and the
+rationale for absolute over relative scoring.
 
 ---
 

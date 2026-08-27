@@ -35,7 +35,7 @@ money-denominated coverage & reconciliation report per engagement).
   share of normalized exposure with ABCD asset-level coverage — broken down by
   sector with unmatched counterparties listed by name and exposure.
 
-Verified: full R suite FAIL 0 / PASS 404, invariants INV-001..006 all PASS,
+Verified: full R suite green (FAIL 0), invariants INV-001..006 all PASS,
 SDB engagement exits 0 with `coverage_report` in its step list, MCB public
 snapshot byte-identity intact.
 

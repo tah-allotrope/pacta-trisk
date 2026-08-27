@@ -113,32 +113,49 @@ def list_report_files() -> list[Path]:
     return sorted(REPORTS_DIR.glob("*.html"))
 
 
+def _load_report_catalog_sidecar() -> dict[str, dict[str, str]]:
+    """Read the report_catalog.json sidecar copied into the snapshot by
+    scripts/refresh_dashboard_data.R (Wave 3 PHASE-02). Returns {} if the
+    sidecar is absent (e.g. an old snapshot predating this phase) or
+    unreadable -- report_catalog() below degrades every file to an
+    uncatalogued entry rather than raising.
+    """
+    sidecar_path = REPORTS_DIR / "report_catalog.json"
+    if not sidecar_path.exists():
+        return {}
+    try:
+        import json
+
+        return json.loads(sidecar_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+
+
 def report_catalog() -> list[dict[str, str | Path]]:
-    summaries = {
-        "2026-04-16-final-vietnam-bank-trisk-demo.html": {
-            "title": "Final Vietnam Bank TRISK Demo",
-            "date": "2026-04-16",
-            "summary": "Combined client-facing synthesis of the Vietnam PACTA baseline and TRISK power pilot.",
-        },
-        "PACTA_Vietnam_Bank_Report.html": {
-            "title": "PACTA Vietnam Bank Report",
-            "date": "2026-03-20",
-            "summary": "Vietnam-specific PACTA alignment narrative for the synthetic Mekong Commercial Bank portfolio.",
-        },
-        "2026-04-16-trisk-power-pilot.html": {
-            "title": "TRISK Power Pilot",
-            "date": "2026-04-16",
-            "summary": "Power-sector stress-test report with borrower-level NPV and PD changes plus sensitivity findings.",
-        },
-        "PACTA_Synthesis_Report.html": {
-            "title": "PACTA Synthesis Report",
-            "date": "2026-03-19",
-            "summary": "Best-of-both alignment report combining the earlier AI and staff PACTA approaches.",
-        },
-    }
+    """Every HTML file actually present in the reports snapshot, with
+    metadata from report_catalog.json when available. A published file with
+    no catalog entry is never silently dropped (Wave 3 PHASE-02, N-008) --
+    it gets a filename-derived title and an explicit "no summary" marker
+    instead.
+    """
+    catalog = _load_report_catalog_sidecar()
     rows: list[dict[str, str | Path]] = []
     for path in list_report_files():
-        meta = summaries.get(path.name)
+        meta = catalog.get(path.name)
         if meta:
-            rows.append({"path": path, **meta})
+            rows.append({
+                "path": path,
+                "title": meta.get("title", path.stem),
+                "date": meta.get("date", ""),
+                "summary": meta.get("summary", "No summary available."),
+                "category": meta.get("category", "uncatalogued"),
+            })
+        else:
+            rows.append({
+                "path": path,
+                "title": path.stem,
+                "date": "",
+                "summary": "No summary available.",
+                "category": "uncatalogued",
+            })
     return rows

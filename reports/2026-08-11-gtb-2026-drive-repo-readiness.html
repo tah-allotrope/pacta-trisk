@@ -1,0 +1,597 @@
+<title>GTB 2026–2027: Drive Commitments vs. Repo Capability</title>
+<style>
+  :root {
+    --ground:        #fbfcfd;
+    --surface:       #f2f5f7;
+    --surface-sunk:  #e7ecef;
+    --ink:           #16212b;
+    --ink-soft:      #4a5b68;
+    --ink-faint:     #788896;
+    --rule:          #d5dee3;
+    --rule-soft:     #e6ecef;
+    --accent:        #0e6f72;
+    --accent-soft:   #d9ebeb;
+    --ready:         #2f6b4f;
+    --ready-soft:    #dfeee6;
+    --partial:       #8a5f12;
+    --partial-soft:  #f4e9d3;
+    --gap:           #a33a32;
+    --gap-soft:      #f6e0dd;
+
+    --display: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+    --body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "Cascadia Mono", "SF Mono", Menlo, Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:        #0f1417;
+      --surface:       #171e23;
+      --surface-sunk:  #1e272d;
+      --ink:           #e4ebef;
+      --ink-soft:      #a6b6c0;
+      --ink-faint:     #7c8e9a;
+      --rule:          #2b363d;
+      --rule-soft:     #222c32;
+      --accent:        #5cc3c4;
+      --accent-soft:   #16353a;
+      --ready:         #74c69a;
+      --ready-soft:    #163025;
+      --partial:       #d9ab54;
+      --partial-soft:  #322715;
+      --gap:           #e08b81;
+      --gap-soft:      #351d1c;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground:        #0f1417;
+    --surface:       #171e23;
+    --surface-sunk:  #1e272d;
+    --ink:           #e4ebef;
+    --ink-soft:      #a6b6c0;
+    --ink-faint:     #7c8e9a;
+    --rule:          #2b363d;
+    --rule-soft:     #222c32;
+    --accent:        #5cc3c4;
+    --accent-soft:   #16353a;
+    --ready:         #74c69a;
+    --ready-soft:    #163025;
+    --partial:       #d9ab54;
+    --partial-soft:  #322715;
+    --gap:           #e08b81;
+    --gap-soft:      #351d1c;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 16.5px;
+    line-height: 1.62;
+    margin: 0;
+    padding: 0 1.5rem 6rem;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 54rem;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 3.25rem;
+  }
+
+  /* ---------- masthead ---------- */
+
+  header.masthead {
+    padding-top: 4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 2.25rem;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(2rem, 5.2vw, 2.9rem);
+    line-height: 1.14;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  .standfirst {
+    font-size: 1.1rem;
+    color: var(--ink-soft);
+    max-width: 44rem;
+    margin: 0;
+  }
+
+  .meta-line {
+    font-family: var(--mono);
+    font-size: 0.76rem;
+    color: var(--ink-faint);
+    margin: 0;
+  }
+
+  /* ---------- sections ---------- */
+
+  section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.15rem;
+  }
+
+  h2 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 1.6rem;
+    line-height: 1.22;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0;
+    padding-bottom: 0.55rem;
+    border-bottom: 2px solid var(--accent);
+    align-self: flex-start;
+  }
+
+  h3 {
+    font-family: var(--body);
+    font-weight: 650;
+    font-size: 0.94rem;
+    letter-spacing: 0.01em;
+    margin: 0;
+    color: var(--ink);
+  }
+
+  p { margin: 0; max-width: 44rem; }
+
+  a { color: var(--accent); text-underline-offset: 2px; }
+  a:focus-visible,
+  summary:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.845em;
+    background: var(--surface-sunk);
+    color: var(--ink);
+    padding: 0.1em 0.36em;
+    border-radius: 3px;
+    word-break: break-word;
+  }
+
+  strong { font-weight: 650; }
+
+  /* ---------- source doc cards ---------- */
+
+  .sources {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: 1rem;
+  }
+
+  .doc {
+    background: var(--surface);
+    border: 1px solid var(--rule-soft);
+    border-radius: 4px;
+    padding: 1.1rem 1.15rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+
+  .doc-title {
+    font-weight: 650;
+    font-size: 0.92rem;
+    line-height: 1.35;
+  }
+
+  .doc-meta {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--ink-faint);
+    line-height: 1.55;
+  }
+
+  .doc-note {
+    font-size: 0.87rem;
+    color: var(--ink-soft);
+  }
+
+  /* ---------- status pills ---------- */
+
+  .pill {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.2em 0.6em;
+    border-radius: 3px;
+    white-space: nowrap;
+    vertical-align: 0.08em;
+  }
+  .pill.ready   { background: var(--ready-soft);   color: var(--ready); }
+  .pill.partial { background: var(--partial-soft); color: var(--partial); }
+  .pill.gap     { background: var(--gap-soft);     color: var(--gap); }
+
+  /* ---------- mapping rows ---------- */
+
+  .map {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    background: var(--surface);
+    border: 1px solid var(--rule-soft);
+    border-left: 3px solid var(--rule);
+    border-radius: 3px;
+    padding: 0.95rem 1.1rem;
+  }
+  .row.ready   { border-left-color: var(--ready); }
+  .row.partial { border-left-color: var(--partial); }
+  .row.gap     { border-left-color: var(--gap); }
+
+  .row-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.6rem;
+    justify-content: space-between;
+  }
+
+  .row-claim {
+    font-size: 0.93rem;
+    color: var(--ink-soft);
+  }
+
+  .row-claim .lead {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  /* ---------- callout ---------- */
+
+  .callout {
+    background: var(--accent-soft);
+    border-radius: 4px;
+    padding: 1.3rem 1.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+
+  .callout h3 { color: var(--ink); }
+  .callout p { color: var(--ink-soft); max-width: none; }
+
+  /* ---------- stat strip ---------- */
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .stat {
+    background: var(--surface);
+    padding: 0.95rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .stat-num {
+    font-family: var(--display);
+    font-size: 1.7rem;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+  }
+
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  /* ---------- lists ---------- */
+
+  ul.tight {
+    margin: 0;
+    padding-left: 1.15rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-width: 44rem;
+  }
+  ul.tight li { padding-left: 0.15rem; }
+
+  ol.actions {
+    margin: 0;
+    padding-left: 1.3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    max-width: 44rem;
+  }
+  ol.actions li::marker {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    color: var(--accent);
+  }
+
+  /* ---------- table ---------- */
+
+  .table-scroll { overflow-x: auto; }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 34rem;
+    font-size: 0.88rem;
+  }
+
+  th, td {
+    text-align: left;
+    padding: 0.55rem 0.85rem 0.55rem 0;
+    border-bottom: 1px solid var(--rule-soft);
+    vertical-align: top;
+  }
+
+  th {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 400;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  /* ---------- footer ---------- */
+
+  footer {
+    border-top: 1px solid var(--rule);
+    padding-top: 1.5rem;
+    font-size: 0.83rem;
+    color: var(--ink-faint);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Internal readiness note · Allotrope Partners</p>
+    <h1>GTB 2026–2027: what BIDV and Techcombank have been promised, and what this repo can already deliver</h1>
+    <p class="standfirst">Two documents moved on Drive in the last week — the BIDV MoU (edited this morning) and the Techcombank concept note. Read against the <code>pacta-trisk</code> repo, one of the named commitments is already built, several are close, and one structural layer is missing entirely.</p>
+    <p class="meta-line">11 August 2026 · sources: Google Drive + repo at <code>7ce3dc8</code> (v0.4.0)</p>
+  </header>
+
+  <section>
+    <h2>What moved on Drive</h2>
+    <div class="sources">
+
+      <div class="doc">
+        <div class="doc-title">BIDV_GTB MoU 2026-2027 v2.docx</div>
+        <div class="doc-meta">modified 2026-08-11 03:33<br>owner tah@ · .docx</div>
+        <p class="doc-note">Bilingual. Supersedes the 2023 MoU; funding now stated as confirmed. Scope tightened into countable commitments — one priority sector calculated by Allotrope, phased handover to BIDV's PCAF focal point, up to two trainings, a shortlist of three SLL clients, KPI/SPT input for two.</p>
+      </div>
+
+      <div class="doc">
+        <div class="doc-title">2026/2027_GTB Techcombank Concept Note v2.docx</div>
+        <div class="doc-meta">modified 2026-08-05 · opened 2026-08-10<br>owner tah@ · .docx</div>
+        <p class="doc-note">Still marked "Concept note for review". Three objectives across emissions measurement, transition lending activation, and capacity building. <strong>Output 1.2 names PACTA for Banks and TRISK explicitly.</strong></p>
+      </div>
+
+      <div class="doc">
+        <div class="doc-title">BIDV_VIE-ENG_Requests for 2026-2027.xlsx</div>
+        <div class="doc-meta">modified 2026-08-05<br>owner httt@ · .xlsx</div>
+        <p class="doc-note">BIDV's own request list with internal go/no-go triage. SLL coordination marked GO and priority; retail green-credit and green-deposit products marked NO GO. The MoU scope tracks this triage.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>Where the repo stands</h2>
+    <p>Wave 2 ("Contracts &amp; Units") closed on 8 August, so the platform is in a stronger state than the last time either client document was drafted. Loanbook money is true VND end to end, severity scoring is absolute rather than min-max normalized, and the intake path now honors its contract.</p>
+    <div class="stats">
+      <div class="stat"><span class="stat-num">404</span><span class="stat-label">R tests passing</span></div>
+      <div class="stat"><span class="stat-num">0.4.0</span><span class="stat-label">golden freeze</span></div>
+      <div class="stat"><span class="stat-num">3</span><span class="stat-label">TRISK sectors</span></div>
+      <div class="stat"><span class="stat-num">2</span><span class="stat-label">engagement configs</span></div>
+    </div>
+    <p>Both a public MCB demo and an unseen-bank rehearsal (<code>engagements/sdb-rehearsal</code>) run end to end through one orchestrator, which means a third engagement — BIDV or TCB — is a config file, not a fork.</p>
+  </section>
+
+  <section>
+    <h2>BIDV MoU: expected outcomes against the repo</h2>
+    <p>The English section of the MoU lists eight expected outcomes. Mapped against what <code>pacta-trisk</code> produces today:</p>
+
+    <div class="map">
+
+      <div class="row ready">
+        <div class="row-head">
+          <h3>A practical framework recommendation report for investment decision-making and climate risk management</h3>
+          <span class="pill ready">Already built</span>
+        </div>
+        <p class="row-claim"><span class="lead">This exists as a finished deliverable.</span> <code>reports/BIDV_Framework_Recommendation_Report.html</code> — 133 KB, ten sections, regenerable via <code>scripts/generate_bidv_report.R</code>. Carries the framework landscape matrix, a three-tier recommended stack, sector prioritization, Decision 263 mapping, a five-phase roadmap, and a risk register. It needs a refresh pass against the final MoU wording, not a rebuild.</p>
+      </div>
+
+      <div class="row partial">
+        <div class="row-head">
+          <h3>Client readiness screening framework + shortlist of three priority SLL clients</h3>
+          <span class="pill partial">Close</span>
+        </div>
+        <p class="row-claim"><span class="lead">The scoring machinery is built; the framing is wrong.</span> <code>scripts/engagement_scoring.R</code> ranks borrowers into <code>engagement_priority.csv</code> on an absolute severity composite and <code>generate_engagement_letters.R</code> renders per-borrower letters with a <code>--top_n</code> flag. It screens on transition risk and misalignment, which is not the same axis as SLL readiness (data availability, KPI feasibility, client appetite). Reframing it is a scoring-input change plus a template change, not new infrastructure.</p>
+      </div>
+
+      <div class="row partial">
+        <div class="row-head">
+          <h3>Baseline report identifying portfolio hotspots and priority sectors for client engagement</h3>
+          <span class="pill partial">Close</span>
+        </div>
+        <p class="row-claim"><span class="lead">Hotspot identification works, from a different input.</span> <code>docs/bidv_sector_prioritization_methodology.md</code> and the sector prioritization report rank sectors, but from PACTA alignment gaps and TRISK stress — not from a PCAF financed-emissions inventory, which is what the MoU means by "baseline". The output shape is right; the input layer is the gap below.</p>
+      </div>
+
+      <div class="row partial">
+        <div class="row-head">
+          <h3>Virtual workshop for smaller Vietnamese banks, using anonymized GTB tools</h3>
+          <span class="pill partial">Close</span>
+        </div>
+        <p class="row-claim"><span class="lead">The anonymization requirement is already met.</span> <code>generate_disclosure_pack.R --anonymize</code> was verified to produce zero real names, and <code>intake/</code> ships schema docs plus CSV templates that are exactly the "common data quality issues / data collection protocols" material the MoU describes. The public dashboard works as the live teaching surface.</p>
+      </div>
+
+      <div class="row partial">
+        <div class="row-head">
+          <h3>Updated net zero transition roadmap</h3>
+          <span class="pill partial">Partial</span>
+        </div>
+        <p class="row-claim"><span class="lead">Two different roadmaps share a name.</span> <code>docs/bidv_implementation_roadmap.md</code> is a 24-week <em>adoption</em> pathway for the tooling. The MoU means a <em>net zero</em> roadmap — sector interim reduction targets off a finalized baseline. PACTA SDA and market-share targets give the pathway curves; the target-setting layer on top is not written.</p>
+      </div>
+
+      <div class="row gap">
+        <div class="row-head">
+          <h3>Updated Scope 3 financed emissions calculation toolset with input-data guidelines</h3>
+          <span class="pill gap">Not in repo</span>
+        </div>
+        <p class="row-claim">No PCAF calculator, no emission-factor handling, no attribution-factor logic. The repo starts one layer downstream. See below.</p>
+      </div>
+
+      <div class="row gap">
+        <div class="row-head">
+          <h3>KPI/SPT advisory inputs for two priority clients</h3>
+          <span class="pill gap">Advisory work</span>
+        </div>
+        <p class="row-claim">The engagement letters carry per-sector actions including a covenant trigger, which is adjacent, but KPI and SPT design is judgement work rather than pipeline output. Treat as consulting delivery the repo supports with evidence, not automates.</p>
+      </div>
+
+      <div class="row gap">
+        <div class="row-head">
+          <h3>Scope 1 &amp; 2 assessment report; two hand-off trainings; rooftop solar / BESS / REC feasibility</h3>
+          <span class="pill gap">Out of scope</span>
+        </div>
+        <p class="row-claim">Operational emissions and clean-energy feasibility sit entirely outside this codebase. Worth stating plainly in any internal resourcing plan so they don't get assumed into the platform's column.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>Techcombank concept note: the repo is the deliverable</h2>
+
+    <div class="callout">
+      <h3>Output 1.2 describes this repository almost line for line</h3>
+      <p>The note commits Allotrope to assess "leading portfolio alignment frameworks (potentially including SBTi for Financial Institutions or PACTA for Banks) as well as the TRISK against TCB's portfolio composition and data availability", evaluating "use cases, data requirements, and limitations" to found future IFRS S2 work.</p>
+      <p><code>docs/bidv_framework_comparison.md</code> already scores a 7 × 10 matrix across <strong>PACTA, TRISK, PCAF, SBTi FI, GFANZ/NZBA, NGFS and IFRS S2</strong> — the exact named set — on dimensions including data inputs, Vietnam regulatory compatibility, implementation complexity and time to first results. It carries a four-layer complementarity model (PCAF → PACTA → TRISK → IFRS S2) and a section on where peer frameworks outperform the recommendation.</p>
+      <p>Nothing in it is BIDV-specific at the methodology level. Retargeting to TCB is a client-context swap in <code>scripts/generate_bidv_report.R</code> plus a TCB engagement config — and unlike a desk study, it ships with a working PACTA + TRISK run and a public dashboard that demonstrate the data requirements and limitations empirically rather than asserting them.</p>
+    </div>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>Output</th><th>Commitment</th><th>Repo position</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1.1</td>
+            <td>PCAF-aligned financed emissions inventory across business loans, project finance, listed equity</td>
+            <td><span class="pill gap">Not in repo</span> Same PCAF gap as BIDV</td>
+          </tr>
+          <tr>
+            <td>1.2</td>
+            <td>Portfolio alignment / transition risk methodology assessment (PACTA, SBTi FI, TRISK)</td>
+            <td><span class="pill ready">Already built</span> Framework comparison + live demo</td>
+          </tr>
+          <tr>
+            <td>1.3</td>
+            <td>Net zero transition framework with sector-level interim targets</td>
+            <td><span class="pill partial">Partial</span> Scenario pathways yes, target-setting layer no</td>
+          </tr>
+          <tr>
+            <td>2.1 / 2.2</td>
+            <td>Map transition lending opportunities; structure up to two pilot transactions</td>
+            <td><span class="pill gap">Advisory</span> Deal work, outside the pipeline</td>
+          </tr>
+          <tr>
+            <td>3.1</td>
+            <td>Capacity building on financed emissions accounting, grounded in TCB's own data</td>
+            <td><span class="pill partial">Partial</span> Teaching assets exist; the subject is PCAF</td>
+          </tr>
+          <tr>
+            <td>3.2</td>
+            <td>Two knowledge products documenting methodology and sector transition finance approaches</td>
+            <td><span class="pill ready">Ready to adapt</span> Existing reports are the raw material</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>The one structural gap</h2>
+    <p>Both documents open at PCAF financed-emissions accounting. This repo opens one layer later, at PACTA alignment. That is not an oversight — the repo's own framework comparison classes PCAF as a <em>prerequisite</em> that is "already in place", assuming the inventory arrives from elsewhere.</p>
+    <p>That assumption held while BIDV's financed-emissions work was being done by hand (the January 2026 preliminary assessment: cement 5.84 MtCO₂e, iron &amp; steel 3.23 MtCO₂e, coal thermal power 0.87 MtCO₂e). Both new documents scale that work up — BIDV to a repeatable toolset with input-data guidelines and a handover to their PCAF focal point; TCB to a full inventory across three asset classes.</p>
+    <p>So the question to settle before either scope is signed: does the PCAF layer become part of this platform, or stay a spreadsheet deliverable that feeds it? The repo's intake contract, FX-at-intake conversion and sector mapping are the natural foundation if the answer is the former — but it is a genuine build, not a refresh.</p>
+  </section>
+
+  <section>
+    <h2>Drafting issues worth fixing before either document goes out</h2>
+    <ul class="tight">
+      <li><strong>The BIDV MoU's English section carries unresolved redline residue.</strong> The Vietnamese section reads clean, but the English "for reference" version contains broken fragments — "Support BIDV to complete an", "T this cooperation continues into the 2026-2027 program period.", a stray "A" line, and two overlapping outcome lists where the old 2023 outcomes sit underneath the new ones. The document has a signature block dated 2026; the English half is not currently signable.</li>
+      <li><strong>The TCB note says "four reinforcing tracks" and then lists three.</strong> The opening paragraph also contains both the old two-track sentence and the new three-objective sentence, one after the other.</li>
+      <li><strong>The TCB note has two "Output 3.2" headings</strong>, the second one empty, and a few typos from the merge — "technicalassessment", a doubled period before "By evaluating".</li>
+      <li><strong>Objective 1's opening sentence in the TCB note reads as two alternative drafts spliced together</strong> — the Scope 3 methodology version and the comprehensive baseline version — with no separator.</li>
+    </ul>
+    <p>These are all merge artifacts from editing v1 into v2, not substantive problems. But the BIDV one matters most because that document is closest to signature.</p>
+  </section>
+
+  <section>
+    <h2>What I'd do next</h2>
+    <ol class="actions">
+      <li><strong>Clean the English half of the BIDV MoU.</strong> Highest urgency, lowest effort, and it was edited this morning — so it is live.</li>
+      <li><strong>Decide the PCAF question.</strong> Build it into the platform or keep it external. Everything else in both scopes sits downstream of that answer, and it is the only decision here that changes the shape of the work.</li>
+      <li><strong>Spin a TCB engagement config and retarget the framework report.</strong> This turns TCB Output 1.2 from a promise into something demonstrable in the next conversation, and the orchestrator already supports a third engagement without a fork.</li>
+      <li><strong>Reframe engagement scoring onto SLL readiness</strong> for the BIDV shortlist-of-three commitment — new inputs and template, existing machinery.</li>
+      <li><strong>Fix the TCB note's merge artifacts</strong> before it goes to the client as "for review".</li>
+    </ol>
+  </section>
+
+  <footer>
+    <p>Prepared from Google Drive documents and the <code>pacta-trisk</code> repository at commit <code>7ce3dc8</code>. Drive document contents summarized, not reproduced.</p>
+    <p>All figures produced by the <code>pacta-trisk</code> pipeline are based on synthetic, illustrative data for a fictional bank and do not represent any real institution's portfolio. BIDV emissions figures cited above are from the January 2026 Allotrope/BIDV preliminary assessment on Drive.</p>
+  </footer>
+
+</div>

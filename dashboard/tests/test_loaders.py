@@ -79,3 +79,63 @@ def test_trisk_grid_scenario_count() -> None:
     # asserts against the documented product (see
     # docs/trisk_scenario_grid_contract.md) rather than a bare magic number.
     assert grid_meta["scenario_count"] == 3 ** 5
+
+
+# --- Wave 3 PHASE-02: report_catalog() reads the report_catalog.json sidecar --
+
+def test_report_catalog_never_drops_a_published_html_file(monkeypatch, tmp_path) -> None:
+    import dashboard.lib.loaders as loaders_mod
+
+    reports_dir = tmp_path / "reports"
+    reports_dir.mkdir()
+    (reports_dir / "Known_Report.html").write_text("<html></html>", encoding="utf-8")
+    (reports_dir / "Mystery_Report.html").write_text("<html></html>", encoding="utf-8")
+    (reports_dir / "report_catalog.json").write_text(
+        json.dumps({
+            "Known_Report.html": {
+                "title": "Known Report", "date": "2026-01-01",
+                "summary": "A cataloged report.", "category": "client_facing",
+            }
+        }),
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(loaders_mod, "REPORTS_DIR", reports_dir)
+
+    rows = loaders_mod.report_catalog()
+    names = {row["path"].name: row for row in rows}
+
+    assert len(rows) == 2
+    assert names["Known_Report.html"]["title"] == "Known Report"
+    assert names["Known_Report.html"]["category"] == "client_facing"
+    assert names["Mystery_Report.html"]["title"] == "Mystery_Report"
+    assert names["Mystery_Report.html"]["summary"] == "No summary available."
+    assert names["Mystery_Report.html"]["category"] == "uncatalogued"
+
+
+def test_report_catalog_degrades_gracefully_with_no_sidecar(monkeypatch, tmp_path) -> None:
+    import dashboard.lib.loaders as loaders_mod
+
+    reports_dir = tmp_path / "reports"
+    reports_dir.mkdir()
+    (reports_dir / "Orphan.html").write_text("<html></html>", encoding="utf-8")
+
+    monkeypatch.setattr(loaders_mod, "REPORTS_DIR", reports_dir)
+
+    rows = loaders_mod.report_catalog()
+    assert len(rows) == 1
+    assert rows[0]["title"] == "Orphan"
+    assert rows[0]["category"] == "uncatalogued"
+
+
+def test_live_snapshot_report_catalog_matches_published_reports() -> None:
+    """The public MCB snapshot's report_catalog() must reflect exactly the
+    files scripts/refresh_dashboard_data.R actually copied, with no
+    internal_build entries eligible for it (Wave 3 PHASE-02, DEC-006)."""
+    from dashboard.lib.loaders import report_catalog
+
+    rows = report_catalog()
+    for row in rows:
+        assert row["category"] != "internal_build", (
+            f"{row['path'].name} is category internal_build and must not be in the published snapshot"
+        )

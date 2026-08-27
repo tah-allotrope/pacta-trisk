@@ -1,0 +1,6 @@
+sector,technology,capacity_factor,source
+power,coalcap,0.60,synthetic_illustrative_typical_range
+power,gascap,0.45,synthetic_illustrative_typical_range
+power,hydrocap,0.40,synthetic_illustrative_typical_range
+power,renewablescap,0.25,synthetic_illustrative_typical_range
+power,oilcap,0.20,synthetic_illustrative_typical_range

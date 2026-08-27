@@ -52,6 +52,48 @@ test_that("run_steps stops after the first failure and does not run later steps"
   expect_equal(results[[1]]$status, "failed")
 })
 
+test_that("run_step captures error_excerpt (last lines of output) on a failed step", {
+  rscript <- rscript_bin()
+  if (is.na(rscript)) skip("Rscript not found on PATH")
+
+  fail_path <- tempfile(fileext = ".R")
+  writeLines(c('cat("line one\\n")', 'cat("boom happened\\n")', "quit(status = 1)"), fail_path)
+  on.exit(unlink(fail_path))
+
+  result <- run_step(list(name = "boom", script = fail_path, args = character()))
+
+  expect_equal(result$status, "failed")
+  expect_true(is.character(result$error_excerpt))
+  expect_true(any(grepl("boom happened", result$error_excerpt, fixed = TRUE)))
+})
+
+test_that("run_step leaves error_excerpt NULL on a successful step", {
+  rscript <- rscript_bin()
+  if (is.na(rscript)) skip("Rscript not found on PATH")
+
+  ok_fixture <- write_exit_fixture(0)
+  on.exit(unlink(ok_fixture))
+
+  result <- run_step(list(name = "ok", script = ok_fixture, args = character()))
+
+  expect_equal(result$status, "ok")
+  expect_null(result$error_excerpt)
+})
+
+test_that("run_step's error_excerpt keeps only the last 20 lines of a longer failure", {
+  rscript <- rscript_bin()
+  if (is.na(rscript)) skip("Rscript not found on PATH")
+
+  fail_path <- tempfile(fileext = ".R")
+  writeLines(c('for (i in 1:30) cat(sprintf("line %d\\n", i))', "quit(status = 1)"), fail_path)
+  on.exit(unlink(fail_path))
+
+  result <- run_step(list(name = "boom", script = fail_path, args = character()))
+
+  expect_equal(result$status, "failed")
+  expect_lte(length(result$error_excerpt), 20)
+})
+
 test_that("write_pipeline_manifest writes the expected JSON shape with extra fields merged in", {
   results <- list(
     list(name = "step_a", status = "ok", seconds = 1.2),
@@ -109,7 +151,7 @@ test_that("committed pipeline_manifest.json still contains the mandatory default
   expect_true(all(diff(matched_idx) > 0), info = "mandatory step names must appear in order")
 })
 
-test_that("run_engagement.R --full --dry-run for MCB prints the exact 13-step order", {
+test_that("run_engagement.R --full --dry-run for MCB prints the exact 16-step order", {
   rscript <- rscript_bin()
   if (is.na(rscript)) skip("Rscript not found on PATH")
 
@@ -135,8 +177,8 @@ test_that("run_engagement.R --full --dry-run for MCB prints the exact 13-step or
     "generate_vietnam_data", "pacta_vietnam_scenario", "trisk_prepare_inputs",
     "trisk_sector_demo_power", "trisk_sector_demo_cement", "trisk_sector_demo_steel",
     "trisk_scenario_grid", "sector_prioritization", "refresh_dashboard_data",
-    "engagement_scoring", "generate_engagement_letters", "generate_disclosure_pack",
-    "refresh_audit"
+    "engagement_scoring", "financed_emissions", "sll_readiness", "generate_engagement_letters", "generate_disclosure_pack",
+    "refresh_audit", "record_history"
   ))
 })
 

@@ -298,3 +298,203 @@ test_that("inv_loanbook_currency_scale ignores non-VND currency rows", {
   result <- inv_loanbook_currency_scale(fixture_root)
   expect_true(result$ok)
 })
+
+# --- INV-007: engagement fixture allowlist -------------------------------------
+
+.git_init_with_tracked_file <- function(root, rel_path, content = "x") {
+  full_path <- file.path(root, rel_path)
+  dir.create(dirname(full_path), recursive = TRUE, showWarnings = FALSE)
+  writeLines(content, full_path)
+  old_wd <- getwd()
+  setwd(root)
+  on.exit(setwd(old_wd), add = TRUE)
+  system2("git", c("init", "-q"))
+  system2("git", c("add", rel_path))
+}
+
+test_that("inv_engagement_fixture_allowlist passes on the live repo", {
+  result <- inv_engagement_fixture_allowlist(root)
+  expect_true(result$ok)
+  expect_equal(length(result$detail), 0)
+})
+
+test_that("inv_engagement_fixture_allowlist fails when a non-allowlisted slug has a tracked fixture file", {
+  fixture_root <- .new_fixture_root()
+  on.exit(unlink(fixture_root, recursive = TRUE, force = TRUE))
+  .git_init_with_tracked_file(
+    fixture_root, "engagements/bidv/intake/normalized_loanbook.csv"
+  )
+
+  result <- inv_engagement_fixture_allowlist(fixture_root)
+  expect_false(result$ok)
+  expect_equal(length(result$detail), 1)
+  expect_true(grepl("bidv", result$detail[1], fixed = TRUE))
+})
+
+test_that("inv_engagement_fixture_allowlist exempts a non-allowlisted slug's own engagement_config.json", {
+  fixture_root <- .new_fixture_root()
+  on.exit(unlink(fixture_root, recursive = TRUE, force = TRUE))
+  .git_init_with_tracked_file(
+    fixture_root, "engagements/bidv/engagement_config.json"
+  )
+
+  result <- inv_engagement_fixture_allowlist(fixture_root)
+  expect_true(result$ok)
+  expect_equal(length(result$detail), 0)
+})
+
+test_that("inv_engagement_fixture_allowlist passes when the allowlisted slug has tracked fixture files", {
+  fixture_root <- .new_fixture_root()
+  on.exit(unlink(fixture_root, recursive = TRUE, force = TRUE))
+  .git_init_with_tracked_file(
+    fixture_root, "engagements/sdb-rehearsal/intake/normalized_loanbook.csv"
+  )
+
+  result <- inv_engagement_fixture_allowlist(fixture_root)
+  expect_true(result$ok)
+})
+
+# --- INV-008: dependency manifest agreement ------------------------------------
+
+.write_dep_fixture <- function(root, description_imports, description_suggests, install_deps_cran, renv_pkgs) {
+  dir.create(root, recursive = TRUE, showWarnings = FALSE)
+  dir.create(file.path(root, "scripts", "ci"), recursive = TRUE, showWarnings = FALSE)
+
+  desc_lines <- c(
+    "Package: fixture",
+    "Imports:",
+    paste0("    ", paste(description_imports, collapse = ",\n    "))
+  )
+  if (length(description_suggests) > 0) {
+    desc_lines <- c(desc_lines, "Suggests:", paste0("    ", paste(description_suggests, collapse = ",\n    ")))
+  }
+  writeLines(desc_lines, file.path(root, "DESCRIPTION"))
+
+  writeLines(
+    sprintf('cran_packages <- c(%s)', paste0('"', install_deps_cran, '"', collapse = ", ")),
+    file.path(root, "scripts", "ci", "install_deps.R")
+  )
+
+  lock <- list(Packages = setNames(
+    lapply(renv_pkgs, function(p) list(Package = p, Version = "1.0.0")),
+    renv_pkgs
+  ))
+  writeLines(jsonlite::toJSON(lock, auto_unbox = TRUE, pretty = TRUE), file.path(root, "renv.lock"))
+}
+
+test_that("inv_dependency_manifests_agree passes on the live repo", {
+  result <- inv_dependency_manifests_agree(root)
+  expect_true(result$ok)
+  expect_equal(length(result$detail), 0)
+})
+
+test_that("inv_dependency_manifests_agree fails when install_deps.R installs a package absent from Imports", {
+  fixture_root <- .new_fixture_root()
+  on.exit(unlink(fixture_root, recursive = TRUE, force = TRUE))
+  .write_dep_fixture(
+    fixture_root,
+    description_imports = c("dplyr"), description_suggests = character(0),
+    install_deps_cran = c("dplyr", "zoo"), renv_pkgs = c("dplyr")
+  )
+
+  result <- inv_dependency_manifests_agree(fixture_root)
+  expect_false(result$ok)
+  expect_true(any(grepl("zoo", result$detail, fixed = TRUE)))
+})
+
+test_that("inv_dependency_manifests_agree fails when renv.lock records a package absent from Imports", {
+  fixture_root <- .new_fixture_root()
+  on.exit(unlink(fixture_root, recursive = TRUE, force = TRUE))
+  .write_dep_fixture(
+    fixture_root,
+    description_imports = c("dplyr"), description_suggests = character(0),
+    install_deps_cran = c("dplyr"), renv_pkgs = c("dplyr", "trisk.model")
+  )
+
+  result <- inv_dependency_manifests_agree(fixture_root)
+  expect_false(result$ok)
+  expect_true(any(grepl("trisk.model", result$detail, fixed = TRUE)))
+})
+
+test_that("inv_dependency_manifests_agree exempts a Suggests-listed package", {
+  fixture_root <- .new_fixture_root()
+  on.exit(unlink(fixture_root, recursive = TRUE, force = TRUE))
+  .write_dep_fixture(
+    fixture_root,
+    description_imports = c("dplyr"), description_suggests = c("testthat"),
+    install_deps_cran = c("dplyr"), renv_pkgs = c("dplyr", "testthat")
+  )
+
+  result <- inv_dependency_manifests_agree(fixture_root)
+  expect_true(result$ok)
+})
+
+test_that("inv_dependency_manifests_agree passes when every used package is declared", {
+  fixture_root <- .new_fixture_root()
+  on.exit(unlink(fixture_root, recursive = TRUE, force = TRUE))
+  .write_dep_fixture(
+    fixture_root,
+    description_imports = c("dplyr", "zoo", "trisk.model"), description_suggests = character(0),
+    install_deps_cran = c("dplyr", "zoo"), renv_pkgs = c("dplyr", "zoo", "trisk.model")
+  )
+
+  result <- inv_dependency_manifests_agree(fixture_root)
+  expect_true(result$ok)
+})
+
+# --- INV-009: scenario vintage declared and consistent -------------------------
+
+.write_vintage_fixture <- function(root, slug, vintage, ms_dir_name, co2_dir_name, create_vintage_dir = TRUE) {
+  dir.create(file.path(root, "engagements", slug), recursive = TRUE, showWarnings = FALSE)
+  cfg <- list(
+    bank_name = "Test Bank", bank_slug = slug,
+    inputs = list(
+      scenario_vintage = vintage,
+      scenario_ms_csv = file.path("data", "scenarios", ms_dir_name, "vietnam_scenario_ms.csv"),
+      scenario_co2_csv = file.path("data", "scenarios", co2_dir_name, "vietnam_scenario_co2.csv")
+    )
+  )
+  writeLines(
+    jsonlite::toJSON(cfg, auto_unbox = TRUE, pretty = TRUE),
+    file.path(root, "engagements", slug, "engagement_config.json")
+  )
+  if (create_vintage_dir) {
+    dir.create(file.path(root, "data", "scenarios", vintage), recursive = TRUE, showWarnings = FALSE)
+  }
+}
+
+test_that("inv_scenario_vintage_declared passes on the live repo", {
+  result <- inv_scenario_vintage_declared(root)
+  expect_true(result$ok)
+  expect_equal(length(result$detail), 0)
+})
+
+test_that("inv_scenario_vintage_declared fails when scenario_vintage does not match the scenario paths", {
+  fixture_root <- .new_fixture_root()
+  on.exit(unlink(fixture_root, recursive = TRUE, force = TRUE))
+  .write_vintage_fixture(fixture_root, "acme", "pdp8-2025-adjusted", "pdp8-2023", "pdp8-2023")
+
+  result <- inv_scenario_vintage_declared(fixture_root)
+  expect_false(result$ok)
+  expect_equal(length(result$detail), 1)
+  expect_true(grepl("acme", result$detail[1], fixed = TRUE))
+})
+
+test_that("inv_scenario_vintage_declared fails when the declared vintage directory does not exist", {
+  fixture_root <- .new_fixture_root()
+  on.exit(unlink(fixture_root, recursive = TRUE, force = TRUE))
+  .write_vintage_fixture(fixture_root, "acme", "pdp8-nonexistent", "pdp8-nonexistent", "pdp8-nonexistent", create_vintage_dir = FALSE)
+
+  result <- inv_scenario_vintage_declared(fixture_root)
+  expect_false(result$ok)
+  expect_true(any(grepl("no directory", result$detail, fixed = TRUE)))
+})
+
+test_that("inv_scenario_vintage_declared passes when vintage and paths agree", {
+  fixture_root <- .new_fixture_root()
+  on.exit(unlink(fixture_root, recursive = TRUE, force = TRUE))
+  .write_vintage_fixture(fixture_root, "acme", "pdp8-2023", "pdp8-2023", "pdp8-2023")
+
+  result <- inv_scenario_vintage_declared(fixture_root)
+  expect_true(result$ok)
+})

@@ -18,7 +18,16 @@ test_that("default config (no path) reproduces MCB defaults", {
   expect_equal(cfg$paths$prioritization_output_dir, "synthesis_output/prioritization")
 })
 
-test_that("mcb-demo engagement_config.json is identical to the built-in defaults", {
+test_that("mcb-demo engagement_config.json matches the built-in defaults except deliberate Wave 3 additions", {
+  # Historically this asserted full equality with load_engagement_config(NULL)
+  # -- mcb-demo's config was a pure reproduction of the hardcoded defaults.
+  # Wave 3 deliberately added two fields the bare defaults do not set:
+  # inputs.fx_rate_usd_vnd (PHASE-05, so carbon_cost_exposure() can compute
+  # for the public demo instead of returning NA throughout) and
+  # inputs.scenario_vintage (PHASE-03, always set explicitly once the
+  # vintage mechanism exists, even though it happens to equal the default
+  # value "pdp8-2023"). Compare everything else for equality; assert the
+  # two deliberate additions explicitly instead of excluding them silently.
   withr_wd <- setwd(root)
   on.exit(setwd(withr_wd))
 
@@ -27,11 +36,21 @@ test_that("mcb-demo engagement_config.json is identical to the built-in defaults
 
   expect_equal(cfg_file$bank_name, cfg_default$bank_name)
   expect_equal(cfg_file$bank_slug, cfg_default$bank_slug)
-  expect_equal(cfg_file$inputs, cfg_default$inputs)
+
+  inputs_file_minus_additions <- cfg_file$inputs
+  inputs_file_minus_additions$fx_rate_usd_vnd <- NULL
+  inputs_file_minus_additions$scenario_vintage <- NULL
+  inputs_default_minus_additions <- cfg_default$inputs
+  inputs_default_minus_additions$fx_rate_usd_vnd <- NULL
+  inputs_default_minus_additions$scenario_vintage <- NULL
+  expect_equal(inputs_file_minus_additions, inputs_default_minus_additions)
+  expect_equal(cfg_file$inputs$fx_rate_usd_vnd, 26300)
+  expect_equal(cfg_file$inputs$scenario_vintage, "pdp8-2023")
+
   expect_equal(cfg_file$trisk_sectors, cfg_default$trisk_sectors)
   expect_equal(cfg_file$run_grid, cfg_default$run_grid)
-  expect_equal(cfg_file$paths, cfg_default$paths)
   expect_equal(cfg_file$anonymize, cfg_default$anonymize)
+  expect_equal(cfg_file$paths, cfg_default$paths)
 })
 
 test_that("partial override config falls back to defaults for missing keys", {
@@ -217,4 +236,79 @@ test_that("sector_meta preserves the original alignment_mode equality-check valu
   expect_equal(power_meta$alignment_mode, "company_ms")
   expect_equal(cement_meta$alignment_mode, "sector_sda")
   expect_equal(power_meta$title, "Power")
+})
+
+# --- Wave 3 PHASE-02: schema_version and strict unknown-key rejection ---------
+
+test_that("default config (no path) has schema_version 1", {
+  withr_wd <- setwd(root)
+  on.exit(setwd(withr_wd))
+
+  cfg <- load_engagement_config(NULL)
+  expect_equal(cfg$schema_version, 1L)
+})
+
+test_that("a config with a different schema_version is rejected", {
+  withr_wd <- setwd(root)
+  on.exit(setwd(withr_wd))
+
+  tmp <- tempfile(fileext = ".json")
+  writeLines('{"schema_version":2,"bank_name":"X Bank","bank_slug":"x-bank"}', tmp)
+  on.exit(unlink(tmp), add = TRUE)
+
+  expect_error(load_engagement_config(tmp), "schema_version")
+})
+
+test_that("an unknown top-level config key is rejected, naming the key and accepted siblings", {
+  withr_wd <- setwd(root)
+  on.exit(setwd(withr_wd))
+
+  tmp <- tempfile(fileext = ".json")
+  writeLines('{"bank_name":"X Bank","bank_slug":"x-bank","trisk_sector":["power"]}', tmp)
+  on.exit(unlink(tmp), add = TRUE)
+
+  err <- tryCatch(load_engagement_config(tmp), error = function(e) conditionMessage(e))
+  expect_true(grepl("unknown config key 'trisk_sector'", err, fixed = TRUE))
+  expect_true(grepl("trisk_sectors", err, fixed = TRUE))
+})
+
+test_that("an unknown nested config key (inside inputs) is rejected with a dotted path", {
+  withr_wd <- setwd(root)
+  on.exit(setwd(withr_wd))
+
+  tmp <- tempfile(fileext = ".json")
+  writeLines('{"bank_name":"X Bank","bank_slug":"x-bank","inputs":{"loanbok_csv":"data/vietnam_loanbook.csv"}}', tmp)
+  on.exit(unlink(tmp), add = TRUE)
+
+  err <- tryCatch(load_engagement_config(tmp), error = function(e) conditionMessage(e))
+  expect_true(grepl("unknown config key 'inputs.loanbok_csv'", err, fixed = TRUE))
+})
+
+test_that("engagements/mcb-demo/engagement_config.json and sdb-rehearsal's still load cleanly", {
+  mcb_path <- file.path(root, "engagements", "mcb-demo", "engagement_config.json")
+  sdb_path <- file.path(root, "engagements", "sdb-rehearsal", "engagement_config.json")
+  withr_wd <- setwd(root)
+  on.exit(setwd(withr_wd))
+
+  expect_silent(load_engagement_config(mcb_path))
+  expect_silent(load_engagement_config(sdb_path))
+})
+
+test_that("steps and published_reports default to empty and accept a character vector", {
+  withr_wd <- setwd(root)
+  on.exit(setwd(withr_wd))
+
+  cfg <- load_engagement_config(NULL)
+  expect_equal(cfg$steps, character(0))
+  expect_equal(cfg$published_reports, character(0))
+
+  tmp <- tempfile(fileext = ".json")
+  writeLines(
+    '{"bank_name":"X Bank","bank_slug":"x-bank","steps":["pacta_vietnam_scenario"],"published_reports":["Foo.html"]}',
+    tmp
+  )
+  on.exit(unlink(tmp), add = TRUE)
+  cfg2 <- load_engagement_config(tmp)
+  expect_equal(cfg2$steps, "pacta_vietnam_scenario")
+  expect_equal(cfg2$published_reports, "Foo.html")
 })

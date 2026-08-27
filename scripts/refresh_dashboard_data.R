@@ -7,6 +7,7 @@ suppressPackageStartupMessages({
   library(dplyr)
   library(readr)
   library(tibble)
+  library(jsonlite)
 })
 
 source("R/engagement_config.R")
@@ -70,16 +71,36 @@ pacta_files <- file.path(cfg$paths$pacta_output_dir, c(
   "06_vn_sda_alignment_2030.csv"
 ))
 
-report_files <- c(
-  "reports/PACTA_Vietnam_Bank_Report.html",
-  "reports/PACTA_Alignment_Report.html",
-  "reports/PACTA_Synthesis_Report.html",
-  "reports/PACTA_Comparison_Report.html",
-  "reports/2026-04-16-final-vietnam-bank-trisk-demo.html",
-  "reports/2026-04-16-trisk-power-pilot.html",
-  "reports/2026-04-16-pacta-baseline-stabilization.html",
-  "reports/2026-04-28-trisk-multisector-phases-1-2.html"
-)
+# Wave 3 PHASE-02 (DEC-006): the published report set is config-declared
+# (cfg$published_reports) and cross-checked against reports/report_catalog.json
+# rather than hardcoded here. A file named in published_reports that is absent
+# from the catalog, or present with category "internal_build", is a hard
+# error -- this is what keeps an internal engineering phase report or a
+# European-demo-data report from silently reaching the public snapshot again.
+report_catalog_path <- "reports/report_catalog.json"
+report_catalog <- if (file.exists(report_catalog_path)) {
+  jsonlite::fromJSON(report_catalog_path, simplifyVector = TRUE)
+} else {
+  list()
+}
+
+for (fname in cfg$published_reports) {
+  entry <- report_catalog[[fname]]
+  if (is.null(entry)) {
+    stop(sprintf(
+      "refresh_dashboard_data.R: '%s' is named in published_reports but has no entry in %s",
+      fname, report_catalog_path
+    ), call. = FALSE)
+  }
+  if (identical(entry$category, "internal_build")) {
+    stop(sprintf(
+      "refresh_dashboard_data.R: '%s' is category \"internal_build\" in %s and may not be published",
+      fname, report_catalog_path
+    ), call. = FALSE)
+  }
+}
+
+report_files <- file.path("reports", cfg$published_reports)
 
 trisk_sector_files <- c(
   "assets.csv",
@@ -114,6 +135,9 @@ copy_png_group(cfg$paths$pacta_output_dir, file.path(snapshot_dir, "pacta"))
 # the data snapshot from publishing.
 for (f in report_files) {
   copy_file(f, file.path(snapshot_dir, "reports"), required = FALSE)
+}
+if (file.exists(report_catalog_path)) {
+  copy_file(report_catalog_path, file.path(snapshot_dir, "reports"), required = FALSE)
 }
 
 trisk_dest <- file.path(snapshot_dir, "trisk")

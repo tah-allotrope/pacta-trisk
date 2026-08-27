@@ -59,3 +59,40 @@ If Streamlit Community Cloud changes free-tier terms or the app exceeds 1 GB RAM
 | **Language** | Python (Streamlit + Plotly + Pandas) |
 | **Fallback** | Hugging Face Spaces (Streamlit SDK) |
 | **Decision date** | 2026-04-26 |
+
+## Multi-client private instances (2026-08)
+
+The recipe in `docs/private-instance-deploy.md` — clone the repo, replace
+`dashboard/data/`, deploy a new private Streamlit Community Cloud app per
+bank — was written for one client. It does not survive contact with two:
+
+- **Streamlit Community Cloud's free tier supports exactly one private
+  app.** `docs/private-instance-deploy.md` says this itself; the BIDV and
+  Techcombank engagements are two concurrent clients, and "delete the first
+  one or upgrade" is not a workaround for two live engagements.
+- **`DEMO_PASSWORD` (`dashboard/lib/auth.py`) is a single shared static
+  string** — no per-user identity, no rotation, no lockout, no access log.
+  That is the right amount of access control for a public synthetic demo
+  and is not being changed for that use case. It is the first item a bank's
+  infosec reviewer would flag for an instance holding a real client's
+  loanbook-derived exposures under a signed MoU.
+
+**Decision:** for a real client engagement, host a single
+access-controlled, operator-managed deployment with per-engagement data
+separation (one server, one auth boundary, engagement-scoped data
+directories), rather than one cloned private repository per client. This
+avoids multiplying the `.gitignore`/data-governance surface (see
+`docs/intake_privacy.md`) by the number of clients, and it does not depend
+on a free-tier limit that is already exhausted by two clients.
+
+This is a decision record, not a deployment. No infrastructure has been
+built to this design yet; `docs/private-instance-deploy.md`'s per-client
+clone recipe remains the documented (and now known-insufficient) fallback
+until it is.
+
+| Field | Value |
+|---|---|
+| **Decision** | Single operator-hosted, access-controlled deployment; per-engagement data separation; not per-client cloned repos |
+| **Forcing facts** | Streamlit Community Cloud free tier = 1 private app; `DEMO_PASSWORD` has no per-user identity, rotation, lockout, or audit log |
+| **Public demo impact** | None — `pactavn.streamlit.app` stays public, unauthenticated, synthetic-only |
+| **Decision date** | 2026-08-27 |

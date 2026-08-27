@@ -8,6 +8,7 @@ See `README.md` for the full architecture and `AGENTS.md` for a quick map.
 ## Commands
 
 - **Full R test suite:** `Rscript -e "testthat::test_dir('tests/testthat')"`
+  (or `Rscript tools/run_tests.R`, which also lists gated tests it skipped)
 - **Single R test file:** `Rscript -e "testthat::test_file('tests/testthat/test_golden_numbers.R')"`
 - **Python test suite:** `python -m pytest dashboard/tests`
 - **Regenerate PACTA outputs:** `Rscript scripts/pacta_vietnam_scenario.R`
@@ -64,6 +65,10 @@ Windows: prepend `& "C:\Program Files\R\R-4.5.2\bin\Rscript.exe"` or add it to
    in `renv.lock`. `yaml` was deliberately rejected in favor of JSON configs
    via `jsonlite`. Dev-only tooling (e.g. `roxygen2`/`devtools`) is the only
    category added without a strong reason.
+9. **Changelog entries must not quote test counts.** `NEWS.md` is prose, not a
+   gate — nothing verifies a hand-typed pass count against the suite, so it
+   silently goes stale (Wave 3 PHASE-01). Say "full R suite green (FAIL 0)"
+   instead of a specific PASS number.
 
 ## Do-not-touch
 

@@ -1,0 +1,6 @@
+sector,technology,emission_factor,unit,source,data_quality_score
+power,coalcap,0.95,tCO2/MWh,synthetic_illustrative_IEA_typical_range,4
+power,gascap,0.40,tCO2/MWh,synthetic_illustrative_IEA_typical_range,4
+power,hydrocap,0.02,tCO2/MWh,synthetic_illustrative_IEA_typical_range,4
+power,renewablescap,0.03,tCO2/MWh,synthetic_illustrative_IEA_typical_range,4
+power,oilcap,0.75,tCO2/MWh,synthetic_illustrative_IEA_typical_range,4

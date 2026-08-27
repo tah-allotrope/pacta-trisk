@@ -33,8 +33,12 @@ pacta_load_inputs <- function(cfg) {
   # running the analysis logic standalone with a hand-built cfg list).
   # fx_rate_usd_vnd is a NUMBER, not a path (Wave 2 PHASE-05, ASM-006) -- it
   # is a non-path value and must be skipped, or every config that sets a rate
-  # fails here with "Missing: 26300".
-  required_files <- unlist(cfg$inputs, use.names = FALSE)
+  # fails here with "Missing: 26300". scenario_vintage (Wave 3 PHASE-03) is a
+  # directory NAME, not a path either, and must be skipped by name (it is
+  # not numeric-looking, so the fx_rate filter below does not catch it) --
+  # without this, every config fails here with "Missing: pdp8-2023".
+  non_path_inputs <- c("fx_rate_usd_vnd", "scenario_vintage")
+  required_files <- unlist(cfg$inputs[setdiff(names(cfg$inputs), non_path_inputs)], use.names = FALSE)
   required_files <- required_files[!grepl("^[0-9.+-]+$", as.character(required_files))]
 
   missing <- required_files[!file.exists(required_files)]
@@ -356,7 +360,18 @@ pacta_coverage <- function(loanbook_classified, matched, output_dir, bank_name, 
 #'   company-level market-share tables, and the resolved PDP8 target metric
 #'   name (also consumed by pacta_alignment_gaps()).
 #' @export
-pacta_market_share <- function(matched, abcd_norm, scenario, region, output_dir, bank_short) {
+#' @param pdp8_scenario_source chr(1) -- the `scenario_source` value in the
+#'   loaded scenario CSV that identifies the PDP8/NDC pathway rows for the
+#'   chart-specific filters below (Wave 3 PHASE-03). Defaults to
+#'   "pdp8_2023" for backward compatibility with any caller that does not
+#'   pass it explicitly; scripts/pacta_vietnam_scenario.R always passes the
+#'   value derived from the engagement's configured
+#'   inputs.scenario_vintage. Without this, a second scenario vintage's rows
+#'   are silently filtered out of every chart in this function (they DO
+#'   still feed the underlying target_market_share() computation, which is
+#'   vintage-agnostic).
+pacta_market_share <- function(matched, abcd_norm, scenario, region, output_dir, bank_short,
+                                pdp8_scenario_source = "pdp8_2023") {
   cat("--- Section 5: Market share analysis ---\n\n")
 
   matched_for_ms <- matched %>%
@@ -403,7 +418,7 @@ pacta_market_share <- function(matched, abcd_norm, scenario, region, output_dir,
   # --- Chart: Power Technology Mix (PDP8 scenario) ---
   power_techmix_data <- ms_portfolio %>%
     filter(sector == "power", region == "vietnam",
-           metric %in% c("projected", "corporate_economy", target_pdp8), scenario_source == "pdp8_2023")
+           metric %in% c("projected", "corporate_economy", target_pdp8), scenario_source == pdp8_scenario_source)
 
   if (nrow(power_techmix_data) > 0) {
     p_power_techmix <- qplot_techmix(power_techmix_data) +
@@ -420,7 +435,7 @@ pacta_market_share <- function(matched, abcd_norm, scenario, region, output_dir,
 
   # --- Chart: Coal Capacity Trajectory ---
   coal_traj_data <- ms_portfolio %>%
-    filter(sector == "power", technology == "coalcap", region == "vietnam", scenario_source == "pdp8_2023")
+    filter(sector == "power", technology == "coalcap", region == "vietnam", scenario_source == pdp8_scenario_source)
 
   if (nrow(coal_traj_data) > 0) {
     coal_labels <- coal_traj_data %>%
@@ -447,7 +462,7 @@ pacta_market_share <- function(matched, abcd_norm, scenario, region, output_dir,
 
   # --- Chart: Renewables Buildout Trajectory ---
   renew_traj_data <- ms_portfolio %>%
-    filter(sector == "power", technology == "renewablescap", region == "vietnam", scenario_source == "pdp8_2023")
+    filter(sector == "power", technology == "renewablescap", region == "vietnam", scenario_source == pdp8_scenario_source)
 
   if (nrow(renew_traj_data) > 0) {
     renew_labels <- renew_traj_data %>%
@@ -473,7 +488,7 @@ pacta_market_share <- function(matched, abcd_norm, scenario, region, output_dir,
   # --- Chart: Automotive Technology Mix ---
   auto_techmix_data <- ms_portfolio %>%
     filter(sector == "automotive", region == "vietnam",
-           metric %in% c("projected", "corporate_economy", target_pdp8), scenario_source == "pdp8_2023")
+           metric %in% c("projected", "corporate_economy", target_pdp8), scenario_source == pdp8_scenario_source)
 
   if (nrow(auto_techmix_data) > 0) {
     p_auto_techmix <- qplot_techmix(auto_techmix_data) +
@@ -490,7 +505,7 @@ pacta_market_share <- function(matched, abcd_norm, scenario, region, output_dir,
 
   # --- Chart: EV Trajectory ---
   ev_traj_data <- ms_portfolio %>%
-    filter(sector == "automotive", technology == "electric", region == "vietnam", scenario_source == "pdp8_2023")
+    filter(sector == "automotive", technology == "electric", region == "vietnam", scenario_source == pdp8_scenario_source)
 
   if (nrow(ev_traj_data) > 0) {
     ev_labels <- ev_traj_data %>%

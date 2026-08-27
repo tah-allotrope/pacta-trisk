@@ -24,17 +24,49 @@ count_rows <- function(path) {
 
 #' Run one pipeline step as an Rscript subprocess.
 #'
+#' Wave 3 PHASE-02 (F-006): a failed step used to record only a status, with
+#' no captured output, so diagnosing a CI failure meant re-reading console
+#' scrollback. This still prints the step's live output to the console as
+#' before (via `stdout = ""`), but ALSO captures it so the last lines are
+#' available in the return value and, from there, in pipeline_manifest.json.
+#'
 #' @param step list(name, script, args) — step$name is a label for the
 #'   manifest, step$script is the R script path, step$args is a character
 #'   vector of CLI arguments passed to it.
-#' @return list(name, status ("ok"|"failed"), seconds) — the executed step's
-#'   outcome and wall-clock duration.
+#' @return list(name, status ("ok"|"failed"), seconds, error_excerpt) — the
+#'   executed step's outcome, wall-clock duration, and (only when
+#'   status == "failed") the last 20 lines of its combined stdout+stderr;
+#'   NULL when the step succeeded.
 run_step <- function(step) {
   cat(sprintf("\n=== %s ===\n", step$name))
   t0 <- Sys.time()
-  status <- system2("Rscript", args = c(step$script, step$args))
+
+  log_path <- tempfile("step_output_")
+  status <- system2(
+    "Rscript", args = c(step$script, step$args),
+    stdout = log_path, stderr = log_path
+  )
+  # Echo the captured log to the console so interactive/CI output is
+  # unchanged from before this phase (system2(stdout = log_path) alone
+  # would otherwise go silent on the console).
+  if (file.exists(log_path)) {
+    log_lines <- readLines(log_path, warn = FALSE)
+    if (length(log_lines) > 0) cat(paste(log_lines, collapse = "\n"), "\n")
+  } else {
+    log_lines <- character(0)
+  }
+
   elapsed <- as.numeric(difftime(Sys.time(), t0, units = "secs"))
-  list(name = step$name, status = if (status == 0) "ok" else "failed", seconds = round(elapsed, 1))
+  ok <- identical(status, 0L) || identical(status, 0)
+  error_excerpt <- if (!ok) utils::tail(log_lines, 20) else NULL
+  unlink(log_path)
+
+  list(
+    name = step$name,
+    status = if (ok) "ok" else "failed",
+    seconds = round(elapsed, 1),
+    error_excerpt = error_excerpt
+  )
 }
 
 #' Execute a list of pipeline steps in order, stopping at the first failure.

@@ -1,4 +1,5 @@
 {
+  "schema_version": 1,
   "bank_name": "Mekong Commercial Bank",
   "bank_slug": "mcb-demo",
   "inputs": {
@@ -6,9 +7,15 @@
     "abcd_csv": "data/vietnam_abcd.csv",
     "scenario_ms_csv": "data/scenarios/pdp8-2023/vietnam_scenario_ms.csv",
     "scenario_co2_csv": "data/scenarios/pdp8-2023/vietnam_scenario_co2.csv",
-    "region_isos_csv": "data/vietnam_region_isos.csv"
+    "region_isos_csv": "data/vietnam_region_isos.csv",
+    "scenario_vintage": "pdp8-2023",
+    "fx_rate_usd_vnd": 26300
   },
-  "trisk_sectors": ["power", "cement", "steel"],
+  "trisk_sectors": [
+    "power",
+    "cement",
+    "steel"
+  ],
   "run_grid": true,
   "paths": {
     "pacta_output_dir": "synthesis_output/vietnam",
@@ -31,5 +38,17 @@
     "dashboard/data/trisk/power/npv_results_latest.csv",
     "dashboard/data/trisk/cement/npv_results_latest.csv",
     "dashboard/data/trisk/steel/npv_results_latest.csv"
-  ]
+  ],
+  "published_reports": [
+    "PACTA_Vietnam_Bank_Report.html",
+    "PACTA_Synthesis_Report.html",
+    "2026-04-16-final-vietnam-bank-trisk-demo.html",
+    "2026-04-16-trisk-power-pilot.html",
+    "BIDV_Framework_Recommendation_Report.html",
+    "Financed_Emissions.html",
+    "SLL_Readiness_Shortlist.html"
+  ],
+  "run_history": true,
+  "run_financed_emissions": true,
+  "run_sll_readiness": true
 }

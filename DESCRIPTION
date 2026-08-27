@@ -11,7 +11,9 @@ Imports:
     fs,
     ggplot2,
     ggrepel,
+    glue,
     jsonlite,
+    magrittr,
     pacta.loanbook,
     purrr,
     r2dii.analysis,
@@ -23,7 +25,11 @@ Imports:
     scales,
     stringi,
     tibble,
-    tidyr
+    tidyr,
+    trisk.model,
+    uuid,
+    xfun,
+    zoo
 Suggests:
     testthat,
     roxygen2,

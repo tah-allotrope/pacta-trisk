@@ -695,6 +695,21 @@ vietnam_region_isos <- bind_rows(
   tibble(region = c("global","vietnam","asia_pacific"), isos = "vn", source = "steps_2023"),
   tibble(region = c("global","vietnam","asia_pacific"), isos = "vn", source = "nze_2023")
 )
+# Wave 3 PHASE-03: a second (or later) PDP8 scenario vintage's
+# scenario_source needs its own three rows here too, or
+# target_market_share()'s join against region_isos silently drops every row
+# of that vintage's scenario data (no error -- the run just never produces
+# a target_<scenario> metric for it). This file is used by every engagement
+# regardless of scenario vintage, and target_market_share() emits a
+# "corporate_economy"/"projected" row PER region_isos source row -- so
+# adding a vintage's rows here changes the row COUNT of every downstream
+# artifact for every engagement, even ones still on the original vintage
+# (verified: it broke byte-identity of synthesis_output/vietnam/04_vn_ms_*.csv
+# for mcb-demo, which had not changed vintage). DO NOT add new-vintage rows
+# to this shared file. Instead, give the new vintage its own scoped copy at
+# data/scenarios/<vintage>/vietnam_region_isos.csv (see
+# data/scenarios/pdp8-2025-adjusted/vietnam_region_isos.csv for the pattern),
+# consumed only by scripts/compare_scenario_vintages.R's per-vintage runs.
 
 cat(sprintf("  Region ISOs: %d rows\n", nrow(vietnam_region_isos)))
 write_csv(vietnam_region_isos, "data/vietnam_region_isos.csv")

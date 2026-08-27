@@ -1,0 +1,26 @@
+"name_abcd","sector","scope","outstanding_vnd","borrower_capital_vnd","data_source","attribution_factor","borrower_emissions_tco2e","financed_emissions_tco2e","data_quality_score","exclusion_reason"
+"EVN (Electricity of Vietnam)","power","1+2",5.77e+12,9.37625e+12,"mcb-demo",0.615384615384615,65326824,40201122.4615385,4,
+"Vinacomin Power JSC","power","1+2",9.1e+11,1401891891892,"mcb-demo",0.649122807017494,12982320,8427119.99999935,4,
+"International Power Mong Duong","power","1+2",6.2e+11,878333333333,"mcb-demo",0.705882352941444,5991840,4229534.11764866,4,
+"PVN Power Corporation","power","1+2",2.53e+12,4274827586207,"mcb-demo",0.591836734693863,9618480,5692569.79591823,4,
+"Nghi Son Power LLC","power","1+2",1.03e+12,1477826086957,"mcb-demo",0.696969696969471,5991840,4176130.90908956,4,
+"Dung Quat LNG Power Consortium","power","1+2",6.8e+11,1003809523810,"mcb-demo",0.677419354838388,630720,427261.935483668,4,
+"Vietnam Hydropower JSC","power","1+2",9.8e+11,1796666666667,"mcb-demo",0.545454545454444,168192,91741.0909090739,4,
+"Trung Nam Group","power","1+2",8.7e+11,1.305e+12,"mcb-demo",0.666666666666667,68985,45990,4,
+"BIM Group","power","1+2",3.8e+11,603529411765,"mcb-demo",0.629629629629323,24966,15719.3333333257,4,
+"Thanh Thanh Cong Group","power","1+2",5.2e+11,801081081081,"mcb-demo",0.64912280701761,34164,22176.6315789496,4,
+"Xuan Thien Group","power","1+2",6.5e+11,967073170732,"mcb-demo",0.67213114754078,42705,28703.360655729,4,
+"T&T Group","power","1+2",4.8e+11,770909090909,"mcb-demo",0.622641509434036,31536,19635.6226415118,4,
+"Gia Lai Electricity JSC","power","1+2",3.5e+11,5.5e+11,"mcb-demo",0.636363636363636,22995,14633.1818181818,4,
+"THACO Industries","automotive","1+2",1.2e+12,3.6e+12,"mcb-demo",,,,,"scope_3_dominant_sector_out_of_scope"
+"Toyota Motor Corporation","automotive","1+2",8.5e+11,2.55e+12,"mcb-demo",,,,,"scope_3_dominant_sector_out_of_scope"
+"Ford Motor Company","automotive","1+2",6.5e+11,1.95e+12,"mcb-demo",,,,,"scope_3_dominant_sector_out_of_scope"
+"Hyundai Motor Company","automotive","1+2",5.5e+11,1.65e+12,"mcb-demo",,,,,"scope_3_dominant_sector_out_of_scope"
+"Vingroup JSC","automotive","1+2",1e+12,3e+12,"mcb-demo",,,,,"scope_3_dominant_sector_out_of_scope"
+"Honda Motor Co Ltd","automotive","1+2",2.5e+11,7.5e+11,"mcb-demo",,,,,"scope_3_dominant_sector_out_of_scope"
+"VICEM","cement","1+2",1.2e+12,1831578947368,"mcb-demo",0.655172413793254,10250000,6715517.24138085,2,
+"Holcim Group","cement","1+2",8e+11,1642105263158,"mcb-demo",0.487179487179456,5040000,2455384.61538446,2,
+"Hoa Phat Group JSC","steel","1+2",9e+11,1480645161290,"mcb-demo",0.607843137255034,13875000,8433823.5294136,2,
+"Pomina Group","steel","1+2",6e+11,860869565217,"mcb-demo",0.696969696970014,696000,485090.90909113,2,
+"Vietnam National Coal-Mineral Industries Group","coal","1+2",,2e+12,"mcb-demo",,,,,"scope_3_dominant_sector_out_of_scope"
+"Dong Bac Corporation","coal","1+2",,2e+12,"mcb-demo",,,,,"scope_3_dominant_sector_out_of_scope"

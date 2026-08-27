@@ -62,8 +62,15 @@ matches <- pacta_match_and_prioritize(loanbook_classified, inputs$abcd, vn_outpu
 
 coverage <- pacta_coverage(loanbook_classified, matches$prioritized, vn_output, bank_name, bank_short)
 
+# Wave 3 PHASE-03: the scenario CSV's scenario_source value for the
+# configured vintage -- e.g. inputs.scenario_vintage "pdp8-2023" (hyphen,
+# directory name) -> scenario_source "pdp8_2023" (underscore, CSV column
+# value). Every vintage this repo ships follows that same
+# hyphen-to-underscore convention (see data/scenarios/*/SOURCE.md).
+pdp8_scenario_source <- gsub("-", "_", cfg$inputs$scenario_vintage)
+
 ms <- pacta_market_share(matches$prioritized, matches$abcd_norm, inputs$scenario, inputs$region,
-                          vn_output, bank_short)
+                          vn_output, bank_short, pdp8_scenario_source = pdp8_scenario_source)
 
 sda <- pacta_sda(matches$prioritized, matches$abcd_norm, inputs$co2, vn_output, bank_short)
 

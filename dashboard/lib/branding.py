@@ -80,7 +80,9 @@ def data_freshness_badge() -> None:
     status = manifest.get("status", "unknown")
     sha = manifest.get("git_sha") or "unknown"
     status_note = "" if status == "ok" else " — **last refresh failed, showing prior snapshot**"
-    st.caption(f"Data as of: {generated_at} (pipeline `{sha[:7] if sha != 'unknown' else sha}`){status_note}")
+    vintage = manifest.get("scenario_vintage")
+    vintage_note = f" — scenario vintage: `{vintage}`" if vintage else ""
+    st.caption(f"Data as of: {generated_at} (pipeline `{sha[:7] if sha != 'unknown' else sha}`){vintage_note}{status_note}")
 
 
 def footer_note() -> None:

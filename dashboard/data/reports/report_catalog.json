@@ -1,0 +1,56 @@
+{
+  "PACTA_Vietnam_Bank_Report.html": {
+    "title": "PACTA Vietnam Bank Report",
+    "date": "2026-03-20",
+    "summary": "Vietnam-specific PACTA alignment narrative for the synthetic Mekong Commercial Bank portfolio.",
+    "category": "client_facing"
+  },
+  "PACTA_Synthesis_Report.html": {
+    "title": "PACTA Synthesis Report",
+    "date": "2026-03-19",
+    "summary": "Best-of-both alignment report combining the earlier AI and staff PACTA methodology approaches.",
+    "category": "methodology_reference"
+  },
+  "2026-04-16-final-vietnam-bank-trisk-demo.html": {
+    "title": "Final Vietnam Bank TRISK Demo",
+    "date": "2026-04-16",
+    "summary": "Combined client-facing synthesis of the Vietnam PACTA baseline and TRISK power pilot.",
+    "category": "client_facing"
+  },
+  "2026-04-16-trisk-power-pilot.html": {
+    "title": "TRISK Power Pilot",
+    "date": "2026-04-16",
+    "summary": "Power-sector stress-test report with borrower-level NPV and PD changes plus sensitivity findings.",
+    "category": "client_facing"
+  },
+  "BIDV_Framework_Recommendation_Report.html": {
+    "title": "BIDV Framework Recommendation Report",
+    "date": "2026-05-23",
+    "summary": "Comparison of climate risk/alignment frameworks (PACTA, PCAF, TRISK, TCFD/ISSB, GFANZ/NZBA, SBTi FI, NGFS) mapped to Decision 263 and recommended for a Vietnamese bank's adoption roadmap.",
+    "category": "client_facing"
+  },
+  "PACTA_Alignment_Report.html": {
+    "title": "PACTA Alignment Report",
+    "date": "2026-03-01",
+    "summary": "r2dii-package demonstration report built on the bundled European demo loanbook, not the Vietnam MCB portfolio. Retired from the public snapshot (Wave 3 PHASE-02, N-008 / DEC-006): a European demo portfolio inside a Vietnam-facing showcase is a mislabeling risk. Kept in the catalog as a methodology reference only, not eligible for publication.",
+    "category": "methodology_reference"
+  },
+  "PACTA_Comparison_Report.html": {
+    "title": "PACTA Comparison Report",
+    "date": "2026-02-27",
+    "summary": "r2dii-package demonstration report built on the bundled European demo loanbook, not the Vietnam MCB portfolio. Retired from the public snapshot for the same reason as PACTA_Alignment_Report.html.",
+    "category": "methodology_reference"
+  },
+  "2026-04-16-pacta-baseline-stabilization.html": {
+    "title": "PACTA Baseline Stabilization (internal build report)",
+    "date": "2026-04-16",
+    "summary": "Internal engineering phase-completion report, not written for a client audience. Retired from the public snapshot (Wave 3 PHASE-02, N-008): internal build logs do not belong on the sales-facing Reports page.",
+    "category": "internal_build"
+  },
+  "2026-04-28-trisk-multisector-phases-1-2.html": {
+    "title": "TRISK Multisector Phases 1-2 (internal build report)",
+    "date": "2026-04-28",
+    "summary": "Internal engineering phase-completion report, not written for a client audience. Retired from the public snapshot for the same reason as the baseline-stabilization report.",
+    "category": "internal_build"
+  }
+}

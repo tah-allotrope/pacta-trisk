@@ -13,6 +13,19 @@ displayed on this same whole-VND scale. If your loanbook extract is
 denominated in millions of VND, multiply every exposure and credit-limit
 value by 1,000,000 before submitting it.
 
+## Submission size
+
+**Measured for intake validation only** (`docs/scale_benchmark.md` has the
+full grid and machine details): intake completed for 50,000 loan rows
+across up to 5,000 distinct counterparties in under 3 minutes on a single
+developer machine. Larger submissions are accepted — intake has no hard row
+limit — but have not been characterized.
+
+This number covers **intake validation only**, not the full pipeline. Name
+matching (`r2dii.match::match_name()`) and the PACTA/TRISK analysis stages
+have not yet been benchmarked at this scale; do not assume the full chain
+completes quickly just because intake does.
+
 ## Input Schema (Bank Provides)
 
 ### Required Columns

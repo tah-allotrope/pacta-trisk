@@ -40,7 +40,9 @@ These climate-risk processes are designed to feed MCB's overall credit-risk mana
 
 ## Metrics & Targets (Chỉ số và Mục tiêu)
 
-MCB monitors: (i) financed technology-mix alignment versus PDP8/NDC/NZE pathways by sector; (ii) emission-intensity gaps for cement and steel via the Sectoral Decarbonisation Approach (SDA); and (iii) TRISK net-present-value and probability-of-default changes under stress for covered borrowers.
+MCB monitors: (i) **financed Scope 1+2 GHG emissions** (tCO2e), computed per PCAF's attribution-factor method and reported with a data-quality composition (score 1, best, to 5, worst) for every published total — see `Financed_Emissions.html`; (ii) financed technology-mix alignment versus PDP8/NDC/NZE pathways by sector; (iii) emission-intensity gaps for cement and steel via the Sectoral Decarbonisation Approach (SDA); and (iv) TRISK net-present-value and probability-of-default changes under stress for covered borrowers.
+
+**Scope.** The financed-emissions inventory covers Scope 1+2 only for the power, cement and steel sectors. Automotive and coal-mining borrowers are excluded from this inventory because Scope 3 emissions dominate their financed-emissions profile — reporting a Scope 1+2-only figure for those sectors would understate exactly the borrowers the bank should care most about, so they are named as excluded rather than silently omitted. A future Scope 3 extension is scoped by design (every row already carries a `scope` column), not a schema migration.
 
 The bank's working target is to narrow the financed-alignment gap in priority sectors over successive reporting cycles, supported by borrower transition plans and sustainability-linked instruments. Targets shown in any specific cycle are illustrative for this demonstration and would be calibrated against the bank's risk appetite and national policy in a production deployment.
 

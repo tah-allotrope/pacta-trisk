@@ -13,7 +13,7 @@ public_demo_banner()
 reports = report_catalog()
 st.markdown(
     "Use this page when the bank audience wants the longer-form write-up behind the dashboard snapshots. "
-    "The cards below expose the most useful four HTML reports inline and as downloadable artifacts."
+    "The cards below expose the published HTML reports inline and as downloadable artifacts."
 )
 
 for report in reports:

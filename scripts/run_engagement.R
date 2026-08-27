@@ -14,7 +14,7 @@
 # engagements/mcb-demo/engagement_config.json.
 #
 # Usage:
-#   Rscript scripts/run_engagement.R --config engagements/<slug>/engagement_config.json [--full] [--raw-loanbook <path>] [--skip-intake] [--top-n <int>] [--dry-run]
+#   Rscript scripts/run_engagement.R --config engagements/<slug>/engagement_config.json [--full] [--raw-loanbook <path>] [--skip-intake] [--top-n <int>] [--only-step <name> [--only-step <name> ...]] [--resume-from <name>] [--dry-run]
 #
 # --full: sets run_data_generation TRUE for this run (regenerates the
 #   synthetic input data first). Only meaningful for mcb-demo in practice --
@@ -28,6 +28,12 @@
 #   intake + validation report steps (useful for re-running downstream
 #   stages only).
 # --top-n <int>: forwarded to generate_engagement_letters.R as --top_n.
+# --only-step <name>: run only the named step(s) from the resolved list.
+#   Repeatable. An unknown name is a hard error naming the valid step names
+#   for this run. Combine with --dry-run to preview the filtered list.
+# --resume-from <name>: drop every step before the first whose name matches,
+#   then run the rest. Combine with --only-step (applied first, then
+#   --resume-from filters the result).
 # --dry-run: print the resolved step list (one "name: script args" line per
 #   step) and exit 0 without executing or writing anything.
 #
@@ -42,6 +48,7 @@ suppressPackageStartupMessages({
 
 source("R/engagement_config.R")
 source("R/step_runner.R")
+source("R/step_registry.R")
 
 args <- commandArgs(trailingOnly = TRUE)
 
@@ -51,11 +58,24 @@ get_flag_value <- function(args, name) {
   args[[idx[[1]] + 1]]
 }
 
+#' Collect every value following a repeatable flag, e.g. multiple
+#' --only-step <name> pairs.
+#' @param args character — CLI arguments.
+#' @param name character — the flag to collect values for.
+#' @return character — every value found, in argument order; empty if none.
+get_flag_values <- function(args, name) {
+  idx <- which(args == name)
+  idx <- idx[idx < length(args)]
+  if (length(idx) == 0) return(character(0))
+  args[idx + 1]
+}
+
 config_path <- get_flag_value(args, "--config")
 if (is.null(config_path)) {
   stop(paste(
     "Usage: Rscript scripts/run_engagement.R --config <path>",
-    "[--full] [--raw-loanbook <path>] [--skip-intake] [--top-n <int>] [--dry-run]"
+    "[--full] [--raw-loanbook <path>] [--skip-intake] [--top-n <int>]",
+    "[--only-step <name> [--only-step <name> ...]] [--resume-from <name>] [--dry-run]"
   ), call. = FALSE)
 }
 
@@ -63,6 +83,8 @@ skip_intake  <- "--skip-intake" %in% args
 top_n        <- get_flag_value(args, "--top-n")
 dry_run      <- "--dry-run" %in% args
 full_flag    <- "--full" %in% args
+only_steps   <- get_flag_values(args, "--only-step")
+resume_from  <- get_flag_value(args, "--resume-from") %||% NA_character_
 
 cfg <- load_engagement_config(config_path)
 if (full_flag) {
@@ -89,106 +111,20 @@ effective_config_path <- if (run_intake) {
 }
 
 # --- Build the ordered step list --------------------------------------------
+# Wave 3 PHASE-02: the step list is now resolved from R/step_registry.R's
+# declarative registry rather than a hardcoded `if` ladder here. See
+# resolve_step_list() for the boolean-flag translation (unchanged behavior)
+# and cfg$steps for the new declarative override.
 
-build_step_list <- function(cfg, effective_config_path, run_intake, raw_loanbook, intake_dir, top_n) {
-  steps <- list()
-
-  if (isTRUE(cfg$run_data_generation)) {
-    # scripts/generate_vietnam_data.R is config-unaware (always writes the
-    # MCB defaults); it is only meaningful for mcb-demo.
-    steps <- c(steps, list(list(
-      name = "generate_vietnam_data", script = "scripts/generate_vietnam_data.R", args = character()
-    )))
-  }
-
-  if (run_intake) {
-    intake_args <- c("--input", raw_loanbook, "--output-dir", intake_dir)
-    if (isTRUE(cfg$anonymize)) intake_args <- c(intake_args, "--anonymize")
-    # Wave 2 PHASE-05 (ASM-006): forward the configured FX rate so USD rows
-    # are converted once at intake instead of being retained as NA. Empty
-    # shapes (NULL / list() / character(0)) round-trip as "not configured".
-    if (length(cfg$inputs$fx_rate_usd_vnd) > 0) {
-      intake_args <- c(intake_args, "--fx-rate-usd-vnd", as.character(cfg$inputs$fx_rate_usd_vnd))
-    }
-    steps <- c(steps, list(list(
-      name = "intake", script = "scripts/intake_validate_and_map.R", args = intake_args
-    )))
-    steps <- c(steps, list(list(
-      name = "validation_report",
-      script = "scripts/generate_validation_report.R",
-      args = c(
-        "--intake-dir", intake_dir,
-        "--output", file.path(cfg$paths$reports_dir, "Intake_Validation_Report.html"),
-        "--bank-name", cfg$bank_name
-      )
-    )))
-    # Wave 2 PHASE-06 (coverage & reconciliation): money-denominated report of
-    # submitted vs processed vs dropped exposure and ABCD asset-level coverage.
-    # Sits inside the same if (run_intake) branch -- engagements with no raw
-    # loanbook (mcb-demo) never run intake and so never run this step.
-    steps <- c(steps, list(list(
-      name = "coverage_report",
-      script = "scripts/generate_coverage_report.R",
-      args = c(
-        "--config", effective_config_path,
-        "--intake-dir", intake_dir,
-        "--output", file.path(cfg$paths$reports_dir, "Coverage_Reconciliation_Report.html")
-      )
-    )))
-  }
-
-  steps <- c(steps, list(
-    list(name = "pacta_vietnam_scenario", script = "scripts/pacta_vietnam_scenario.R", args = c("--config", effective_config_path)),
-    list(name = "trisk_prepare_inputs", script = "scripts/trisk_prepare_inputs.R", args = c("--config", effective_config_path))
-  ))
-
-  # Power first, for continuity with the default pipeline's step naming.
-  sectors <- cfg$trisk_sectors
-  if ("power" %in% sectors) sectors <- c("power", setdiff(sectors, "power"))
-  for (sector in sectors) {
-    steps <- c(steps, list(list(
-      name = sprintf("trisk_sector_demo_%s", sector),
-      script = "scripts/trisk_sector_demo.R",
-      args = c(sector, "--config", effective_config_path)
-    )))
-  }
-
-  if (isTRUE(cfg$run_grid)) {
-    steps <- c(steps, list(list(
-      name = "trisk_scenario_grid", script = "scripts/trisk_scenario_grid.R", args = c("--config", effective_config_path)
-    )))
-  }
-
-  steps <- c(steps, list(
-    list(name = "sector_prioritization", script = "scripts/sector_prioritization.R", args = c("--config", effective_config_path)),
-    list(name = "refresh_dashboard_data", script = "scripts/refresh_dashboard_data.R", args = c("--config", effective_config_path)),
-    list(name = "engagement_scoring", script = "scripts/engagement_scoring.R", args = c("--config", effective_config_path))
-  ))
-
-  if (isTRUE(cfg$run_outputs)) {
-    letters_args <- c("--config", effective_config_path)
-    if (!is.null(top_n)) letters_args <- c(letters_args, "--top_n", top_n)
-    steps <- c(steps, list(list(
-      name = "generate_engagement_letters", script = "scripts/generate_engagement_letters.R", args = letters_args
-    )))
-
-    steps <- c(steps, list(list(
-      name = "generate_disclosure_pack", script = "scripts/generate_disclosure_pack.R", args = c("--config", effective_config_path)
-    )))
-  }
-
-  if (isTRUE(cfg$run_refresh_audit)) {
-    # scripts/generate_refresh_audit.R is config-unaware (always reads the
-    # MCB default paths); it is only meaningful for mcb-demo.
-    steps <- c(steps, list(list(
-      name = "refresh_audit", script = "scripts/generate_refresh_audit.R", args = character()
-    )))
-  }
-
-  steps
-}
-
-full_steps <- build_step_list(cfg, effective_config_path, run_intake, raw_loanbook, intake_dir, top_n)
+step_ctx <- list(
+  effective_config_path = effective_config_path,
+  run_intake = run_intake,
+  raw_loanbook = raw_loanbook,
+  intake_dir = intake_dir,
+  top_n = top_n
+)
+full_steps <- resolve_step_list(cfg, step_ctx)
+full_steps <- filter_step_list(full_steps, only = only_steps, resume_from = resume_from)
 
 # --- Banner ------------------------------------------------------------------
 
@@ -208,7 +144,15 @@ if (dry_run) {
 
 # --- Execute -------------------------------------------------------------
 
-if (run_intake) {
+# Wave 3 PHASE-02: --only-step / --resume-from can filter "intake" out of
+# full_steps even when run_intake is TRUE (e.g. --only-step engagement_scoring
+# to re-run just one downstream stage against an already-resolved config from
+# a prior run). Only take the intake-splitting path when "intake" actually
+# survived filtering; otherwise fall through to the plain run_steps() branch,
+# the same way --skip-intake already does.
+intake_step_present <- any(vapply(full_steps, function(s) identical(s$name, "intake"), logical(1)))
+
+if (run_intake && intake_step_present) {
   # Locate "intake" by name, not by position: run_data_generation may have
   # prepended a generate_vietnam_data step ahead of it (Wave 1 PHASE-05).
   intake_idx <- which(vapply(full_steps, function(s) identical(s$name, "intake"), logical(1)))[[1]]
@@ -249,7 +193,10 @@ manifest_path <- if (isTRUE(cfg$public_snapshot_allowed)) {
 write_pipeline_manifest(
   step_results, manifest_path,
   row_count_files = cfg$row_count_files,
-  extra = list(bank_slug = cfg$bank_slug, config_path = effective_config_path)
+  extra = list(
+    bank_slug = cfg$bank_slug, config_path = effective_config_path,
+    scenario_vintage = cfg$inputs$scenario_vintage
+  )
 )
 cat(sprintf("\n[OK] Manifest written: %s\n", manifest_path))
 

@@ -88,6 +88,33 @@ Unit: fraction of the engagement's total Decision-263-relevant exposure, in
 |---|---|---|---|---|---|
 | severity | 0.00 | 0.25 | 0.50 | 0.75 | 1.00 |
 
+### Table SLL-1 — SLL readiness exposure severity
+
+Wave 3 PHASE-06. Sectors: all (`R/sll_readiness.R`). Unit: a single
+borrower's own exposure, whole VND — not a share of portfolio exposure
+(Table C, above, is portfolio share; this is absolute ticket size, because a
+bank's appetite to structure a sustainability-linked loan scales with
+absolute deal size, not portfolio concentration).
+
+| exposure (VND) | 2.5×10¹¹ | 8×10¹¹ | 1.5×10¹² | 3×10¹² | 5.77×10¹² |
+|---|---|---|---|---|---|
+| severity | 0.00 | 0.25 | 0.50 | 0.75 | 1.00 |
+
+Calibrated against the MCB synthetic book's own borrower-exposure range
+(250 billion to 5.77 trillion VND), not a generic round-number scale —
+retune against a real loanbook's exposure distribution once one exists.
+
+**SLL readiness bands** (`sll_readiness_band()` in `R/sll_readiness.R`) are
+similarly calibrated against the MCB book rather than using generic
+breakpoints: `Ready >= 0.75`, `Near-ready >= 0.70`, `Developing >= 0.50`,
+else `Not ready`. With every borrower in `engagement_priority.csv`
+already ABCD-matched by construction, the readiness score's
+`data_availability` dimension is a near-constant 1.0 on this synthetic
+book, so materiality and exposure severity are the only two dimensions
+that actually discriminate — narrower bands than Table A-D's are needed to
+land the qualified pool (Ready + Near-ready) at the target ~5-8 of 23
+borrowers rather than qualifying nearly everyone.
+
 ## Band thresholds
 
 `classify_band()` in `R/prioritization_core.R` keeps its pre-existing cut

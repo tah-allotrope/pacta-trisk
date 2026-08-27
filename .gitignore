@@ -61,9 +61,9 @@ engagements/*/output/trisk_inputs/
 # tracked: normalized_loanbook.csv, validation_warnings.csv, and
 # coverage_metrics.json -- Wave 2 PHASE-05/06).
 engagements/*/intake/*
-!engagements/*/intake/normalized_loanbook.csv
-!engagements/*/intake/validation_warnings.csv
-!engagements/*/intake/coverage_metrics.json
+!engagements/sdb-rehearsal/intake/normalized_loanbook.csv
+!engagements/sdb-rehearsal/intake/validation_warnings.csv
+!engagements/sdb-rehearsal/intake/coverage_metrics.json
 
 # Per-engagement effective config copy.
 engagements/*/engagement_config.resolved.json
@@ -74,7 +74,12 @@ engagements/*/output/*
 !engagements/*/output/engagement/
 !engagements/*/output/trisk/
 engagements/*/output/engagement/*
-!engagements/*/output/engagement/engagement_priority.csv
+!engagements/sdb-rehearsal/output/engagement/engagement_priority.csv
 engagements/*/output/trisk/*/*
-!engagements/*/output/trisk/*/npv_results_latest.csv
-!engagements/*/output/trisk/*/company_summary.csv
+!engagements/sdb-rehearsal/output/trisk/*/npv_results_latest.csv
+!engagements/sdb-rehearsal/output/trisk/*/company_summary.csv
+
+# Wave 3 PHASE-04: scratch space for the scale-fixture generator and the
+# PHASE-03 scenario-vintage comparison's temporary PACTA runs. Never
+# committed; local-only build artifacts.
+bench/

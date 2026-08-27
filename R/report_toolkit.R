@@ -1,7 +1,7 @@
 # ==============================================================================
 # R/report_toolkit.R
 # Shared helpers for the repo's hand-built self-contained HTML report
-# generators (scripts/generate_report.R, scripts/pacta_vietnam_scenario.R,
+# generators (scripts/pacta_vietnam_scenario.R,
 # scripts/generate_validation_report.R, and later report scripts).
 #
 # Only genuinely identical logic is centralized here. Each report's CSS and
@@ -18,9 +18,9 @@ if (requireNamespace("base64enc", quietly = TRUE)) {
 #' Encode a PNG file as a base64 data URI.
 #'
 #' Requires the base64enc package (pinned in renv.lock). Callers that must
-#' degrade gracefully without it (see scripts/generate_report.R) source this
-#' file and then override img_to_base64 themselves when
-#' requireNamespace("base64enc") is FALSE.
+#' degrade gracefully without it (see attic/generate_report.R, retired
+#' Wave 3 PHASE-02) source this file and then override img_to_base64
+#' themselves when requireNamespace("base64enc") is FALSE.
 #'
 #' @param path character — path to a PNG file.
 #' @return character — a `data:image/png;base64,...` URI string.

@@ -1,4 +1,5 @@
 {
+  "schema_version": 1,
   "bank_name": "Saigon Delta Bank",
   "bank_slug": "sdb-rehearsal",
   "inputs": {
@@ -8,9 +9,14 @@
     "scenario_co2_csv": "data/scenarios/pdp8-2023/vietnam_scenario_co2.csv",
     "region_isos_csv": "data/vietnam_region_isos.csv",
     "raw_loanbook_csv": "data/fixtures/unseen_bank_loanbook.csv",
-    "fx_rate_usd_vnd": 26300
+    "fx_rate_usd_vnd": 26300,
+    "scenario_vintage": "pdp8-2023"
   },
-  "trisk_sectors": ["power", "cement", "steel"],
+  "trisk_sectors": [
+    "power",
+    "cement",
+    "steel"
+  ],
   "run_grid": false,
   "paths": {
     "pacta_output_dir": "engagements/sdb-rehearsal/output/pacta",
@@ -21,7 +27,10 @@
     "engagement_output_dir": "engagements/sdb-rehearsal/output/engagement",
     "letters_output_dir": "engagements/sdb-rehearsal/output/engagement_letters",
     "disclosure_output_dir": "engagements/sdb-rehearsal/output/disclosure",
-    "prioritization_output_dir": "engagements/sdb-rehearsal/output/prioritization"
+    "prioritization_output_dir": "engagements/sdb-rehearsal/output/prioritization",
+    "financed_emissions_output_dir": "engagements/sdb-rehearsal/output/financed_emissions"
   },
-  "anonymize": false
+  "anonymize": false,
+  "run_financed_emissions": true,
+  "run_sll_readiness": true
 }

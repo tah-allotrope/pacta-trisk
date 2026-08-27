@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hmac
 import os
 
 import streamlit as st
@@ -24,7 +25,7 @@ def require_password() -> None:
         st.markdown("### Access Required")
         pw = st.text_input("Access password", type="password")
         if pw:
-            if pw == expected:
+            if hmac.compare_digest(pw, expected):
                 st.session_state["auth_ok"] = True
                 st.rerun()
             else:

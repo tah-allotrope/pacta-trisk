@@ -584,7 +584,7 @@ section_exec_summary <- {
   </div>
 
   <div class="callout callout-danger">
-    <strong>Key Finding:</strong> In the illustrative MCB synthetic portfolio, the <strong>power sector dominates all three priority dimensions</strong> (alignment gap, transition stress, and portfolio exposure), scoring maximum (1.0) on the composite priority scale. BIDV should prioritize power sector engagement, followed by steel and cement.
+    <strong>Key Finding:</strong> In the illustrative MCB synthetic portfolio, the <strong>power sector dominates all three priority dimensions</strong> (alignment gap, transition stress, and portfolio exposure), scoring highest on the composite priority scale (absolute severity, not rank-relative — see docs/scoring_anchors.md). BIDV should prioritize power sector engagement; steel and cement also score in the High band on the same absolute scale and should not be read as low-priority.
   </div>
 
   <p><strong>What BIDV should do:</strong> Adopt a phased 6-month implementation pathway beginning with data preparation (extracting Decision 263 portfolio exposure and collecting client emissions data), followed by PACTA alignment analysis, TRISK stress testing, borrower engagement, and quarterly monitoring. The full roadmap is detailed in Section 8.</p>
