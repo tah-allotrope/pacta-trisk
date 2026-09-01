@@ -1,7 +1,7 @@
 ---
 title: "Wave 3: Convergence, Scenario Vintage Truth, and Delivery Readiness"
 date: "2026-08-26"
-status: "draft"
+status: "complete — all 7 phases landed in commits f69ceca/59f5cf2: DESCRIPTION 0.5.0, INV-007/008/009 added and all nine invariants PASS, pdp8-2025-adjusted vintage tenant, PCAF/SLL/target/workshop/i18n-PDF artifacts present, goldens re-pinned to composite 0.9816483381 and trisk_stress_rank_pct"
 request: "Turn research/2026-08-26-wave3-convergence-vintage-and-delivery-readiness-brainstorm.md into a multi-phase implementation plan, merging the two predecessor brainstorms (2026-08-11 GTB gap closers, 2026-08-19 PCAF/seams) into one sequenced program with a single refreeze boundary"
 plan_type: "multi-phase"
 research_inputs:
