@@ -146,3 +146,39 @@ test_that("carbon_cost_exposure is NA throughout when no FX rate is configured",
   out <- carbon_cost_exposure(fe, carbon_price, numeric(0))
   expect_true(all(is.na(out$carbon_cost_vnd)))
 })
+
+# --- data_source provenance (Wave 4 PHASE-03) ---------------------------------
+# R/financed_emissions.R hardcoded data_source = "mcb-demo", so ANY engagement's
+# generated inventory was stamped with the demo bank's slug regardless of whose
+# loanbook it described.
+
+.fe_min_inputs <- function() {
+  list(
+    abcd = data.frame(
+      company_id = "C1", sector = "cement", technology = "integrated",
+      year = 2025L, production = 100, emission_factor = 0.8, stringsAsFactors = FALSE
+    ),
+    capital = data.frame(
+      company_id = "C1", name_company = "Acme", sector = "cement",
+      borrower_capital_vnd = 1e12, borrower_capital_source = "reported",
+      stringsAsFactors = FALSE
+    ),
+    loanbook = data.frame(name_company = "Acme", outstanding_vnd = 1e11, stringsAsFactors = FALSE),
+    ef = data.frame(technology = character(0), emission_factor = numeric(0)),
+    cf = data.frame(technology = character(0), capacity_factor = numeric(0))
+  )
+}
+
+test_that("financed_emissions stamps the caller's data_source on every row", {
+  i <- .fe_min_inputs()
+  out <- financed_emissions(i$abcd, i$capital, i$loanbook, i$ef, i$cf,
+                            data_source = "sdb-rehearsal")
+  expect_equal(unique(out$data_source), "sdb-rehearsal")
+})
+
+test_that("financed_emissions defaults data_source to NA, never a bank slug", {
+  i <- .fe_min_inputs()
+  out <- financed_emissions(i$abcd, i$capital, i$loanbook, i$ef, i$cf)
+  expect_true(all(is.na(out$data_source)))
+  expect_false(any(out$data_source %in% "mcb-demo"))
+})

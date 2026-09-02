@@ -239,7 +239,16 @@ with a partial one unless asked to.
 
 ---
 
-### N-105 — A client's financed-emissions inventory is stamped with another bank's identifier
+### N-105 — Every engagement's financed-emissions inventory is stamped with the demo bank's identifier
+
+> **Correction (recorded during Wave 4 PHASE-03 implementation).** This finding
+> originally said the *committed* SDB fixture carried `"mcb-demo"`. That was
+> wrong. `engagements/sdb-rehearsal/output/financed_emissions/financed_emissions.csv`
+> is gitignored by `.gitignore:73` (`engagements/*/output/*`) and has never been
+> committed — the file inspected was a local build artifact. The hardcoded
+> literal below is real and is fixed, but no incorrect value was ever committed
+> to the repository, so the severity is "would mislabel any real engagement's
+> inventory the moment it is generated", not "a wrong value is in git".
 
 `R/financed_emissions.R:115`:
 
@@ -252,8 +261,8 @@ common <- list(
 )
 ```
 
-Verified in the committed SDB fixture
-(`engagements/sdb-rehearsal/output/financed_emissions/financed_emissions.csv`):
+Verified in the generated (gitignored, never-committed) SDB output at
+`engagements/sdb-rehearsal/output/financed_emissions/financed_emissions.csv`:
 
 ```
 "EVN (Electricity of Vietnam)","power","1+2",4.2e+11,9.37625e+12,"mcb-demo",...
@@ -271,9 +280,9 @@ leaking into a client deliverable," but its implementation
 `cfg$paths$engagement_output_dir/engagement_priority.csv`. Wave 3 added three
 new per-engagement CSV outputs and none of them inherited the guard.
 
-**Severity: medium-high (client-facing mislabelling). Effort: trivial.**
-Note this changes a committed SDB fixture — a scoped fixture refreeze, not a
-golden refreeze, since `data_source` feeds no score.
+**Severity: medium (mislabels any real engagement's inventory on generation;
+nothing wrong is committed). Effort: trivial.** No fixture refreeze is needed —
+the affected file is not tracked.
 
 ---
 

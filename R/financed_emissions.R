@@ -90,13 +90,20 @@ pcaf_data_quality_score <- function(activity_source, factor_source, capital_sour
 #' @param capacity_factors data.frame — data/vietnam_capacity_factors.csv.
 #' @param report_year integer(1) — the ABCD year to use for power capacity
 #'   and cement/steel production/emission_factor, default 2025.
+#' @param data_source character(1) — the engagement's own bank_slug, written
+#'   verbatim into every row's `data_source` column. Defaults to NA_character_
+#'   rather than any bank's slug: until Wave 4 this was hardcoded to the demo
+#'   bank's slug, so EVERY engagement's generated inventory was stamped with it
+#'   regardless of whose loanbook the inventory described. (The affected file is
+#'   gitignored per .gitignore:73, so no wrong value was ever committed -- but
+#'   any real engagement's inventory would have carried it on generation.)
 #' @return data.frame: name_abcd, sector, scope, outstanding_vnd,
 #'   borrower_capital_vnd, attribution_factor, borrower_emissions_tco2e,
 #'   financed_emissions_tco2e, data_quality_score, exclusion_reason,
 #'   data_source.
 #' @export
 financed_emissions <- function(abcd, capital, loanbook_exposure, emission_factors, capacity_factors,
-                                report_year = 2025L) {
+                                report_year = 2025L, data_source = NA_character_) {
   companies <- unique(capital[, c("company_id", "name_company", "sector")])
 
   rows <- lapply(seq_len(nrow(companies)), function(i) {
@@ -112,7 +119,7 @@ financed_emissions <- function(abcd, capital, loanbook_exposure, emission_factor
       name_abcd = name, sector = sector, scope = "1+2",
       outstanding_vnd = outstanding_vnd,
       borrower_capital_vnd = cap_row$borrower_capital_vnd,
-      data_source = "mcb-demo"
+      data_source = data_source
     )
 
     if (sector %in% SCOPE_3_DOMINANT_SECTORS) {

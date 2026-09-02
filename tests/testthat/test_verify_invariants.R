@@ -635,3 +635,71 @@ test_that("inv_audit_attests_configured_vintage skips an engagement with no metr
 
   expect_true(inv_audit_attests_configured_vintage(fixture_root)$ok)
 })
+
+# --- INV-003 widened + INV-004 self-maintaining (Wave 4 PHASE-03) -------------
+
+test_that("inv_engagement_data_source now checks the Wave 3 outputs too", {
+  fixture_root <- .new_fixture_root()
+  on.exit(unlink(fixture_root, recursive = TRUE, force = TRUE))
+  slug <- "acme"
+  dir.create(file.path(fixture_root, "engagements", slug), recursive = TRUE)
+  dir.create(file.path(fixture_root, "out", "eng"), recursive = TRUE)
+  dir.create(file.path(fixture_root, "out", "fe"), recursive = TRUE)
+
+  cfg <- list(
+    bank_slug = slug,
+    paths = list(engagement_output_dir = "out/eng", financed_emissions_output_dir = "out/fe")
+  )
+  write(jsonlite::toJSON(cfg, auto_unbox = TRUE, pretty = TRUE),
+        file.path(fixture_root, "engagements", slug, "engagement_config.json"))
+
+  # Correct provenance in the file INV-003 always checked ...
+  utils::write.csv(data.frame(name_abcd = "X", data_source = slug, stringsAsFactors = FALSE),
+                   file.path(fixture_root, "out", "eng", "engagement_priority.csv"), row.names = FALSE)
+  # ... and another bank's slug in one Wave 3 added.
+  utils::write.csv(data.frame(name_abcd = "X", data_source = "other-bank", stringsAsFactors = FALSE),
+                   file.path(fixture_root, "out", "fe", "financed_emissions.csv"), row.names = FALSE)
+
+  result <- inv_engagement_data_source(fixture_root)
+  expect_false(result$ok)
+  expect_true(any(grepl("financed_emissions.csv", result$detail, fixed = TRUE)))
+  expect_true(any(grepl("other-bank", result$detail, fixed = TRUE)))
+})
+
+test_that("inv_engagement_data_source skips a CSV with no data_source column", {
+  fixture_root <- .new_fixture_root()
+  on.exit(unlink(fixture_root, recursive = TRUE, force = TRUE))
+  slug <- "acme"
+  dir.create(file.path(fixture_root, "engagements", slug), recursive = TRUE)
+  dir.create(file.path(fixture_root, "out", "eng"), recursive = TRUE)
+  cfg <- list(bank_slug = slug, paths = list(engagement_output_dir = "out/eng"))
+  write(jsonlite::toJSON(cfg, auto_unbox = TRUE, pretty = TRUE),
+        file.path(fixture_root, "engagements", slug, "engagement_config.json"))
+  utils::write.csv(data.frame(sector = "power", target_value = 1),
+                   file.path(fixture_root, "out", "eng", "target_registry.csv"), row.names = FALSE)
+
+  expect_true(inv_engagement_data_source(fixture_root)$ok)
+})
+
+test_that(".scan_hardcoded_sector_triples finds a stray literal and honours the allowlist", {
+  fixture_root <- .new_fixture_root()
+  on.exit(unlink(fixture_root, recursive = TRUE, force = TRUE))
+  dir.create(file.path(fixture_root, "scripts"), recursive = TRUE)
+  dir.create(file.path(fixture_root, "R"), recursive = TRUE)
+
+  writeLines('for (s in c("power", "cement", "steel")) { }',
+             file.path(fixture_root, "scripts", "bad.R"))
+  writeLines('# prose naming c("power", "cement", "steel") is not a declaration',
+             file.path(fixture_root, "scripts", "comment_only.R"))
+  writeLines('sector <- c("power", "cement", "steel")',
+             file.path(fixture_root, "R", "sector_registry.R"))
+
+  hits <- .scan_hardcoded_sector_triples(fixture_root)
+  expect_true(any(grepl("scripts/bad.R", hits, fixed = TRUE)))
+  expect_false(any(grepl("comment_only", hits, fixed = TRUE)))
+  expect_false(any(grepl("sector_registry", hits, fixed = TRUE)))
+})
+
+test_that("the live repo declares the sector list only in the entitled files", {
+  expect_equal(.scan_hardcoded_sector_triples(root), character(0))
+})

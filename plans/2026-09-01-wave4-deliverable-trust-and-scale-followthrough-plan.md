@@ -790,25 +790,25 @@ Wave 3 modules from carrying private copies of the supported-sector list, and
 widen the two invariants that were supposed to prevent both.
 
 **Tasks**
-- [ ] TASK-03-01: Add a `data_source` parameter to `financed_emissions()` in
+- [x] TASK-03-01: Add a `data_source` parameter to `financed_emissions()` in
       `R/financed_emissions.R`. New signature:
       `financed_emissions(abcd, capital, loanbook_exposure, emission_factors, capacity_factors, report_year = 2025L, data_source = NA_character_)`.
       Replace the hardcoded `data_source = "mcb-demo"` at line 115 with
       `data_source = data_source`. Update the roxygen `@param` block.
-- [ ] TASK-03-02: In `scripts/generate_financed_emissions.R`, pass
+- [x] TASK-03-02: In `scripts/generate_financed_emissions.R`, pass
       `data_source = cfg$bank_slug` to the `financed_emissions()` call.
-- [ ] TASK-03-03: In `R/target_setting.R`, replace the hardcoded
+- [x] TASK-03-03: In `R/target_setting.R`, replace the hardcoded
       `sectors <- c("power", "cement", "steel")` at line 73 with a call to the
       sector registry: `source`/reference `sector_registry()` and use
       `sectors <- sector_registry()$sector`. `R/target_setting.R` is sourced by
       `scripts/generate_targets.R`; add the `sector_registry.R` source there
       rather than inside the module if the module is currently sourced without
       it, matching how `tests/testthat/test_engagement_config.R:5` sources it.
-- [ ] TASK-03-04: In `scripts/generate_financed_emissions.R`, replace the
+- [x] TASK-03-04: In `scripts/generate_financed_emissions.R`, replace the
       hardcoded `for (sector in c("power", "cement", "steel"))` at line 55 with
       `for (sector in sector_registry()$sector)`, sourcing
       `R/sector_registry.R` at the top of the script.
-- [ ] TASK-03-05: Widen INV-003 (`inv_engagement_data_source()`,
+- [x] TASK-03-05: Widen INV-003 (`inv_engagement_data_source()`,
       `tools/verify_refactor.R:248`) from one filename to a set. For each
       engagement config, check every one of these paths that exists:
       `<paths.engagement_output_dir>/engagement_priority.csv`,
@@ -818,7 +818,7 @@ widen the two invariants that were supposed to prevent both.
       if it has a `data_source` column, every value must equal the config's
       `bank_slug`. Preserve the existing behaviour for files without the column
       (skip) and for missing files (skip).
-- [ ] TASK-03-06: Make INV-004 self-maintaining. Add
+- [x] TASK-03-06: Make INV-004 self-maintaining. Add
       `.scan_hardcoded_sector_triples(root)`, which greps every `.R` file under
       `R/`, `scripts/` and `tools/` for the regex
       `c\(\s*"power"\s*,\s*"cement"\s*,\s*"steel"\s*\)` and returns the matching
@@ -828,10 +828,10 @@ widen the two invariants that were supposed to prevent both.
       `inv_sector_lists_agree()`: any hit outside the allowlist fails INV-004
       with a detail line naming the file and line. Keep the existing
       four-source agreement check unchanged and run both.
-- [ ] TASK-03-07: Regenerate the SDB engagement so its financed-emissions
+- [x] TASK-03-07: Regenerate the SDB engagement so its financed-emissions
       fixture carries the correct provenance:
       `Rscript scripts/run_engagement.R --config engagements/sdb-rehearsal/engagement_config.json`.
-- [ ] TASK-03-08: Add a test to `tests/testthat/test_financed_emissions.R`
+- [x] TASK-03-08: Add a test to `tests/testthat/test_financed_emissions.R`
       asserting that `financed_emissions()` propagates its `data_source`
       argument, and a test to `tests/testthat/test_verify_invariants.R` for the
       widened INV-003 and the new INV-004 scan.
@@ -908,6 +908,23 @@ widen the two invariants that were supposed to prevent both.
       reports `FAIL 0` — no golden number moved.
 - [ ] `git diff --stat engagements/sdb-rehearsal/` shows a change confined to
       `financed_emissions.csv` (and any file whose only diff is a timestamp).
+
+**Execution notes (Wave 4, recorded during implementation)**
+- **ASM-005 and DEC-002 were based on a false premise, now corrected.** Both
+  said the `data_source` fix would change a *committed* SDB fixture and called
+  for a "scoped fixture refreeze". It does not, and none was needed:
+  `engagements/sdb-rehearsal/output/financed_emissions/financed_emissions.csv`
+  is gitignored by `.gitignore:73` (`engagements/*/output/*`) and has never been
+  committed (`git cat-file -e 503743f:<path>` fails). The file inspected during
+  planning was a local build artifact. Regenerating the SDB engagement changed
+  exactly one tracked file — its `pipeline_manifest.json`.
+  The hardcoded literal at `R/financed_emissions.R:115` was real and is fixed;
+  the accurate severity is "would stamp any real engagement's inventory with the
+  demo bank's slug on generation", not "a wrong value is committed".
+- INV-004 is now self-maintaining via `.scan_hardcoded_sector_triples()`, which
+  scans `R/`, `scripts/` and `tools/` for the literal and ignores comment lines.
+  Proven to detect a stray literal in a fixture, to ignore a comment-only
+  mention, and to honour the four-file allowlist — not merely to return empty.
 
 **Phase Risks**
 - **RISK-03-01:** Regenerating the SDB engagement (TASK-03-07) may change more

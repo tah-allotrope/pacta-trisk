@@ -345,9 +345,16 @@ inv_scenario_vintage_single_source <- function(root) {
   list(id = "INV-002", ok = length(detail) == 0, detail = detail)
 }
 
-#' INV-003: every engagement's committed engagement_priority.csv must carry
-#' its own bank_slug as data_source, never another engagement's. Catches
+#' INV-003: every committed per-engagement CSV that carries a `data_source`
+#' column must name its own bank_slug, never another engagement's. Catches
 #' hardcoded provenance leaking into a client deliverable.
+#'
+#' Wave 4 PHASE-03 widened this from `engagement_priority.csv` alone to every
+#' per-engagement output. Wave 3 added three more such CSVs and none inherited
+#' the guard, which is why `R/financed_emissions.R` could hardcode
+#' `data_source = "mcb-demo"` and stamp it on Saigon Delta Bank's committed
+#' financed-emissions inventory without any gate objecting.
+#'
 #' @param root character — repo root.
 #' @return list(id = "INV-003", ok, detail).
 inv_engagement_data_source <- function(root) {
@@ -356,21 +363,34 @@ inv_engagement_data_source <- function(root) {
 
   for (config_path in config_paths) {
     cfg <- tryCatch(jsonlite::fromJSON(config_path, simplifyVector = TRUE), error = function(e) NULL)
-    if (is.null(cfg) || is.null(cfg$bank_slug) || is.null(cfg$paths) || is.null(cfg$paths$engagement_output_dir)) {
-      next
-    }
-    ep_path <- file.path(root, cfg$paths$engagement_output_dir, "engagement_priority.csv")
-    if (!file.exists(ep_path)) next
+    if (is.null(cfg) || is.null(cfg$bank_slug) || is.null(cfg$paths)) next
 
-    ep <- utils::read.csv(ep_path, stringsAsFactors = FALSE)
-    if (!"data_source" %in% names(ep) || nrow(ep) == 0) next
-
-    bad_values <- unique(ep$data_source[ep$data_source != cfg$bank_slug])
-    if (length(bad_values) > 0) {
-      detail <- c(detail, sprintf(
-        "%s: expected data_source '%s', found '%s'",
-        ep_path, cfg$bank_slug, paste(bad_values, collapse = "', '")
+    candidates <- character(0)
+    if (!is.null(cfg$paths$engagement_output_dir)) {
+      candidates <- c(candidates, file.path(
+        root, cfg$paths$engagement_output_dir,
+        c("engagement_priority.csv", "sll_readiness.csv", "target_registry.csv")
       ))
+    }
+    if (!is.null(cfg$paths$financed_emissions_output_dir)) {
+      candidates <- c(candidates, file.path(
+        root, cfg$paths$financed_emissions_output_dir, "financed_emissions.csv"
+      ))
+    }
+
+    for (csv_path in candidates) {
+      if (!file.exists(csv_path)) next
+      df <- tryCatch(utils::read.csv(csv_path, stringsAsFactors = FALSE), error = function(e) NULL)
+      if (is.null(df) || !"data_source" %in% names(df) || nrow(df) == 0) next
+
+      present <- df$data_source[!is.na(df$data_source) & nzchar(df$data_source)]
+      bad_values <- unique(present[present != cfg$bank_slug])
+      if (length(bad_values) > 0) {
+        detail <- c(detail, sprintf(
+          "%s: expected data_source '%s', found '%s'",
+          csv_path, cfg$bank_slug, paste(bad_values, collapse = "', '")
+        ))
+      }
     }
   }
 
@@ -383,6 +403,45 @@ inv_engagement_data_source <- function(root) {
 #' place and not the others.
 #' @param root character — repo root.
 #' @return list(id = "INV-004", ok, detail).
+#' Locate hardcoded `c("power", "cement", "steel")` literals outside the small
+#' set of files entitled to declare the supported-sector list.
+#'
+#' Wave 4 PHASE-03. INV-004 previously compared four hand-registered sites, so
+#' it could only catch drift among places someone remembered to register --
+#' and Wave 3 duly added two it did not know about (`R/target_setting.R` and
+#' `scripts/generate_financed_emissions.R`). Scanning for the literal instead
+#' makes the invariant self-maintaining.
+#'
+#' @param root character — repo root.
+#' @param allowlist character — repo-relative files entitled to the literal.
+#' @return character — "path:line" for each unentitled occurrence.
+.scan_hardcoded_sector_triples <- function(root,
+                                           allowlist = c(
+                                             "R/sector_registry.R",
+                                             "R/engagement_config.R",
+                                             "R/trisk_core.R",
+                                             "scripts/new_engagement.R"
+                                           )) {
+  pattern <- '"power"\\s*,\\s*"cement"\\s*,\\s*"steel"'
+  hits <- character(0)
+  dirs <- file.path(root, c("R", "scripts", "tools"))
+  files <- unlist(lapply(dirs[dir.exists(dirs)], function(d) {
+    list.files(d, pattern = "\\.R$", full.names = TRUE, recursive = TRUE)
+  }), use.names = FALSE)
+
+  for (f in files) {
+    rel <- gsub("\\\\", "/", sub(paste0("^", gsub("\\\\", "/", normalizePath(root, winslash = "/")), "/?"),
+                                "", gsub("\\\\", "/", normalizePath(f, winslash = "/"))))
+    if (rel %in% allowlist) next
+    lines <- tryCatch(readLines(f, warn = FALSE), error = function(e) character(0))
+    # Ignore comment lines: prose may legitimately mention the three sectors.
+    idx <- grep(pattern, lines)
+    idx <- idx[!grepl("^\\s*#", lines[idx])]
+    if (length(idx) > 0) hits <- c(hits, sprintf("%s:%d", rel, idx))
+  }
+  hits
+}
+
 inv_sector_lists_agree <- function(root) {
   sources <- list(
     sector_registry = .get_registry_sectors(root),
@@ -392,6 +451,15 @@ inv_sector_lists_agree <- function(root) {
   )
 
   detail <- character(0)
+
+  # Self-maintaining half: any sector triple outside the entitled files.
+  stray <- .scan_hardcoded_sector_triples(root)
+  if (length(stray) > 0) {
+    detail <- c(detail, sprintf(
+      "hardcoded sector list outside the registry at %s (use sector_registry()$sector)",
+      stray
+    ))
+  }
   failed <- character(0)
   for (name in names(sources)) {
     if (is.null(sources[[name]])) {
@@ -413,7 +481,9 @@ inv_sector_lists_agree <- function(root) {
     return(list(id = "INV-004", ok = FALSE, detail = detail))
   }
 
-  list(id = "INV-004", ok = TRUE, detail = character(0))
+  # `detail` may already hold stray-literal findings from the scan above, so
+  # the verdict is "no findings", not an unconditional TRUE.
+  list(id = "INV-004", ok = length(detail) == 0, detail = detail)
 }
 
 #' INV-005: every sector named in the published TRISK manifest must be a

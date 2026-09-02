@@ -70,7 +70,11 @@ sda_convergence_target <- function(baseline_value, baseline_year, scenario, targ
 #' @export
 build_target_registry <- function(sda_portfolio, ms_portfolio, scenario_co2, scenario_ms,
                                   scenario_vintage, horizons = c(2030L, 2035L, 2050L)) {
-  sectors <- c("power", "cement", "steel")
+  # Wave 4 PHASE-03: read the supported sectors from the single registry
+  # rather than a private copy. INV-004 watches four declaration sites and did
+  # not watch this one, so a fourth sector would have silently produced a
+  # three-sector target registry.
+  sectors <- sector_registry()$sector
   rows <- list()
   for (sector in sectors) {
     # Baseline year is fixed per S6

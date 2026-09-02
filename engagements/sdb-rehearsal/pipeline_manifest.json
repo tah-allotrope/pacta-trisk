@@ -1,71 +1,71 @@
 {
-  "generated_at": "2026-08-27T16:13:02+0700",
-  "git_sha": "f69ceca9c347804e0b511f7ddbf9d3cfee64c831",
+  "generated_at": "2026-09-02T10:21:05+0700",
+  "git_sha": "71e1d696de23575b2ea9185cdba24cfd35af2c75",
   "steps": [
     {
       "name": "intake",
       "status": "ok",
-      "seconds": 4.7,
+      "seconds": 2.2,
       "error_excerpt": {}
     },
     {
       "name": "validation_report",
       "status": "ok",
-      "seconds": 2.3,
+      "seconds": 1.3,
       "error_excerpt": {}
     },
     {
       "name": "coverage_report",
       "status": "ok",
-      "seconds": 2.9,
+      "seconds": 1.6,
       "error_excerpt": {}
     },
     {
       "name": "pacta_vietnam_scenario",
       "status": "ok",
-      "seconds": 24.1,
+      "seconds": 10.7,
       "error_excerpt": {}
     },
     {
       "name": "trisk_prepare_inputs",
       "status": "ok",
-      "seconds": 6.7,
+      "seconds": 3.1,
       "error_excerpt": {}
     },
     {
       "name": "trisk_sector_demo_power",
       "status": "ok",
-      "seconds": 28.8,
+      "seconds": 15,
       "error_excerpt": {}
     },
     {
       "name": "trisk_sector_demo_cement",
       "status": "ok",
-      "seconds": 22,
+      "seconds": 11.1,
       "error_excerpt": {}
     },
     {
       "name": "trisk_sector_demo_steel",
       "status": "ok",
-      "seconds": 22.9,
+      "seconds": 11.2,
       "error_excerpt": {}
     },
     {
       "name": "sector_prioritization",
       "status": "ok",
-      "seconds": 5.6,
+      "seconds": 2.7,
       "error_excerpt": {}
     },
     {
       "name": "refresh_dashboard_data",
       "status": "ok",
-      "seconds": 2.5,
+      "seconds": 1.4,
       "error_excerpt": {}
     },
     {
       "name": "engagement_scoring",
       "status": "ok",
-      "seconds": 2.6,
+      "seconds": 1.5,
       "error_excerpt": {}
     },
     {
@@ -77,23 +77,24 @@
     {
       "name": "sll_readiness",
       "status": "ok",
-      "seconds": 1,
+      "seconds": 0.5,
       "error_excerpt": {}
     },
     {
       "name": "generate_engagement_letters",
       "status": "ok",
-      "seconds": 2.4,
+      "seconds": 1.4,
       "error_excerpt": {}
     },
     {
       "name": "generate_disclosure_pack",
       "status": "ok",
-      "seconds": 2.5,
+      "seconds": 1.5,
       "error_excerpt": {}
     }
   ],
   "status": "ok",
+  "partial": false,
   "row_counts": {},
   "bank_slug": "sdb-rehearsal",
   "config_path": "engagements/sdb-rehearsal/engagement_config.resolved.json",

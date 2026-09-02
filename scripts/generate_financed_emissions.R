@@ -19,6 +19,7 @@ suppressPackageStartupMessages({
 source("R/engagement_config.R")
 source("R/financed_emissions.R")
 source("R/report_toolkit.R")
+source("R/sector_registry.R")
 
 cfg <- load_engagement_config(get_config_arg())
 
@@ -43,7 +44,11 @@ loanbook_exposure <- data.frame(
   stringsAsFactors = FALSE
 )
 
-fe <- financed_emissions(abcd, capital, loanbook_exposure, emission_factors, capacity_factors)
+# Wave 4 PHASE-03: stamp the engagement's OWN slug. This was hardcoded to
+# "mcb-demo" inside R/financed_emissions.R, so sdb-rehearsal's committed
+# inventory carried another bank's identifier on every row.
+fe <- financed_emissions(abcd, capital, loanbook_exposure, emission_factors, capacity_factors,
+                         data_source = cfg$bank_slug)
 dq <- data_quality_summary(fe)
 
 # Sum carbon-cost exposure across every TRISK sector's NGFS carbon-price
@@ -52,7 +57,7 @@ dq <- data_quality_summary(fe)
 # see R/trisk_core.R's trisk_base_params()) and renaming its price column
 # to the generic name carbon_cost_exposure() expects.
 cc_rows <- list()
-for (sector in c("power", "cement", "steel")) {
+for (sector in sector_registry()$sector) {
   cp_path <- sprintf("data/vietnam_trisk_ngfs_carbon_price_%s.csv", sector)
   if (!file.exists(cp_path)) next
   cp <- utils::read.csv(cp_path, stringsAsFactors = FALSE)

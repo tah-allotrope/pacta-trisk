@@ -15,6 +15,7 @@
 # ==============================================================================
 
 source("R/engagement_config.R")
+source("R/sector_registry.R")  # build_target_registry() reads sector_registry()
 source("R/target_setting.R")
 source("R/report_toolkit.R")
 
