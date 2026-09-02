@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Wave 4 Implementation Summary</title>
+<style>
+  :root {
+    --primary:#1a365d; --accent:#2b6cb0; --green:#276749; --red:#c53030;
+    --amber:#b7791f; --bg:#f7fafc; --card:#ffffff; --border:#e2e8f0;
+    --text:#2d3748; --muted:#718096;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:"Segoe UI",system-ui,-apple-system,sans-serif; background:var(--bg);
+         color:var(--text); line-height:1.65; }
+  .container { max-width:1000px; margin:0 auto; padding:2rem 1.5rem 4rem; }
+  h1 { color:var(--primary); font-size:1.9rem; line-height:1.25; }
+  h2 { color:var(--accent); margin:2.25rem 0 .75rem; font-size:1.3rem;
+       border-bottom:2px solid var(--border); padding-bottom:.35rem; }
+  h3 { color:var(--primary); margin:1.5rem 0 .5rem; font-size:1.05rem; }
+  p, li { margin-bottom:.6rem; }
+  ul { padding-left:1.25rem; }
+  .meta { color:var(--muted); font-size:.85rem; margin-top:.4rem; }
+  .banner { background:#fffaf0; border-left:4px solid var(--amber); padding:.85rem 1rem;
+            margin:1.25rem 0; font-size:.9rem; border-radius:0 4px 4px 0; }
+  table { width:100%; border-collapse:collapse; margin:1rem 0; font-size:.88rem;
+          background:var(--card); }
+  th { background:var(--primary); color:#fff; padding:.55rem .6rem; text-align:left;
+       font-weight:600; }
+  td { padding:.5rem .6rem; border-bottom:1px solid var(--border); vertical-align:top; }
+  tr:nth-child(even) td { background:#fbfcfd; }
+  code { background:#edf2f7; padding:.1rem .3rem; border-radius:3px; font-size:.85em; }
+  .ok { color:var(--green); font-weight:600; }
+  .no { color:var(--red); font-weight:600; }
+  .partial { color:var(--amber); font-weight:600; }
+  .num { text-align:right; font-variant-numeric:tabular-nums; }
+  footer { margin-top:3rem; padding-top:1rem; border-top:1px solid var(--border);
+           color:var(--muted); font-size:.82rem; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>Wave 4 — Deliverable Trust, Provenance Truth, and Scale Follow-Through</h1>
+<p class="meta">Implementation summary &middot; pactatrisk 0.5.0 &rarr; 0.6.0 &middot;
+branch <code>wave4-deliverable-trust</code> &middot; plan
+<code>plans/2026-09-01-wave4-deliverable-trust-and-scale-followthrough-plan.md</code></p>
+
+<div class="banner">
+<strong>Synthetic data &mdash; illustrative only.</strong> Every figure in this
+repository comes from the fictional "Mekong Commercial Bank" case. Requires
+human &amp; legal review before any external use. /
+<strong>D&#7919; li&#7879;u m&#244; ph&#7887;ng &mdash; ch&#7881; mang t&#237;nh minh h&#7885;a.</strong>
+C&#7847;n r&#224; so&#225;t c&#7911;a con ng&#432;&#7901;i &amp; ph&#225;p l&#253;
+tr&#432;&#7899;c khi s&#7917; d&#7909;ng ra ngo&#224;i.
+</div>
+
+<h2>What this wave was for</h2>
+<p>Waves 0&ndash;3 built three layers of verification &mdash; byte-identical CSVs,
+cross-artifact invariants, and a unit-test suite &mdash; and pointed all three at
+the <em>numbers</em>. Meanwhile the surface a client actually receives grew to 71
+tracked HTML artifacts. None of it was gated: <code>classify_path()</code>
+returned <code>"timestamp-class"</code> for every <code>.html</code> file
+unconditionally, and no test asserted the content of any generated report.</p>
+<p>Three provenance defects were sitting in that blind spot. This wave closes the
+blind spot, fixes the defects, and finishes the scale measurement Wave&nbsp;3
+started but could not complete.</p>
+
+<h2>Phases</h2>
+<table>
+<tr><th>Phase</th><th>Goal</th><th>Status</th><th>Key outputs</th></tr>
+<tr><td>PHASE-01</td><td>Gate the HTML deliverables</td><td class="ok">Done</td>
+    <td><code>R/report_fingerprint.R</code>; <code>GATED_HTML_PATHS</code>;
+        <code>INV-010</code> (disclaimer); 48 tests</td></tr>
+<tr><td>PHASE-02</td><td>Provenance truth in audit &amp; manifest</td><td class="ok">Done</td>
+    <td><code>--config</code>-aware refresh audit; <code>partial</code> manifests;
+        <code>INV-011</code>, <code>INV-012</code></td></tr>
+<tr><td>PHASE-03</td><td>Remove hardcoded provenance &amp; sector lists</td><td class="ok">Done</td>
+    <td><code>data_source</code> threaded; <code>INV-003</code> widened;
+        <code>INV-004</code> self-maintaining</td></tr>
+<tr><td>PHASE-04</td><td>Restore the package surface; test two modules</td><td class="ok">Done</td>
+    <td>NAMESPACE 33&rarr;55; man 45&rarr;73; CI freshness check;
+        58 new tests</td></tr>
+<tr><td>PHASE-05</td><td>Scale follow-through</td><td class="partial">Done, 1 task deferred</td>
+    <td>Intake vectorized; <code>match_seconds</code> fixed;
+        <code>--full-chain</code> deliberately not done</td></tr>
+<tr><td>PHASE-06</td><td>Parity, surfacing, doc reconciliation</td><td class="ok">Done</td>
+    <td>SDB parity; <code>dashboard/data/analytics/</code> + new page;
+        docs corrected; 0.6.0</td></tr>
+</table>
+
+<h2>Verification, before and after</h2>
+<table>
+<tr><th>Check</th><th>Command</th><th class="num">Before</th><th class="num">After</th></tr>
+<tr><td>R suite</td><td><code>testthat::test_dir('tests/testthat')</code></td>
+    <td class="num">FAIL 0 &middot; PASS 552</td><td class="num">FAIL 0 &middot; PASS 665</td></tr>
+<tr><td>Python suite</td><td><code>python -m pytest dashboard/tests</code></td>
+    <td class="num">63 passed</td><td class="num">69 passed</td></tr>
+<tr><td>Invariants</td><td><code>tools/verify_refactor.R --invariants</code></td>
+    <td class="num">INV-001..009 PASS</td><td class="num">INV-001..012 PASS</td></tr>
+<tr><td>Byte-identity</td><td><code>tools/verify_refactor.R</code></td>
+    <td class="num">PASS</td><td class="num">PASS</td></tr>
+<tr><td>Golden numbers</td><td><code>test_file('test_golden_numbers.R')</code></td>
+    <td class="num">FAIL 0 &middot; PASS 14</td><td class="num">FAIL 0 &middot; PASS 14</td></tr>
+<tr><td>SDB end-to-end</td><td><code>RUN_SDB_ENGAGEMENT=1 test_file(...)</code></td>
+    <td class="num">FAIL 0 &middot; PASS 15</td><td class="num">FAIL 0 &middot; PASS 15</td></tr>
+<tr><td>Package version</td><td><code>DESCRIPTION</code></td>
+    <td class="num">0.5.0</td><td class="num">0.6.0</td></tr>
+</table>
+<p class="meta">No golden number moved. The 5 R warnings are environmental
+(<code>package 'X' was built under R version 4.5.3</code>), not failures.</p>
+
+<h2>The three provenance defects</h2>
+
+<h3>1. The refresh audit attested to the wrong scenario vintage</h3>
+<p><code>scripts/generate_refresh_audit.R</code> hardcoded every path it touched,
+including a 2023 scenario-vintage directory. Wave&nbsp;3 moved
+<code>mcb-demo</code> to <code>pdp8-2025-adjusted</code>, so the audit went on
+publishing the MD5 digests of files the pipeline had not read.</p>
+<table>
+<tr><th>Field</th><th>Before (wrong)</th><th>After (correct)</th></tr>
+<tr><td><code>scenario_ms_checksum</code></td>
+    <td><code>1827b277&hellip;</code> = <em>pdp8-2023</em></td>
+    <td><code>7454bb5c27224d77df3da3fb97210e1d</code> = <em>pdp8-2025-adjusted</em></td></tr>
+<tr><td><code>scenario_co2_checksum</code></td>
+    <td><code>ce806a7c&hellip;</code> = <em>pdp8-2023</em></td>
+    <td><code>f3ff478f028dd53cbd6f2b18cd356890</code> = <em>pdp8-2025-adjusted</em></td></tr>
+<tr><td><code>scenario_vintage</code></td><td>not recorded</td>
+    <td><code>pdp8-2025-adjusted</code></td></tr>
+</table>
+<p>The script now takes <code>--config</code> and derives every path from the
+engagement config, and <code>INV-012</code> checks that the recorded digests
+match the configured inputs. It fired on the committed defect before the fix.</p>
+
+<h3>2. The manifest and the audit contradicted each other</h3>
+<p>The committed <code>pipeline_manifest.json</code> reported
+<code>"seconds": 1</code> for all 16 steps and <code>status: ok</code>, while the
+audit rendered from it showed <code>engagement_scoring failed</code>. The
+mechanism: a <code>--only-step</code> run overwrote the full-run manifest with
+only its own steps and marked it in no way. Manifests now carry
+<code>partial</code>, the orchestrator refuses to clobber a complete public
+manifest without <code>--allow-partial-manifest</code>, and <code>INV-011</code>
+rejects a complete manifest whose steps all report one identical duration.
+The manifest now reports 11 distinct durations across 16 steps.</p>
+
+<h3>3. An analytic hardcoded the demo bank's slug</h3>
+<p><code>R/financed_emissions.R</code> wrote
+<code>data_source = "mcb-demo"</code> on every row of every engagement's
+inventory. <code>INV-003</code> existed to catch exactly this but only ever
+opened <code>engagement_priority.csv</code>; it now checks the three
+per-engagement CSVs Wave&nbsp;3 added as well.</p>
+<div class="banner">
+<strong>Correction to the planning documents.</strong> The brainstorm and plan
+described this as a <em>committed</em> fixture carrying the wrong slug. That was
+wrong: <code>engagements/sdb-rehearsal/output/financed_emissions/financed_emissions.csv</code>
+is gitignored (<code>.gitignore:73</code>) and has never been committed, so no
+incorrect value was ever in git. The hardcoded literal was real and is fixed;
+the accurate severity is "would mislabel any real engagement's inventory the
+moment it is generated". The planned fixture refreeze was unnecessary.
+</div>
+
+<h2>A fourth defect, found by the new gate</h2>
+<p>Not in the plan &mdash; surfaced by running the pipeline under the new checks.
+<code>synthesis_output/prioritization/sector_priority_{ranking,detail}.csv</code>
+carried a <code>stress_score_raw</code> for power of
+<code>4.355628082916891</code> that the repository could no longer reproduce. In
+a pristine <code>git worktree</code> at the pre-Wave-4 commit
+<code>503743f</code>, with entirely unmodified code and data,
+<code>scripts/sector_prioritization.R</code> produces
+<code>4.343708488002581</code>. Zero TRISK outputs changed, confirming the
+staleness was in the prioritization artifact rather than upstream. The committed
+artifact had never matched the inputs it claims to derive from.</p>
+<p><code>composite_score</code> (<code>0.9224749999999999</code>) and
+<code>priority_band</code> (<code>Critical</code>) are unchanged, because power's
+<code>stress_score</code> is capped at 1 &mdash; the moved value is a raw
+diagnostic column only, and the golden tests stay green.</p>
+
+<h2>Scale: intake vectorization</h2>
+<p>Wave&nbsp;3's <code>ALT-005</code> deferred this as "speculative &mdash;
+PHASE-04 measures first". It measured, and named
+<code>scripts/intake_validate_and_map.R:196,253,285</code>. All three passes began
+with <code>row &lt;- input_data[i, ]</code>, a single-row tibble slice per loan.</p>
+<table>
+<tr><th class="num">Loans</th><th class="num">Counterparties</th>
+    <th class="num">Intake before (s)</th><th class="num">Intake after (s)</th>
+    <th class="num">Speed-up</th><th class="num">match_name (s)</th></tr>
+<tr><td class="num">1,000</td><td class="num">200</td><td class="num">3.5</td><td class="num">2.6</td><td class="num">1.35&times;</td><td class="num">0.4</td></tr>
+<tr><td class="num">1,000</td><td class="num">1,000</td><td class="num">3.6</td><td class="num">2.7</td><td class="num">1.33&times;</td><td class="num">0.4</td></tr>
+<tr><td class="num">10,000</td><td class="num">200</td><td class="num">16.4</td><td class="num">6.8</td><td class="num">2.41&times;</td><td class="num">1.4</td></tr>
+<tr><td class="num">10,000</td><td class="num">1,000</td><td class="num">17.1</td><td class="num">7.1</td><td class="num">2.41&times;</td><td class="num">2.5</td></tr>
+<tr><td class="num">10,000</td><td class="num">5,000</td><td class="num">17.4</td><td class="num">7.3</td><td class="num">2.38&times;</td><td class="num">7.2</td></tr>
+<tr><td class="num">50,000</td><td class="num">200</td><td class="num">84.8</td><td class="num">28.2</td><td class="num">3.01&times;</td><td class="num">6.8</td></tr>
+<tr><td class="num">50,000</td><td class="num">1,000</td><td class="num">86.0</td><td class="num">33.3</td><td class="num">2.58&times;</td><td class="num">9.3</td></tr>
+<tr><td class="num">50,000</td><td class="num">5,000</td><td class="num">90.2</td><td class="num">28.1</td><td class="num">3.21&times;</td><td class="num">26.9</td></tr>
+</table>
+<p><strong>Read the 50,000-row figures as "about 3&times;", not as three separate
+numbers.</strong> Run-to-run noise on this shared machine is roughly &plusmn;15%.
+Re-timing the 50,000&times;1,000 cell three times in isolation gave 28.7 / 29.3 /
+33.5&nbsp;s (median 29.3), i.e. 2.9&times; rather than the 2.58&times; a single
+sample suggested. <code>ASM-007</code>'s 3&times; bar is met at the margin, and is
+reported that way rather than rounded up.</p>
+<p>Outputs are byte-identical to the pre-change implementation &mdash; verified in
+a worktree at <code>cec86ae</code> against both the <code>sdb-rehearsal</code>
+fixture and an adversarial fixture with four simultaneous errors on one row,
+unparseable numbers, a blank sector code, an out-of-scope code, USD conversion,
+and an unsupported currency.</p>
+
+<h3>The <code>match_seconds</code> gap was a broken harness, not slow matching</h3>
+<p>Every cell of the original benchmark read <code>NA</code>. The harness built a
+five-column loanbook subset and an ABCD with no <code>sector</code> column, so
+<code>match_name()</code> always raised
+<code>Must have missing names: sector_classification_direct_loantaker</code> and a
+<code>tryCatch</code> swallowed it. Fixed by passing the normalized loanbook whole
+(it is already the 13-column r2dii shape) and mirroring
+<code>R/pacta_core.R</code>'s exact call, VSIC&rarr;ISIC extension included.</p>
+<p>The result confirms the hypothesis Wave&nbsp;3 could not test: <strong>intake
+scales with loan count and is flat in counterparty count; matching is the
+opposite</strong> &mdash; at a fixed 50,000 loans, going from 200 to 5,000
+distinct counterparties takes matching from 6.8&nbsp;s to 26.9&nbsp;s.</p>
+
+<h2>What was not done, and why</h2>
+<ul>
+<li><strong>TASK-05-08, the <code>--full-chain</code> benchmark.</strong> It cannot
+be done honestly with the current fixture:
+<code>tools/generate_scale_fixture.R</code> emits a loanbook and an ABCD table
+only, while the stages past PACTA matching need asset-level inputs (assets,
+financial features, carbon prices, scenarios) for the synthetic counterparties.
+Fabricating them would time a fiction. Recorded as still-unmeasured in
+<code>docs/scale_benchmark.md</code>; extending the fixture generator is the
+prerequisite and belongs to a later wave.</li>
+<li><strong>TASK-04-02 turned out unnecessary.</strong>
+<code>pacta_market_share</code> already carried <code>#' @export</code>
+(<code>R/pacta_core.R:362</code>); the planning-time scan missed it because
+<code>@param</code> lines sit between the tag and the definition. Roxygen added 22
+exports and removed none, confirming there was no discrepancy to fix.</li>
+<li><strong>Two suspected bugs were tested and are not bugs.</strong>
+<code>attribution_factor()</code> with an <code>NA</code> capital and
+<code>sda_convergence_target()</code> with a zero-length baseline both return
+<code>NA</code> cleanly. Left unchanged; the new tests lock that behaviour in.</li>
+</ul>
+
+<h2>Calibrating the gate</h2>
+<p>The gate found two false positives in its own first full run, both run-scoped
+noise rather than content: the audit report renders wall-clock step durations,
+and the PACTA report embeds charts as base64 PNGs whose compression is
+nondeterministic &mdash; the very noise the standalone-<code>.png</code> rule
+already excludes. Both are now normalized away.</p>
+<p>One ordering bug of my own making was found and fixed: a base64 payload
+contains long runs of <code>[0-9a-f]</code>, so applying the git-SHA rule before
+the image rule punched <code>&lt;SHA&gt;</code> tokens into the middle of
+payloads and broke the image pattern's contiguous match. The image rule now runs
+first, covered by a regression test. Tampering with a table cell in each gated
+report still classifies as <span class="no">drift</span>, so the gate remains
+calibrated rather than merely quiet.</p>
+
+<h2>Commits</h2>
+<table>
+<tr><th>Commit</th><th>Scope</th></tr>
+<tr><td><code>6e9b2ef</code></td><td>phase-01: gate the HTML deliverables</td></tr>
+<tr><td><code>71e1d69</code></td><td>phase-02: provenance truth in the audit and the manifest</td></tr>
+<tr><td><code>97d5ae3</code></td><td>phase-03: remove hardcoded provenance and sector lists</td></tr>
+<tr><td><code>cec86ae</code></td><td>phase-04: restore the package export surface, test two modules</td></tr>
+<tr><td><code>9f93da4</code></td><td>phase-05: vectorize intake, measure what Wave 3 could not</td></tr>
+<tr><td><code>35a13c5</code></td><td>phase-06: parity, analytics surfacing, doc reconciliation</td></tr>
+<tr><td><code>3e2c8d9</code></td><td>normalize durations and embedded images in the HTML gate</td></tr>
+<tr><td><code>e9e1940</code></td><td>regenerate MCB artifacts after the gate calibration</td></tr>
+</table>
+
+<footer>
+Generated for the Wave 4 program on branch <code>wave4-deliverable-trust</code>.
+This is a static build report and is deliberately <em>not</em> in
+<code>GATED_HTML_PATHS</code> &mdash; it is never regenerated by a pipeline step.<br><br>
+<strong>Synthetic data &mdash; illustrative only. Requires human &amp; legal review
+before any external use. / D&#7919; li&#7879;u m&#244; ph&#7887;ng &mdash; ch&#7881;
+mang t&#237;nh minh h&#7885;a. C&#7847;n r&#224; so&#225;t c&#7911;a con
+ng&#432;&#7901;i &amp; ph&#225;p l&#253; tr&#432;&#7899;c khi s&#7917; d&#7909;ng
+ra ngo&#224;i.</strong>
+</footer>
+
+</div>
+</body>
+</html>
