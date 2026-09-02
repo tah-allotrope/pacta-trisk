@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-09-02T11:17:28+0700",
-  "git_sha": "35a13c5f3687c0cfeb5d13f6aceeac1970209514",
+  "generated_at": "2026-09-02T11:24:48+0700",
+  "git_sha": "3e2c8d97fe9bbc80ba7c12b2d0631a3ebe3990ad",
   "steps": [
     {
       "name": "pacta_vietnam_scenario",
       "status": "ok",
-      "seconds": 10.7,
+      "seconds": 12.1,
       "error_excerpt": {}
     },
     {
@@ -17,7 +17,7 @@
     {
       "name": "trisk_sector_demo_power",
       "status": "ok",
-      "seconds": 14.9,
+      "seconds": 15,
       "error_excerpt": {}
     },
     {
