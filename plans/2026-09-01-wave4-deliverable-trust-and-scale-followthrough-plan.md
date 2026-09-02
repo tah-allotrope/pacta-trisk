@@ -599,7 +599,7 @@ gate will detect the resulting change to `reports/pipeline_refresh_audit.html`,
 which is the intended proof that the gate works.
 
 **Tasks**
-- [ ] TASK-02-01: Rewrite the top of `scripts/generate_refresh_audit.R` to follow
+- [x] TASK-02-01: Rewrite the top of `scripts/generate_refresh_audit.R` to follow
       the engagement-config convention. Add
       `source("R/engagement_config.R")` and
       `cfg <- load_engagement_config(get_config_arg())`. Replace the hardcoded
@@ -607,37 +607,37 @@ which is the intended proof that the gate works.
       `file.path(cfg$paths$snapshot_dir, "pipeline_manifest.json")`,
       `file.path(cfg$paths$reports_dir, "pipeline_refresh_audit.html")` and
       `file.path(cfg$paths$reports_dir, "refresh_audit_metrics.json")`.
-- [ ] TASK-02-02: Replace the hardcoded `input_files` vector at
+- [x] TASK-02-02: Replace the hardcoded `input_files` vector at
       `scripts/generate_refresh_audit.R:31-35` with a config-derived vector:
       `c(cfg$inputs$loanbook_csv, cfg$inputs$abcd_csv, cfg$inputs$scenario_ms_csv,
       cfg$inputs$scenario_co2_csv)`. Replace the two hardcoded lookups at lines
       84-85 (`input_checksums[["data/scenarios/pdp8-2023/vietnam_scenario_ms.csv"]]`
       and the `_co2` sibling) with `input_checksums[[cfg$inputs$scenario_ms_csv]]`
       and `input_checksums[[cfg$inputs$scenario_co2_csv]]`.
-- [ ] TASK-02-03: Add `scenario_vintage = cfg$inputs$scenario_vintage` as a new
+- [x] TASK-02-03: Add `scenario_vintage = cfg$inputs$scenario_vintage` as a new
       field in the metrics list written to `refresh_audit_metrics.json`, and add
       it to the `fields` vector at line 138 so the run-over-run diff includes it.
-- [ ] TASK-02-04: Replace the hardcoded `pacta_matched_path` at
+- [x] TASK-02-04: Replace the hardcoded `pacta_matched_path` at
       `scripts/generate_refresh_audit.R:44` with
       `file.path(cfg$paths$snapshot_dir, "pacta", "02_vn_matched_prioritized.csv")`.
       Audit the remainder of the file for any other literal path beginning
       `dashboard/data/`, `data/` or `reports/` and route each through `cfg`.
-- [ ] TASK-02-05: In `R/step_registry.R`, change the `refresh_audit` entry's
+- [x] TASK-02-05: In `R/step_registry.R`, change the `refresh_audit` entry's
       `args_fn` from `function(cfg, ctx) character()` to
       `function(cfg, ctx) c("--config", ctx$effective_config_path)`.
-- [ ] TASK-02-06: Add a `partial` parameter to `write_pipeline_manifest()` in
+- [x] TASK-02-06: Add a `partial` parameter to `write_pipeline_manifest()` in
       `R/step_runner.R`. Signature becomes
       `write_pipeline_manifest(step_results, manifest_path, row_count_files = character(0), extra = list(), partial = FALSE, filters = list())`.
       Write `partial` (a scalar logical) and, when `partial` is `TRUE`, a
       `filters` object recording `only_step` and `resume_from`, into the
       manifest JSON. When `partial` is `FALSE`, still write `"partial": false`
       so the field is always present.
-- [ ] TASK-02-07: In `scripts/run_engagement.R`, compute
+- [x] TASK-02-07: In `scripts/run_engagement.R`, compute
       `run_is_partial <- length(only_steps) > 0 || (!is.na(resume_from) && nzchar(resume_from))`
       and pass `partial = run_is_partial` and
       `filters = list(only_step = only_steps, resume_from = resume_from)` to the
       `write_pipeline_manifest()` call at line 193.
-- [ ] TASK-02-08: In `scripts/run_engagement.R`, immediately before that call,
+- [x] TASK-02-08: In `scripts/run_engagement.R`, immediately before that call,
       refuse to overwrite a complete public manifest with a partial one: when
       `run_is_partial` is `TRUE` **and** `isTRUE(cfg$public_snapshot_allowed)`
       **and** the target manifest already exists with `partial` absent or
@@ -645,26 +645,26 @@ which is the intended proof that the gate works.
       the operator to re-run without `--only-step`/`--resume-from`, or to pass
       the new `--allow-partial-manifest` flag. Add that flag to the argument
       parsing and to the usage string in the file header.
-- [ ] TASK-02-09: Add `inv_manifest_plausible()` to `tools/verify_refactor.R` as
+- [x] TASK-02-09: Add `inv_manifest_plausible()` to `tools/verify_refactor.R` as
       **INV-011**, implementing S3. Check every
       `pipeline_manifest.json` reachable from an engagement config
       (`<paths.snapshot_dir>/pipeline_manifest.json` when
       `public_snapshot_allowed` is `true`, otherwise
       `engagements/<slug>/pipeline_manifest.json`).
-- [ ] TASK-02-10: Add `inv_audit_attests_configured_vintage()` to
+- [x] TASK-02-10: Add `inv_audit_attests_configured_vintage()` to
       `tools/verify_refactor.R` as **INV-012**, implementing S4.
-- [ ] TASK-02-11: Register both new invariants in `run_invariants()` after
+- [x] TASK-02-11: Register both new invariants in `run_invariants()` after
       INV-010, and update the `INV-001..010` header comments to `INV-001..012`.
-- [ ] TASK-02-12: Extend `tests/testthat/test_verify_invariants.R` with fixture
+- [x] TASK-02-12: Extend `tests/testthat/test_verify_invariants.R` with fixture
       tests for INV-011 and INV-012, per Test Specs.
-- [ ] TASK-02-13: Fix the two documentation-versus-behaviour defects in
+- [x] TASK-02-13: Fix the two documentation-versus-behaviour defects in
       `R/step_runner.R`. At lines 28-33, correct the comment that claims live
       console output "via `stdout = \"\"`" — the implementation buffers to a
       tempfile and echoes after the step returns, so state that plainly. At line
       86-89, move the `"Stopping pipeline."` message inside the
       `if (stop_on_failure)` branch so `run_steps()` no longer announces a stop
       it will not make.
-- [ ] TASK-02-14: Regenerate the MCB pipeline once
+- [x] TASK-02-14: Regenerate the MCB pipeline once
       (`Rscript scripts/pipeline_refresh.R`) so
       `reports/pipeline_refresh_audit.html`, `reports/refresh_audit_metrics.json`
       and `dashboard/data/pipeline_manifest.json` are rewritten with correct,
@@ -741,6 +741,32 @@ which is the intended proof that the gate works.
 - [ ] `Rscript -e "testthat::test_dir('tests/testthat')"` reports `FAIL 0`.
 - [ ] `Rscript scripts/run_engagement.R --config engagements/mcb-demo/engagement_config.json --dry-run`
       lists `refresh_audit` with `--config` in its argument list.
+
+**Execution notes (Wave 4, recorded during implementation)**
+- Both new invariants fired on the exact defects they were written for, before
+  any fix: INV-011 on `dashboard/data/pipeline_manifest.json` ("all 16 steps
+  report the same duration (1 s)"), INV-012 on the audit's `pdp8-2023`
+  checksums. After the fix and a full refresh, the manifest reports 12 distinct
+  durations across 16 steps and the audit records
+  `7454bb5c27224d77df3da3fb97210e1d` / `f3ff478f028dd53cbd6f2b18cd356890`.
+- **RISK-02-01 materialized, and the cause was pre-existing.** The refresh
+  changed `synthesis_output/prioritization/sector_priority_{ranking,detail}.csv`:
+  power's `stress_score_raw` moved from `4.355628082916891` to
+  `4.343708488002581`. This was proven NOT to be caused by Wave 4. In a pristine
+  `git worktree` at the pre-Wave-4 commit `503743f`, with entirely unmodified
+  code and data, `Rscript scripts/sector_prioritization.R` produces
+  `4.343708488002581` — so the committed artifact never matched the inputs it
+  claims to derive from. Zero TRISK outputs changed in the refresh, confirming
+  the staleness is in the prioritization artifact, not upstream.
+  `composite_score` (0.9224749999999999) and `priority_band` ("Critical") are
+  unchanged, because power's `stress_score` is capped at 1; the moved value is a
+  raw diagnostic column only, and `test_golden_numbers.R` stays green
+  (FAIL 0). The regenerated values are accepted as the correct ones.
+- `record_run_history` refuses a second run on the same calendar day at the same
+  commit (its run ID is `date-shortsha-vintage` and it is append-only by
+  contract), so re-running the pipeline twice in one session fails at the last
+  step until the stale run directory is removed. Pre-existing Wave 3 behaviour,
+  not changed here.
 
 **Phase Risks**
 - **RISK-02-01:** Regenerating the MCB pipeline (TASK-02-14) may surface

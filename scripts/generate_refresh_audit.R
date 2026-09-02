@@ -3,10 +3,20 @@
 # Generates a per-refresh audit report with checksums, coverage metrics,
 # and a diff against the previous run's metrics.
 #
-# Usage: Rscript scripts/generate_refresh_audit.R
+# Usage: Rscript scripts/generate_refresh_audit.R [--config <path>]
 #
-# Reads: dashboard/data/pipeline_manifest.json, key pipeline outputs
-# Writes: reports/pipeline_refresh_audit.html, reports/refresh_audit_metrics.json
+# Reads: <snapshot_dir>/pipeline_manifest.json, key pipeline outputs
+# Writes: <reports_dir>/pipeline_refresh_audit.html,
+#         <reports_dir>/refresh_audit_metrics.json
+#
+# Wave 4 PHASE-02: this script used to hardcode every path it touched,
+# including a hardcoded 2023 scenario-vintage directory. Once mcb-demo moved to
+# the adjusted-2025 vintage in Wave 3 PHASE-03, the audit went on publishing
+# the checksums of scenario files the pipeline had not read -- an audit
+# artifact attesting to the wrong inputs. Every path now derives from the
+# engagement config (CLAUDE.md law 6). Invoked with no --config flag it falls
+# back to load_engagement_config(NULL)'s built-in MCB defaults, so a bare
+# `Rscript scripts/generate_refresh_audit.R` behaves as it always did.
 
 suppressPackageStartupMessages({
   library(jsonlite)
@@ -14,12 +24,16 @@ suppressPackageStartupMessages({
   library(readr)
 })
 
-manifest_path <- "dashboard/data/pipeline_manifest.json"
-out_html <- "reports/pipeline_refresh_audit.html"
-metrics_path <- "reports/refresh_audit_metrics.json"
+source("R/engagement_config.R")
+
+cfg <- load_engagement_config(get_config_arg())
+
+manifest_path <- file.path(cfg$paths$snapshot_dir, "pipeline_manifest.json")
+out_html <- file.path(cfg$paths$reports_dir, "pipeline_refresh_audit.html")
+metrics_path <- file.path(cfg$paths$reports_dir, "refresh_audit_metrics.json")
 
 if (!file.exists(manifest_path)) {
-  stop("pipeline_manifest.json not found. Run the pipeline first.")
+  stop(sprintf("%s not found. Run the pipeline first.", manifest_path))
 }
 
 manifest <- fromJSON(readLines(manifest_path, warn = FALSE), simplifyVector = FALSE)
@@ -28,11 +42,14 @@ generated_at <- manifest$generated_at
 git_sha <- manifest$git_sha %||% "unknown"
 step_timings <- manifest$steps
 
+# The engagement's own declared inputs -- never a hardcoded vintage.
+scenario_ms_csv <- cfg$inputs$scenario_ms_csv
+scenario_co2_csv <- cfg$inputs$scenario_co2_csv
 input_files <- c(
-  "data/vietnam_loanbook.csv",
-  "data/vietnam_abcd.csv",
-  "data/scenarios/pdp8-2023/vietnam_scenario_ms.csv",
-  "data/scenarios/pdp8-2023/vietnam_scenario_co2.csv"
+  cfg$inputs$loanbook_csv,
+  cfg$inputs$abcd_csv,
+  scenario_ms_csv,
+  scenario_co2_csv
 )
 
 input_checksums <- list()
@@ -42,7 +59,7 @@ for (f in input_files) {
   }
 }
 
-pacta_matched_path <- "dashboard/data/pacta/02_vn_matched_prioritized.csv"
+pacta_matched_path <- file.path(cfg$paths$snapshot_dir, "pacta", "02_vn_matched_prioritized.csv")
 pacta_coverage <- list()
 if (file.exists(pacta_matched_path)) {
   matched <- read_csv(pacta_matched_path, show_col_types = FALSE)
@@ -51,7 +68,7 @@ if (file.exists(pacta_matched_path)) {
   }
 }
 
-trisk_top_path <- "dashboard/data/trisk/power/top_borrowers_alignment_trisk.csv"
+trisk_top_path <- file.path(cfg$paths$snapshot_dir, "trisk", "power", "top_borrowers_alignment_trisk.csv")
 trisk_top5 <- data.frame()
 if (file.exists(trisk_top_path)) {
   tb <- read_csv(trisk_top_path, show_col_types = FALSE)
@@ -60,7 +77,7 @@ if (file.exists(trisk_top_path)) {
   }
 }
 
-engagement_path <- "output/engagement/engagement_priority.csv"
+engagement_path <- file.path(cfg$paths$engagement_output_dir, "engagement_priority.csv")
 engagement_top5 <- data.frame()
 if (file.exists(engagement_path)) {
   ep <- read_csv(engagement_path, show_col_types = FALSE)
@@ -81,8 +98,12 @@ current_metrics <- list(
   n_engagement = if (file.exists(engagement_path)) nrow(read_csv(engagement_path, show_col_types = FALSE)) else 0,
   top_trisk_borrower = if (nrow(trisk_top5) > 0) trisk_top5$company_name[1] else NA_character_,
   top_engagement = if (nrow(engagement_top5) > 0) engagement_top5$name_abcd[1] else NA_character_,
-  scenario_ms_checksum = input_checksums[["data/scenarios/pdp8-2023/vietnam_scenario_ms.csv"]] %||% NA_character_,
-  scenario_co2_checksum = input_checksums[["data/scenarios/pdp8-2023/vietnam_scenario_co2.csv"]] %||% NA_character_
+  scenario_ms_checksum = input_checksums[[scenario_ms_csv]] %||% NA_character_,
+  scenario_co2_checksum = input_checksums[[scenario_co2_csv]] %||% NA_character_,
+  # Wave 4 PHASE-02: record WHICH vintage the checksums above belong to, so a
+  # reader (and INV-012) can tell at a glance whether the audit attests to the
+  # engagement's configured inputs.
+  scenario_vintage = cfg$inputs$scenario_vintage %||% NA_character_
 )
 
 write(toJSON(current_metrics, auto_unbox = TRUE, pretty = TRUE), metrics_path)
@@ -135,7 +156,8 @@ if (nrow(engagement_top5) > 0) {
 
 diff_rows <- ""
 if (!is.null(prev_metrics)) {
-  fields <- c("n_pacta_matched", "n_engagement", "top_trisk_borrower", "top_engagement", "scenario_ms_checksum", "scenario_co2_checksum")
+  fields <- c("n_pacta_matched", "n_engagement", "top_trisk_borrower", "top_engagement",
+              "scenario_ms_checksum", "scenario_co2_checksum", "scenario_vintage")
   for (f in fields) {
     prev_val <- prev_metrics[[f]] %||% "N/A"
     curr_val <- current_metrics[[f]] %||% "N/A"

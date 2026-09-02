@@ -498,3 +498,140 @@ test_that("inv_scenario_vintage_declared passes when vintage and paths agree", {
   result <- inv_scenario_vintage_declared(fixture_root)
   expect_true(result$ok)
 })
+
+# --- INV-011: manifest plausibility (Wave 4 PHASE-02) -------------------------
+
+#' Write an engagement config plus a pipeline manifest into a fixture root.
+#' @param root character — fixture root.
+#' @param slug character — bank slug.
+#' @param seconds numeric — one duration per step.
+#' @param partial logical — the manifest's `partial` flag; NULL omits the field.
+.write_manifest_fixture <- function(root, slug, seconds, partial = FALSE) {
+  dir.create(file.path(root, "engagements", slug), recursive = TRUE, showWarnings = FALSE)
+  cfg <- list(
+    bank_slug = slug,
+    public_snapshot_allowed = FALSE,
+    inputs = list(scenario_vintage = "pdp8-2023"),
+    paths = list(reports_dir = "reports")
+  )
+  write(jsonlite::toJSON(cfg, auto_unbox = TRUE, pretty = TRUE),
+        file.path(root, "engagements", slug, "engagement_config.json"))
+
+  manifest <- list(
+    generated_at = "2026-09-02T08:00:00+0700",
+    steps = data.frame(
+      name = paste0("step_", seq_along(seconds)),
+      status = rep("ok", length(seconds)),
+      seconds = seconds,
+      stringsAsFactors = FALSE
+    ),
+    status = "ok"
+  )
+  if (!is.null(partial)) manifest$partial <- partial
+  write(jsonlite::toJSON(manifest, auto_unbox = TRUE, pretty = TRUE),
+        file.path(root, "engagements", slug, "pipeline_manifest.json"))
+}
+
+test_that("inv_manifest_plausible fails when every step reports the same duration", {
+  fixture_root <- .new_fixture_root()
+  on.exit(unlink(fixture_root, recursive = TRUE, force = TRUE))
+  .write_manifest_fixture(fixture_root, "acme", seconds = c(1, 1, 1, 1))
+
+  result <- inv_manifest_plausible(fixture_root)
+  expect_equal(result$id, "INV-011")
+  expect_false(result$ok)
+  expect_true(any(grepl("same duration", result$detail, fixed = TRUE)))
+})
+
+test_that("inv_manifest_plausible exempts a run marked partial", {
+  fixture_root <- .new_fixture_root()
+  on.exit(unlink(fixture_root, recursive = TRUE, force = TRUE))
+  .write_manifest_fixture(fixture_root, "acme", seconds = c(1, 1, 1, 1), partial = TRUE)
+
+  expect_true(inv_manifest_plausible(fixture_root)$ok)
+})
+
+test_that("inv_manifest_plausible ignores a run with fewer than three steps", {
+  fixture_root <- .new_fixture_root()
+  on.exit(unlink(fixture_root, recursive = TRUE, force = TRUE))
+  .write_manifest_fixture(fixture_root, "acme", seconds = c(1, 1))
+
+  expect_true(inv_manifest_plausible(fixture_root)$ok)
+})
+
+test_that("inv_manifest_plausible passes on realistic varied timings", {
+  fixture_root <- .new_fixture_root()
+  on.exit(unlink(fixture_root, recursive = TRUE, force = TRUE))
+  .write_manifest_fixture(fixture_root, "acme", seconds = c(12.7, 3.4, 16.1))
+
+  expect_true(inv_manifest_plausible(fixture_root)$ok)
+})
+
+# --- INV-012: the audit must attest to the configured vintage ----------------
+
+#' Write a public engagement whose refresh-audit metrics record `recorded_*`
+#' digests, alongside a scenario file whose real content is `ms_content`.
+.write_audit_fixture <- function(root, ms_content, recorded_ms, recorded_co2 = NULL) {
+  slug <- "pub"
+  vintage_dir <- file.path("data", "scenarios", "v1")
+  dir.create(file.path(root, vintage_dir), recursive = TRUE, showWarnings = FALSE)
+  dir.create(file.path(root, "engagements", slug), recursive = TRUE, showWarnings = FALSE)
+  dir.create(file.path(root, "reports"), recursive = TRUE, showWarnings = FALSE)
+
+  ms_rel <- file.path(vintage_dir, "vietnam_scenario_ms.csv")
+  co2_rel <- file.path(vintage_dir, "vietnam_scenario_co2.csv")
+  writeLines(ms_content, file.path(root, ms_rel))
+  writeLines("co2,content", file.path(root, co2_rel))
+
+  cfg <- list(
+    bank_slug = slug,
+    public_snapshot_allowed = TRUE,
+    inputs = list(
+      scenario_vintage = "v1",
+      scenario_ms_csv = gsub("\\\\", "/", ms_rel),
+      scenario_co2_csv = gsub("\\\\", "/", co2_rel)
+    ),
+    paths = list(reports_dir = "reports", snapshot_dir = "snap")
+  )
+  write(jsonlite::toJSON(cfg, auto_unbox = TRUE, pretty = TRUE),
+        file.path(root, "engagements", slug, "engagement_config.json"))
+
+  metrics <- list(scenario_ms_checksum = recorded_ms)
+  if (!is.null(recorded_co2)) metrics$scenario_co2_checksum <- recorded_co2
+  write(jsonlite::toJSON(metrics, auto_unbox = TRUE, pretty = TRUE),
+        file.path(root, "reports", "refresh_audit_metrics.json"))
+  file.path(root, ms_rel)
+}
+
+test_that("inv_audit_attests_configured_vintage fails on a stale recorded checksum", {
+  fixture_root <- .new_fixture_root()
+  on.exit(unlink(fixture_root, recursive = TRUE, force = TRUE))
+  .write_audit_fixture(fixture_root, "real,content", recorded_ms = "00000000000000000000000000000000")
+
+  result <- inv_audit_attests_configured_vintage(fixture_root)
+  expect_equal(result$id, "INV-012")
+  expect_false(result$ok)
+  expect_true(any(grepl("hashes to", result$detail, fixed = TRUE)))
+})
+
+test_that("inv_audit_attests_configured_vintage passes when the digest matches the configured input", {
+  fixture_root <- .new_fixture_root()
+  on.exit(unlink(fixture_root, recursive = TRUE, force = TRUE))
+  ms_path <- .write_audit_fixture(fixture_root, "real,content", recorded_ms = "placeholder")
+  real_digest <- unname(tools::md5sum(ms_path))
+  .write_audit_fixture(fixture_root, "real,content", recorded_ms = real_digest)
+
+  expect_true(inv_audit_attests_configured_vintage(fixture_root)$ok)
+})
+
+test_that("inv_audit_attests_configured_vintage skips an engagement with no metrics file", {
+  fixture_root <- .new_fixture_root()
+  on.exit(unlink(fixture_root, recursive = TRUE, force = TRUE))
+  dir.create(file.path(fixture_root, "engagements", "nope"), recursive = TRUE)
+  cfg <- list(bank_slug = "nope", public_snapshot_allowed = TRUE,
+              inputs = list(scenario_vintage = "v1"), paths = list(reports_dir = "reports"))
+  write(jsonlite::toJSON(cfg, auto_unbox = TRUE, pretty = TRUE),
+        file.path(fixture_root, "engagements", "nope", "engagement_config.json"))
+
+  expect_true(inv_audit_attests_configured_vintage(fixture_root)$ok)
+})

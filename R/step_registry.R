@@ -124,9 +124,11 @@ step_registry <- function() {
       script = "scripts/generate_disclosure_pack.R",
       args_fn = function(cfg, ctx) c("--config", ctx$effective_config_path)
     ),
+    # Wave 4 PHASE-02: previously the only step receiving no config at all,
+    # which is why it hardcoded a scenario vintage and the public snapshot dir.
     refresh_audit = list(
       script = "scripts/generate_refresh_audit.R",
-      args_fn = function(cfg, ctx) character()
+      args_fn = function(cfg, ctx) c("--config", ctx$effective_config_path)
     ),
     # Wave 3 PHASE-03: optional, gated on run_vintage_comparison (default
     # FALSE). Compares the engagement's current inputs.scenario_vintage

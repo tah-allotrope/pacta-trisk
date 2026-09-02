@@ -14,7 +14,7 @@
 # engagements/mcb-demo/engagement_config.json.
 #
 # Usage:
-#   Rscript scripts/run_engagement.R --config engagements/<slug>/engagement_config.json [--full] [--raw-loanbook <path>] [--skip-intake] [--top-n <int>] [--only-step <name> [--only-step <name> ...]] [--resume-from <name>] [--dry-run]
+#   Rscript scripts/run_engagement.R --config engagements/<slug>/engagement_config.json [--full] [--raw-loanbook <path>] [--skip-intake] [--top-n <int>] [--only-step <name> [--only-step <name> ...]] [--resume-from <name>] [--allow-partial-manifest] [--dry-run]
 #
 # --full: sets run_data_generation TRUE for this run (regenerates the
 #   synthetic input data first). Only meaningful for mcb-demo in practice --
@@ -34,6 +34,10 @@
 # --resume-from <name>: drop every step before the first whose name matches,
 #   then run the rest. Combine with --only-step (applied first, then
 #   --resume-from filters the result).
+# --allow-partial-manifest: permit a filtered run (--only-step/--resume-from)
+#   to overwrite an existing COMPLETE manifest in the public snapshot. The
+#   written manifest is marked "partial": true either way; without this flag
+#   the orchestrator refuses rather than destroying the full-run record.
 # --dry-run: print the resolved step list (one "name: script args" line per
 #   step) and exit 0 without executing or writing anything.
 #
@@ -75,7 +79,8 @@ if (is.null(config_path)) {
   stop(paste(
     "Usage: Rscript scripts/run_engagement.R --config <path>",
     "[--full] [--raw-loanbook <path>] [--skip-intake] [--top-n <int>]",
-    "[--only-step <name> [--only-step <name> ...]] [--resume-from <name>] [--dry-run]"
+    "[--only-step <name> [--only-step <name> ...]] [--resume-from <name>]",
+    "[--allow-partial-manifest] [--dry-run]"
   ), call. = FALSE)
 }
 
@@ -85,6 +90,9 @@ dry_run      <- "--dry-run" %in% args
 full_flag    <- "--full" %in% args
 only_steps   <- get_flag_values(args, "--only-step")
 resume_from  <- get_flag_value(args, "--resume-from") %||% NA_character_
+# Wave 4 PHASE-02: opt-in to overwriting a complete public manifest with a
+# partial (filtered) run's manifest.
+allow_partial_manifest <- "--allow-partial-manifest" %in% args
 
 cfg <- load_engagement_config(config_path)
 if (full_flag) {
@@ -190,13 +198,42 @@ manifest_path <- if (isTRUE(cfg$public_snapshot_allowed)) {
 } else {
   file.path("engagements", cfg$bank_slug, "pipeline_manifest.json")
 }
+# Wave 4 PHASE-02: a --only-step / --resume-from run produces a manifest that
+# describes only the steps it ran. Writing that over a complete manifest
+# silently destroys the provenance record -- and the refresh audit, which reads
+# this file, then renders the remains as though they were a full run. Mark it,
+# and refuse to clobber a complete PUBLIC manifest without an explicit opt-in.
+run_is_partial <- length(only_steps) > 0 || (!is.na(resume_from) && nzchar(resume_from))
+
+if (run_is_partial && isTRUE(cfg$public_snapshot_allowed) &&
+    !allow_partial_manifest && file.exists(manifest_path)) {
+  existing <- tryCatch(
+    jsonlite::fromJSON(manifest_path, simplifyVector = TRUE),
+    error = function(e) NULL
+  )
+  existing_is_complete <- !is.null(existing) && !isTRUE(existing$partial)
+  if (existing_is_complete) {
+    stop(sprintf(paste0(
+      "Refusing to overwrite the complete public manifest at %s with a partial run.\n",
+      "  This run was filtered by %s.\n",
+      "  Re-run without --only-step/--resume-from, or pass --allow-partial-manifest ",
+      "to accept a partial provenance record."
+    ), manifest_path, paste(c(
+      if (length(only_steps) > 0) sprintf("--only-step %s", paste(only_steps, collapse = ", ")),
+      if (!is.na(resume_from) && nzchar(resume_from)) sprintf("--resume-from %s", resume_from)
+    ), collapse = " and ")), call. = FALSE)
+  }
+}
+
 write_pipeline_manifest(
   step_results, manifest_path,
   row_count_files = cfg$row_count_files,
   extra = list(
     bank_slug = cfg$bank_slug, config_path = effective_config_path,
     scenario_vintage = cfg$inputs$scenario_vintage
-  )
+  ),
+  partial = run_is_partial,
+  filters = list(only_step = only_steps, resume_from = resume_from)
 )
 cat(sprintf("\n[OK] Manifest written: %s\n", manifest_path))
 

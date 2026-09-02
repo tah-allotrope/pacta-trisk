@@ -27,8 +27,13 @@ count_rows <- function(path) {
 #' Wave 3 PHASE-02 (F-006): a failed step used to record only a status, with
 #' no captured output, so diagnosing a CI failure meant re-reading console
 #' scrollback. This still prints the step's live output to the console as
-#' before (via `stdout = ""`), but ALSO captures it so the last lines are
-#' available in the return value and, from there, in pipeline_manifest.json.
+#' before, but ALSO captures it so the last lines are available in the return
+#' value and, from there, in pipeline_manifest.json.
+#'
+#' Corrected in Wave 4 PHASE-02: console output is NOT live. An earlier version
+#' of this comment claimed the step still streamed via `stdout = ""`; the code
+#' captures to a temp file and echoes once the step returns. Ordering is
+#' preserved, but a long-running step prints nothing until it finishes.
 #'
 #' @param step list(name, script, args) — step$name is a label for the
 #'   manifest, step$script is the R script path, step$args is a character
@@ -84,8 +89,12 @@ run_steps <- function(steps, stop_on_failure = TRUE) {
     result <- run_step(step)
     step_results[[length(step_results) + 1]] <- result
     if (result$status != "ok") {
-      cat(sprintf("\n[FAILED] Step '%s' exited non-zero. Stopping pipeline.\n", result$name))
-      if (stop_on_failure) break
+      # Wave 4 PHASE-02: only claim we are stopping when we actually are.
+      if (stop_on_failure) {
+        cat(sprintf("\n[FAILED] Step '%s' exited non-zero. Stopping pipeline.\n", result$name))
+        break
+      }
+      cat(sprintf("\n[FAILED] Step '%s' exited non-zero. Continuing.\n", result$name))
     }
   }
   step_results
@@ -99,9 +108,16 @@ run_steps <- function(steps, stop_on_failure = TRUE) {
 #'   under `row_counts` in the manifest; defaults to none.
 #' @param extra list — additional top-level fields merged into the manifest
 #'   (e.g. bank_slug, config_path); defaults to none.
+#' @param partial logical(1) — TRUE when the run that produced `step_results`
+#'   was filtered by --only-step or --resume-from and therefore does NOT
+#'   describe a complete pipeline. Always written, so the field's absence
+#'   identifies a manifest predating Wave 4 rather than a complete run.
+#' @param filters list — when `partial` is TRUE, the filter that produced the
+#'   run: `only_step` (character) and `resume_from` (character(1) or NA).
 #' @return character (invisible) — the manifest_path written to.
 #' @export
-write_pipeline_manifest <- function(step_results, manifest_path, row_count_files = character(0), extra = list()) {
+write_pipeline_manifest <- function(step_results, manifest_path, row_count_files = character(0), extra = list(),
+                                    partial = FALSE, filters = list()) {
   git_sha <- tryCatch(
     trimws(system("git rev-parse HEAD", intern = TRUE)),
     error = function(e) NA_character_
@@ -113,8 +129,23 @@ write_pipeline_manifest <- function(step_results, manifest_path, row_count_files
     git_sha = git_sha,
     steps = step_results,
     status = if (all(vapply(step_results, function(s) s$status == "ok", logical(1)))) "ok" else "failed",
+    # Wave 4 PHASE-02: a --only-step / --resume-from run used to overwrite the
+    # full-run manifest with only the executed steps, and marked it in no way --
+    # so a filtered run silently destroyed the provenance record and the refresh
+    # audit rendered the remains as though they were a complete run.
+    partial = isTRUE(partial),
     row_counts = setNames(as.list(vapply(row_count_files, count_rows, integer(1))), row_count_files)
   )
+  if (isTRUE(partial)) {
+    manifest$filters <- list(
+      only_step = if (length(filters$only_step) > 0) as.character(filters$only_step) else character(0),
+      resume_from = if (length(filters$resume_from) > 0 && !is.na(filters$resume_from[[1]])) {
+        as.character(filters$resume_from[[1]])
+      } else {
+        NA_character_
+      }
+    )
+  }
   manifest <- .merge_manifest_extra(manifest, extra)
 
   dir.create(dirname(manifest_path), recursive = TRUE, showWarnings = FALSE)

@@ -1,10 +1,11 @@
 {
-  "generated_at": "2026-08-27T16:19:03+0700",
-  "git_sha": "f69ceca9c347804e0b511f7ddbf9d3cfee64c831",
+  "generated_at": "2026-09-02T10:13:53+0700",
+  "git_sha": "6e9b2ef193192203799f4edeb7442a85a1a431e7",
   "n_pacta_matched": 43,
   "n_engagement": 23,
   "top_trisk_borrower": "Nghi Son Power LLC",
   "top_engagement": "Nghi Son Power LLC",
-  "scenario_ms_checksum": "1827b2776aa0df5f50b72ff866d54665",
-  "scenario_co2_checksum": "ce806a7c4cdfa4d835ff925759ab695e"
+  "scenario_ms_checksum": "7454bb5c27224d77df3da3fb97210e1d",
+  "scenario_co2_checksum": "f3ff478f028dd53cbd6f2b18cd356890",
+  "scenario_vintage": "pdp8-2025-adjusted"
 }

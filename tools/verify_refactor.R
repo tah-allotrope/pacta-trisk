@@ -19,7 +19,7 @@
 #   Rscript tools/verify_refactor.R --skip-refresh # classifies the current working
 #                                                   # tree without running anything
 #   Rscript tools/verify_refactor.R --invariants   # runs only the cross-artifact
-#                                                   # invariant checks (INV-001..010),
+#                                                   # invariant checks (INV-001..012),
 #                                                   # never the pipeline refresh
 #
 # Why git diff and not md5sum: git applies core.autocrlf normalization, so a
@@ -175,7 +175,7 @@ classify_path <- function(path, volatile_basenames = VOLATILE_BASENAMES,
 }
 
 # ==============================================================================
-# --invariants: cross-artifact consistency checks (INV-001..010)
+# --invariants: cross-artifact consistency checks (INV-001..012)
 #
 # Each inv_*() function takes a repo root (and, where relevant, a snapshot
 # directory) and returns list(id, ok, detail) — detail is a character vector
@@ -696,6 +696,106 @@ inv_deliverables_carry_disclaimer <- function(root, html_paths = DISCLAIMER_HTML
   list(id = "INV-010", ok = length(detail) == 0, detail = detail)
 }
 
+#' Every engagement's manifest path, keyed by config path.
+#' @param root character — repo root.
+#' @return named list of list(cfg, manifest_path).
+.engagement_manifests <- function(root) {
+  out <- list()
+  for (config_path in Sys.glob(file.path(root, "engagements", "*", "engagement_config.json"))) {
+    cfg <- tryCatch(jsonlite::fromJSON(config_path, simplifyVector = TRUE), error = function(e) NULL)
+    if (is.null(cfg) || is.null(cfg$bank_slug)) next
+    manifest_path <- if (isTRUE(cfg$public_snapshot_allowed) && !is.null(cfg$paths$snapshot_dir)) {
+      file.path(root, cfg$paths$snapshot_dir, "pipeline_manifest.json")
+    } else {
+      file.path(root, "engagements", cfg$bank_slug, "pipeline_manifest.json")
+    }
+    out[[config_path]] <- list(cfg = cfg, manifest_path = manifest_path)
+  }
+  out
+}
+
+#' INV-011: a complete pipeline manifest must not report an identical
+#' wall-clock duration for every one of its steps.
+#'
+#' A genuine multi-step run of this pipeline cannot produce the same `seconds`
+#' value for PACTA, three TRISK sector runs and the scenario grid -- the
+#' committed MCB manifest that motivated this check reported "seconds": 1 for
+#' all 16 steps while the SDB manifest reported 2.3 to 28.8 for the same work.
+#' Deliberately weak: it asserts no specific timing (which would be
+#' machine-dependent), only that a complete run's timings are not degenerate.
+#' A `partial` run is exempt, and fewer than 3 steps is not enough evidence.
+#'
+#' @param root character — repo root.
+#' @return list(id = "INV-011", ok, detail).
+inv_manifest_plausible <- function(root) {
+  detail <- character(0)
+  for (entry in .engagement_manifests(root)) {
+    mp <- entry$manifest_path
+    if (!file.exists(mp)) next
+    m <- tryCatch(jsonlite::fromJSON(mp, simplifyVector = TRUE), error = function(e) NULL)
+    if (is.null(m) || is.null(m$steps)) next
+    if (isTRUE(m$partial)) next
+
+    seconds <- tryCatch(as.numeric(m$steps$seconds), error = function(e) numeric(0))
+    seconds <- seconds[!is.na(seconds)]
+    if (length(seconds) < 3) next
+    if (length(unique(seconds)) == 1) {
+      detail <- c(detail, sprintf(
+        "%s: all %d steps report the same duration (%s s) and the run is not marked partial",
+        mp, length(seconds), format(seconds[[1]])
+      ))
+    }
+  }
+  list(id = "INV-011", ok = length(detail) == 0, detail = detail)
+}
+
+#' INV-012: the refresh audit's recorded scenario checksums must match the
+#' scenario files the engagement's config actually declares.
+#'
+#' scripts/generate_refresh_audit.R hardcoded `data/scenarios/pdp8-2023/` until
+#' Wave 4, so after Wave 3 moved mcb-demo to `pdp8-2025-adjusted` the audit
+#' published the digests of files the pipeline never read. INV-009 checks only
+#' that a vintage is DECLARED; this checks that the artifacts ATTEST to it.
+#'
+#' @param root character — repo root.
+#' @return list(id = "INV-012", ok, detail).
+inv_audit_attests_configured_vintage <- function(root) {
+  detail <- character(0)
+  for (entry in .engagement_manifests(root)) {
+    cfg <- entry$cfg
+    if (!isTRUE(cfg$public_snapshot_allowed)) next
+    if (is.null(cfg$paths$reports_dir)) next
+
+    metrics_path <- file.path(root, cfg$paths$reports_dir, "refresh_audit_metrics.json")
+    if (!file.exists(metrics_path)) next
+    metrics <- tryCatch(jsonlite::fromJSON(metrics_path, simplifyVector = TRUE), error = function(e) NULL)
+    if (is.null(metrics)) next
+
+    checks <- list(
+      list(field = "scenario_ms_checksum", path = cfg$inputs$scenario_ms_csv),
+      list(field = "scenario_co2_checksum", path = cfg$inputs$scenario_co2_csv)
+    )
+    for (chk in checks) {
+      recorded <- metrics[[chk$field]]
+      if (is.null(recorded) || length(recorded) == 0 || is.na(recorded)) next
+      if (is.null(chk$path) || length(chk$path) == 0) next
+      computed <- .md5_of(file.path(root, chk$path))
+      if (is.na(computed)) {
+        detail <- c(detail, sprintf(
+          "%s: %s declares %s, which does not exist",
+          metrics_path, chk$field, chk$path
+        ))
+      } else if (!identical(as.character(recorded), computed)) {
+        detail <- c(detail, sprintf(
+          "%s: %s is %s but the configured input %s hashes to %s",
+          metrics_path, chk$field, recorded, chk$path, computed
+        ))
+      }
+    }
+  }
+  list(id = "INV-012", ok = length(detail) == 0, detail = detail)
+}
+
 #' Run every cross-artifact invariant and print a [PASS]/[FAIL] report.
 #' @param root character — repo root.
 #' @param snapshot_dir character — snapshot directory relative to root,
@@ -712,7 +812,9 @@ run_invariants <- function(root, snapshot_dir = "dashboard/data") {
     inv_engagement_fixture_allowlist(root),
     inv_dependency_manifests_agree(root),
     inv_scenario_vintage_declared(root),
-    inv_deliverables_carry_disclaimer(root)
+    inv_deliverables_carry_disclaimer(root),
+    inv_manifest_plausible(root),
+    inv_audit_attests_configured_vintage(root)
   )
 
   for (r in results) {
