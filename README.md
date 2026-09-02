@@ -108,14 +108,18 @@ $env:Path += ";C:\Program Files\R\R-4.5.2\bin"
 Rscript tools/verify_refactor.R --invariants
 ```
 
-This checks five cross-artifact consistency rules against the current tree
+This checks ten cross-artifact consistency rules against the current tree
 without running anything: the TRISK scenario grid's base-parameter cell
 must equal the base (non-grid) TRISK run; no scenario vintage may exist at
 two paths; every engagement's `data_source` column must equal its own
 `bank_slug`; the supported-sector literal must agree across every file
 that hardcodes it; every published TRISK manifest sector must be a known
-registry sector. It prints `INVARIANTS PASS` and exits 0 only when every
-invariant holds. Both `.github/workflows/ci.yml` and
+registry sector; every declared-VND loanbook must be on a plausible scale;
+no tracked engagement file may fall outside the fixture allowlist; the
+dependency manifests must agree; every engagement must declare a scenario
+vintage that exists; and every generated HTML deliverable must carry its
+synthetic-data disclaimer. It prints `INVARIANTS PASS` and exits 0 only
+when every invariant holds. Both `.github/workflows/ci.yml` and
 `.github/workflows/refresh.yml` run this on every push and every weekly
 refresh.
 

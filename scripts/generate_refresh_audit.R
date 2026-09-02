@@ -207,6 +207,12 @@ html <- paste0('<!DOCTYPE html>
 ', diff_rows, '
 </table>
 
+<footer style="margin-top:2rem;padding-top:1rem;border-top:1px solid #e2e8f0;color:#718096;font-size:0.85rem;">
+Synthetic data &mdash; illustrative only. Requires human &amp; legal review before any
+external use. / D&#7919; li&#7879;u m&#244; ph&#7887;ng &mdash; ch&#7881; mang t&#237;nh minh h&#7885;a.
+C&#7847;n r&#224; so&#225;t c&#7911;a con ng&#432;&#7901;i &amp; ph&#225;p l&#253; tr&#432;&#7899;c khi s&#7917; d&#7909;ng ra ngo&#224;i.
+</footer>
+
 </body>
 </html>')
 

@@ -43,8 +43,16 @@ Windows: prepend `& "C:\Program Files\R\R-4.5.2\bin\Rscript.exe"` or add it to
    raw `md5sum` (git's `core.autocrlf` normalization means a
    byte-identical-after-normalization file can have a different raw digest
    across Windows/Linux). PNGs are compared visually only (compression is
-   nondeterministic); HTML reports may differ only in the generated-timestamp
-   text. Separately, `Rscript tools/verify_refactor.R --invariants` checks
+   nondeterministic). HTML reports may differ only in generated-timestamp
+   text — and since Wave 4 that is checked rather than assumed: the
+   deliverables listed in `GATED_HTML_PATHS` (`tools/verify_refactor.R`) are
+   compared against their committed version after timestamps, long dates and
+   git SHAs are normalized away (`R/report_fingerprint.R`), so a changed
+   number in a report is genuine drift. Every other `.html` file — the static
+   historical build reports under `reports/` — is still ignored. When a report
+   generator adds a new timestamp format, extend `normalize_report_html()`;
+   never add the report to an exclusion list.
+   Separately, `Rscript tools/verify_refactor.R --invariants` checks
    that committed artifacts agree with each other (e.g. the TRISK scenario
    grid matches the base TRISK run) — a class of defect byte-identity alone
    cannot catch, since a stale cache that never regenerates trivially
