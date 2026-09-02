@@ -10,7 +10,8 @@ pacta_market_share(
   scenario,
   region,
   output_dir,
-  bank_short
+  bank_short,
+  pdp8_scenario_source = "pdp8_2023"
 )
 }
 \arguments{
@@ -25,6 +26,17 @@ pacta_market_share(
 \item{output_dir}{chr — directory to write CSVs and PNGs into.}
 
 \item{bank_short}{chr — short bank label, used in chart subtitles.}
+
+\item{pdp8_scenario_source}{chr(1) -- the \code{scenario_source} value in the
+loaded scenario CSV that identifies the PDP8/NDC pathway rows for the
+chart-specific filters below (Wave 3 PHASE-03). Defaults to
+"pdp8_2023" for backward compatibility with any caller that does not
+pass it explicitly; scripts/pacta_vietnam_scenario.R always passes the
+value derived from the engagement's configured
+inputs.scenario_vintage. Without this, a second scenario vintage's rows
+are silently filtered out of every chart in this function (they DO
+still feed the underlying target_market_share() computation, which is
+vintage-agnostic).}
 }
 \value{
 list(ms_portfolio, ms_company, target_pdp8) — portfolio- and

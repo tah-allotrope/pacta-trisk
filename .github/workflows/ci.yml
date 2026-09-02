@@ -50,6 +50,17 @@ jobs:
         run: |
           Rscript -e "if (!requireNamespace('devtools', quietly = TRUE)) install.packages('devtools'); devtools::load_all('.'); cat('pactatrisk loads OK\n')"
 
+      # Wave 4 PHASE-04. devtools::load_all() above loads every function in R/
+      # regardless of NAMESPACE, so it cannot notice when NAMESPACE goes stale.
+      # It had: 20 Wave 3 functions carried #' @export and appeared in no
+      # NAMESPACE entry, so library(pactatrisk) exposed none of the PCAF layer,
+      # the target registry, the SLL screen, the run history or the i18n engine.
+      - name: NAMESPACE is up to date with roxygen
+        run: |
+          cp NAMESPACE /tmp/NAMESPACE.before
+          Rscript -e "if (!requireNamespace('roxygen2', quietly = TRUE)) install.packages('roxygen2'); roxygen2::roxygenise()"
+          diff -u /tmp/NAMESPACE.before NAMESPACE
+
       - name: Run R tests
         run: Rscript -e "testthat::test_dir('tests/testthat')"
 

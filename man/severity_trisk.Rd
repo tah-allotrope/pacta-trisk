@@ -11,7 +11,7 @@ severity_trisk(npv_change)
 npv_change (value gain) scores 0.00; only max(0, -npv_change) is stress.}
 }
 \value{
-numeric in \link{0, 1}; NA_real_ when npv_change is NA.
+numeric in [0, 1]; NA_real_ when npv_change is NA.
 }
 \description{
 Severity for TRISK value loss, using Table B.

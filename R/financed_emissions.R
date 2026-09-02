@@ -23,12 +23,12 @@ HOURS_PER_YEAR <- 8760
 SCOPE_3_DOMINANT_SECTORS <- c("automotive", "coal")
 
 #' Attribution factor: the bank's share of a borrower's total financed
-#' activity, clamped to [0, 1] (a ratio above 1 indicates the loan exceeds
+#' activity, clamped to \[0, 1\] (a ratio above 1 indicates the loan exceeds
 #' the borrower's total capital -- a data error, not a real attribution).
 #'
 #' @param outstanding_vnd numeric — outstanding exposure, whole VND.
 #' @param capital_vnd numeric — borrower total debt + equity, whole VND.
-#' @return numeric in [0, 1], NA where either input is NA or capital_vnd is 0.
+#' @return numeric in \[0, 1\], NA where either input is NA or capital_vnd is 0.
 #' @export
 attribution_factor <- function(outstanding_vnd, capital_vnd) {
   ratio <- outstanding_vnd / capital_vnd
@@ -38,7 +38,7 @@ attribution_factor <- function(outstanding_vnd, capital_vnd) {
 
 #' Annual financed generation-based emissions for a power asset.
 #' @param capacity_mw numeric — installed capacity, MW.
-#' @param capacity_factor numeric — dimensionless utilization fraction, [0, 1].
+#' @param capacity_factor numeric — dimensionless utilization fraction, \[0, 1\].
 #' @param emission_factor_tco2_per_mwh numeric.
 #' @return numeric — tonnes of CO2 equivalent per year.
 #' @export

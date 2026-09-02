@@ -13,7 +13,7 @@ severity_alignment(gap, basis)
 (Table A2); any other value is an error.}
 }
 \value{
-numeric in \link{0, 1}.
+numeric in [0, 1].
 }
 \description{
 Severity for an alignment gap, using the sector-appropriate anchor table.

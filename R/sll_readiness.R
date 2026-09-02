@@ -32,7 +32,7 @@ SLL_EXPOSURE_ANCHORS_X <- c(2.5e11, 8e11, 1.5e12, 3e12, 5.77e12)
 
 SLL_READINESS_WEIGHTS <- list(w_materiality = 0.30, w_exposure = 0.25, w_data = 0.25, w_relationship = 0.20)
 
-#' SLL readiness composite score in [0, 1] for one or more borrowers.
+#' SLL readiness composite score in \[0, 1\] for one or more borrowers.
 #'
 #' @param severity_alignment numeric — from engagement_priority.csv.
 #' @param severity_trisk numeric — from engagement_priority.csv; may be NA
@@ -41,9 +41,9 @@ SLL_READINESS_WEIGHTS <- list(w_materiality = 0.30, w_exposure = 0.25, w_data = 
 #' @param has_abcd_match logical — TRUE when the borrower resolves to an
 #'   ABCD company (data-availability proxy).
 #' @param relationship numeric — optional relationship-signal score in
-#'   [0, 1] from the overlay CSV; NA when not configured (vectorized: pass a
+#'   \[0, 1\] from the overlay CSV; NA when not configured (vectorized: pass a
 #'   vector of NA of the right length to drop the dimension for every row).
-#' @return numeric in [0, 1], same length as the inputs.
+#' @return numeric in \[0, 1\], same length as the inputs.
 #' @export
 sll_readiness_score <- function(severity_alignment, severity_trisk, exposure_vnd, has_abcd_match, relationship = NA_real_) {
   materiality <- ifelse(is.na(severity_trisk), severity_alignment, (severity_alignment + severity_trisk) / 2)
@@ -73,7 +73,7 @@ sll_readiness_score <- function(severity_alignment, severity_trisk, exposure_vnd
 #' of MCB's 23 borrowers, per Q-002's guidance -- retune once a real
 #' loanbook exists and data_availability genuinely varies.
 #'
-#' @param readiness numeric in [0, 1].
+#' @param readiness numeric in \[0, 1\].
 #' @return character, one of "Ready", "Near-ready", "Developing", "Not ready".
 #' @export
 sll_readiness_band <- function(readiness) {
@@ -91,7 +91,7 @@ sll_readiness_band <- function(readiness) {
 #'   every row has a match today -- this keeps the dimension meaningful if
 #'   engagement_scoring.R ever starts including unmatched borrowers).
 #' @param overlay data.frame|NULL — optional relationship overlay with
-#'   columns name_abcd, relationship_score in [0, 1]. NULL means "not
+#'   columns name_abcd, relationship_score in \[0, 1\]. NULL means "not
 #'   configured".
 #' @return data.frame: name_abcd, sector, exposure_vnd, materiality,
 #'   exposure_severity, data_availability, relationship, readiness,

@@ -12,9 +12,21 @@ manifest, step$script is the R script path, step$args is a character
 vector of CLI arguments passed to it.}
 }
 \value{
-list(name, status ("ok"|"failed"), seconds) — the executed step's
-outcome and wall-clock duration.
+list(name, status ("ok"|"failed"), seconds, error_excerpt) — the
+executed step's outcome, wall-clock duration, and (only when
+status == "failed") the last 20 lines of its combined stdout+stderr;
+NULL when the step succeeded.
 }
 \description{
-Run one pipeline step as an Rscript subprocess.
+Wave 3 PHASE-02 (F-006): a failed step used to record only a status, with
+no captured output, so diagnosing a CI failure meant re-reading console
+scrollback. This still prints the step's live output to the console as
+before, but ALSO captures it so the last lines are available in the return
+value and, from there, in pipeline_manifest.json.
+}
+\details{
+Corrected in Wave 4 PHASE-02: console output is NOT live. An earlier version
+of this comment claimed the step still streamed via \code{stdout = ""}; the code
+captures to a temp file and echoes once the step returns. Ordering is
+preserved, but a long-running step prints nothing until it finishes.
 }

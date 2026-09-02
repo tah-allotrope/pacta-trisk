@@ -2,7 +2,7 @@
 % Please edit documentation in R/severity_scoring.R
 \name{severity_from_anchors}
 \alias{severity_from_anchors}
-\title{Clamped piecewise-linear severity in \link{0, 1} from a five-point anchor table.}
+\title{Clamped piecewise-linear severity in [0, 1] from a five-point anchor table.}
 \usage{
 severity_from_anchors(x, anchors_x, anchors_y = c(0, 0.25, 0.5, 0.75, 1))
 }
@@ -15,7 +15,7 @@ severity_from_anchors(x, anchors_x, anchors_y = c(0, 0.25, 0.5, 0.75, 1))
 c(0, 0.25, 0.5, 0.75, 1).}
 }
 \value{
-numeric in \link{0, 1}, same length as x. NA_real_ where x is NA.
+numeric in [0, 1], same length as x. NA_real_ where x is NA.
 }
 \description{
 Values beyond the last breakpoint saturate at the table's max y (normally

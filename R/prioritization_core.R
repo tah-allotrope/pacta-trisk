@@ -43,7 +43,7 @@ suppressPackageStartupMessages({
 
 #' Classify a composite priority score into a band.
 #'
-#' @param score numeric — composite score in [0, 1].
+#' @param score numeric — composite score in \[0, 1\].
 #' @return character — one of "Critical", "High", "Medium", "Low".
 classify_band <- function(score) {
   if (score >= 0.70) return("Critical")

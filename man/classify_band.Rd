@@ -7,7 +7,7 @@
 classify_band(score)
 }
 \arguments{
-\item{score}{numeric — composite score in \link{0, 1}.}
+\item{score}{numeric — composite score in [0, 1].}
 }
 \value{
 character — one of "Critical", "High", "Medium", "Low".

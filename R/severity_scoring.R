@@ -17,7 +17,7 @@
 # Base R plus stats::approx() only (CON-002 -- no new package dependency).
 # ==============================================================================
 
-#' Clamped piecewise-linear severity in [0, 1] from a five-point anchor table.
+#' Clamped piecewise-linear severity in \[0, 1\] from a five-point anchor table.
 #'
 #' Values beyond the last breakpoint saturate at the table's max y (normally
 #' 1.00) rather than being extrapolated -- this is deliberate: an
@@ -28,7 +28,7 @@
 #' @param anchors_x numeric — breakpoint values of the metric, strictly ascending.
 #' @param anchors_y numeric — severity values at each breakpoint, default
 #'   c(0, 0.25, 0.5, 0.75, 1).
-#' @return numeric in [0, 1], same length as x. NA_real_ where x is NA.
+#' @return numeric in \[0, 1\], same length as x. NA_real_ where x is NA.
 #' @export
 severity_from_anchors <- function(x, anchors_x, anchors_y = c(0, 0.25, 0.5, 0.75, 1)) {
   if (length(anchors_x) != length(anchors_y)) {
@@ -72,7 +72,7 @@ severity_from_anchors <- function(x, anchors_x, anchors_y = c(0, 0.25, 0.5, 0.75
 #' @param gap numeric — the raw alignment gap. abs() is applied before scoring.
 #' @param basis character — "market_share" (Table A1) or "sda_intensity"
 #'   (Table A2); any other value is an error.
-#' @return numeric in [0, 1].
+#' @return numeric in \[0, 1\].
 #' @export
 severity_alignment <- function(gap, basis) {
   if (identical(basis, "market_share")) {
@@ -88,7 +88,7 @@ severity_alignment <- function(gap, basis) {
 #'
 #' @param npv_change numeric — fractional NPV change under a shock. A positive
 #'   npv_change (value gain) scores 0.00; only max(0, -npv_change) is stress.
-#' @return numeric in [0, 1]; NA_real_ when npv_change is NA.
+#' @return numeric in \[0, 1\]; NA_real_ when npv_change is NA.
 #' @export
 severity_trisk <- function(npv_change) {
   loss <- pmax(0, -npv_change)
@@ -97,10 +97,10 @@ severity_trisk <- function(npv_change) {
 
 #' Severity for exposure concentration, using Table C.
 #'
-#' @param share numeric — fraction of total relevant exposure, in [0, 1]
+#' @param share numeric — fraction of total relevant exposure, in \[0, 1\]
 #'   (not a percentage: severity_exposure(0.82) is correct, severity_exposure(82)
 #'   silently saturates at 1.0).
-#' @return numeric in [0, 1].
+#' @return numeric in \[0, 1\].
 #' @export
 severity_exposure <- function(share) {
   severity_from_anchors(share, .TABLE_C_X, .TABLE_C_Y)

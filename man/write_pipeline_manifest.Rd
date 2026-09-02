@@ -8,7 +8,9 @@ write_pipeline_manifest(
   step_results,
   manifest_path,
   row_count_files = character(0),
-  extra = list()
+  extra = list(),
+  partial = FALSE,
+  filters = list()
 )
 }
 \arguments{
@@ -21,6 +23,14 @@ under \code{row_counts} in the manifest; defaults to none.}
 
 \item{extra}{list — additional top-level fields merged into the manifest
 (e.g. bank_slug, config_path); defaults to none.}
+
+\item{partial}{logical(1) — TRUE when the run that produced \code{step_results}
+was filtered by --only-step or --resume-from and therefore does NOT
+describe a complete pipeline. Always written, so the field's absence
+identifies a manifest predating Wave 4 rather than a complete run.}
+
+\item{filters}{list — when \code{partial} is TRUE, the filter that produced the
+run: \code{only_step} (character) and \code{resume_from} (character(1) or NA).}
 }
 \value{
 character (invisible) — the manifest_path written to.

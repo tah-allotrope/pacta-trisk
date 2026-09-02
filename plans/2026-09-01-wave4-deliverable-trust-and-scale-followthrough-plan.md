@@ -949,7 +949,7 @@ to notice when it drifts again, and give the two untested Wave 3 modules the
 same coverage their sibling specifications already have.
 
 **Tasks**
-- [ ] TASK-04-01: Regenerate `NAMESPACE` and `man/` from the roxygen comments:
+- [x] TASK-04-01: Regenerate `NAMESPACE` and `man/` from the roxygen comments:
       `Rscript -e "roxygen2::roxygenise()"`. This adds the 20 missing exports
       (`attribution_factor`, `borrower_emissions_intensity`,
       `borrower_emissions_power`, `build_target_registry`,
@@ -960,16 +960,16 @@ same coverage their sibling specifications already have.
       `sda_convergence_target`, `sll_readiness`, `sll_readiness_band`,
       `sll_readiness_score`) plus the two functions added by PHASE-01
       (`normalize_report_html`, `report_fingerprint`).
-- [ ] TASK-04-02: Resolve the reverse discrepancy: `pacta_market_share` is
+- [x] TASK-04-02: Resolve the reverse discrepancy: `pacta_market_share` is
       exported in `NAMESPACE` with no matching `#' @export` in `R/pacta_core.R`.
       Add the missing `#' @export` tag to its roxygen block (it has a `man/`
       page and is a legitimate public function), then re-run roxygenise so the
       export is generated rather than orphaned.
-- [ ] TASK-04-03: Add `R/report_fingerprint.R` to the package by confirming it
+- [x] TASK-04-03: Add `R/report_fingerprint.R` to the package by confirming it
       is picked up by roxygenise (it lives in `R/`, so it is). Verify
       `DESCRIPTION`'s `Imports` needs no addition — the module uses only base R
       and `tools`.
-- [ ] TASK-04-04: Add a `NAMESPACE` freshness check to
+- [x] TASK-04-04: Add a `NAMESPACE` freshness check to
       `.github/workflows/ci.yml`'s `r-tests` job, immediately after the
       `Verify pactatrisk package loads` step. The step runs roxygenise into a
       scratch copy and fails if `NAMESPACE` would change:
@@ -981,9 +981,9 @@ same coverage their sibling specifications already have.
           diff -u /tmp/NAMESPACE.before NAMESPACE
       ```
       `diff` exits non-zero when the files differ, failing the job.
-- [ ] TASK-04-05: Create `tests/testthat/test_target_setting.R` covering
+- [x] TASK-04-05: Create `tests/testthat/test_target_setting.R` covering
       `sda_convergence_target()` and `build_target_registry()` per Test Specs.
-- [ ] TASK-04-06: Create `tests/testthat/test_report_toolkit.R` covering
+- [x] TASK-04-06: Create `tests/testthat/test_report_toolkit.R` covering
       `load_report_labels()` and `report_label()` per Test Specs.
 
 **File Changes**
@@ -1073,6 +1073,22 @@ same coverage their sibling specifications already have.
 - [ ] `Rscript tools/verify_refactor.R --invariants` prints `INVARIANTS PASS` —
       in particular INV-008 (dependency manifests agree) still holds after the
       `DESCRIPTION`/`NAMESPACE` touch.
+
+**Execution notes (Wave 4, recorded during implementation)**
+- **TASK-04-02 was unnecessary — the finding behind it was a scanner artifact.**
+  `pacta_market_share` DOES carry `#' @export` (`R/pacta_core.R:362`); the
+  planning-time scan missed it because several `@param` lines sit between the
+  tag and the function definition, outside the scanner's 5-line lookahead.
+  `roxygen2::roxygenise()` added 22 exports and removed none, confirming there
+  was no reverse discrepancy to fix.
+- Exports went 33 -> 55; `man/` went 45 -> 73 pages, with **no** page deleted.
+- Roxygen emitted "Could not resolve link to topic 0, 1" warnings because
+  `DESCRIPTION` sets `Roxygen: list(markdown = TRUE)` and 15 roxygen lines wrote
+  a range as `[0, 1]`, which markdown reads as a link. Escaped to `\[0, 1\]`
+  across `R/financed_emissions.R`, `R/prioritization_core.R`,
+  `R/severity_scoring.R` and `R/sll_readiness.R`; roxygen now runs with 0
+  warnings and is idempotent (a second run leaves `NAMESPACE` and every `man/`
+  page byte-identical).
 
 **Phase Risks**
 - **RISK-04-01:** `roxygen2::roxygenise()` may rewrite existing `man/` pages

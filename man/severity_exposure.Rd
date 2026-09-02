@@ -7,12 +7,12 @@
 severity_exposure(share)
 }
 \arguments{
-\item{share}{numeric — fraction of total relevant exposure, in \link{0, 1}
+\item{share}{numeric — fraction of total relevant exposure, in [0, 1]
 (not a percentage: severity_exposure(0.82) is correct, severity_exposure(82)
 silently saturates at 1.0).}
 }
 \value{
-numeric in \link{0, 1}.
+numeric in [0, 1].
 }
 \description{
 Severity for exposure concentration, using Table C.

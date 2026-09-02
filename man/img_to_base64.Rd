@@ -14,7 +14,7 @@ character — a \verb{data:image/png;base64,...} URI string.
 }
 \description{
 Requires the base64enc package (pinned in renv.lock). Callers that must
-degrade gracefully without it (see scripts/generate_report.R) source this
-file and then override img_to_base64 themselves when
-requireNamespace("base64enc") is FALSE.
+degrade gracefully without it (see attic/generate_report.R, retired
+Wave 3 PHASE-02) source this file and then override img_to_base64
+themselves when requireNamespace("base64enc") is FALSE.
 }
