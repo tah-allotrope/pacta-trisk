@@ -15,8 +15,11 @@
 # generator adds a new timestamp format, extend this table -- do not add the
 # report to an exclusion list.
 #
-# Deliberately NOT normalized: numbers, table cells, prose, base64 image
-# payloads. A change in any of those is genuine drift and must fail the gate.
+# Deliberately NOT normalized: numbers, table cells, prose. A change in any of
+# those is genuine drift and must fail the gate. Base64 image payloads ARE
+# excluded, because PNG compression is nondeterministic and CLAUDE.md already
+# says PNGs are compared visually only -- gating them would re-import exactly
+# the noise the standalone-.png rule exists to exclude.
 # ==============================================================================
 
 #' Replace every generated timestamp, date and git SHA in an HTML document
@@ -39,25 +42,38 @@ normalize_report_html <- function(html) {
   #    trap). Without this the two never compare equal.
   x <- gsub("\r\n", "\n", x, fixed = TRUE)
 
+  # 1. Base64 image payloads, FIRST. PNG compression is nondeterministic, which
+  #    is why tools/verify_refactor.R classifies a standalone .png as
+  #    "png-noise" and CLAUDE.md says PNGs are compared visually only. A chart
+  #    embedded in a self-contained report is the same bytes by another route,
+  #    so excluding it keeps that policy consistent rather than re-importing the
+  #    noise. The report's text, tables and numbers stay compared.
+  #
+  #    ORDER IS LOAD-BEARING: this must run before the git-SHA rule below.
+  #    A base64 payload contains long runs of [0-9a-f], so the SHA rule would
+  #    otherwise punch <SHA> tokens into the middle of a payload and break this
+  #    pattern's contiguous match, leaving most of the image behind.
+  x <- gsub("data:image/[A-Za-z]+;base64,[A-Za-z0-9+/=[:space:]]+", "<IMAGE>", x)
+
   months <- paste(
     "January", "February", "March", "April", "May", "June", "July",
     "August", "September", "October", "November", "December",
     sep = "|"
   )
 
-  # 1. ISO-8601, "%Y-%m-%dT%H:%M:%S%z" (R/step_runner.R, R/run_history.R) and
+  # 2. ISO-8601, "%Y-%m-%dT%H:%M:%S%z" (R/step_runner.R, R/run_history.R) and
   #    "%Y-%m-%dT%H:%M:%SZ" (R/trisk_core.R's grid metadata). Must precede the
   #    space-separated patterns below.
   x <- gsub("[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}([+-][0-9]{4}|Z)?",
             "<TIMESTAMP>", x)
 
-  # 2. "%Y-%m-%d %H:%M:%S" (scripts/generate_engagement_letters.R). Must
-  #    precede pattern 3, which would otherwise match its "%H:%M" prefix and
+  # 3. "%Y-%m-%d %H:%M:%S" (scripts/generate_engagement_letters.R). Must
+  #    precede pattern 4, which would otherwise match its "%H:%M" prefix and
   #    leave a stray ":SS".
   x <- gsub("[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}",
             "<TIMESTAMP>", x)
 
-  # 3. "%Y-%m-%d %H:%M %Z" (scripts/generate_validation_report.R,
+  # 4. "%Y-%m-%d %H:%M %Z" (scripts/generate_validation_report.R,
   #    scripts/generate_coverage_report.R, scripts/generate_wave3_summary.R).
   #    The zone is optional and single-token; the observed value in this repo's
   #    reports is "+07". A multi-word Windows zone name would leave a stable
@@ -65,17 +81,24 @@ normalize_report_html <- function(html) {
   x <- gsub("[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}( [A-Za-z+][A-Za-z0-9+:_-]*)?",
             "<TIMESTAMP>", x)
 
-  # 4. "%d %B %Y" (scripts/generate_disclosure_pack.R,
+  # 5. "%d %B %Y" (scripts/generate_disclosure_pack.R,
   #    scripts/generate_engagement_letters.R's letter_date).
   x <- gsub(sprintf("[0-9]{1,2} (%s) [0-9]{4}", months), "<DATE>", x)
 
-  # 5. "%B %d, %Y" (R/pacta_core.R, scripts/generate_bidv_report.R).
+  # 6. "%B %d, %Y" (R/pacta_core.R, scripts/generate_bidv_report.R).
   x <- gsub(sprintf("(%s) [0-9]{1,2}, [0-9]{4}", months), "<DATE>", x)
 
-  # 6. Git SHAs, full or abbreviated, as rendered by the refresh audit's
+  # 7. Git SHAs, full or abbreviated, as rendered by the refresh audit's
   #    "Commit: <sha>" line and the manifest's git_sha. Bounded to 7-40 hex
   #    chars on word boundaries so ordinary numbers are untouched.
   x <- gsub("\\b[0-9a-f]{7,40}\\b", "<SHA>", x)
+
+  # 8. Step durations, as rendered by scripts/generate_refresh_audit.R's
+  #    "<td>12.7s</td>" timing table. A wall-clock measurement is run-scoped in
+  #    exactly the way a generated timestamp is -- two identical runs differ
+  #    here and in nothing else. Scoped to the table-cell form so an ordinary
+  #    number in prose is untouched.
+  x <- gsub("<td>[0-9]+\\.[0-9]+s</td>", "<td><DURATION></td>", x)
 
   x
 }

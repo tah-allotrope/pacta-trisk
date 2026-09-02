@@ -214,3 +214,55 @@ test_that("every generated deliverable in the live repo carries its disclaimer",
   res <- inv_deliverables_carry_disclaimer(root)
   expect_true(res$ok, info = paste(res$detail, collapse = "; "))
 })
+
+# --- Wave 4 PHASE-06 additions: duration and image normalization -------------
+# Both were found by the byte-identity gate itself: after a real pipeline run,
+# pipeline_refresh_audit.html differed only in step durations, and
+# PACTA_Vietnam_Bank_Report.html differed only inside its embedded base64 PNGs.
+
+test_that("normalize_report_html neutralizes step-duration table cells", {
+  expect_equal(normalize_report_html("<td>12.7s</td>"), "<td><DURATION></td>")
+  expect_equal(normalize_report_html("<td>3.1s</td>"), "<td><DURATION></td>")
+  # ... without touching an ordinary number in prose
+  expect_equal(normalize_report_html("<p>0.9816 is the score</p>"),
+               "<p>0.9816 is the score</p>")
+})
+
+test_that("normalize_report_html excludes base64 image payloads", {
+  expect_equal(
+    normalize_report_html('<img src="data:image/png;base64,AAA+/BBB=="> tail'),
+    '<img src="<IMAGE>"> tail'
+  )
+  # Two runs whose charts compress differently must compare equal ...
+  a <- normalize_report_html('<img src="data:image/png;base64,AAAA"><td>1</td>')
+  b <- normalize_report_html('<img src="data:image/png;base64,ZZZZZZZZ"><td>1</td>')
+  expect_identical(a, b)
+  # ... while a changed table cell beside the same chart must not.
+  c1 <- normalize_report_html('<img src="data:image/png;base64,AAAA"><td>1</td>')
+  c2 <- normalize_report_html('<img src="data:image/png;base64,AAAA"><td>2</td>')
+  expect_false(identical(c1, c2))
+})
+
+test_that("the image rule runs before the git-SHA rule", {
+  # Regression guard for a real bug: a base64 payload contains long runs of
+  # [0-9a-f], so applying the SHA rule first punched <SHA> tokens into the
+  # middle of payloads, broke the image pattern's contiguous match, and left
+  # most of the image in the comparison. Every untouched report then read as
+  # drift.
+  payload <- paste(rep("abcdef0123456789", 40), collapse = "")
+  out <- normalize_report_html(sprintf('<img src="data:image/png;base64,%s"> end', payload))
+  expect_equal(out, '<img src="<IMAGE>"> end')
+  expect_false(grepl("<SHA>", out, fixed = TRUE))
+})
+
+test_that("every gated report in the live repo is timestamp-class, not drift", {
+  # The end-to-end statement of the gate's calibration: nothing untouched in the
+  # working tree may read as drift.
+  for (p in GATED_HTML_PATHS) {
+    if (!file.exists(file.path(root, p))) next
+    expect_equal(
+      classify_path(p, root = root), "timestamp-class",
+      info = paste("unexpected drift in", p)
+    )
+  }
+})

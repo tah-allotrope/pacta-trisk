@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-09-02T11:02:50+0700",
-  "git_sha": "9f93da4e0e0c1c57aa89daa2456f0eb4d99599d1",
+  "generated_at": "2026-09-02T11:17:28+0700",
+  "git_sha": "35a13c5f3687c0cfeb5d13f6aceeac1970209514",
   "steps": [
     {
       "name": "pacta_vietnam_scenario",
       "status": "ok",
-      "seconds": 10.6,
+      "seconds": 10.7,
       "error_excerpt": {}
     },
     {
@@ -29,7 +29,7 @@
     {
       "name": "trisk_sector_demo_steel",
       "status": "ok",
-      "seconds": 11.3,
+      "seconds": 11.1,
       "error_excerpt": {}
     },
     {
@@ -95,7 +95,7 @@
     {
       "name": "record_history",
       "status": "ok",
-      "seconds": 0.7,
+      "seconds": 0.9,
       "error_excerpt": {}
     }
   ],
