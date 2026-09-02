@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-09-02T10:21:05+0700",
-  "git_sha": "71e1d696de23575b2ea9185cdba24cfd35af2c75",
+  "generated_at": "2026-09-02T10:58:49+0700",
+  "git_sha": "cec86ae0741eaaab2ab92956683c4fbe5851d5db",
   "steps": [
     {
       "name": "intake",
       "status": "ok",
-      "seconds": 2.2,
+      "seconds": 2.1,
       "error_excerpt": {}
     },
     {
@@ -23,73 +23,73 @@
     {
       "name": "pacta_vietnam_scenario",
       "status": "ok",
-      "seconds": 10.7,
+      "seconds": 11,
       "error_excerpt": {}
     },
     {
       "name": "trisk_prepare_inputs",
       "status": "ok",
-      "seconds": 3.1,
+      "seconds": 3,
       "error_excerpt": {}
     },
     {
       "name": "trisk_sector_demo_power",
       "status": "ok",
-      "seconds": 15,
+      "seconds": 15.2,
       "error_excerpt": {}
     },
     {
       "name": "trisk_sector_demo_cement",
       "status": "ok",
-      "seconds": 11.1,
+      "seconds": 11.3,
       "error_excerpt": {}
     },
     {
       "name": "trisk_sector_demo_steel",
       "status": "ok",
-      "seconds": 11.2,
+      "seconds": 11.7,
       "error_excerpt": {}
     },
     {
       "name": "sector_prioritization",
       "status": "ok",
-      "seconds": 2.7,
+      "seconds": 3.2,
       "error_excerpt": {}
     },
     {
       "name": "refresh_dashboard_data",
       "status": "ok",
-      "seconds": 1.4,
+      "seconds": 1.7,
       "error_excerpt": {}
     },
     {
       "name": "engagement_scoring",
       "status": "ok",
-      "seconds": 1.5,
+      "seconds": 1.9,
       "error_excerpt": {}
     },
     {
       "name": "financed_emissions",
       "status": "ok",
-      "seconds": 1.1,
+      "seconds": 1.4,
       "error_excerpt": {}
     },
     {
       "name": "sll_readiness",
       "status": "ok",
-      "seconds": 0.5,
+      "seconds": 0.6,
       "error_excerpt": {}
     },
     {
       "name": "generate_engagement_letters",
       "status": "ok",
-      "seconds": 1.4,
+      "seconds": 1.7,
       "error_excerpt": {}
     },
     {
       "name": "generate_disclosure_pack",
       "status": "ok",
-      "seconds": 1.5,
+      "seconds": 1.8,
       "error_excerpt": {}
     }
   ],

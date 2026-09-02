@@ -193,44 +193,59 @@ main <- function() {
 
   # Validate each row (hard errors only -- currency and sector-scope handled
   # separately below via the warning path, not here).
-  for (i in seq_len(n_total)) {
-    row <- input_data[i, ]
+  #
+  # Wave 4 PHASE-05: every column-level coercion below is hoisted out of the
+  # row loop and computed once over the whole column. The loop that remains
+  # only *emits* errors, in the same order as before: ascending row, and within
+  # a row counterparty_name -> exposure_vnd -> credit_limit_vnd ->
+  # sector_code_system -> sector_code. Preserving that order matters because
+  # validation_errors.csv is a committed regression fixture.
+  #
+  # What this removes is `row <- input_data[i, ]` -- a single-row tibble slice
+  # executed once per loan, which docs/scale_benchmark.md identified as the
+  # dominant intake cost (three such passes at 50,000 rows).
+  nm_chr    <- trimws(as.character(input_data$counterparty_name))
+  exp_num   <- suppressWarnings(as.numeric(input_data$exposure_vnd))
+  cl_num    <- suppressWarnings(as.numeric(input_data$credit_limit_vnd))
+  scs_chr   <- trimws(as.character(input_data$sector_code_system))
+  sc_chr    <- trimws(as.character(input_data$sector_code))
 
-    # counterparty_name must be non-empty
-    if (is.na(row$counterparty_name) || trimws(row$counterparty_name) == "") {
+  bad_name    <- is.na(nm_chr) | nm_chr == ""
+  exp_missing <- is.na(exp_num)
+  exp_neg     <- !exp_missing & exp_num < 0
+  cl_missing  <- is.na(cl_num)
+  cl_neg      <- !cl_missing & cl_num < 0
+  bad_system  <- !(scs_chr %in% c("VSIC", "ISIC"))
+  sc_missing  <- is.na(sc_chr) | sc_chr == ""
+  # A *format* error -- distinct from a well-formed code that simply maps to no
+  # PACTA sector, which is a warning below, not an error.
+  sc_malformed <- !sc_missing & scs_chr == "VSIC" & !grepl("^[A-Za-z]*\\d+$", sc_chr)
+
+  # Only rows with at least one problem need visiting at all.
+  flagged <- which(bad_name | exp_missing | exp_neg | cl_missing | cl_neg |
+                     bad_system | sc_missing | sc_malformed)
+
+  for (i in flagged) {
+    if (bad_name[i]) {
       add_error(i, "counterparty_name", "Counterparty name is missing or empty")
     }
-
-    # exposure_vnd must be numeric and >= 0
-    exp_val <- suppressWarnings(as.numeric(row$exposure_vnd))
-    if (is.na(exp_val)) {
+    if (exp_missing[i]) {
       add_error(i, "exposure_vnd", "exposure_vnd is not a valid number")
-    } else if (exp_val < 0) {
-      add_error(i, "exposure_vnd", sprintf("exposure_vnd is negative (%.0f)", exp_val))
+    } else if (exp_neg[i]) {
+      add_error(i, "exposure_vnd", sprintf("exposure_vnd is negative (%.0f)", exp_num[i]))
     }
-
-    # credit_limit_vnd must be numeric and >= 0
-    cl_val <- suppressWarnings(as.numeric(row$credit_limit_vnd))
-    if (is.na(cl_val)) {
+    if (cl_missing[i]) {
       add_error(i, "credit_limit_vnd", "credit_limit_vnd is not a valid number")
-    } else if (cl_val < 0) {
-      add_error(i, "credit_limit_vnd", sprintf("credit_limit_vnd is negative (%.0f)", cl_val))
+    } else if (cl_neg[i]) {
+      add_error(i, "credit_limit_vnd", sprintf("credit_limit_vnd is negative (%.0f)", cl_num[i]))
     }
-
-    # sector_code_system must be VSIC or ISIC
-    scs <- trimws(as.character(row$sector_code_system))
-    if (!scs %in% c("VSIC", "ISIC")) {
-      add_error(i, "sector_code_system", sprintf("sector_code_system is '%s', expected 'VSIC' or 'ISIC'", scs))
+    if (bad_system[i]) {
+      add_error(i, "sector_code_system", sprintf("sector_code_system is '%s', expected 'VSIC' or 'ISIC'", scs_chr[i]))
     }
-
-    # sector_code must be non-empty and well-formed (a *format* error --
-    # distinct from a well-formed code that simply maps to no PACTA sector,
-    # which is a warning below, not an error).
-    sc <- trimws(as.character(row$sector_code))
-    if (is.na(sc) || sc == "") {
+    if (sc_missing[i]) {
       add_error(i, "sector_code", "sector_code is missing or empty")
-    } else if (scs == "VSIC" && !grepl("^[A-Za-z]*\\d+$", sc)) {
-      add_error(i, "sector_code", sprintf("sector_code '%s' is not a valid VSIC code", sc))
+    } else if (sc_malformed[i]) {
+      add_error(i, "sector_code", sprintf("sector_code '%s' is not a valid VSIC code", sc_chr[i]))
     }
   }
 
@@ -250,19 +265,24 @@ main <- function() {
   # intake/SCHEMA.md has always said an out-of-scope-but-well-formed code is
   # "classified as not in scope" -- retained, not dropped. The row keeps its
   # normalized code and gets PACTA sector "not in scope" downstream.
-  for (i in seq_len(n_total)) {
-    sc <- trimws(as.character(input_data$sector_code[i]))
-    scs <- trimws(as.character(input_data$sector_code_system[i]))
-    if (is.na(sc) || sc == "") next # already a hard error above
-    norm_code <- normalize_sector_code(sc, scs)
-    if (is.na(norm_code)) next # already a hard error above (unparseable format)
-    if (identical(map_sector_code(norm_code), "not in scope")) {
-      add_warning(
-        i, "sector_code",
-        sprintf("sector_code '%s' (normalized %s) is not in PACTA scope", sc, norm_code),
-        "sector_out_of_scope"
-      )
-    }
+  # Wave 4 PHASE-05: normalization and mapping are computed once over the whole
+  # column (map_sector_code() is already vectorized; normalize_sector_code() is
+  # applied element-wise via mapply, exactly as the mapping step further below
+  # already does). Only rows that are genuinely out of scope are then visited,
+  # in ascending row order as before.
+  scope_norm <- mapply(normalize_sector_code, sc_chr, scs_chr, USE.NAMES = FALSE)
+  scope_mapped <- map_sector_code(scope_norm)
+  out_of_scope <- which(
+    !sc_missing &                # blank code is already a hard error above
+      !is.na(scope_norm) &       # unparseable format is already a hard error
+      scope_mapped == "not in scope"
+  )
+  for (i in out_of_scope) {
+    add_warning(
+      i, "sector_code",
+      sprintf("sector_code '%s' (normalized %s) is not in PACTA scope", sc_chr[i], scope_norm[i]),
+      "sector_out_of_scope"
+    )
   }
 
   cat("--- Schema validation complete ---\n")
@@ -282,25 +302,41 @@ main <- function() {
   have_fx_rate <- !is.null(fx_rate_usd_vnd) && length(fx_rate_usd_vnd) > 0 &&
     !is.na(fx_rate_usd_vnd) && is.finite(fx_rate_usd_vnd) && fx_rate_usd_vnd > 0
 
-  for (i in seq_len(n_total)) {
-    cur <- currency_effective[i]
-    if (identical(cur, "VND")) {
-      next
+  # Wave 4 PHASE-05: the overwhelmingly common case is a VND row, which the old
+  # loop visited only to `next`. Partition once and touch only the rows that
+  # actually need conversion, preserving ascending-row warning order.
+  is_vnd <- currency_effective == "VND"
+  is_usd <- currency_effective == "USD"
+  usd_idx <- which(is_usd)
+  other_idx <- which(!is_vnd & !is_usd)
+
+  if (length(usd_idx) > 0) {
+    if (have_fx_rate) {
+      converted_exposure[usd_idx] <- convert_to_vnd(exposure_raw_num[usd_idx], "USD", fx_rate_usd_vnd)
+      converted_credit[usd_idx] <- convert_to_vnd(credit_raw_num[usd_idx], "USD", fx_rate_usd_vnd)
+      converted_currency[usd_idx] <- "VND"
+    } else {
+      converted_exposure[usd_idx] <- NA_real_
+      converted_credit[usd_idx] <- NA_real_
+      usd_without_rate <- TRUE
     }
-    if (identical(cur, "USD")) {
+  }
+  if (length(other_idx) > 0) {
+    converted_exposure[other_idx] <- NA_real_
+    converted_credit[other_idx] <- NA_real_
+  }
+
+  # Emit warnings in ascending row order across both categories, matching the
+  # single-pass ordering of the loop this replaced.
+  for (i in sort(c(usd_idx, other_idx))) {
+    if (is_usd[i]) {
       if (have_fx_rate) {
-        converted_exposure[i] <- convert_to_vnd(exposure_raw_num[i], "USD", fx_rate_usd_vnd)
-        converted_credit[i] <- convert_to_vnd(credit_raw_num[i], "USD", fx_rate_usd_vnd)
-        converted_currency[i] <- "VND"
         add_warning(
           i, "currency",
           sprintf("exposure and credit limit converted from USD to VND at rate %s", fx_rate_usd_vnd),
           "fx_converted"
         )
       } else {
-        converted_exposure[i] <- NA_real_
-        converted_credit[i] <- NA_real_
-        usd_without_rate <- TRUE
         add_warning(
           i, "currency",
           "currency is USD but inputs.fx_rate_usd_vnd is not configured -- exposure and credit limit excluded from VND totals",
@@ -308,11 +344,9 @@ main <- function() {
         )
       }
     } else {
-      converted_exposure[i] <- NA_real_
-      converted_credit[i] <- NA_real_
       add_warning(
         i, "currency",
-        sprintf("currency '%s' is not VND or USD -- exposure and credit limit excluded from VND totals", cur),
+        sprintf("currency '%s' is not VND or USD -- exposure and credit limit excluded from VND totals", currency_effective[i]),
         "unsupported_currency"
       )
     }

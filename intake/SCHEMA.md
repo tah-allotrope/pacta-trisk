@@ -15,16 +15,24 @@ value by 1,000,000 before submitting it.
 
 ## Submission size
 
-**Measured for intake validation only** (`docs/scale_benchmark.md` has the
-full grid and machine details): intake completed for 50,000 loan rows
-across up to 5,000 distinct counterparties in under 3 minutes on a single
-developer machine. Larger submissions are accepted — intake has no hard row
-limit — but have not been characterized.
+**Measured for intake validation and name matching** (`docs/scale_benchmark.md`
+has the full grid and machine details): on a single busy developer machine,
+50,000 loan rows across up to 5,000 distinct counterparties completed intake in
+about 28 seconds and fuzzy name matching (`r2dii.match::match_name()`) in about
+27 seconds — under a minute for the two stages together. Larger submissions are
+accepted — intake has no hard row limit — but have not been characterized.
 
-This number covers **intake validation only**, not the full pipeline. Name
-matching (`r2dii.match::match_name()`) and the PACTA/TRISK analysis stages
-have not yet been benchmarked at this scale; do not assume the full chain
-completes quickly just because intake does.
+Two cost drivers behave differently, which matters when sizing a real
+submission: **intake scales with the loan row count** and is flat in
+counterparty count, while **matching scales with the number of distinct
+counterparties** (at 50,000 loans, going from 200 to 5,000 counterparties takes
+matching from 6.8 to 26.9 seconds). A book with many loans to few borrowers is
+cheap; a book with many distinct borrowers is the one to watch.
+
+These numbers cover **intake and matching only**, not the full pipeline. The
+PACTA analysis stages (`target_market_share()`, `target_sda()`) and the
+per-sector TRISK runs have still not been benchmarked at this scale; do not
+assume the full chain completes quickly just because these two stages do.
 
 ## Input Schema (Bank Provides)
 

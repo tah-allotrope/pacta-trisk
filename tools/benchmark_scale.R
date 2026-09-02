@@ -26,6 +26,8 @@
 suppressPackageStartupMessages({
   library(r2dii.match)
   library(r2dii.data)
+  library(dplyr)
+  library(tibble)
 })
 
 args <- commandArgs(trailingOnly = TRUE)
@@ -40,6 +42,9 @@ out_csv <- get_flag(args, "--out", "docs/scale_benchmark.csv")
 
 source("tools/generate_scale_fixture.R")
 source("R/matching_helpers.R")
+# normalize_sector_code() / map_sector_code(): the intake script guards its
+# own main(), so sourcing it here reuses the mapping without running the CLI.
+source("scripts/intake_validate_and_map.R")
 
 LOAN_COUNTS <- c(1000L, 10000L, 50000L)
 COUNTERPARTY_COUNTS <- c(200L, 1000L, 5000L)
@@ -97,34 +102,74 @@ benchmark_cell <- function(n_loans, n_counterparties, timeout_seconds) {
     ))
   }
 
-  # A minimal r2dii-shaped loanbook + ABCD pair, built from the fixture's own
-  # counterparties, for match_name() timing (the fuzzy-matching bottleneck
-  # named in research/2026-08-19-...-brainstorm.md F-005).
+  # match_name() timing -- the fuzzy-matching bottleneck named in
+  # research/2026-08-19-...-brainstorm.md F-005.
+  #
+  # Wave 4 PHASE-05: this used to build a 5-column loanbook subset and an ABCD
+  # with no `sector` column, so every call raised
+  #   "Must have missing names: `sector_classification_direct_loantaker`"
+  # which the tryCatch below swallowed into NA. Every match_seconds cell in
+  # docs/scale_benchmark.csv was NA for that reason, not because matching was
+  # slow. The normalized loanbook intake already emits is exactly r2dii-shaped
+  # (same 13 columns as r2dii.data::loanbook_demo), so pass it through whole,
+  # and build ABCD from the fixture's own abcd.csv with its sector codes mapped
+  # to PACTA sectors -- giving a representative match rate rather than a
+  # trivial 0%.
   normalized <- utils::read.csv(normalized_path, stringsAsFactors = FALSE)
-  lb_for_match <- data.frame(
-    id_loan = seq_len(nrow(normalized)),
-    id_direct_loantaker = normalized$name_direct_loantaker,
-    name_direct_loantaker = normalized$name_direct_loantaker,
-    id_ultimate_parent = normalized$name_direct_loantaker,
-    name_ultimate_parent = normalized$name_direct_loantaker,
-    stringsAsFactors = FALSE
-  )
-  distinct_names <- unique(normalized$name_direct_loantaker)
+  abcd_fixture <- utils::read.csv(fixture$abcd_path, stringsAsFactors = FALSE)
   abcd_for_match <- data.frame(
-    company_id = seq_along(distinct_names),
-    name_company = distinct_names,
+    company_id = abcd_fixture$company_id,
+    name_company = abcd_fixture$name_company,
+    sector = map_sector_code(
+      vapply(
+        seq_len(nrow(abcd_fixture)),
+        function(i) normalize_sector_code(abcd_fixture$sector_code[i], "VSIC"),
+        character(1)
+      )
+    ),
     stringsAsFactors = FALSE
   )
+  # Rows whose code maps outside PACTA scope cannot match by construction.
+  abcd_for_match <- abcd_for_match[abcd_for_match$sector != "not in scope", , drop = FALSE]
 
-  t_match <- tryCatch(
-    system.time(match_name(lb_for_match, abcd_for_match))[["elapsed"]],
-    error = function(e) NA_real_
+  # Mirror the production call exactly (R/pacta_core.R): the same VSIC->ISIC
+  # classification extension and the same tuned fuzzy parameters. Without the
+  # extension, r2dii rejects the pipeline's own ISIC codes as unknown and
+  # matching returns zero rows, which would time a path the pipeline never
+  # takes.
+  vsic_to_pacta <- tibble::tribble(
+    ~code_system, ~code,  ~sector,      ~borderline,
+    "ISIC",       "3511", "power",       FALSE,
+    "ISIC",       "2910", "automotive",  FALSE,
+    "ISIC",       "2394", "cement",      FALSE,
+    "ISIC",       "2410", "steel",       FALSE,
+    "ISIC",       "0510", "coal",        FALSE,
+    "ISIC",       "0610", "oil and gas", FALSE
   )
+  sector_classification_ext <- dplyr::bind_rows(r2dii.data::sector_classifications, vsic_to_pacta)
+
+  match_note <- ""
+  t0_match <- Sys.time()
+  matched <- tryCatch(
+    match_name(
+      normalized, abcd_for_match,
+      by_sector = TRUE, min_score = 0.8, method = "jw", p = 0.1,
+      sector_classification = sector_classification_ext
+    ),
+    error = function(e) {
+      match_note <<- paste("match_name failed:", conditionMessage(e))
+      NULL
+    }
+  )
+  t_match <- as.numeric(difftime(Sys.time(), t0_match, units = "secs"))
+  if (is.null(matched)) t_match <- NA_real_
 
   data.frame(
     n_loans = n_loans, n_counterparties = n_counterparties,
     fixture_seconds = round(t_fixture, 1), intake_seconds = round(t_intake, 1),
-    match_seconds = round(t_match, 1), completed = TRUE, note = "",
+    match_seconds = if (is.na(t_match)) NA_real_ else round(t_match, 1),
+    completed = TRUE,
+    note = if (nzchar(match_note)) match_note else sprintf("match_rows=%d", if (is.null(matched)) 0L else nrow(matched)),
     stringsAsFactors = FALSE
   )
 }
