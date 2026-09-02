@@ -1298,20 +1298,20 @@ in the dashboard as data rather than static pictures, and bring the
 documentation back into agreement with the code.
 
 **Tasks**
-- [ ] TASK-06-01: Bring `engagements/sdb-rehearsal/engagement_config.json` to
+- [x] TASK-06-01: Bring `engagements/sdb-rehearsal/engagement_config.json` to
       feature parity. Add `"run_targets": true`, `"run_history": true`, and
       `"report_language": "bilingual"`. Do **not** add `published_reports` or
       `public_snapshot_allowed` — SDB must never publish to the public snapshot.
       Leave `inputs.scenario_vintage` at `"pdp8-2023"`: SDB is deliberately the
       engagement that still runs the prior vintage, which is what makes
       `compare_scenario_vintages` meaningful and what INV-012 now verifies.
-- [ ] TASK-06-02: Regenerate the SDB engagement and commit the resulting new
+- [x] TASK-06-02: Regenerate the SDB engagement and commit the resulting new
       fixtures (`target_registry.csv`, a `history/sdb-rehearsal/` run directory,
       and the bilingual-labelled reports). Update `.gitignore` if the target
       registry or history output falls outside the current
       `engagements/sdb-rehearsal/` allowlist — INV-007 polices that allowlist,
       so run the invariants immediately afterwards.
-- [ ] TASK-06-03: Extend `scripts/refresh_dashboard_data.R` to copy the three
+- [x] TASK-06-03: Extend `scripts/refresh_dashboard_data.R` to copy the three
       Wave 3 analytic CSVs into the snapshot, creating
       `<snapshot_dir>/analytics/`: `financed_emissions.csv` and
       `data_quality_summary.csv` from `cfg$paths$financed_emissions_output_dir`,
@@ -1319,38 +1319,38 @@ documentation back into agreement with the code.
       `cfg$paths$engagement_output_dir`. Copy a file only when it exists, so an
       engagement that did not run those steps still refreshes cleanly. This is
       the only script permitted to write `dashboard/data/` (CON-002).
-- [ ] TASK-06-04: Add loaders to `dashboard/lib/loaders.py`:
+- [x] TASK-06-04: Add loaders to `dashboard/lib/loaders.py`:
       `ANALYTICS_DIR = DATA_DIR / "analytics"`, `analytics_path(name)`, and
       `load_analytics_tables() -> dict[str, pd.DataFrame]` returning whichever
       of the four CSVs exist, keyed `financed_emissions`,
       `data_quality_summary`, `target_registry`, `sll_readiness`. A missing file
       must be omitted from the dict, never raise.
-- [ ] TASK-06-05: Create `dashboard/pages/8_Financed_Emissions.py` presenting
+- [x] TASK-06-05: Create `dashboard/pages/8_Financed_Emissions.py` presenting
       the PCAF inventory: total financed emissions, the data-quality composition
       table (never a total without it), the Scope 3 exclusion note, the sector
       target registry, and the SLL readiness shortlist. Apply the existing page
       frame and banners via `dashboard.lib.branding.apply_page_frame` and
       `footer_note`, matching the structure of
       `dashboard/pages/2_TRISK_Risk.py`. Include the synthetic-data disclaimer.
-- [ ] TASK-06-06: Add `dashboard/tests/test_analytics_page.py` covering
+- [x] TASK-06-06: Add `dashboard/tests/test_analytics_page.py` covering
       `load_analytics_tables()` per Test Specs.
-- [ ] TASK-06-07: Correct `CLAUDE.md` law 4. It currently pins
+- [x] TASK-06-07: Correct `CLAUDE.md` law 4. It currently pins
       ``composite_score[1]` == 1.0`; the 0.5.0 refreeze moved it to
       `0.9816483381`. Replace the stale value and keep the rest of the law
       unchanged.
-- [ ] TASK-06-08: Rewrite `plans/PROGRESS.md`. It currently states "Waves 0, 1
+- [x] TASK-06-08: Rewrite `plans/PROGRESS.md`. It currently states "Waves 0, 1
       and 2 are complete. The platform is at version 0.4.1 (...) six
       cross-artifact invariants." Update to Wave 4, the current version, and the
       current invariant count. Keep it a pointer, not a duplicate of `NEWS.md`.
-- [ ] TASK-06-09: Update `README.md`'s repository map table to add rows for
+- [x] TASK-06-09: Update `README.md`'s repository map table to add rows for
       `tools/`, `templates/`, `output/`, `history/` and `workshop/`, and correct
       the `scripts/` row, which currently calls `pipeline_refresh.R` the
       orchestrator — `run_engagement.R` is the orchestrator and
       `pipeline_refresh.R` is a thin wrapper over it.
-- [ ] TASK-06-10: Fix `dashboard/app.py:19`, which says "Work through the five
+- [x] TASK-06-10: Fix `dashboard/app.py:19`, which says "Work through the five
       steps below" above six `st.page_link` calls. Make the count agree with the
       links, accounting for the page added in TASK-06-05.
-- [ ] TASK-06-11: Retire `compare/` to `attic/`. It is referenced only from
+- [x] TASK-06-11: Retire `compare/` to `attic/`. It is referenced only from
       superseded plans and brainstorms — nothing in `scripts/`, `R/`,
       `dashboard/` or `docs/` reads it. Move the directory to
       `attic/compare/` and add a paragraph to `attic/README.md` recording what
@@ -1372,7 +1372,7 @@ documentation back into agreement with the code.
       `engagements/sdb-rehearsal/snapshot/reports/PACTA_Comparison_Report.html`;
       it is gitignored by `.gitignore:52` (`engagements/*/snapshot/`), so it is
       a local build artifact that needs no edit and will be regenerated.
-- [ ] TASK-06-12: Bump `DESCRIPTION`'s `Version` to `0.6.0` and write the
+- [x] TASK-06-12: Bump `DESCRIPTION`'s `Version` to `0.6.0` and write the
       `NEWS.md` entry. Follow the existing structure: one bullet per phase
       naming the concrete artifacts. Per the repo convention, do **not** quote a
       test PASS count — write "full R suite green (FAIL 0)" instead.
@@ -1442,6 +1442,27 @@ documentation back into agreement with the code.
       phase).
 - [ ] `Rscript -e "cat(read.dcf('DESCRIPTION')[, 'Version'], '\n')"` prints
       `0.6.0` (it prints `0.5.0` before this phase).
+
+**Execution notes (Wave 4, recorded during implementation)**
+- **RISK-06-01 was resolved the strict way**, as the plan preferred. A new
+  `paths.history_dir` config key (registered in `.default_engagement_config()`,
+  defaulting to `"history"`) lets `sdb-rehearsal` write its run history to
+  `engagements/sdb-rehearsal/history/`, so `ci.yml`'s cross-contamination
+  assertion stays strict rather than being loosened.
+- **Parity exposed a real defect, now fixed.** With `run_history` enabled,
+  re-running SDB the same day at the same commit made `record_run_history()`
+  hit its append-only refusal, which failed the step, exited the orchestrator
+  non-zero, and stamped an otherwise-clean manifest `"failed"` — untrue
+  provenance, exactly what this wave exists to remove. The step wrapper
+  `scripts/record_run_history.R` now treats an already-recorded
+  date/commit/vintage as a `[SKIP]`; `R/run_history.R` keeps its strict
+  contract for direct callers.
+- `tests/testthat/test_step_registry.R`'s pinned SDB step list grew from 15 to
+  17 (`generate_targets`, `record_history`) — the intended consequence of
+  parity, updated rather than worked around.
+- README's invariant count was stale in two places at once: it said "five
+  cross-artifact consistency rules" when there were nine. Corrected to twelve
+  and each rule named.
 
 **Phase Risks**
 - **RISK-06-01:** Enabling `run_history` for SDB writes a new

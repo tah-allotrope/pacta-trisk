@@ -28,9 +28,13 @@
     "letters_output_dir": "engagements/sdb-rehearsal/output/engagement_letters",
     "disclosure_output_dir": "engagements/sdb-rehearsal/output/disclosure",
     "prioritization_output_dir": "engagements/sdb-rehearsal/output/prioritization",
-    "financed_emissions_output_dir": "engagements/sdb-rehearsal/output/financed_emissions"
+    "financed_emissions_output_dir": "engagements/sdb-rehearsal/output/financed_emissions",
+    "history_dir": "engagements/sdb-rehearsal/history"
   },
   "anonymize": false,
   "run_financed_emissions": true,
-  "run_sll_readiness": true
+  "run_sll_readiness": true,
+  "run_targets": true,
+  "run_history": true,
+  "report_language": "bilingual"
 }

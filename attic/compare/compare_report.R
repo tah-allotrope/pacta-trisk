@@ -6,7 +6,7 @@
 # Produces: reports/PACTA_Comparison_Report.html
 #
 # Run from project root:
-#   Rscript compare/compare_report.R
+#   Rscript attic/compare/compare_report.R
 # ==============================================================================
 
 library(pacta.loanbook)
@@ -678,7 +678,7 @@ html <- paste0('<!DOCTYPE html>
   <p>This report compares two independent implementations of the PACTA for Banks demo pipeline, both using the same underlying <code>r2dii</code> package ecosystem and the same <code>demo_2020</code> dataset:</p>
   <ul>
     <li><span class="badge badge-ai">AI Approach</span> &mdash; <code>scripts/pacta_demo.R</code> + <code>scripts/generate_report.R</code>: Uses default fuzzy matching, custom <code>ggplot2</code> visualizations, and a standalone HTML report generator.</li>
-    <li><span class="badge badge-staff">Staff Approach</span> &mdash; <code>compare/PACTA for Banks staff.Rmd</code> (by Trang Tran): Uses exact matching only (<code>min_score = 1</code>), the official <code>r2dii.plot</code> visualization package, and R Markdown for literate programming.</li>
+    <li><span class="badge badge-staff">Staff Approach</span> &mdash; <code>attic/compare/PACTA for Banks staff.Rmd</code> (by Trang Tran): Uses exact matching only (<code>min_score = 1</code>), the official <code>r2dii.plot</code> visualization package, and R Markdown for literate programming.</li>
   </ul>
 
   <div class="kpi-row">

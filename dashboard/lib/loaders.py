@@ -12,6 +12,7 @@ DATA_DIR = ROOT / "data"
 PACTA_DIR = DATA_DIR / "pacta"
 TRISK_DIR = DATA_DIR / "trisk"
 REPORTS_DIR = DATA_DIR / "reports"
+ANALYTICS_DIR = DATA_DIR / "analytics"
 TRISK_MANIFEST = TRISK_DIR / "manifest.csv"
 PIPELINE_MANIFEST = DATA_DIR / "pipeline_manifest.json"
 
@@ -55,6 +56,40 @@ def trisk_sector_path(sector: str, name: str) -> Path:
 
 def reports_path(name: str) -> Path:
     return REPORTS_DIR / name
+
+
+def analytics_path(name: str) -> Path:
+    return ANALYTICS_DIR / name
+
+
+# Filenames copied into <snapshot>/analytics/ by scripts/refresh_dashboard_data.R,
+# keyed by the name the app uses for each table.
+ANALYTICS_TABLES = {
+    "financed_emissions": "financed_emissions.csv",
+    "data_quality_summary": "data_quality_summary.csv",
+    "target_registry": "target_registry.csv",
+    "sll_readiness": "sll_readiness.csv",
+}
+
+
+def load_analytics_tables() -> dict[str, pd.DataFrame]:
+    """The Wave 3 analytics (PCAF inventory, target registry, SLL shortlist) as
+    data rather than rendered HTML.
+
+    A file that is absent is omitted from the result rather than raising: an
+    engagement may not have run financed emissions, targets or the SLL screen,
+    and an older snapshot predates the analytics/ directory entirely.
+    """
+    tables: dict[str, pd.DataFrame] = {}
+    for key, filename in ANALYTICS_TABLES.items():
+        path = analytics_path(filename)
+        if not path.exists():
+            continue
+        try:
+            tables[key] = load_csv(path)
+        except (OSError, ValueError, pd.errors.ParserError):
+            continue
+    return tables
 
 
 def load_pacta_alignment_tables() -> dict[str, pd.DataFrame]:

@@ -1,59 +1,59 @@
 {
-  "generated_at": "2026-09-02T10:58:49+0700",
-  "git_sha": "cec86ae0741eaaab2ab92956683c4fbe5851d5db",
+  "generated_at": "2026-09-02T11:14:59+0700",
+  "git_sha": "9f93da4e0e0c1c57aa89daa2456f0eb4d99599d1",
   "steps": [
     {
       "name": "intake",
       "status": "ok",
-      "seconds": 2.1,
+      "seconds": 2.5,
       "error_excerpt": {}
     },
     {
       "name": "validation_report",
       "status": "ok",
-      "seconds": 1.3,
+      "seconds": 1.4,
       "error_excerpt": {}
     },
     {
       "name": "coverage_report",
       "status": "ok",
-      "seconds": 1.6,
+      "seconds": 1.8,
       "error_excerpt": {}
     },
     {
       "name": "pacta_vietnam_scenario",
       "status": "ok",
-      "seconds": 11,
+      "seconds": 11.5,
       "error_excerpt": {}
     },
     {
       "name": "trisk_prepare_inputs",
       "status": "ok",
-      "seconds": 3,
+      "seconds": 3.1,
       "error_excerpt": {}
     },
     {
       "name": "trisk_sector_demo_power",
       "status": "ok",
-      "seconds": 15.2,
+      "seconds": 15.6,
       "error_excerpt": {}
     },
     {
       "name": "trisk_sector_demo_cement",
       "status": "ok",
-      "seconds": 11.3,
+      "seconds": 12.3,
       "error_excerpt": {}
     },
     {
       "name": "trisk_sector_demo_steel",
       "status": "ok",
-      "seconds": 11.7,
+      "seconds": 12.8,
       "error_excerpt": {}
     },
     {
       "name": "sector_prioritization",
       "status": "ok",
-      "seconds": 3.2,
+      "seconds": 3.1,
       "error_excerpt": {}
     },
     {
@@ -71,7 +71,7 @@
     {
       "name": "financed_emissions",
       "status": "ok",
-      "seconds": 1.4,
+      "seconds": 1.3,
       "error_excerpt": {}
     },
     {
@@ -81,15 +81,27 @@
       "error_excerpt": {}
     },
     {
+      "name": "generate_targets",
+      "status": "ok",
+      "seconds": 1.2,
+      "error_excerpt": {}
+    },
+    {
       "name": "generate_engagement_letters",
       "status": "ok",
-      "seconds": 1.7,
+      "seconds": 1.8,
       "error_excerpt": {}
     },
     {
       "name": "generate_disclosure_pack",
       "status": "ok",
       "seconds": 1.8,
+      "error_excerpt": {}
+    },
+    {
+      "name": "record_history",
+      "status": "ok",
+      "seconds": 0.6,
       "error_excerpt": {}
     }
   ],

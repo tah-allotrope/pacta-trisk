@@ -28,5 +28,23 @@ artifacts <- c(
   file.path(cfg$paths$pacta_output_dir, "06_vn_sda_alignment_2030.csv")
 )
 
-run_dir <- record_run_history(cfg, artifacts)
-cat(sprintf("[OK] Run history recorded: %s\n", run_dir))
+history_root <- cfg$paths$history_dir %||% "history"
+
+# Wave 4 PHASE-06: record_run_history() refuses to overwrite an existing run
+# directory, which is the right append-only contract for a direct caller. As a
+# PIPELINE STEP, though, re-running the same engagement on the same day at the
+# same commit and vintage is a no-op, not a failure -- that run is already
+# recorded. Treating it as an error made the orchestrator exit non-zero and
+# stamped an otherwise-clean manifest "failed", which is precisely the kind of
+# untrue provenance Wave 4 exists to remove.
+git_sha <- tryCatch(trimws(system("git rev-parse HEAD", intern = TRUE)), error = function(e) NA_character_)
+if (length(git_sha) == 0 || identical(git_sha, "")) git_sha <- NA_character_
+existing <- file.path(history_root, cfg$bank_slug,
+                      make_run_id(git_sha, cfg$inputs$scenario_vintage))
+
+if (dir.exists(existing)) {
+  cat(sprintf("[SKIP] Run history already recorded for this date/commit/vintage: %s\n", existing))
+} else {
+  run_dir <- record_run_history(cfg, artifacts, history_root = history_root)
+  cat(sprintf("[OK] Run history recorded: %s\n", run_dir))
+}

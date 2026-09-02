@@ -28,3 +28,18 @@ Their rendered HTML reports remain under `reports/` for methodology
 reference (see `reports/report_catalog.json`, category
 `methodology_reference`) but are no longer eligible for the public
 dashboard snapshot.
+
+## `compare/` — methodology-convergence comparison (retired 2026-09-02, Wave 4 PHASE-06)
+
+`attic/compare/` holds a side-by-side comparison of this repository's PACTA
+implementation against a staff-written reference implementation
+(`PACTA for Banks staff.Rmd`, by Trang Tran), which used exact matching only
+(`min_score = 1`), the official `r2dii.plot` package, and R Markdown. The
+comparison documented that the two approaches converge, and produced
+`reports/PACTA_Comparison_Report.html`.
+
+It was retired because nothing live reads it: no pipeline step, script,
+dashboard module or doc referenced `compare/` — only superseded plans and
+research briefs did. It is kept for the same reason as everything else here:
+the methodology-convergence exercise is worth being able to re-read, but it is
+not part of any pipeline and is never tested.

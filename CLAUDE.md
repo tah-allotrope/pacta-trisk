@@ -34,7 +34,8 @@ Windows: prepend `& "C:\Program Files\R\R-4.5.2\bin\Rscript.exe"` or add it to
    `stringi::stri_trans_general(x, "Latin-ASCII")`). CSVs are UTF-8, no BOM.
 4. **The golden-number tests are load-bearing.** `tests/testthat/test_golden_numbers.R`
    pins exact values (e.g. `engagement_priority.csv` rank-1 `name_abcd` ==
-   `"Nghi Son Power LLC"`, `composite_score[1]` == 1.0). A green run of the
+   `"Nghi Son Power LLC"`, `composite_score[1]` == 0.9816483381 since the
+   0.5.0 refreeze). A green run of the
    full suite is the primary proof that a refactor changed nothing observable.
 5. **Refactor acceptance bar: byte-identical MCB CSV outputs, plus
    cross-artifact consistency.** Any change touching `scripts/` or `R/` must

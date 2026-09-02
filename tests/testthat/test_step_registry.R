@@ -33,6 +33,10 @@ test_that("resolve_step_list for MCB (run_intake FALSE) matches the pre-registry
   ))
 })
 
+# Wave 4 PHASE-06 brought sdb-rehearsal to feature parity with mcb-demo
+# (run_targets, run_history, report_language), so its step list grew by
+# generate_targets and record_history. The point of the second engagement is
+# that CI's end-to-end job exercises the same feature set the public demo does.
 test_that("resolve_step_list for SDB (run_intake TRUE) includes intake steps and omits grid/refresh_audit", {
   withr_wd <- setwd(root)
   on.exit(setwd(withr_wd))
@@ -52,7 +56,9 @@ test_that("resolve_step_list for SDB (run_intake TRUE) includes intake steps and
     "pacta_vietnam_scenario", "trisk_prepare_inputs",
     "trisk_sector_demo_power", "trisk_sector_demo_cement", "trisk_sector_demo_steel",
     "sector_prioritization", "refresh_dashboard_data", "engagement_scoring",
-    "financed_emissions", "sll_readiness", "generate_engagement_letters", "generate_disclosure_pack"
+    "financed_emissions", "sll_readiness", "generate_targets",
+    "generate_engagement_letters", "generate_disclosure_pack",
+    "record_history"
   ))
   expect_false("trisk_scenario_grid" %in% names)
   expect_false("refresh_audit" %in% names)

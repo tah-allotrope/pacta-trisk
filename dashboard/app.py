@@ -16,7 +16,7 @@ data_freshness_badge()
 st.markdown(
     """
 This is a self-guided evaluation of a synthetic Vietnam commercial bank case
-("Mekong Commercial Bank"). Work through the five steps below in order — each
+("Mekong Commercial Bank"). Work through the steps below in order — each
 links to the page that covers it. Expect about 20-30 minutes end to end.
 
 All figures are illustrative transition-risk indicators for portfolio

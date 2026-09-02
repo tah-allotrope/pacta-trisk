@@ -87,7 +87,14 @@ if (!exists("%||%", mode = "function")) {
       report_overlay_md = NULL,
       # Wave 3 PHASE-07 (TASK-07-03): per-engagement i18n override CSV.
       # NULL means "no override" -- use templates/i18n/labels.csv only.
-      i18n_override_csv = NULL
+      i18n_override_csv = NULL,
+      # Wave 4 PHASE-06: root under which record_run_history() writes this
+      # engagement's append-only run history. Defaults to the shared top-level
+      # "history/" (mcb-demo's behaviour, unchanged). A non-public engagement
+      # should point this inside its own engagements/<slug>/ tree so that
+      # ci.yml's sdb-engagement job can keep asserting that a second bank's run
+      # leaves nothing outside its own directory.
+      history_dir = "history"
     ),
     anonymize = FALSE,
     # Only mcb-demo's engagement_config.json sets this TRUE. The orchestrator

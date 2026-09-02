@@ -1,3 +1,66 @@
+# pactatrisk 0.6.0
+
+Wave 4 "Deliverable Trust, Provenance Truth, and Scale Follow-Through" —
+extends the acceptance gates from the numbers to the deliverables, corrects
+three provenance defects, and finishes the scale measurement Wave 3 started.
+
+- **Gated deliverables (PHASE-01):** `classify_path()` returned
+  `"timestamp-class"` for *every* `.html` file, so all 71 tracked HTML
+  artifacts — every client-facing report, the disclosure pack, the engagement
+  letters index — sat outside the acceptance gate by construction, and no test
+  asserted any report's content. `R/report_fingerprint.R` normalizes the six
+  timestamp/date/SHA formats the generators actually emit (plus CRLF); the
+  seven tracked, regenerated reports in `GATED_HTML_PATHS` are now compared
+  against their committed version, so a changed number in a report is genuine
+  drift. `INV-010` asserts every generated deliverable carries its
+  synthetic-data disclaimer — and caught, on its first run, that
+  `pipeline_refresh_audit.html` carried none.
+- **Provenance truth (PHASE-02):** `scripts/generate_refresh_audit.R` hardcoded
+  every path it touched, including a 2023 scenario-vintage directory, so after
+  Wave 3 moved `mcb-demo` to `pdp8-2025-adjusted` the audit published the MD5
+  digests of files the pipeline had not read. It now takes `--config` and
+  derives every path from the engagement config. `write_pipeline_manifest()`
+  marks filtered runs `partial`, and the orchestrator refuses to overwrite a
+  complete public manifest with a partial one without
+  `--allow-partial-manifest`. `INV-011` (a complete manifest must not report one
+  identical duration for every step) and `INV-012` (the audit must attest to the
+  configured vintage) both fired on the committed defects before the fix.
+  Also corrected a pre-existing staleness: `sector_priority_{ranking,detail}.csv`
+  carried a `stress_score_raw` no longer reproducible from the repo's own
+  inputs; `composite_score` and `priority_band` are unaffected.
+- **Provenance and sector lists (PHASE-03):** `R/financed_emissions.R`
+  hardcoded `data_source = "mcb-demo"`, stamping the demo bank's slug on every
+  engagement's generated inventory. `INV-003` widened from
+  `engagement_priority.csv` alone to the three per-engagement CSVs Wave 3 added,
+  and `INV-004` became self-maintaining — it scans for hardcoded sector triples
+  outside a four-file allowlist instead of comparing hand-registered sites.
+- **Package surface (PHASE-04):** 20 Wave 3 functions carried `#' @export` and
+  appeared in no `NAMESPACE` entry, so `library(pactatrisk)` exposed none of the
+  PCAF layer, target registry, SLL screen, run history or i18n engine; CI could
+  not notice, because it checks with `devtools::load_all()`. Exports 33 → 55,
+  man pages 45 → 73, a `NAMESPACE`-freshness step added to `ci.yml`, and new
+  test files for the two previously untested modules (`R/target_setting.R`,
+  the i18n engine in `R/report_toolkit.R`).
+- **Scale (PHASE-05):** vectorized the intake validator's three row-wise passes
+  — intake at 50,000 loans went from roughly 85–90 s to roughly 28–33 s, with
+  byte-identical outputs verified against the pre-change implementation on an
+  adversarial fixture. `match_seconds` had been `NA` in every benchmark cell
+  because the harness built a loanbook subset `match_name()` rejected, not
+  because matching was slow; fixed, and it confirms that intake scales with loan
+  count while matching scales with counterparty count. The full-chain benchmark
+  remains deliberately unmeasured — the fixture cannot produce asset-level data,
+  and faking it would time a fiction.
+- **Parity, surfacing, docs (PHASE-06):** `sdb-rehearsal` now exercises targets,
+  history and bilingual rendering, with its history scoped inside its own tree
+  so CI's cross-contamination assertion stays strict. The PCAF inventory, target
+  registry and SLL shortlist are published to `dashboard/data/analytics/` and
+  surfaced on a new Financed Emissions page instead of existing only as static
+  HTML. `CLAUDE.md`'s stale golden, `plans/PROGRESS.md`'s stale version and
+  invariant count, and the `README.md` repository map were corrected, and
+  `compare/` was retired to `attic/`.
+
+Full R suite green (FAIL 0). Python suite green. `INV-001`..`INV-012` PASS.
+
 # pactatrisk 0.5.0
 
 Wave 3 "Convergence, Scenario Vintage Truth, and Delivery Readiness" — one

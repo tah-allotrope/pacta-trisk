@@ -181,6 +181,32 @@ for (i in seq_len(nrow(trisk_manifest))) {
 write_csv(trisk_manifest, file.path(trisk_dest, "manifest.csv"))
 message(sprintf("  [OK] %s written", file.path(trisk_dest, "manifest.csv")))
 
+# --- Wave 3 analytics as DATA, not just as rendered HTML (Wave 4 PHASE-06) ---
+# The PCAF inventory, the sector target registry and the SLL shortlist reached
+# the dashboard only as static <snapshot>/reports/*.html, so a bank evaluator
+# could filter and drill into PACTA and TRISK but could only scroll a picture of
+# the financed-emissions layer the BIDV MoU names first. Copy the underlying
+# CSVs into <snapshot>/analytics/ so the app can read them like any other table.
+#
+# Each file is copied only when it exists: an engagement that did not run
+# financed emissions, targets or the SLL screen still refreshes cleanly.
+analytics_dest <- file.path(cfg$paths$snapshot_dir, "analytics")
+if (!dir.exists(analytics_dest)) dir.create(analytics_dest, recursive = TRUE, showWarnings = FALSE)
+
+analytics_sources <- c(
+  file.path(cfg$paths$financed_emissions_output_dir, "financed_emissions.csv"),
+  file.path(cfg$paths$financed_emissions_output_dir, "data_quality_summary.csv"),
+  file.path(cfg$paths$engagement_output_dir, "target_registry.csv"),
+  file.path(cfg$paths$engagement_output_dir, "sll_readiness.csv")
+)
+for (src in analytics_sources) {
+  if (file.exists(src)) {
+    copy_file(src, analytics_dest)
+  } else {
+    message(sprintf("  [SKIP] %s not present for this engagement", src))
+  }
+}
+
 if (length(misses_required) > 0) {
   message("\nMISSING REQUIRED artifacts — snapshot refresh FAILED:")
   for (m in unique(misses_required)) message(sprintf("  - %s", m))
