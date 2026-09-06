@@ -137,41 +137,13 @@ if (run_intake && plan$intake_present) {
   step_results <- run_steps(full_steps)
 }
 
-# Public engagements (mcb-demo) write the manifest alongside the public
-# snapshot, matching where scripts/pipeline_refresh.R always wrote it, so
-# its delegation to this script is observationally identical. Every other
-# engagement keeps its manifest under its own engagements/<slug>/ tree.
-manifest_path <- if (isTRUE(cfg$public_snapshot_allowed)) {
-  file.path(cfg$paths$snapshot_dir, "pipeline_manifest.json")
-} else {
-  file.path("engagements", cfg$bank_slug, "pipeline_manifest.json")
-}
-# Wave 4 PHASE-02: a --only-step / --resume-from run produces a manifest that
-# describes only the steps it ran. Writing that over a complete manifest
-# silently destroys the provenance record -- and the refresh audit, which reads
-# this file, then renders the remains as though they were a full run. Mark it,
-# and refuse to clobber a complete PUBLIC manifest without an explicit opt-in.
-run_is_partial <- length(only_steps) > 0 || (!is.na(resume_from) && nzchar(resume_from))
+# Manifest path and partial-run derivation come from the plan; the refusal
+# effect lives in enforce_manifest_policy(). write_pipeline_manifest()
+# itself stays in R/step_runner.R.
+manifest_path <- plan$manifest_path
+run_is_partial <- plan$manifest_policy$run_is_partial
 
-if (run_is_partial && isTRUE(cfg$public_snapshot_allowed) &&
-    !allow_partial_manifest && file.exists(manifest_path)) {
-  existing <- tryCatch(
-    jsonlite::fromJSON(manifest_path, simplifyVector = TRUE),
-    error = function(e) NULL
-  )
-  existing_is_complete <- !is.null(existing) && !isTRUE(existing$partial)
-  if (existing_is_complete) {
-    stop(sprintf(paste0(
-      "Refusing to overwrite the complete public manifest at %s with a partial run.\n",
-      "  This run was filtered by %s.\n",
-      "  Re-run without --only-step/--resume-from, or pass --allow-partial-manifest ",
-      "to accept a partial provenance record."
-    ), manifest_path, paste(c(
-      if (length(only_steps) > 0) sprintf("--only-step %s", paste(only_steps, collapse = ", ")),
-      if (!is.na(resume_from) && nzchar(resume_from)) sprintf("--resume-from %s", resume_from)
-    ), collapse = " and ")), call. = FALSE)
-  }
-}
+enforce_manifest_policy(plan, allow_partial_manifest)
 
 write_pipeline_manifest(
   step_results, manifest_path,

@@ -39,9 +39,10 @@
 #'
 #' Owns the --full application, raw-loanbook resolution, run_intake
 #' derivation, intake directories, step_ctx construction, the
-#' resolve_step_list() + filter_step_list() call pair, and the by-name
-#' intake split. The manifest path/policy, guard rail, and banner move in
-#' later steps.
+#' resolve_step_list() + filter_step_list() call pair, the by-name intake
+#' split, and the manifest path + partial-run derivation. The guard rail,
+#' manifest refusal effect, resolved-config write, and banner move in the
+#' final step.
 #'
 #' @param cfg list — validated engagement config (load_engagement_config() output).
 #' @param cli list — parse_engagement_cli() output.
@@ -50,7 +51,10 @@
 #'   intake_dir character(1), effective_config_path character(1),
 #'   step_ctx list, steps list of list(name, script, args),
 #'   intake_present logical(1), steps_before_intake list,
-#'   intake_step list|NULL, steps_after_intake list.
+#'   intake_step list|NULL, steps_after_intake list,
+#'   manifest_path character(1),
+#'   manifest_policy list(run_is_partial logical(1),
+#'     only_step character, resume_from character(1)).
 #' @export
 plan_engagement_run <- function(cfg, cli) {
   if (isTRUE(cli$full)) {
@@ -95,6 +99,18 @@ plan_engagement_run <- function(cfg, cli) {
     steps_after_intake <- list()
   }
 
+  # Public engagements (mcb-demo) write the manifest alongside the public
+  # snapshot; every other engagement keeps its manifest under its own
+  # engagements/<slug>/ tree (verbatim from scripts/run_engagement.R).
+  manifest_path <- if (isTRUE(cfg$public_snapshot_allowed)) {
+    file.path(cfg$paths$snapshot_dir, "pipeline_manifest.json")
+  } else {
+    file.path("engagements", cfg$bank_slug, "pipeline_manifest.json")
+  }
+  # A --only-step / --resume-from run produces a manifest that describes
+  # only the steps it ran (verbatim from scripts/run_engagement.R).
+  run_is_partial <- length(cli$only_steps) > 0 || (!is.na(cli$resume_from) && nzchar(cli$resume_from))
+
   list(
     cfg = cfg,
     cli = cli,
@@ -107,8 +123,54 @@ plan_engagement_run <- function(cfg, cli) {
     intake_present = intake_present,
     steps_before_intake = steps_before_intake,
     intake_step = intake_step,
-    steps_after_intake = steps_after_intake
+    steps_after_intake = steps_after_intake,
+    manifest_path = manifest_path,
+    manifest_policy = list(
+      run_is_partial = run_is_partial,
+      only_step = cli$only_steps,
+      resume_from = cli$resume_from
+    )
   )
+}
+
+#' Enforce the manifest policy decided by plan_engagement_run().
+#'
+#' A filtered run's manifest describes only the steps it ran. Writing that
+#' over a complete PUBLIC manifest silently destroys the provenance record,
+#' so the orchestrator refuses without an explicit opt-in (verbatim from
+#' scripts/run_engagement.R). Filesystem reads and the refusal stop() live
+#' here, at the edge; the decision inputs live in the plan.
+#'
+#' @param plan list — plan_engagement_run() output.
+#' @param allow_partial_manifest logical(1) — cli$allow_partial_manifest.
+#' @return invisible TRUE; calls stop() only when a filtered run would
+#'   clobber a complete public manifest without the opt-in flag.
+#' @export
+enforce_manifest_policy <- function(plan, allow_partial_manifest) {
+  policy <- plan$manifest_policy
+  if (!isTRUE(policy$run_is_partial)) return(invisible(TRUE))
+  if (!isTRUE(plan$cfg$public_snapshot_allowed)) return(invisible(TRUE))
+  if (isTRUE(allow_partial_manifest)) return(invisible(TRUE))
+
+  manifest_path <- plan$manifest_path
+  if (!file.exists(manifest_path)) return(invisible(TRUE))
+  existing <- tryCatch(
+    jsonlite::fromJSON(manifest_path, simplifyVector = TRUE),
+    error = function(e) NULL
+  )
+  existing_is_complete <- !is.null(existing) && !isTRUE(existing$partial)
+  if (existing_is_complete) {
+    stop(sprintf(paste0(
+      "Refusing to overwrite the complete public manifest at %s with a partial run.\n",
+      "  This run was filtered by %s.\n",
+      "  Re-run without --only-step/--resume-from, or pass --allow-partial-manifest ",
+      "to accept a partial provenance record."
+    ), manifest_path, paste(c(
+      if (length(policy$only_step) > 0) sprintf("--only-step %s", paste(policy$only_step, collapse = ", ")),
+      if (!is.na(policy$resume_from) && nzchar(policy$resume_from)) sprintf("--resume-from %s", policy$resume_from)
+    ), collapse = " and ")), call. = FALSE)
+  }
+  invisible(TRUE)
 }
 #' Parse the orchestrator CLI into a plain data list.
 #'

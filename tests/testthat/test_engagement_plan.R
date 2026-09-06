@@ -227,3 +227,67 @@ test_that("plan filtered to a downstream step falls through to the plain branch"
     "engagement_scoring"
   )
 })
+
+# --- plan_engagement_run(): manifest path + partial policy --------------------
+
+.public_cfg <- function(snapshot_dir, ...) {
+  cfg <- .test_cfg(
+    paths = list(snapshot_dir = snapshot_dir),
+    public_snapshot_allowed = TRUE,
+    ...
+  )
+  cfg
+}
+
+.write_manifest <- function(path, partial) {
+  dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
+  writeLines(jsonlite::toJSON(list(partial = partial), auto_unbox = TRUE), path)
+  path
+}
+
+test_that("plan derives the manifest path from the public-snapshot flag", {
+  public <- plan_engagement_run(.public_cfg("some/snapshot"), .test_cli())
+  expect_equal(public$manifest_path, file.path("some/snapshot", "pipeline_manifest.json"))
+
+  private <- plan_engagement_run(.test_cfg(), .test_cli())
+  expect_equal(private$manifest_path, file.path("engagements", "test-bank", "pipeline_manifest.json"))
+})
+
+test_that("plan marks filtered runs partial and full runs complete", {
+  expect_false(plan_engagement_run(.test_cfg(), .test_cli())$manifest_policy$run_is_partial)
+  expect_true(plan_engagement_run(.test_cfg(), .test_cli("--only-step", "engagement_scoring"))$manifest_policy$run_is_partial)
+  expect_true(plan_engagement_run(.test_cfg(), .test_cli("--resume-from", "engagement_scoring"))$manifest_policy$run_is_partial)
+})
+
+test_that("enforce_manifest_policy refuses to clobber a complete public manifest", {
+  snap <- file.path(tempfile("snapshot_"))
+  manifest_path <- file.path(snap, "pipeline_manifest.json")
+  .write_manifest(manifest_path, partial = FALSE)
+
+  plan <- plan_engagement_run(.public_cfg(snap), .test_cli("--only-step", "engagement_scoring"))
+
+  expect_error(enforce_manifest_policy(plan, FALSE), "allow-partial-manifest")
+  expect_silent(enforce_manifest_policy(plan, TRUE))
+})
+
+test_that("enforce_manifest_policy allows full runs and missing manifests", {
+  snap <- file.path(tempfile("snapshot_"))
+
+  full_plan <- plan_engagement_run(.public_cfg(snap), .test_cli())
+  expect_silent(enforce_manifest_policy(full_plan, FALSE))
+
+  missing_plan <- plan_engagement_run(.public_cfg(snap), .test_cli("--only-step", "engagement_scoring"))
+  expect_silent(enforce_manifest_policy(missing_plan, FALSE))
+
+  .write_manifest(file.path(snap, "pipeline_manifest.json"), partial = TRUE)
+  partial_plan <- plan_engagement_run(.public_cfg(snap), .test_cli("--only-step", "engagement_scoring"))
+  expect_silent(enforce_manifest_policy(partial_plan, FALSE))
+})
+
+test_that("enforce_manifest_policy allows partial runs for private engagements", {
+  snap <- file.path(tempfile("snapshot_"))
+  cfg <- .test_cfg(paths = list(snapshot_dir = snap), public_snapshot_allowed = FALSE)
+
+  plan <- plan_engagement_run(cfg, .test_cli("--only-step", "engagement_scoring"))
+  expect_silent(enforce_manifest_policy(plan, FALSE))
+})
