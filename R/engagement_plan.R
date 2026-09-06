@@ -54,7 +54,8 @@
 #'   intake_step list|NULL, steps_after_intake list,
 #'   manifest_path character(1),
 #'   manifest_policy list(run_is_partial logical(1),
-#'     only_step character, resume_from character(1)).
+#'     only_step character, resume_from character(1)),
+#'   banner character(1).
 #' @export
 plan_engagement_run <- function(cfg, cli) {
   if (isTRUE(cli$full)) {
@@ -65,6 +66,13 @@ plan_engagement_run <- function(cfg, cli) {
   # inputs$raw_loanbook_csv (verbatim from scripts/run_engagement.R).
   # %||% is base R (>= 4.4.0).
   raw_loanbook <- cli$raw_loanbook %||% cfg$inputs$raw_loanbook_csv
+
+  # Guard rail: never let an engagement publish into the public snapshot
+  # directory unless its config explicitly allows it (verbatim from
+  # scripts/run_engagement.R).
+  if (identical(cfg$paths$snapshot_dir, "dashboard/data") && !isTRUE(cfg$public_snapshot_allowed)) {
+    stop("Engagement snapshot_dir must not be the public dashboard/data unless public_snapshot_allowed is true", call. = FALSE)
+  }
 
   run_intake <- !is.null(raw_loanbook) && !isTRUE(cli$skip_intake)
   intake_dir <- file.path("engagements", cfg$bank_slug, "intake")
@@ -111,6 +119,12 @@ plan_engagement_run <- function(cfg, cli) {
   # only the steps it ran (verbatim from scripts/run_engagement.R).
   run_is_partial <- length(cli$only_steps) > 0 || (!is.na(cli$resume_from) && nzchar(cli$resume_from))
 
+  banner <- sprintf(
+    "Engagement: %s (%s)\nEffective config: %s\nLoanbook: %s\n\n",
+    cfg$bank_name, cfg$bank_slug, effective_config_path,
+    if (!is.null(raw_loanbook)) raw_loanbook else cfg$inputs$loanbook_csv
+  )
+
   list(
     cfg = cfg,
     cli = cli,
@@ -129,7 +143,8 @@ plan_engagement_run <- function(cfg, cli) {
       run_is_partial = run_is_partial,
       only_step = cli$only_steps,
       resume_from = cli$resume_from
-    )
+    ),
+    banner = banner
   )
 }
 
@@ -171,6 +186,26 @@ enforce_manifest_policy <- function(plan, allow_partial_manifest) {
     ), collapse = " and ")), call. = FALSE)
   }
   invisible(TRUE)
+}
+
+#' Materialize the post-intake resolved config.
+#'
+#' After the intake step normalizes the raw loanbook, all later steps run
+#' against a resolved config whose inputs$loanbook_csv points at the
+#' normalized output (verbatim from scripts/run_engagement.R). I/O lives
+#' here, at the edge; the paths come from the plan.
+#'
+#' @param cfg list — the pre-intake config.
+#' @param intake_dir character(1) — plan$intake_dir.
+#' @param effective_config_path character(1) — plan$effective_config_path.
+#' @return character(1) — the path written (effective_config_path).
+#' @export
+materialize_resolved_config <- function(cfg, intake_dir, effective_config_path) {
+  dir.create(dirname(effective_config_path), recursive = TRUE, showWarnings = FALSE)
+  resolved_cfg <- cfg
+  resolved_cfg$inputs$loanbook_csv <- file.path(intake_dir, "normalized_loanbook.csv")
+  write(jsonlite::toJSON(resolved_cfg, auto_unbox = TRUE, pretty = TRUE), effective_config_path)
+  invisible(effective_config_path)
 }
 #' Parse the orchestrator CLI into a plain data list.
 #'

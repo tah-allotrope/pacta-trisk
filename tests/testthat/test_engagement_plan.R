@@ -71,6 +71,7 @@ test_that("parse_engagement_cli honors --skip-intake", {
 
 .test_cfg <- function(...) {
   cfg <- list(
+    bank_name = "Test Bank",
     bank_slug = "test-bank",
     run_data_generation = FALSE,
     run_grid = FALSE,
@@ -290,4 +291,39 @@ test_that("enforce_manifest_policy allows partial runs for private engagements",
 
   plan <- plan_engagement_run(cfg, .test_cli("--only-step", "engagement_scoring"))
   expect_silent(enforce_manifest_policy(plan, FALSE))
+})
+
+# --- plan_engagement_run(): guard rail, banner, materialize -------------------
+
+test_that("plan guard rail blocks a non-public config pointing at dashboard/data", {
+  cfg <- .test_cfg(paths = list(snapshot_dir = "dashboard/data"), public_snapshot_allowed = FALSE)
+
+  expect_error(plan_engagement_run(cfg, .test_cli()), "public dashboard/data")
+})
+
+test_that("plan guard rail allows the public config through", {
+  plan <- plan_engagement_run(.public_cfg("dashboard/data"), .test_cli())
+
+  expect_equal(plan$manifest_path, file.path("dashboard/data", "pipeline_manifest.json"))
+})
+
+test_that("plan banner names the engagement, config, and loanbook", {
+  plan <- plan_engagement_run(.intake_cfg(), .test_cli())
+
+  expect_true(grepl("test-bank", plan$banner, fixed = TRUE))
+  expect_true(grepl("engagement_config.resolved.json", plan$banner, fixed = TRUE))
+  expect_true(grepl("data/raw.csv", plan$banner, fixed = TRUE))
+})
+
+test_that("materialize_resolved_config points the resolved loanbook at intake", {
+  dir <- tempfile("intake_")
+  effective_path <- file.path(tempfile("resolved_"), "engagement_config.resolved.json")
+  cfg <- .intake_cfg()
+
+  out <- materialize_resolved_config(cfg, dir, effective_path)
+
+  expect_equal(out, effective_path)
+  expect_true(file.exists(effective_path))
+  resolved <- jsonlite::read_json(effective_path)
+  expect_equal(resolved$inputs$loanbook_csv, file.path(dir, "normalized_loanbook.csv"))
 })

@@ -58,44 +58,27 @@ source("R/engagement_plan.R")
 args <- commandArgs(trailingOnly = TRUE)
 cli <- parse_engagement_cli(args)
 
-config_path <- cli$config_path
 dry_run <- cli$dry_run
-only_steps <- cli$only_steps
-resume_from <- cli$resume_from
 # Wave 4 PHASE-02: opt-in to overwriting a complete public manifest with a
 # partial (filtered) run's manifest.
 allow_partial_manifest <- cli$allow_partial_manifest
 
-cfg <- load_engagement_config(config_path)
+cfg <- load_engagement_config(cli$config_path)
 
-# --- Build the ordered step list --------------------------------------------
-# Wave 5 (orchestrator deepening): planning lives behind the seam in
-# R/engagement_plan.R::plan_engagement_run(). The script keeps the returned
-# locals it still executes inline; the intake split and manifest policy
-# follow in later steps.
+# Planning lives behind the seam in R/engagement_plan.R. The guard rail,
+# banner data, step order, intake split, and manifest policy all come from
+# the plan; this script parses, plans, prints, executes, and writes.
 
 plan <- plan_engagement_run(cfg, cli)
 cfg <- plan$cfg
-raw_loanbook <- plan$raw_loanbook
 run_intake <- plan$run_intake
 intake_dir <- plan$intake_dir
 effective_config_path <- plan$effective_config_path
 full_steps <- plan$steps
 
-# --- Guard rail: never let an engagement publish into the public snapshot
-# directory unless its config explicitly allows it. (Moves behind the
-# planning seam in a later step; kept inline here so this step stays small.)
-if (identical(cfg$paths$snapshot_dir, "dashboard/data") && !isTRUE(cfg$public_snapshot_allowed)) {
-  stop("Engagement snapshot_dir must not be the public dashboard/data unless public_snapshot_allowed is true", call. = FALSE)
-}
-
 # --- Banner ------------------------------------------------------------------
 
-cat(sprintf(
-  "Engagement: %s (%s)\nEffective config: %s\nLoanbook: %s\n\n",
-  cfg$bank_name, cfg$bank_slug, effective_config_path,
-  if (!is.null(raw_loanbook)) raw_loanbook else cfg$inputs$loanbook_csv
-))
+cat(plan$banner)
 
 if (dry_run) {
   cat("--dry-run: resolved step list (nothing executed)\n\n")
@@ -126,10 +109,7 @@ if (run_intake && plan$intake_present) {
     if (intake_result$status != "ok") {
       step_results <- c(pre_results, list(intake_result))
     } else {
-      dir.create(dirname(effective_config_path), recursive = TRUE, showWarnings = FALSE)
-      resolved_cfg <- cfg
-      resolved_cfg$inputs$loanbook_csv <- file.path(intake_dir, "normalized_loanbook.csv")
-      write(toJSON(resolved_cfg, auto_unbox = TRUE, pretty = TRUE), effective_config_path)
+      materialize_resolved_config(cfg, intake_dir, effective_config_path)
       step_results <- c(pre_results, list(intake_result), run_steps(steps_after_intake))
     }
   }
@@ -153,7 +133,7 @@ write_pipeline_manifest(
     scenario_vintage = cfg$inputs$scenario_vintage
   ),
   partial = run_is_partial,
-  filters = list(only_step = only_steps, resume_from = resume_from)
+  filters = list(only_step = plan$manifest_policy$only_step, resume_from = plan$manifest_policy$resume_from)
 )
 cat(sprintf("\n[OK] Manifest written: %s\n", manifest_path))
 
