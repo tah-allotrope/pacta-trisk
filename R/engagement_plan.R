@@ -37,17 +37,20 @@
 
 #' Plan one engagement run: resolve the ordered step list and derive run paths.
 #'
-#' Step 2 scope: owns the --full application, raw-loanbook resolution,
-#' run_intake derivation, intake directories, step_ctx construction, and the
-#' resolve_step_list() + filter_step_list() call pair. The intake split,
-#' manifest path/policy, guard rail, and banner move in later steps.
+#' Owns the --full application, raw-loanbook resolution, run_intake
+#' derivation, intake directories, step_ctx construction, the
+#' resolve_step_list() + filter_step_list() call pair, and the by-name
+#' intake split. The manifest path/policy, guard rail, and banner move in
+#' later steps.
 #'
 #' @param cfg list — validated engagement config (load_engagement_config() output).
 #' @param cli list — parse_engagement_cli() output.
 #' @return named list with fields cfg (with cli$full applied), cli,
 #'   raw_loanbook character(1)|NULL, run_intake logical(1),
 #'   intake_dir character(1), effective_config_path character(1),
-#'   step_ctx list, steps list of list(name, script, args).
+#'   step_ctx list, steps list of list(name, script, args),
+#'   intake_present logical(1), steps_before_intake list,
+#'   intake_step list|NULL, steps_after_intake list.
 #' @export
 plan_engagement_run <- function(cfg, cli) {
   if (isTRUE(cli$full)) {
@@ -77,6 +80,21 @@ plan_engagement_run <- function(cfg, cli) {
   steps <- resolve_step_list(cfg, step_ctx)
   steps <- filter_step_list(steps, only = cli$only_steps, resume_from = cli$resume_from)
 
+  # Locate "intake" by name, not by position: run_data_generation may have
+  # prepended a generate_vietnam_data step ahead of it (verbatim from
+  # scripts/run_engagement.R).
+  intake_present <- any(vapply(steps, function(s) identical(s$name, "intake"), logical(1)))
+  if (intake_present) {
+    intake_idx <- which(vapply(steps, function(s) identical(s$name, "intake"), logical(1)))[[1]]
+    steps_before_intake <- if (intake_idx > 1) steps[seq_len(intake_idx - 1)] else list()
+    intake_step <- steps[[intake_idx]]
+    steps_after_intake <- steps[-seq_len(intake_idx)]
+  } else {
+    steps_before_intake <- list()
+    intake_step <- NULL
+    steps_after_intake <- list()
+  }
+
   list(
     cfg = cfg,
     cli = cli,
@@ -85,7 +103,11 @@ plan_engagement_run <- function(cfg, cli) {
     intake_dir = intake_dir,
     effective_config_path = effective_config_path,
     step_ctx = step_ctx,
-    steps = steps
+    steps = steps,
+    intake_present = intake_present,
+    steps_before_intake = steps_before_intake,
+    intake_step = intake_step,
+    steps_after_intake = steps_after_intake
   )
 }
 #' Parse the orchestrator CLI into a plain data list.

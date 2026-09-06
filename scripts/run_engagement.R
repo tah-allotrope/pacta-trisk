@@ -106,22 +106,15 @@ if (dry_run) {
 }
 
 # --- Execute -------------------------------------------------------------
+# The intake split comes from the plan (by name, not by position).
+# --only-step / --resume-from can filter "intake" out even when run_intake
+# is TRUE; then intake_present is FALSE and we fall through to the plain
+# run_steps() branch, the same way --skip-intake already does.
 
-# Wave 3 PHASE-02: --only-step / --resume-from can filter "intake" out of
-# full_steps even when run_intake is TRUE (e.g. --only-step engagement_scoring
-# to re-run just one downstream stage against an already-resolved config from
-# a prior run). Only take the intake-splitting path when "intake" actually
-# survived filtering; otherwise fall through to the plain run_steps() branch,
-# the same way --skip-intake already does.
-intake_step_present <- any(vapply(full_steps, function(s) identical(s$name, "intake"), logical(1)))
-
-if (run_intake && intake_step_present) {
-  # Locate "intake" by name, not by position: run_data_generation may have
-  # prepended a generate_vietnam_data step ahead of it (Wave 1 PHASE-05).
-  intake_idx <- which(vapply(full_steps, function(s) identical(s$name, "intake"), logical(1)))[[1]]
-  steps_before_intake <- if (intake_idx > 1) full_steps[seq_len(intake_idx - 1)] else list()
-  intake_step <- full_steps[[intake_idx]]
-  steps_after_intake <- full_steps[-seq_len(intake_idx)]
+if (run_intake && plan$intake_present) {
+  steps_before_intake <- plan$steps_before_intake
+  intake_step <- plan$intake_step
+  steps_after_intake <- plan$steps_after_intake
 
   pre_results <- if (length(steps_before_intake) > 0) run_steps(steps_before_intake) else list()
   pre_ok <- all(vapply(pre_results, function(s) s$status == "ok", logical(1)))

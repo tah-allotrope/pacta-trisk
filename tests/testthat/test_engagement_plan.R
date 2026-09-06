@@ -173,3 +173,57 @@ test_that("plan_engagement_run errors on unknown --only-step, naming valid names
   expect_true(grepl("nope", err, fixed = TRUE))
   expect_true(grepl("pacta_vietnam_scenario", err, fixed = TRUE))
 })
+
+# --- plan_engagement_run(): by-name intake split ------------------------------
+
+.intake_cfg <- function(...) {
+  .test_cfg(
+    inputs = list(raw_loanbook_csv = "data/raw.csv", loanbook_csv = "data/vietnam_loanbook.csv"),
+    ...
+  )
+}
+
+test_that("plan intake split is by name: generate_vietnam_data lands before intake", {
+  plan <- plan_engagement_run(.intake_cfg(), .test_cli("--full"))
+
+  expect_true(plan$run_intake)
+  expect_true(plan$intake_present)
+  expect_equal(
+    vapply(plan$steps_before_intake, function(s) s$name, character(1)),
+    "generate_vietnam_data"
+  )
+  expect_equal(plan$intake_step$name, "intake")
+  expect_equal(plan$steps_after_intake[[1]]$name, "validation_report")
+})
+
+test_that("plan without data generation splits with empty before list", {
+  plan <- plan_engagement_run(.intake_cfg(), .test_cli())
+
+  expect_true(plan$intake_present)
+  expect_equal(length(plan$steps_before_intake), 0)
+  expect_equal(plan$intake_step$name, "intake")
+  expect_equal(plan$intake_step$script, "scripts/intake_validate_and_map.R")
+  expect_equal(plan$steps_after_intake[[1]]$name, "validation_report")
+})
+
+test_that("plan with run_intake FALSE has no intake split", {
+  plan <- plan_engagement_run(.test_cfg(), .test_cli())
+
+  expect_false(plan$run_intake)
+  expect_false(plan$intake_present)
+  expect_null(plan$intake_step)
+  expect_equal(length(plan$steps_before_intake), 0)
+  expect_equal(length(plan$steps_after_intake), 0)
+})
+
+test_that("plan filtered to a downstream step falls through to the plain branch", {
+  plan <- plan_engagement_run(.intake_cfg(), .test_cli("--only-step", "engagement_scoring"))
+
+  expect_true(plan$run_intake)
+  expect_false(plan$intake_present)
+  expect_null(plan$intake_step)
+  expect_equal(
+    vapply(plan$steps, function(s) s$name, character(1)),
+    "engagement_scoring"
+  )
+})
