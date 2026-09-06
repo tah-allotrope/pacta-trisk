@@ -24,7 +24,9 @@
 #
 # Every flag this script receives (--full, --dry-run, or both) is forwarded
 # unchanged to run_engagement.R -- true pass-through, not a reimplementation
-# of run_engagement.R's flag parsing.
+# of run_engagement.R's flag parsing. Ordering policy itself lives behind
+# the seam in R/engagement_plan.R, so this file stays a one-line delegation
+# by construction: there is nothing left here to reimplement.
 #
 # system2("Rscript", ...) needs Rscript resolvable on PATH even when this
 # script itself was invoked with a full path.
