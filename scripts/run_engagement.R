@@ -56,84 +56,38 @@ source("R/step_registry.R")
 source("R/engagement_plan.R")
 
 args <- commandArgs(trailingOnly = TRUE)
+cli <- parse_engagement_cli(args)
 
-get_flag_value <- function(args, name) {
-  idx <- which(args == name)
-  if (length(idx) == 0 || idx[[1]] >= length(args)) return(NULL)
-  args[[idx[[1]] + 1]]
-}
-
-#' Collect every value following a repeatable flag, e.g. multiple
-#' --only-step <name> pairs.
-#' @param args character — CLI arguments.
-#' @param name character — the flag to collect values for.
-#' @return character — every value found, in argument order; empty if none.
-get_flag_values <- function(args, name) {
-  idx <- which(args == name)
-  idx <- idx[idx < length(args)]
-  if (length(idx) == 0) return(character(0))
-  args[idx + 1]
-}
-
-config_path <- get_flag_value(args, "--config")
-if (is.null(config_path)) {
-  stop(paste(
-    "Usage: Rscript scripts/run_engagement.R --config <path>",
-    "[--full] [--raw-loanbook <path>] [--skip-intake] [--top-n <int>]",
-    "[--only-step <name> [--only-step <name> ...]] [--resume-from <name>]",
-    "[--allow-partial-manifest] [--dry-run]"
-  ), call. = FALSE)
-}
-
-skip_intake  <- "--skip-intake" %in% args
-top_n        <- get_flag_value(args, "--top-n")
-dry_run      <- "--dry-run" %in% args
-full_flag    <- "--full" %in% args
-only_steps   <- get_flag_values(args, "--only-step")
-resume_from  <- get_flag_value(args, "--resume-from") %||% NA_character_
+config_path <- cli$config_path
+dry_run <- cli$dry_run
+only_steps <- cli$only_steps
+resume_from <- cli$resume_from
 # Wave 4 PHASE-02: opt-in to overwriting a complete public manifest with a
 # partial (filtered) run's manifest.
-allow_partial_manifest <- "--allow-partial-manifest" %in% args
+allow_partial_manifest <- cli$allow_partial_manifest
 
 cfg <- load_engagement_config(config_path)
-if (full_flag) {
-  cfg$run_data_generation <- TRUE
-}
 
-# A CLI --raw-loanbook flag wins; otherwise fall back to the config's own
-# inputs$raw_loanbook_csv so an engagement config can reproduce its own run
-# without an out-of-band flag (Wave 1 PHASE-02, C3). %||% is base R (>= 4.4.0).
-raw_loanbook <- get_flag_value(args, "--raw-loanbook") %||% cfg$inputs$raw_loanbook_csv
+# --- Build the ordered step list --------------------------------------------
+# Wave 5 (orchestrator deepening): planning lives behind the seam in
+# R/engagement_plan.R::plan_engagement_run(). The script keeps the returned
+# locals it still executes inline; the intake split and manifest policy
+# follow in later steps.
+
+plan <- plan_engagement_run(cfg, cli)
+cfg <- plan$cfg
+raw_loanbook <- plan$raw_loanbook
+run_intake <- plan$run_intake
+intake_dir <- plan$intake_dir
+effective_config_path <- plan$effective_config_path
+full_steps <- plan$steps
 
 # --- Guard rail: never let an engagement publish into the public snapshot
-# directory unless its config explicitly allows it. -------------------------
+# directory unless its config explicitly allows it. (Moves behind the
+# planning seam in a later step; kept inline here so this step stays small.)
 if (identical(cfg$paths$snapshot_dir, "dashboard/data") && !isTRUE(cfg$public_snapshot_allowed)) {
   stop("Engagement snapshot_dir must not be the public dashboard/data unless public_snapshot_allowed is true", call. = FALSE)
 }
-
-run_intake <- !is.null(raw_loanbook) && !skip_intake
-intake_dir <- file.path("engagements", cfg$bank_slug, "intake")
-effective_config_path <- if (run_intake) {
-  file.path("engagements", cfg$bank_slug, "engagement_config.resolved.json")
-} else {
-  config_path
-}
-
-# --- Build the ordered step list --------------------------------------------
-# Wave 3 PHASE-02: the step list is now resolved from R/step_registry.R's
-# declarative registry rather than a hardcoded `if` ladder here. See
-# resolve_step_list() for the boolean-flag translation (unchanged behavior)
-# and cfg$steps for the new declarative override.
-
-step_ctx <- list(
-  effective_config_path = effective_config_path,
-  run_intake = run_intake,
-  raw_loanbook = raw_loanbook,
-  intake_dir = intake_dir,
-  top_n = top_n
-)
-full_steps <- resolve_step_list(cfg, step_ctx)
-full_steps <- filter_step_list(full_steps, only = only_steps, resume_from = resume_from)
 
 # --- Banner ------------------------------------------------------------------
 

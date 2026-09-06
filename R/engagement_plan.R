@@ -35,6 +35,59 @@
   args[idx + 1]
 }
 
+#' Plan one engagement run: resolve the ordered step list and derive run paths.
+#'
+#' Step 2 scope: owns the --full application, raw-loanbook resolution,
+#' run_intake derivation, intake directories, step_ctx construction, and the
+#' resolve_step_list() + filter_step_list() call pair. The intake split,
+#' manifest path/policy, guard rail, and banner move in later steps.
+#'
+#' @param cfg list — validated engagement config (load_engagement_config() output).
+#' @param cli list — parse_engagement_cli() output.
+#' @return named list with fields cfg (with cli$full applied), cli,
+#'   raw_loanbook character(1)|NULL, run_intake logical(1),
+#'   intake_dir character(1), effective_config_path character(1),
+#'   step_ctx list, steps list of list(name, script, args).
+#' @export
+plan_engagement_run <- function(cfg, cli) {
+  if (isTRUE(cli$full)) {
+    cfg$run_data_generation <- TRUE
+  }
+
+  # A CLI --raw-loanbook flag wins; otherwise fall back to the config's own
+  # inputs$raw_loanbook_csv (verbatim from scripts/run_engagement.R).
+  # %||% is base R (>= 4.4.0).
+  raw_loanbook <- cli$raw_loanbook %||% cfg$inputs$raw_loanbook_csv
+
+  run_intake <- !is.null(raw_loanbook) && !isTRUE(cli$skip_intake)
+  intake_dir <- file.path("engagements", cfg$bank_slug, "intake")
+  effective_config_path <- if (run_intake) {
+    file.path("engagements", cfg$bank_slug, "engagement_config.resolved.json")
+  } else {
+    cli$config_path
+  }
+
+  step_ctx <- list(
+    effective_config_path = effective_config_path,
+    run_intake = run_intake,
+    raw_loanbook = raw_loanbook,
+    intake_dir = intake_dir,
+    top_n = cli$top_n
+  )
+  steps <- resolve_step_list(cfg, step_ctx)
+  steps <- filter_step_list(steps, only = cli$only_steps, resume_from = cli$resume_from)
+
+  list(
+    cfg = cfg,
+    cli = cli,
+    raw_loanbook = raw_loanbook,
+    run_intake = run_intake,
+    intake_dir = intake_dir,
+    effective_config_path = effective_config_path,
+    step_ctx = step_ctx,
+    steps = steps
+  )
+}
 #' Parse the orchestrator CLI into a plain data list.
 #'
 #' Moved verbatim from scripts/run_engagement.R's inline flag handling so
