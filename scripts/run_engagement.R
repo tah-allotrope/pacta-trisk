@@ -53,6 +53,7 @@ suppressPackageStartupMessages({
 source("R/engagement_config.R")
 source("R/step_runner.R")
 source("R/step_registry.R")
+source("R/engagement_plan.R")
 
 args <- commandArgs(trailingOnly = TRUE)
 
